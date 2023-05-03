@@ -1,0 +1,24 @@
+﻿<Application x:Class="Kitopia.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Kitopia"
+             xmlns:crt="clr-namespace:Kitopia.Converter"
+             StartupUri="MainWindows.xaml">
+    <Application.Resources>
+        
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/HandyControl;component/Themes/SkinDefault.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/HandyControl;component/Themes/Theme.xaml"/>
+                
+            </ResourceDictionary.MergedDictionaries>
+            <crt:DoubleHalfConverter x:Key="doubleHalfConverter"/>
+            <crt:DoubleQuarterConverter x:Key="doubleQuarterConverter"/>
+            <crt:EnumToVisibilityConverter x:Key="enumToVisibilityConverter"/>
+            <crt:ReverseBoolToVisibilityConverter x:Key="reverseBoolToVisibilityConverter"/>
+            <crt:BoolToVisibilityConverter x:Key="boolToVisibilityConverter"/>
+            <crt:PathToImageConverter x:Key="pathToImageConverter"/>
+        </ResourceDictionary>
+        
+    </Application.Resources>
+</Application>
