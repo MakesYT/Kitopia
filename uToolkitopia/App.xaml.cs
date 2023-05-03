@@ -1,10 +1,12 @@
 ﻿
 
+using IWshRuntimeLibrary;
 using Kitopia.Core.ViewModel;
 using Kitopia.View;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.IO;
 using System.Net;
 using System.Windows;
 using System.Windows.Threading;
@@ -20,13 +22,24 @@ namespace Kitopia
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            ServicePointManager.DefaultConnectionLimit = 10240;
-            base.OnStartup(e);
-            //UI线程的异常捕捉
-
             DispatcherUnhandledException += App_DispatcherUnhandledException;
             Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
+            setAutoStartup();
+            ServicePointManager.DefaultConnectionLimit = 10240;
+            base.OnStartup(e);
+           
+
+            
+        }
+        private void setAutoStartup()
+        {
+            string startupPath = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+            string shortcutPath = Path.Combine(startupPath,"Kitopia.lnk"); 
+            WshShell shell = new WshShell(); IWshShortcut shortcut =(IWshShortcut)shell.CreateShortcut(shortcutPath);
+            shortcut.TargetPath = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName; 
+            shortcut.Save();
         }
         public App()
         {

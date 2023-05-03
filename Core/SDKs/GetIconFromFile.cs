@@ -50,8 +50,7 @@ namespace Core.SDKs
                     }
 
                 }
-            }
-            if (icons.ContainsKey(path.Split(".").Last()))
+            }else if (icons.ContainsKey(path.Split(".").Last()))
             {
                 return icons[path.Split(".").Last()];
             }
@@ -61,6 +60,9 @@ namespace Core.SDKs
                 icons.Add(path.Split(".").Last(), icon1);
                 return icon1;
             }
+            return  Icon.ExtractAssociatedIcon((string)path);
+
+
 
         }
     }

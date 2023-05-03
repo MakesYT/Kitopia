@@ -36,4 +36,10 @@
     <Folder Include="Style\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Interop.IWshRuntimeLibrary">
+      <HintPath>..\Core\obj\Debug\net7.0\Interop.IWshRuntimeLibrary.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

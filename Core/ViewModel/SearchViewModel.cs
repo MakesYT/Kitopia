@@ -51,7 +51,7 @@ namespace Kitopia.Core.ViewModel
             {
 
             }
-
+            
         }
 
         private void AppSolver(string file)
@@ -60,7 +60,7 @@ namespace Kitopia.Core.ViewModel
 
             FileInfo refFileInfo = new FileInfo(LnkSolver.ResolveShortcut(file));
             if (refFileInfo.Exists)
-                if (refFileInfo.Extension != ".url" && refFileInfo.Extension != ".txt" && refFileInfo.Extension != ".chm" && !fileInfo.Name.Contains("install") && !fileInfo.Name.Contains("安装") && !fileInfo.Name.Contains("卸载"))
+                if (refFileInfo.Extension != ".url" && refFileInfo.Extension != ".txt" && refFileInfo.Extension != ".chm" && refFileInfo.Extension != ".pdf" && !fileInfo.Name.Contains("install") && !fileInfo.Name.Contains("安装") && !fileInfo.Name.Contains("卸载"))
                 {
 
                     List<string> keys = new List<string>();
@@ -114,71 +114,42 @@ namespace Kitopia.Core.ViewModel
         List<SearchViewItem> collection = new List<SearchViewItem>();
         partial void OnSearchChanged(string? value)
         {
+           
             if (value == null)
                 return;
-            if (EverythingIsOK is null)
+            
+            if (IntPtr.Size == 8)
             {
-                if (IntPtr.Size == 8)
-                {
-                    // 64-bit
-                    Everything64.Everything_SetMax(1);
-                    EverythingIsOK = Everything64.Everything_QueryW(true);
-                }
-                else
-                {
-                    // 32-bit
-                    Everything32.Everything_SetMax(1);
-                    EverythingIsOK = Everything32.Everything_QueryW(true);
-                }
-
+                // 64-bit
+                Everything64.Everything_SetMax(1);
+                EverythingIsOK = Everything64.Everything_QueryW(true);
             }
+            else
+            {
+                // 32-bit
+                Everything32.Everything_SetMax(1);
+                EverythingIsOK = Everything32.Everything_QueryW(true);
+            }
+
+            
 
 
             Items.Clear();
-
+            Kitopia.SDKs.Everything.Tools.main(ref items, value);
             System.GC.Collect();
 
-            Everything64.Everything_Reset();
-            Everything64.Everything_SetSearchW("*.docx|*.doc|*.xls|*.xlsx|*.pdf|*.ppt|*.pptx" + " " + value);
-            Everything64.Everything_SetMatchCase(true);
-            Everything64.Everything_QueryW(true);
-            const int bufsize = 260;
-            StringBuilder buf = new StringBuilder(bufsize);
-            for (int i = 0; i < Everything64.Everything_GetNumResults(); i++)
-            {
-
-                // get the result's full path and file name.
-                Everything64.Everything_GetResultFullPathNameW(i, buf, bufsize);
-                FileInfo fileInfo = new FileInfo(buf.ToString());
-                FileType fileType = FileType.None;
-                if (fileInfo.Name.StartsWith("~") || fileInfo.Name.StartsWith("_"))
-                    continue;
-                if (fileInfo.Extension == ".pdf")
-                {
-                    fileType = FileType.PDF文档;
-                }
-                else if (fileInfo.Extension == ".docx" || fileInfo.Extension == ".doc")
-                {
-                    fileType = FileType.Word文档;
-                }
-                else if (fileInfo.Extension == ".xlsx" || fileInfo.Extension == ".xls")
-                {
-                    fileType = FileType.Excel文档;
-                }
-                else if (fileInfo.Extension == ".ppt" || fileInfo.Extension == ".pptx")
-                {
-                    fileType = FileType.PPT文档;
-                }
-
-                Items.Add(new SearchViewItem { IsVisible = true, fileInfo = fileInfo, fileName = fileInfo.Name, fileType = fileType, icon = GetIconFromFile.GetIcon(fileInfo.FullName) });
-            }
+            
             foreach (SearchViewItem searchViewItem in collection)
             {
                 bool show = false;
                 foreach (string key in searchViewItem.keys)
                 {
                     if (key.Contains(value))
+                    {
                         show = true;
+                        break;
+                    }
+                        
                 }
                 if (show)
                     Items.Add(searchViewItem);
@@ -191,32 +162,7 @@ namespace Kitopia.Core.ViewModel
 
         [ObservableProperty]
         public ObservableCollection<SearchViewItem> items = new();
-        public enum ShowCommands : int
-        {
-            SW_HIDE = 0,
-            SW_SHOWNORMAL = 1,
-            SW_NORMAL = 1,
-            SW_SHOWMINIMIZED = 2,
-            SW_SHOWMAXIMIZED = 3,
-            SW_MAXIMIZE = 3,
-            SW_SHOWNOACTIVATE = 4,
-            SW_SHOW = 5,
-            SW_MINIMIZE = 6,
-            SW_SHOWMINNOACTIVE = 7,
-            SW_SHOWNA = 8,
-            SW_RESTORE = 9,
-            SW_SHOWDEFAULT = 10,
-            SW_FORCEMINIMIZE = 11,
-            SW_MAX = 11
-        }
-        [DllImport("shell32.dll")]
-        static extern IntPtr ShellExecute(
-            IntPtr hwnd,
-            string lpOperation,
-            string lpFile,
-            string lpParameters,
-            string lpDirectory,
-            ShowCommands nShowCmd);
+        
         [ObservableProperty]
         public int? selectedIndex = -1;
         [ObservableProperty]
@@ -233,7 +179,7 @@ namespace Kitopia.Core.ViewModel
         {
 
             if (SelectedIndex != -1)
-                ShellExecute(IntPtr.Zero, "open", searchViewItem.fileInfo.FullName, "", "", ShowCommands.SW_SHOWNORMAL);
+                ShellTools.ShellExecute(IntPtr.Zero, "open", searchViewItem.fileInfo.FullName, "", "", ShellTools.ShowCommands.SW_SHOWNORMAL);
 
             SelectedIndex = -1;
             OnSearchChanged(Search);
@@ -243,7 +189,7 @@ namespace Kitopia.Core.ViewModel
         public void OpenFolder(SearchViewItem searchViewItem)
         {
 
-            ShellExecute(IntPtr.Zero, "open", searchViewItem.fileInfo.DirectoryName, "", "", ShowCommands.SW_SHOWNORMAL);
+            ShellTools.ShellExecute(IntPtr.Zero, "open", searchViewItem.fileInfo.DirectoryName, "", "", ShellTools.ShowCommands.SW_SHOWNORMAL);
             SelectedIndex = -1;
             OnSearchChanged(Search);
             Can = true;
@@ -252,7 +198,7 @@ namespace Kitopia.Core.ViewModel
         public void RunAsAdmin(SearchViewItem searchViewItem)
         {
 
-            ShellExecute(IntPtr.Zero, "runas", searchViewItem.fileInfo.FullName, "", "", ShowCommands.SW_SHOWNORMAL);
+            ShellTools.ShellExecute(IntPtr.Zero, "runas", searchViewItem.fileInfo.FullName, "", "", ShellTools.ShowCommands.SW_SHOWNORMAL);
             SelectedIndex = -1;
             OnSearchChanged(Search);
             Can = true;
@@ -267,24 +213,6 @@ namespace Kitopia.Core.ViewModel
 
         }
     }
-    public class SearchViewItem
-    {
-        public string? fileName { set; get; }
-        public bool? IsVisible { set; get; }
-        public List<string> keys { set; get; }
-        public FileType fileType { set; get; }
-        public FileInfo? fileInfo { set; get; }
-        public Icon? icon { set; get; }
-
-    }
-    public enum FileType
-    {
-        App,
-        Word文档,
-        PPT文档,
-        Excel文档,
-        PDF文档,
-        图像,
-        None
-    }
+    
+    
 }

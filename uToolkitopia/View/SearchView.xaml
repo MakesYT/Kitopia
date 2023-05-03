@@ -17,7 +17,12 @@
         AllowsTransparency="True"
         Background="Transparent" ShowInTaskbar="False"
         Title="SearchView" Window.SizeToContent="Height" Width="800" WindowStyle="None" Deactivated="w_Deactivated" Activated="w_Activated" >
-    
+    <Window.InputBindings>
+        <KeyBinding Command="ApplicationCommands.Close" Key="Esc" />
+    </Window.InputBindings>
+    <Window.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.Close" Executed="w_Deactivated" />
+    </Window.CommandBindings>
     <Window.Effect>
         <DropShadowEffect ShadowDepth="5" Color="Black" Opacity="0.5" BlurRadius="10"/>
     </Window.Effect>
@@ -46,10 +51,10 @@
             </hc:TextBox>
 
         </Grid>
-        <hc:TextBox FontSize="15" Text="Everthing服务未运行,请检查" Height="35" IsReadOnly="True" Visibility="{Binding EverythingIsOK, Converter={StaticResource reverseBoolToVisibilityConverter}}" Margin="0,0,0,0">
+        <hc:TextBox FontSize="15" Text="Everthing服务未运行,无法搜索文档,请检查" Height="35" IsReadOnly="True" Visibility="{Binding EverythingIsOK, Converter={StaticResource reverseBoolToVisibilityConverter}}" Margin="0,0,0,0">
 
         </hc:TextBox>
-        <DataGrid x:Name="dataGrid"  SelectedIndex="{Binding SelectedIndex,Mode=TwoWay}" RowHeight="64" HeadersVisibility="None" MaxHeight="300" ItemsSource="{Binding Items}"  AutoGenerateColumns="False" Margin="0,10,0,0">
+        <DataGrid x:Name="dataGrid"  SelectedIndex="{Binding SelectedIndex,Mode=TwoWay}" RowHeight="75" HeadersVisibility="None" MaxHeight="385 " ItemsSource="{Binding Items}"  AutoGenerateColumns="False" Margin="0,10,0,0">
             
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged"  >
@@ -63,19 +68,32 @@
                 <!-- 根据条件设置行的可见性 -->
                 <Style TargetType="DataGridRow" >
                     <Setter Property="Visibility" Value="{Binding IsVisible, Converter={StaticResource boolToVisibilityConverter}}" />
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#a9a9a9aa"/>
+                        </Trigger>
+                        
+                    </Style.Triggers>
                 </Style>
             </DataGrid.RowStyle>
             <DataGrid.Columns>
-                <DataGridTemplateColumn Header="图标" Width="*">
+                <DataGridTemplateColumn Header="图标" Width="90">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Image Width="48" Height="48" Source="{Binding icon, Converter={StaticResource pathToImageConverter}}"></Image>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Header="操作" Width="*" Binding="{Binding Path=fileName}" IsReadOnly="True">
-                </DataGridTextColumn>
-                <DataGridTemplateColumn Header="操作" Width="*">
+                <DataGridTemplateColumn Header="名称" Width="*"  IsReadOnly="True">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <hc:RunningBlock Content ="{Binding Path=fileName}" Runaway="False" OverridesDefaultStyle="False" AutoRun="True" Background="{x:Null}" BorderBrush="{x:Null}" FontWeight="Normal" FontSize="18">
+                               
+                            </hc:RunningBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="操作" Width="80">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Content="管理员" Visibility="{Binding Path=fileType, Converter={StaticResource enumToVisibilityConverter}, ConverterParameter='RunAsAdmin'}" Command="{Binding Path=DataContext.RunAsAdminCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"  CommandParameter="{Binding}">
@@ -91,7 +109,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="操作" Width="*">
+                <DataGridTemplateColumn Header="操作" Width="80">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Content="文件夹" Visibility="{Binding Path=fileType, Converter={StaticResource enumToVisibilityConverter}, ConverterParameter='Folder'}" Command="{Binding Path=DataContext.OpenFolderCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"  CommandParameter="{Binding}">
@@ -106,7 +124,7 @@
                             </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="操作" Width="*">
+                <DataGridTemplateColumn Header="操作" Width="80">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Content="控制台" Visibility="{Binding Path=fileType, Converter={StaticResource enumToVisibilityConverter}, ConverterParameter='Console'}" Command="{Binding Path=DataContext.OpenFolderInTerminalCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"  CommandParameter="{Binding}">
