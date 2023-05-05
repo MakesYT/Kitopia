@@ -20,6 +20,10 @@ namespace Kitopia.Core.ViewModel
 
             try
             {
+                foreach (string file in Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "*.lnk"))
+                {
+                    AppSolver(file);
+                }
                 foreach (string file in Directory.EnumerateFiles("C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs", "*.lnk"))
                 {
                     AppSolver(file);
@@ -67,7 +71,15 @@ namespace Kitopia.Core.ViewModel
                     keys = nameSolver(keys, fileInfo.Name.Replace(".lnk", ""));
                     keys = nameSolver(keys, refFileInfo.Name.Replace(".exe", ""));
                     //collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = fileInfo.Name.Replace(".lnk", ""), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
-                    collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = LnkSolver.GetLocalizedName(file), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
+                    string localName = LnkSolver.GetLocalizedName(file);
+                    bool add = true;
+                    collection.ForEach((item) =>
+                    {
+                        if (item.fileName == localName)
+                            add = false;
+                    });
+                    if(add)
+                        collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName =localName, fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
 
                 }
 
