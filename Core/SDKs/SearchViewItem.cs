@@ -1,15 +1,10 @@
-﻿using Kitopia.Core.ViewModel;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Drawing;
 
 namespace Core.SDKs
 {
     public class SearchViewItem
     {
+        public int weight { get; set; } = 1;
         public string? fileName { set; get; }
         public bool? IsVisible { set; get; }
         public List<string> keys { set; get; }

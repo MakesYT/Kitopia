@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 
@@ -127,7 +126,7 @@ namespace Kitopia
                         {
                             App.Current.Services.GetService<SearchView>().Visibility = Visibility.Visible;
                             App.Current.Services.GetService<SearchView>().Topmost = true;
-                            
+
                             App.Current.Services.GetService<SearchView>().tx.Focus();
                             App.Current.Services.GetService<SearchView>().Topmost = false;
                         }

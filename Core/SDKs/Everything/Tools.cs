@@ -1,12 +1,7 @@
 ﻿
 using Core.SDKs;
-using Kitopia.SDKs.Everything;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Kitopia.SDKs.Everything
 {
@@ -62,7 +57,7 @@ namespace Kitopia.SDKs.Everything
                 Items.Add(new SearchViewItem { IsVisible = true, fileInfo = fileInfo, fileName = fileInfo.Name, fileType = fileType, icon = GetIconFromFile.GetIcon(fileInfo.FullName) });
             }
         }
-        public static void amd64(ref ObservableCollection<SearchViewItem> Items,string value)
+        public static void amd64(ref ObservableCollection<SearchViewItem> Items, string value)
         {
             Everything64.Everything_Reset();
             Everything64.Everything_SetSearchW("*.docx|*.doc|*.xls|*.xlsx|*.pdf|*.ppt|*.pptx" + " " + value);

@@ -29,16 +29,16 @@ namespace Kitopia
             setAutoStartup();
             ServicePointManager.DefaultConnectionLimit = 10240;
             base.OnStartup(e);
-           
 
-            
+
+
         }
         private void setAutoStartup()
         {
             string startupPath = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
-            string shortcutPath = Path.Combine(startupPath,"Kitopia.lnk"); 
-            WshShell shell = new WshShell(); IWshShortcut shortcut =(IWshShortcut)shell.CreateShortcut(shortcutPath);
-            shortcut.TargetPath = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName; 
+            string shortcutPath = Path.Combine(startupPath, "Kitopia.lnk");
+            WshShell shell = new WshShell(); IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutPath);
+            shortcut.TargetPath = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
             shortcut.Save();
         }
         public App()

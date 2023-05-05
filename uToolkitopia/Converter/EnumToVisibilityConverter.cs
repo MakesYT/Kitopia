@@ -1,5 +1,4 @@
 ﻿using Core.SDKs;
-using Kitopia.Core.ViewModel;
 using System;
 using System.Globalization;
 using System.Windows;

@@ -4,16 +4,13 @@ using Core.SDKs;
 using Kitopia.SDKs.Everything;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Drawing;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Kitopia.Core.ViewModel
 {
     public partial class SearchViewModel : ObservableRecipient
     {
-        
+
         public SearchViewModel()
         {
 
@@ -55,9 +52,11 @@ namespace Kitopia.Core.ViewModel
             {
 
             }
-            
+
         }
 
+        List<SearchViewItem> collection = new List<SearchViewItem>();
+        List<string> names = new List<string>();
         private void AppSolver(string file)
         {
             FileInfo fileInfo = new FileInfo(file);
@@ -68,18 +67,18 @@ namespace Kitopia.Core.ViewModel
                 {
 
                     List<string> keys = new List<string>();
-                    keys = nameSolver(keys, fileInfo.Name.Replace(".lnk", ""));
-                    keys = nameSolver(keys, refFileInfo.Name.Replace(".exe", ""));
+                    
                     //collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = fileInfo.Name.Replace(".lnk", ""), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
                     string localName = LnkSolver.GetLocalizedName(file);
-                    bool add = true;
-                    collection.ForEach((item) =>
+                    keys = nameSolver(keys, localName);
+                    keys = nameSolver(keys, fileInfo.Name.Replace(".lnk", ""));
+                    keys = nameSolver(keys, refFileInfo.Name.Replace(".exe", ""));
+                    if (!names.Contains(localName))
                     {
-                        if (item.fileName == localName)
-                            add = false;
-                    });
-                    if(add)
-                        collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName =localName, fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
+                        names.Add(localName);
+                        collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = localName, fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
+
+                    }
 
                 }
 
@@ -123,13 +122,17 @@ namespace Kitopia.Core.ViewModel
         [ObservableProperty]
         public string? search;
 
-        List<SearchViewItem> collection = new List<SearchViewItem>();
         partial void OnSearchChanged(string? value)
         {
-           
-            if (value == null)
+
+            if (value==null||value=="")
+            {
+                Items.Clear();
+                System.GC.Collect();
                 return;
-            
+            }
+                
+
             if (IntPtr.Size == 8)
             {
                 // 64-bit
@@ -143,88 +146,84 @@ namespace Kitopia.Core.ViewModel
                 EverythingIsOK = Everything32.Everything_QueryW(true);
             }
 
-            
+
 
 
             Items.Clear();
             Kitopia.SDKs.Everything.Tools.main(ref items, value);
             System.GC.Collect();
 
-            
-            foreach (SearchViewItem searchViewItem in collection)
+
+            foreach ( SearchViewItem searchViewItem in collection)
             {
                 bool show = false;
                 foreach (string key in searchViewItem.keys)
                 {
-                    if (key.Contains(value))
+                    if (!String.IsNullOrEmpty(key))
                     {
-                        show = true;
-                        break;
+                        if (key.Contains(value))
+                        {
+                            show = true;
+                            searchViewItem.weight += 1;
+
+                        }
+                        if (key.StartsWith(value))
+                        {
+                            show = true;
+                            searchViewItem.weight += 500;
+
+                        }
+                        if (key.Equals(value))
+                        {
+                            show = true;
+                            searchViewItem.weight += 1000;
+
+                        }
                     }
-                        
+                    
                 }
-                if (show)
-                    Items.Add(searchViewItem);
+                searchViewItem.weight= searchViewItem.weight/searchViewItem.keys.Count();
+                Items.Add(searchViewItem);
             }
-            var sorted = Items.OrderBy(item => item.fileName);
+            var sorted = Items.OrderByDescending(item => item.weight);
             Items = new ObservableCollection<SearchViewItem>(sorted);
 
 
         }
-
-        [ObservableProperty]
-        public ObservableCollection<SearchViewItem> items = new();
         
         [ObservableProperty]
-        public int? selectedIndex = -1;
+        public ObservableCollection<SearchViewItem> items = new();
+
         [ObservableProperty]
-        public bool can = true;
+        public int? selectedIndex = -1;
+
+
+
         [RelayCommand]
-        public void CommandByButton()
-        {
-            Can = false;
-        }
-
-
-        [RelayCommand(CanExecute = nameof(Can))]
         public void OpenFile(SearchViewItem searchViewItem)
         {
-
-            if (SelectedIndex != -1)
-                ShellTools.ShellExecute(IntPtr.Zero, "open", searchViewItem.fileInfo.FullName, "", "", ShellTools.ShowCommands.SW_SHOWNORMAL);
-
-            SelectedIndex = -1;
-            OnSearchChanged(Search);
-
+            ShellTools.ShellExecute(IntPtr.Zero, "open", searchViewItem.fileInfo.FullName, "", "", ShellTools.ShowCommands.SW_SHOWNORMAL);
+            Search = "";
         }
         [RelayCommand]
         public void OpenFolder(SearchViewItem searchViewItem)
         {
-
             ShellTools.ShellExecute(IntPtr.Zero, "open", searchViewItem.fileInfo.DirectoryName, "", "", ShellTools.ShowCommands.SW_SHOWNORMAL);
-            SelectedIndex = -1;
-            OnSearchChanged(Search);
-            Can = true;
+            Search = "";
         }
         [RelayCommand]
         public void RunAsAdmin(SearchViewItem searchViewItem)
         {
-
             ShellTools.ShellExecute(IntPtr.Zero, "runas", searchViewItem.fileInfo.FullName, "", "", ShellTools.ShowCommands.SW_SHOWNORMAL);
-            SelectedIndex = -1;
-            OnSearchChanged(Search);
-            Can = true;
+            Search = "";
         }
         [RelayCommand]
         public void OpenFolderInTerminal(SearchViewItem searchViewItem)
         {
             Process.Start("cmd", "/c cd " + searchViewItem.fileInfo.DirectoryName + " && start cmd.exe");
-            SelectedIndex = -1;
-            OnSearchChanged(Search);
-            Can = true;
-
+            Search = "";
         }
     }
-    
-    
+
+
 }

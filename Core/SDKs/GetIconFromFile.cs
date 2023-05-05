@@ -26,7 +26,7 @@ namespace Core.SDKs
          );
         public static Icon GetIcon(string path)
         {
-            if (path.ToLower().EndsWith(".exe")|| path.ToLower().EndsWith(".lnk"))
+            if (path.ToLower().EndsWith(".exe") || path.ToLower().EndsWith(".lnk"))
             {
                 var iconTotalCount = PrivateExtractIcons((string)path, 0, 0, 0, null, null, 0, 0);
 
@@ -50,7 +50,8 @@ namespace Core.SDKs
                     }
 
                 }
-            }else if (icons.ContainsKey(path.Split(".").Last()))
+            }
+            else if (icons.ContainsKey(path.Split(".").Last()))
             {
                 return icons[path.Split(".").Last()];
             }
@@ -60,7 +61,7 @@ namespace Core.SDKs
                 icons.Add(path.Split(".").Last(), icon1);
                 return icon1;
             }
-            return  Icon.ExtractAssociatedIcon((string)path);
+            return Icon.ExtractAssociatedIcon((string)path);
 
 
 

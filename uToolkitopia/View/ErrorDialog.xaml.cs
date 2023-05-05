@@ -17,7 +17,7 @@ public partial class ErrorDialog : Window
         InitializeComponent();
         info.Text = infostr;
         text.Text = str;
-        var storyboard = (Storyboard) FindResource("Storyboard1");
+        var storyboard = (Storyboard)FindResource("Storyboard1");
         storyboard.Begin();
     }
 

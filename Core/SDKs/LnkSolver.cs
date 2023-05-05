@@ -1,6 +1,5 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
-using System.Runtime.InteropServices.ComTypes;
 namespace Core.SDKs
 {
     public class LnkSolver
@@ -212,7 +211,7 @@ namespace Core.SDKs
         public static string GetLocalizedName(string path)
         {
             Guid shellItemType = ShellItemTypeConstants.ShellItemGuid;
-            int retCode =SHCreateItemFromParsingName(path, IntPtr.Zero, ref shellItemType, out IShellItem shellItem);
+            int retCode = SHCreateItemFromParsingName(path, IntPtr.Zero, ref shellItemType, out IShellItem shellItem);
             if (retCode != 0)
             {
                 return string.Empty;
