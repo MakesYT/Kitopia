@@ -86,7 +86,16 @@ namespace Kitopia.View
             {
                 if(dataGrid.Items is not null)
                     App.Current.Services.GetService<SearchViewModel>().OpenFile((SearchViewItem)dataGrid.Items[0]);
-
+                e.Handled = true;
+            }else
+            if (e.Key == Key.Down)
+            {
+                var keyArgs = new KeyEventArgs(Keyboard.PrimaryDevice, Keyboard.PrimaryDevice.ActiveSource, 0, Key.Tab);
+                // 设置 RoutedEvent 属性为 Keyboard.KeyDownEvent
+                keyArgs.RoutedEvent = Keyboard.KeyDownEvent;
+                // 调用 InputManager.Current.ProcessInput 方法来处理该事件
+                InputManager.Current.ProcessInput(keyArgs);
+                e.Handled = true;
             }
         }
     }

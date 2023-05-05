@@ -38,12 +38,12 @@
 
     <StackPanel x:Name="stackPanel">
         <Grid>
-            <hc:TextBox AcceptsReturn="False" KeyDown="tx_KeyDown" x:Name="tx" FontSize="30" hc:InfoElement.Placeholder="搜索..." hc:InfoElement.ShowClearButton="True" Height="65" Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.HelpText="f">
+            <hc:TextBox AcceptsReturn="False" PreviewKeyDown="tx_KeyDown" x:Name="tx" FontSize="30" hc:InfoElement.Placeholder="搜索..." hc:InfoElement.ShowClearButton="True" Height="65" Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.HelpText="f">
                 
             </hc:TextBox>
 
         </Grid>
-        <hc:TextBox FontSize="15" Text="Everthing服务未运行,无法搜索文档,请检查" Height="35" IsReadOnly="True" Visibility="{Binding EverythingIsOK, Converter={StaticResource reverseBoolToVisibilityConverter}}" Margin="0,0,0,0">
+        <hc:TextBox Focusable="False" FontSize="15" Text="Everthing服务未运行,无法搜索文档,请检查" Height="35" IsReadOnly="True" Visibility="{Binding EverythingIsOK, Converter={StaticResource reverseBoolToVisibilityConverter}}" Margin="0,0,0,0">
 
         </hc:TextBox>
         <DataGrid x:Name="dataGrid"  SelectedIndex="{Binding SelectedIndex,Mode=TwoWay}" RowHeight="75" HeadersVisibility="None" MaxHeight="385 " ItemsSource="{Binding Items}"  AutoGenerateColumns="False" Margin="0,10,0,0">
@@ -74,7 +74,7 @@
                                 <hc:RelativePanel Focusable="False" HorizontalAlignment="Left" Height="67" Width="749" Margin="10,3,3,3" >
                                     
                                     <Border Margin="0"  Width="48" Height="48" Name="图标" hc:RelativePanel.AlignLeftWithPanel="True" hc:RelativePanel.AlignVerticalCenterWithPanel="True">
-                                        <Image Width="48" Height="48" Source="{Binding icon, Converter={StaticResource pathToImageConverter}}"></Image>
+                                        <Image Focusable="False" Width="48" Height="48" Source="{Binding icon, Converter={StaticResource pathToImageConverter}}"></Image>
                                     </Border>
                                     <Border Margin="6,0,0,0" Name="名称" hc:RelativePanel.RightOf="{Binding ElementName=图标}"  hc:RelativePanel.AlignVerticalCenterWithPanel ="True">
                                         <hc:RunningBlock Focusable="False" Content ="{Binding Path=fileName}" Runaway="False" OverridesDefaultStyle="False" AutoRun="True" Background="{x:Null}" BorderBrush="{x:Null}" FontWeight="Normal" FontSize="18">
