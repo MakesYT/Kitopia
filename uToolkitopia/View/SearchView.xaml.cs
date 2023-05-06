@@ -2,7 +2,6 @@
 using Kitopia.Core.ViewModel;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Data.Common;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
@@ -84,10 +83,11 @@ namespace Kitopia.View
         {
             if (e.Key == Key.Enter)
             {
-                if(dataGrid.Items is not null)
+                if (dataGrid.Items is not null)
                     App.Current.Services.GetService<SearchViewModel>().OpenFile((SearchViewItem)dataGrid.Items[0]);
                 e.Handled = true;
-            }else
+            }
+            else
             if (e.Key == Key.Down)
             {
                 var keyArgs = new KeyEventArgs(Keyboard.PrimaryDevice, Keyboard.PrimaryDevice.ActiveSource, 0, Key.Tab);

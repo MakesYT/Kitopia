@@ -4,7 +4,6 @@ using Core.SDKs;
 using Kitopia.SDKs.Everything;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Text.RegularExpressions;
 
 namespace Kitopia.Core.ViewModel
 {
@@ -16,12 +15,17 @@ namespace Kitopia.Core.ViewModel
         public ObservableCollection<SearchViewItem> items = new();//搜索界面显示的软件
         public SearchViewModel()
         {
+            var watch = System.Diagnostics.Stopwatch.StartNew();
             AppSolver.GetAllApps(ref collection, ref names);
-
+            watch.Stop();
+            // 获取执行时间，单位为毫秒
+            var elapsedMs = watch.ElapsedMilliseconds;
+            // 打印或者记录执行时间
+            Debug.WriteLine("Time elapsed: {0} ms", elapsedMs);
         }
 
-        
-        
+
+
         [ObservableProperty]
         public bool? everythingIsOK;
         [ObservableProperty]
@@ -30,7 +34,7 @@ namespace Kitopia.Core.ViewModel
         partial void OnSearchChanged(string? value)
         {
 
-            if (value==null||value=="")
+            if (value == null || value == "")
             {
                 Items.Clear();
                 System.GC.Collect();
