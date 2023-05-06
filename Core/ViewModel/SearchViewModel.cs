@@ -3,7 +3,10 @@ using CommunityToolkit.Mvvm.Input;
 using Core.SDKs;
 using Kitopia.SDKs.Everything;
 using System.Collections.ObjectModel;
+using System.ComponentModel.Design;
 using System.Diagnostics;
+using System.Net;
+using Core.SDKs.Config;
 
 namespace Kitopia.Core.ViewModel
 {
@@ -15,15 +18,38 @@ namespace Kitopia.Core.ViewModel
         public ObservableCollection<SearchViewItem> items = new();//搜索界面显示的软件
         public SearchViewModel()
         {
-            var watch = System.Diagnostics.Stopwatch.StartNew();
-            AppSolver.GetAllApps(ref collection, ref names);
-            watch.Stop();
-            // 获取执行时间，单位为毫秒
-            var elapsedMs = watch.ElapsedMilliseconds;
-            // 打印或者记录执行时间
-            Debug.WriteLine("Time elapsed: {0} ms", elapsedMs);
+
+            ReloadApps();
+            LoadLast();
         }
 
+        public void ReloadApps()
+        {
+            collection.Clear();
+            names.Clear();
+            AppSolver.GetAllApps(ref collection, ref names);
+            
+        }
+
+        public void LoadLast()
+        {
+            Items.Clear();
+            if (ConfigManger.config.lastOpens.Any())
+            {
+                foreach (var name in ConfigManger.config.lastOpens)
+                {
+                    foreach (SearchViewItem searchViewItem in collection)
+                    {
+                        if (searchViewItem.fileName.Equals(name))
+                        {
+                            Items.Add(searchViewItem);
+                        }
+                    }
+                }
+
+                
+            }
+        }
 
 
         [ObservableProperty]
@@ -31,13 +57,14 @@ namespace Kitopia.Core.ViewModel
         [ObservableProperty]
         public string? search;
 
-        partial void OnSearchChanged(string? value)
+        partial void OnSearchChanged(string? value) 
         {
-
+            
             if (value == null || value == "")
             {
-                Items.Clear();
-                System.GC.Collect();
+                
+                
+                LoadLast();
                 return;
             }
             value = value.ToLowerInvariant();
@@ -67,11 +94,11 @@ namespace Kitopia.Core.ViewModel
             // 根据给定的值，从集合中筛选出符合条件的SearchViewItem对象，并计算它们的权重
             var filtered = from item in collection
                            let keys = item.keys.Where(key => !string.IsNullOrEmpty(key)) // 排除空的键
-                           let weight = keys.Count(key => key.Contains(value)) // 统计包含给定值的键的数量
-                                      + keys.Count(key => key.StartsWith(value)) * 500 // 统计以给定值开头的键的数量，并乘以500
-                                      + keys.Count(key => key.Equals(value)) * 1000 // 统计等于给定值的键的数量，并乘以1000
+                           let weight = keys.Count(key => key.Contains(value))*2 // 统计包含给定值的键的数量
+                                      + keys.Count(key => key.StartsWith(value)) * 3 // 统计以给定值开头的键的数量，并乘以500
+                                      + keys.Count(key => key.Equals(value)) * 5 // 统计等于给定值的键的数量，并乘以1000
                            where weight > 0 // 只选择权重为正的对象
-                           select new { Item = item, Weight = weight / keys.Count() }; // 创建一个包含对象和权重属性的匿名类型
+                           select new { Item = item, Weight = weight  }; // 创建一个包含对象和权重属性的匿名类型
 
             // 按照权重降序排序筛选出的对象
             var sorted = filtered.OrderByDescending(x => x.Weight);
@@ -97,25 +124,50 @@ namespace Kitopia.Core.ViewModel
         public void OpenFile(SearchViewItem searchViewItem)
         {
             ShellTools.ShellExecute(IntPtr.Zero, "open", searchViewItem.fileInfo.FullName, "", "", ShellTools.ShowCommands.SW_SHOWNORMAL);
-            Search = "";
+            
+            if (!ConfigManger.config.lastOpens.Contains(searchViewItem.fileName))
+            {
+                ConfigManger.config.lastOpens.Add(searchViewItem.fileName);
+            }Search = "";
+            ConfigManger.Save();
+            
+            
         }
         [RelayCommand]
         public void OpenFolder(SearchViewItem searchViewItem)
         {
             ShellTools.ShellExecute(IntPtr.Zero, "open", searchViewItem.fileInfo.DirectoryName, "", "", ShellTools.ShowCommands.SW_SHOWNORMAL);
-            Search = "";
+            
+            if (!ConfigManger.config.lastOpens.Contains(searchViewItem.fileName))
+            {
+                ConfigManger.config.lastOpens.Add(searchViewItem.fileName);
+            }Search = "";
+            ConfigManger.Save();
+           
         }
         [RelayCommand]
         public void RunAsAdmin(SearchViewItem searchViewItem)
         {
             ShellTools.ShellExecute(IntPtr.Zero, "runas", searchViewItem.fileInfo.FullName, "", "", ShellTools.ShowCommands.SW_SHOWNORMAL);
-            Search = "";
+            
+            if (!ConfigManger.config.lastOpens.Contains(searchViewItem.fileName))
+            {
+                ConfigManger.config.lastOpens.Add(searchViewItem.fileName);
+            }Search = "";
+            ConfigManger.Save();
+            
         }
         [RelayCommand]
         public void OpenFolderInTerminal(SearchViewItem searchViewItem)
         {
             Process.Start("cmd", "/c cd " + searchViewItem.fileInfo.DirectoryName + " && start cmd.exe");
-            Search = "";
+            
+            if (!ConfigManger.config.lastOpens.Contains(searchViewItem.fileName))
+            {
+                ConfigManger.config.lastOpens.Add(searchViewItem.fileName);
+            }Search = "";
+            ConfigManger.Save();
+            
         }
     }
 

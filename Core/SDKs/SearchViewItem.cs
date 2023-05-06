@@ -6,7 +6,7 @@ namespace Core.SDKs
     {
         public string? fileName { set; get; }
         public bool? IsVisible { set; get; }
-        public List<string>? keys { set; get; }
+        public HashSet<string>? keys { set; get; }
         public FileType fileType { set; get; }
         public FileInfo? fileInfo { set; get; }
         public Icon? icon { set; get; }

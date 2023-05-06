@@ -10,6 +10,7 @@ using System.IO;
 using System.Net;
 using System.Windows;
 using System.Windows.Threading;
+using Core.SDKs.Config;
 
 namespace Kitopia
 {
@@ -33,6 +34,13 @@ namespace Kitopia
 
 
         }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            ConfigManger.Save();
+            base.OnExit(e);
+        }
+
         private void setAutoStartup()
         {
             string startupPath = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
@@ -44,7 +52,7 @@ namespace Kitopia
         public App()
         {
             Services = ConfigureServices();
-
+            ConfigManger.Init();
 
 
         }

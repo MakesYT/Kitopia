@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Title="错误" WindowStyle="None" Width="700" Height="450">
@@ -56,11 +56,11 @@
 
             </ScrollViewer>
         </StackPanel>
-        <Button FocusVisualStyle="{x:Null}" Style="{StaticResource MaterialDesignFlatButton}" IsCancel="True"
+        <Button FocusVisualStyle="{x:Null}"  IsCancel="True"
                 HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="Hand"
                 FontFamily="/NchargeL;component/Resources/#SSZhiZunShuFaTi" FontSize="20" Content="确定"
                 Margin="0,0,16,16" Foreground="{DynamicResource BodyColor}" Click="Button_Click" />
-        <Button FocusVisualStyle="{x:Null}" Style="{StaticResource MaterialDesignFlatButton}" IsCancel="True"
+        <Button FocusVisualStyle="{x:Null}"  IsCancel="True"
                 HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="Hand"
                 FontFamily="/NchargeL;component/Resources/#SSZhiZunShuFaTi" FontSize="20" Content="打开logs目录"
                 Margin="0,0,104,16" Foreground="{DynamicResource BodyColor}" Click="logs_Click" />

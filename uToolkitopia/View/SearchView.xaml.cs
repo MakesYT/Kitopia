@@ -3,6 +3,7 @@ using Kitopia.Core.ViewModel;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -23,7 +24,9 @@ namespace Kitopia.View
 
         private void w_Deactivated(object sender, System.EventArgs e)
         {
+            
             this.Visibility = Visibility.Hidden;
+            
         }
         [DllImport("user32.dll", SetLastError = true)]
         static extern IntPtr SetFocus(IntPtr hWnd);
@@ -31,6 +34,7 @@ namespace Kitopia.View
         static extern bool SetForegroundWindow(IntPtr hWnd);
         private void w_Activated(object sender, System.EventArgs e)
         {
+            
             var hwnd = new WindowInteropHelper(this).Handle;
             SetForegroundWindow(hwnd);
             SetFocus(hwnd);
