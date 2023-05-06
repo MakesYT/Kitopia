@@ -59,45 +59,30 @@ namespace Kitopia.Core.ViewModel
             System.GC.Collect();
 
 
-            foreach ( SearchViewItem searchViewItem in collection)
+            // 使用LINQ语句来简化和优化筛选和排序逻辑，而不需要使用foreach循环和if判断
+            // 根据给定的值，从集合中筛选出符合条件的SearchViewItem对象，并计算它们的权重
+            var filtered = from item in collection
+                           let keys = item.keys.Where(key => !string.IsNullOrEmpty(key)) // 排除空的键
+                           let weight = keys.Count(key => key.Contains(value)) // 统计包含给定值的键的数量
+                                      + keys.Count(key => key.StartsWith(value)) * 500 // 统计以给定值开头的键的数量，并乘以500
+                                      + keys.Count(key => key.Equals(value)) * 1000 // 统计等于给定值的键的数量，并乘以1000
+                           where weight > 0 // 只选择权重为正的对象
+                           select new { Item = item, Weight = weight / keys.Count() }; // 创建一个包含对象和权重属性的匿名类型
+
+            // 按照权重降序排序筛选出的对象
+            var sorted = filtered.OrderByDescending(x => x.Weight);
+
+            // 将排序后的对象添加到Items集合中
+            foreach (var x in sorted)
             {
-                bool show = false;
-                foreach (string key in searchViewItem.keys)
-                {
-                    if (!String.IsNullOrEmpty(key))
-                    {
-                        if (key.Contains(value))
-                        {
-                            show = true;
-                            searchViewItem.weight += 1;
-
-                        }
-                        if (key.StartsWith(value))
-                        {
-                            show = true;
-                            searchViewItem.weight += 500;
-
-                        }
-                        if (key.Equals(value))
-                        {
-                            show = true;
-                            searchViewItem.weight += 1000;
-
-                        }
-                    }
-                    
-                }
-                searchViewItem.weight= searchViewItem.weight/searchViewItem.keys.Count();
-                
-                Items.Add(searchViewItem) ;
+                Items.Add(x.Item);
             }
-            var sorted = Items.OrderByDescending(item => item.weight);
-            Items = new ObservableCollection<SearchViewItem>(sorted);
+
 
 
         }
-        
-        
+
+
 
         [ObservableProperty]
         public int? selectedIndex = -1;

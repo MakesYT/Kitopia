@@ -62,9 +62,9 @@ namespace Core.SDKs
 
                     //collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = fileInfo.Name.Replace(".lnk", ""), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
                     string localName = LnkSolver.GetLocalizedName(file);
-                    nameSolver(ref keys, localName);
-                    nameSolver(ref keys, fileInfo.Name.Replace(".lnk", ""));
-                    nameSolver(ref keys, refFileInfo.Name.Replace(".exe", ""));
+                    nameSolver(keys, localName);
+                    nameSolver(keys, fileInfo.Name.Replace(".lnk", ""));
+                    nameSolver(keys, refFileInfo.Name.Replace(".exe", ""));
                     if (!names.Contains(localName))
                     {
                         names.Add(localName);
@@ -77,39 +77,34 @@ namespace Core.SDKs
             //Console.WriteLine();
         }
         private static string pattern = @"([a-zA-Z0-9.]+)|([\u4e00-\u9fa5]+)"; //匹配英文数字或中文
-        private static void nameSolver(ref List<string> keys, string name)
+        private static void nameSolver(List<string> keys, string name)
         {
-            
-                                                                    //匹配非中文或中文
-            MatchCollection matches = Regex.Matches(name, pattern);
+            //匹配非中文或中文
+            var matches = Regex.Matches(name, pattern);
             foreach (Match match in matches)
             {
-                string a2 = match.Groups[1].Value;
-                string a3 = match.Groups[2].Value;
-                if (!String.IsNullOrWhiteSpace(a2))
+                var a2 = match.Groups[1].Value;
+                var a3 = match.Groups[2].Value;
+                if (!string.IsNullOrEmpty(a2))
                 {
-
-                    keys.Add(a2);//PowerPoint
-                    keys.Add(a2.ToLower());//powerpoint
-                    keys.Add(a2.ToUpper());//POWERPOINT
-                    string a1 = Regex.Replace(a2, "[^A-Z]", "");
-                    keys.Add(a1);//PP
-                    keys.Add(a1 + a2.Last());//PPt
-                    keys.Add(a1 + a2.Last().ToString().ToUpper());//PPT
-                    keys.Add((a1 + a2.Last()).ToLower());//ppt
+                    keys.Add(a2); //PowerPoint
+                    keys.Add(a2.ToLowerInvariant()); //powerpoint
+                    keys.Add(a2.ToUpperInvariant()); //POWERPOINT
+                    var a1 = Regex.Replace(a2, "[^A-Z]", "");
+                    keys.Add(a1); //PP
+                    keys.Add($"{a1}{a2.Last()}"); //PPt
+                    keys.Add($"{a1}{a2.Last().ToString().ToUpperInvariant()}"); //PPT
+                    keys.Add($"{a1}{a2.Last().ToString().ToLowerInvariant()}"); //ppt
                 }
-                else if (!String.IsNullOrWhiteSpace(a3))
+                else if (!string.IsNullOrEmpty(a3))
                 {
-
-                    keys.Add(NPinyin.Pinyin.GetInitials(a3).ToLower());
-                    keys.Add(NPinyin.Pinyin.GetInitials(a3).ToUpper());
-                    keys.Add(NPinyin.Pinyin.GetPinyin(a3).Replace(" ", "").ToUpper());
-                    keys.Add(NPinyin.Pinyin.GetPinyin(a3).Replace(" ", "").ToLower());
+                    keys.Add(NPinyin.Pinyin.GetInitials(a3).ToLowerInvariant());
+                    keys.Add(NPinyin.Pinyin.GetInitials(a3).ToUpperInvariant());
+                    keys.Add(NPinyin.Pinyin.GetPinyin(a3).Replace(" ", "").ToUpperInvariant());
+                    keys.Add(NPinyin.Pinyin.GetPinyin(a3).Replace(" ", "").ToLowerInvariant());
                 }
-
             }
-            
-           
         }
+
     }
 }
