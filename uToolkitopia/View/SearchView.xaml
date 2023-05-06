@@ -42,7 +42,7 @@
 
         </Grid>
         <hc:TextBox Focusable="False" FontSize="15" Text="Everthing服务未运行,无法搜索文档,请检查" Height="35" IsReadOnly="True"
-                    Visibility="{Binding EverythingIsOK, Converter={StaticResource reverseBoolToVisibilityConverter}}"
+                    Visibility="{Binding EverythingIsOk, Converter={StaticResource reverseBoolToVisibilityConverter}}"
                     Margin="0,0,0,0" />
         <DataGrid x:Name="dataGrid" SelectedIndex="{Binding SelectedIndex,Mode=TwoWay}" RowHeight="75"
                   HeadersVisibility="None" MaxHeight="385 " ItemsSource="{Binding Items}" AutoGenerateColumns="False"
