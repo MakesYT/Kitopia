@@ -1,45 +1,45 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net7.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
-    <UseWPF>true</UseWPF>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net7.0-windows</TargetFramework>
+        <Nullable>enable</Nullable>
+        <UseWPF>true</UseWPF>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="log4net.config" />
-  </ItemGroup>
+    <ItemGroup>
+        <None Remove="log4net.config"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="log4net.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
+    <ItemGroup>
+        <Content Include="log4net.config">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.0" />
-    <PackageReference Include="HandyControl" Version="3.4.0" />
-    <PackageReference Include="log4net" Version="2.0.15" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
-    <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.0"/>
+        <PackageReference Include="HandyControl" Version="3.4.0"/>
+        <PackageReference Include="log4net" Version="2.0.15"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0"/>
+        <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39"/>
+        <PackageReference Include="System.Drawing.Common" Version="7.0.0"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Core\Core.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Core\Core.csproj"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Style\" />
-  </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Style\"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="Interop.IWshRuntimeLibrary">
-      <HintPath>..\Core\obj\Debug\net7.0\Interop.IWshRuntimeLibrary.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+    <ItemGroup>
+        <Reference Include="Interop.IWshRuntimeLibrary">
+            <HintPath>..\Core\obj\Debug\net7.0\Interop.IWshRuntimeLibrary.dll</HintPath>
+        </Reference>
+    </ItemGroup>
 
 </Project>

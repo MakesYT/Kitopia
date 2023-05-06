@@ -1,7 +1,5 @@
-﻿namespace Core
-{
-    public class Class1
-    {
+﻿namespace Core;
 
-    }
+public class Class1
+{
 }

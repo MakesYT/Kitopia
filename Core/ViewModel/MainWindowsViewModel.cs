@@ -1,14 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
-namespace Kitopia.Core.ViewModel
+namespace Core.ViewModel;
+
+public class MainWindowsViewModel : ObservableRecipient
 {
-    public partial class MainWindowsViewModel : ObservableRecipient
+    [RelayCommand]
+    public void Exit()
     {
-        [RelayCommand]
-        public void Exit()
-        {
-            Environment.Exit(0);
-        }
+        Environment.Exit(0);
     }
 }

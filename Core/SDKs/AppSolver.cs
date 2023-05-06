@@ -1,120 +1,98 @@
-﻿using System.Collections.ObjectModel;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
+using NPinyin;
 
-namespace Core.SDKs
+namespace Core.SDKs;
+
+public partial class AppSolver
 {
-    public class AppSolver
+    public static void GetAllApps(ref List<SearchViewItem> collection, ref List<string> names)
     {
-        // 定义一个方法，用于遍历指定目录下的所有符合条件的文件，并调用AppSolverA方法
-        private static void EnumerateFiles(string directory, ref List<SearchViewItem> collection, ref List<string> names)
+        foreach (var file in Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                     "*.lnk")) AppSolverA(ref collection, ref names, file);
+        foreach (var file in Directory.EnumerateFiles("C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs",
+                     "*.lnk")) AppSolverA(ref collection, ref names, file);
+        foreach (var path in Directory.EnumerateDirectories("C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs",
+                     "*", SearchOption.AllDirectories))
         {
-            // 使用DirectoryInfo类来提高遍历效率[^1^][1]
-            DirectoryInfo dirInfo = new DirectoryInfo(directory);
-            // 使用SearchOption.TopDirectoryOnly来避免递归遍历所有子目录[^2^][2]
-            foreach (FileInfo fileInfo in dirInfo.EnumerateFiles("*.lnk", SearchOption.TopDirectoryOnly))
-            {
-                AppSolverA(ref collection, ref names, fileInfo.FullName);
-            }
-            foreach (FileInfo fileInfo in dirInfo.EnumerateFiles("*.appref-ms", SearchOption.TopDirectoryOnly))
-            {
-                AppSolverA(ref collection, ref names, fileInfo.FullName);
-            }
+            foreach (var file in Directory.EnumerateFiles(path, "*.lnk")) AppSolverA(ref collection, ref names, file);
+            foreach (var file in Directory.EnumerateFiles(path, "*.appref-ms"))
+                AppSolverA(ref collection, ref names, file);
         }
-        public static void GetAllApps(ref List<SearchViewItem> collection, ref List<string> names)
-        {
 
-            // 调用EnumerateFiles方法来遍历不同的目录
-            EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), ref collection, ref names);
-            EnumerateFiles("C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs", ref collection, ref names);
-            // 使用DirectoryInfo类来获取子目录[^1^][1]
-            DirectoryInfo programDir = new DirectoryInfo("C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs");
-            foreach (DirectoryInfo subDir in programDir.EnumerateDirectories())
-            {
-                EnumerateFiles(subDir.FullName, ref collection, ref names);
-            }
-            DirectoryInfo userDir = new DirectoryInfo(Environment.GetFolderPath(Environment.SpecialFolder.Programs));
-            foreach (DirectoryInfo subDir in userDir.EnumerateDirectories())
-            {
-                EnumerateFiles(subDir.FullName, ref collection, ref names);
-            }
+        foreach (var path in Directory.EnumerateDirectories(
+                     Environment.GetFolderPath(Environment.SpecialFolder.Programs), "*", SearchOption.AllDirectories))
+        {
+            foreach (var file in Directory.EnumerateFiles(path, "*.lnk")) AppSolverA(ref collection, ref names, file);
+            foreach (var file in Directory.EnumerateFiles(path, "*.appref-ms"))
+                AppSolverA(ref collection, ref names, file);
         }
-        private static void AppSolverA(ref List<SearchViewItem> collection, ref List<string> names, string file)
-        {
-            FileInfo fileInfo = new FileInfo(file);
+    }
 
-            FileInfo refFileInfo = new FileInfo(LnkSolver.ResolveShortcut(file));
-            if (refFileInfo.Exists)
-                if (refFileInfo.Extension != ".url" && refFileInfo.Extension != ".txt" && refFileInfo.Extension != ".chm" && refFileInfo.Extension != ".pdf" && !fileInfo.Name.Contains("install") && !fileInfo.Name.Contains("安装") && !fileInfo.Name.Contains("卸载"))
-                {
+    private static void AppSolverA(ref List<SearchViewItem> collection, ref List<string> names, string file)
+    {
+        var fileInfo = new FileInfo(file);
 
-                    List<string> keys = new List<string>();
-
-                    //collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = fileInfo.Name.Replace(".lnk", ""), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
-                    string localName = LnkSolver.GetLocalizedName(file);
-                    nameSolver(keys, localName);
-                    nameSolver(keys, fileInfo.Name.Replace(".lnk", ""));
-                    nameSolver(keys, refFileInfo.Name.Replace(".exe", ""));
-                    if (!names.Contains(localName))
-                    {
-                        names.Add(localName);
-                        collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = localName, fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
-
-                    }
-
-                }
-        }
-    
-
-
-            //Console.WriteLine();
-        
-        // 使用const或readonly修饰符来声明pattern字符串
-        private readonly static string pattern = @"([a-zA-Z0-9.]+)|([\u4e00-\u9fa5]+)"; //匹配英文数字或中文
-        private static void nameSolver(List<string> keys, string name)
-        {
-            // 使用集合初始化器或LINQ表达式来简化向字符串列表中添加元素的操作
-            keys.AddRange(new[]
+        var refFileInfo = new FileInfo(LnkSolver.ResolveShortcut(file));
+        if (refFileInfo.Exists)
+            if (refFileInfo.Extension != ".url" && refFileInfo.Extension != ".txt" && refFileInfo.Extension != ".chm" &&
+                refFileInfo.Extension != ".pdf" && !fileInfo.Name.Contains("install") &&
+                !fileInfo.Name.Contains("安装") && !fileInfo.Name.Contains("卸载"))
             {
-                // 使用StringComparison.OrdinalIgnoreCase来转换字符串为小写
-               
-                NPinyin.Pinyin.GetInitials(name).Replace(" ", "").ToLowerInvariant(),
-                NPinyin.Pinyin.GetPinyin(name).Replace(" ", "").ToLowerInvariant()
-            }) ;
-            //匹配非中文或中文
-            var matches = Regex.Matches(name, pattern);
-            foreach (Match match in matches)
-            {
-                var a2 = match.Groups[1].Value;
-                var a3 = match.Groups[2].Value;
-                if (!string.IsNullOrEmpty(a2))
+                var keys = new HashSet<string>();
+
+                //collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = fileInfo.Name.Replace(".lnk", ""), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
+                var localName = LnkSolver.GetLocalizedName(file);
+                nameSolver(keys, localName);
+                //nameSolver(keys, fileInfo.Name.Replace(".lnk", ""));
+                nameSolver(keys, refFileInfo.Name.Replace(".exe", ""));
+                if (!names.Contains(localName))
                 {
-                    //PowerPoint
-                    // 使用StringComparison.OrdinalIgnoreCase来转换字符串为小写
-                    keys.AddRange(new[]
+                    names.Add(localName);
+                    collection.Add(new SearchViewItem
                     {
-                        a2.ToLowerInvariant(),
-                        String.Concat(Regex.Replace(a2, "[^A-Z]", ""), a2.Last().ToString().ToLowerInvariant())
-                    });
-
-                    //powerpoint
-
-
-                    // 使用String.Concat方法来拼接字符串
-
-                }
-                else if (!string.IsNullOrEmpty(a3))
-                {
-                    // 使用集合初始化器或LINQ表达式来简化向字符串列表中添加元素的操作
-                    keys.AddRange(new[]
-                    {
-                        NPinyin.Pinyin.GetInitials(a3).ToLowerInvariant(),
-                        NPinyin.Pinyin.GetPinyin(a3).Replace(" ", "").ToLowerInvariant()
+                        keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = localName,
+                        fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName)
                     });
                 }
             }
+    }
+
+
+    //Console.WriteLine();
+    private static void CreateCombinations(HashSet<string> keys, int startIndex, string pair, string[] initialArray)
+    {
+        for (var i = startIndex; i < initialArray.Length; i++)
+        {
+            var value = $"{pair}{initialArray[i]}";
+            AddUtil(keys, value.ToLowerInvariant());
+            AddUtil(keys, Pinyin.GetInitials(value).Replace(" ", "").ToLowerInvariant());
+            AddUtil(keys, Pinyin.GetPinyin(value).Replace(" ", "").ToLowerInvariant());
+            AddUtil(keys, GetRegex().Replace(value, "").ToLowerInvariant());
+            CreateCombinations(keys, i + 1, value, initialArray);
         }
+    }
 
+    [GeneratedRegex("[^A-Z]", RegexOptions.IgnoreCase)]
+    private static partial Regex GetRegex();
 
+    // 使用const或readonly修饰符来声明pattern字符串
+    public static void nameSolver(HashSet<string> keys, string name)
+    {
+        var initials = name.Split(" ");
+        CreateCombinations(keys, 0, "", initials);
 
+        AddUtil(keys, Pinyin.GetInitials(name).Replace(" ", "").ToLowerInvariant());
+        AddUtil(keys, Pinyin.GetPinyin(name).Replace(" ", "").ToLowerInvariant());
+        AddUtil(keys,
+            string.Concat(GetRegex().Replace(name, "").ToLowerInvariant(), name.Last().ToString().ToLowerInvariant()));
+    }
+
+    private static void AddUtil(HashSet<string> keys, string name)
+    {
+        if (string.IsNullOrEmpty(name)) return;
+
+        if (name.Length <= 1) return;
+
+        keys.Add(name);
     }
 }

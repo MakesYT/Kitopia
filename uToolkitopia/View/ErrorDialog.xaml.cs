@@ -1,8 +1,8 @@
-﻿using log4net;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Media.Animation;
+using log4net;
 
 namespace Kitopia.View;
 
@@ -12,6 +12,7 @@ namespace Kitopia.View;
 public partial class ErrorDialog : Window
 {
     private static readonly ILog log = LogManager.GetLogger("ErrorDialog");
+
     public ErrorDialog(string infostr, string str)
     {
         InitializeComponent();
@@ -25,11 +26,13 @@ public partial class ErrorDialog : Window
     {
         Close();
     }
+
     private void logs_Click(object sender, RoutedEventArgs e)
     {
         ExecuteInCmd("start \"\" \"" + Directory.GetCurrentDirectory() + "\\logs\"", "");
         // System.Diagnostics.Process.Start(Directory.GetCurrentDirectory() );
     }
+
     public string ExecuteInCmd(string cmdline, string dir)
     {
         using (var process = new Process())
