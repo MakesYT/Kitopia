@@ -87,20 +87,18 @@ namespace Core.SDKs
                 var a3 = match.Groups[2].Value;
                 if (!string.IsNullOrEmpty(a2))
                 {
-                    keys.Add(a2); //PowerPoint
+                    //PowerPoint
                     keys.Add(a2.ToLowerInvariant()); //powerpoint
-                    keys.Add(a2.ToUpperInvariant()); //POWERPOINT
-                    var a1 = Regex.Replace(a2, "[^A-Z]", "");
-                    keys.Add(a1); //PP
-                    keys.Add($"{a1}{a2.Last()}"); //PPt
-                    keys.Add($"{a1}{a2.Last().ToString().ToUpperInvariant()}"); //PPT
+                    
+                    var a1 = Regex.Replace(a2, "[^A-Z]", "");//pp
+                    
                     keys.Add($"{a1}{a2.Last().ToString().ToLowerInvariant()}"); //ppt
                 }
                 else if (!string.IsNullOrEmpty(a3))
                 {
                     keys.Add(NPinyin.Pinyin.GetInitials(a3).ToLowerInvariant());
-                    keys.Add(NPinyin.Pinyin.GetInitials(a3).ToUpperInvariant());
-                    keys.Add(NPinyin.Pinyin.GetPinyin(a3).Replace(" ", "").ToUpperInvariant());
+                   
+                    
                     keys.Add(NPinyin.Pinyin.GetPinyin(a3).Replace(" ", "").ToLowerInvariant());
                 }
             }

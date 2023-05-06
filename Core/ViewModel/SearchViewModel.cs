@@ -36,7 +36,7 @@ namespace Kitopia.Core.ViewModel
                 System.GC.Collect();
                 return;
             }
-                
+            value = value.ToLowerInvariant();
 
             if (IntPtr.Size == 8)
             {
