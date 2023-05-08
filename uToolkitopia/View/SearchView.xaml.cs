@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -22,6 +23,7 @@ public partial class SearchView : Window
     private void w_Deactivated(object sender, EventArgs e)
     {
         Visibility = Visibility.Hidden;
+        
     }
 
     [DllImport("user32.dll", SetLastError = true)]
@@ -32,9 +34,11 @@ public partial class SearchView : Window
 
     private void w_Activated(object sender, EventArgs e)
     {
+        
         var hwnd = new WindowInteropHelper(this).Handle;
         SetForegroundWindow(hwnd);
         SetFocus(hwnd);
+        
     }
 
     private void Button_PreviewKeyDown(object sender, KeyEventArgs e)

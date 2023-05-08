@@ -28,7 +28,7 @@ public class GetIconFromFile
 
     public static Icon GetIcon(string path)
     {
-        if (path.ToLower().EndsWith(".exe") || path.ToLower().EndsWith(".lnk"))
+        if (path.ToLower().EndsWith(".exe") || path.ToLower().EndsWith(".lnk")|| path.ToLower().EndsWith(".msc")|| path.ToLower().EndsWith(".appref-ms"))
         {
             var iconTotalCount = PrivateExtractIcons(path, 0, 0, 0, null, null, 0, 0);
 

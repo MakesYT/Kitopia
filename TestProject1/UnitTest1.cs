@@ -45,7 +45,7 @@ public class UnitTest1
         var names = new List<string>(); //软件去重
         var watch = Stopwatch.StartNew();
 
-        AppSolver.GetAllApps(ref collection, ref names);
+        AppSolver.GetAllApps( collection,  names);
         watch.Stop();
         // 获取执行时间，单位为毫秒
         var elapsedMs = watch.ElapsedMilliseconds;

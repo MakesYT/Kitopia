@@ -5,43 +5,65 @@ namespace Core.SDKs;
 
 public partial class AppSolver
 {
-    public static void GetAllApps(ref List<SearchViewItem> collection, ref List<string> names)
+    public static void GetAllApps( List<SearchViewItem> collection,  List<string> names)
     {
-        foreach (var file in Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                     "*.lnk")) AppSolverA(ref collection, ref names, file);
-        foreach (var file in Directory.EnumerateFiles("C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs",
-                     "*.lnk")) AppSolverA(ref collection, ref names, file);
-        foreach (var path in Directory.EnumerateDirectories("C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs",
-                     "*", SearchOption.AllDirectories))
+        List<Task> taskList = new List<Task>();
+
+        foreach (var file in Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "*.lnk"))
+            taskList.Add(Task.Run(() =>
+            {
+                AppSolverA( collection,  names, file);
+            }));
+            
+        foreach (var file in Directory.EnumerateFiles("C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs", "*.lnk")) 
+            taskList.Add(Task.Run(() =>
+            {
+                AppSolverA( collection,  names, file);
+            }));
+        foreach (var path in Directory.EnumerateDirectories("C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs", "*", SearchOption.AllDirectories))
         {
-            foreach (var file in Directory.EnumerateFiles(path, "*.lnk")) AppSolverA(ref collection, ref names, file);
+            foreach (var file in Directory.EnumerateFiles(path, "*.lnk")) 
+                taskList.Add(Task.Run(() =>
+                {
+                    AppSolverA( collection,  names, file);
+                }));
             foreach (var file in Directory.EnumerateFiles(path, "*.appref-ms"))
-                AppSolverA(ref collection, ref names, file);
+                taskList.Add(Task.Run(() =>
+                {
+                    AppSolverA( collection,  names, file);
+                }));
         }
 
-        foreach (var path in Directory.EnumerateDirectories(
-                     Environment.GetFolderPath(Environment.SpecialFolder.Programs), "*", SearchOption.AllDirectories))
+        foreach (var path in Directory.EnumerateDirectories(Environment.GetFolderPath(Environment.SpecialFolder.Programs), "*", SearchOption.AllDirectories))
         {
-            foreach (var file in Directory.EnumerateFiles(path, "*.lnk")) AppSolverA(ref collection, ref names, file);
+            foreach (var file in Directory.EnumerateFiles(path, "*.lnk")) 
+                taskList.Add(Task.Run(() =>
+                {
+                    AppSolverA( collection,  names, file);
+                }));
             foreach (var file in Directory.EnumerateFiles(path, "*.appref-ms"))
-                AppSolverA(ref collection, ref names, file);
+                taskList.Add(Task.Run(() =>
+                {
+                    AppSolverA( collection,  names, file);
+                }));
         }
+        Task.WaitAll(taskList.ToArray());
     }
 
-    private static void AppSolverA(ref List<SearchViewItem> collection, ref List<string> names, string file)
+    private static void AppSolverA( List<SearchViewItem> collection,  List<string> names, string file)
     {
         var fileInfo = new FileInfo(file);
 
         var refFileInfo = new FileInfo(LnkSolver.ResolveShortcut(file));
         if (refFileInfo.Exists)
             if (refFileInfo.Extension != ".url" && refFileInfo.Extension != ".txt" && refFileInfo.Extension != ".chm" &&
-                refFileInfo.Extension != ".pdf" && !fileInfo.Name.Contains("install") &&
+                refFileInfo.Extension != ".pdf" && refFileInfo.Extension != ".bat" && !fileInfo.Name.Contains("install") &&
                 !fileInfo.Name.Contains("安装") && !fileInfo.Name.Contains("卸载"))
             {
                 var keys = new HashSet<string>();
 
                 //collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = fileInfo.Name.Replace(".lnk", ""), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
-                var localName = LnkSolver.GetLocalizedName(file);
+                var localName = LnkSolver.GetLocalizedName(file).Result;
                 nameSolver(keys, localName);
                 //nameSolver(keys, fileInfo.Name.Replace(".lnk", ""));
                 nameSolver(keys, refFileInfo.Name.Replace(".exe", ""));

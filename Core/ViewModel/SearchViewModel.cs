@@ -34,7 +34,7 @@ public partial class SearchViewModel : ObservableRecipient
     {
         _collection.Clear();
         _names.Clear();
-        AppSolver.GetAllApps(ref _collection, ref _names);
+        AppSolver.GetAllApps( _collection,  _names);
     }
 
     public void LoadLast()

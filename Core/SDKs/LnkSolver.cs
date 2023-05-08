@@ -32,7 +32,7 @@ public class LnkSolver
         ref Guid riid,
         [MarshalAs(UnmanagedType.Interface)] out IShellItem shellItem);
 
-    public static string GetLocalizedName(string path)
+    public  static async Task<string> GetLocalizedName(string path)
     {
         var shellItemType = ShellItemTypeConstants.ShellItemGuid;
         var retCode = SHCreateItemFromParsingName(path, IntPtr.Zero, ref shellItemType, out var shellItem);
