@@ -155,9 +155,8 @@ public sealed partial class App : Application
             catch (Exception e2)
             {
                 //此时程序出现严重异常，将强制结束退出
-                var error = new ErrorDialog("", "程序发生致命错误，将终止，");
-                error.ShowDialog();
-                //MessageBox.Show("程序发生致命错误，将终止，");
+                
+                MessageBox.Show("程序发生致命错误，将终止，");
             }
         })).Wait();
     }

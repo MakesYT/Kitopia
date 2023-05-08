@@ -32,8 +32,15 @@ public partial class SearchViewModel : ObservableRecipient
 
     public void ReloadApps()
     {
+        Items.Clear();
+        foreach (var searchViewItem in _collection)
+        {
+            searchViewItem.icon.Dispose();
+        }
         _collection.Clear();
         _names.Clear();
+        GetIconFromFile.ClearCache();
+        System.GC.Collect();
         AppSolver.GetAllApps( _collection,  _names);
     }
 
@@ -51,6 +58,7 @@ public partial class SearchViewModel : ObservableRecipient
     {
         if (value == null || value == "")
         {
+            //ReloadApps();
             LoadLast();
             return;
         }

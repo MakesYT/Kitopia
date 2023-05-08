@@ -7,6 +7,10 @@ public class GetIconFromFile
 {
     private static readonly Dictionary<string, Icon> icons = new();
 
+    public static void ClearCache()
+    {
+        icons.Clear();
+    }
     [DllImport("User32.dll")]
     public static extern int PrivateExtractIcons(
         string lpszFile, //file name
