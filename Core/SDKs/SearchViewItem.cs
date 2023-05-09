@@ -2,7 +2,7 @@
 
 namespace Core.SDKs;
 
-public class SearchViewItem
+public class SearchViewItem: ICloneable
 {
     public string? fileName { set; get; }
     public bool? IsVisible { set; get; }
@@ -10,6 +10,18 @@ public class SearchViewItem
     public FileType fileType { set; get; }
     public FileInfo? fileInfo { set; get; }
     public Icon? icon { set; get; }
+
+    public object Clone()
+    {
+        return new SearchViewItem()
+        {
+            fileName = fileName,
+            IsVisible = IsVisible,
+            keys = new HashSet<string>(keys),
+            fileType = fileType,
+            fileInfo = new FileInfo(fileInfo.FullName),
+        };
+    }
 }
 
 public enum FileType

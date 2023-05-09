@@ -1,5 +1,7 @@
 ﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Core.SDKs;
@@ -15,9 +17,10 @@ public partial class SearchViewModel : ObservableRecipient
 
     [ObservableProperty] private bool? _everythingIsOk;
 
-    [ObservableProperty] private ObservableCollection<SearchViewItem> _items = new(); //搜索界面显示的软件
+    [ObservableProperty] private BindingList<SearchViewItem> _items = new(); //搜索界面显示的软件
 
     private List<string> _names = new(); //软件去重
+    private GetIconFromFile _fromFile = new GetIconFromFile();
 
     [ObservableProperty] private string? _search;
 
@@ -33,15 +36,12 @@ public partial class SearchViewModel : ObservableRecipient
     public void ReloadApps()
     {
         Items.Clear();
-        foreach (var searchViewItem in _collection)
-        {
-            searchViewItem.icon.Dispose();
-        }
+        //_fromFile.ClearCache(); 
         _collection.Clear();
         _names.Clear();
-        GetIconFromFile.ClearCache();
-        System.GC.Collect();
+        
         AppSolver.GetAllApps( _collection,  _names);
+        GC.Collect();
     }
 
     public void LoadLast()
@@ -51,18 +51,37 @@ public partial class SearchViewModel : ObservableRecipient
             foreach (var name in ConfigManger.config.lastOpens)
             foreach (var searchViewItem in _collection)
                 if (searchViewItem.fileName.Equals(name))
-                    Items.Add(searchViewItem);
+                    Items.Add((SearchViewItem)searchViewItem.Clone());
+        OnItemsChanged(Items);
     }
 
+    partial void OnItemsChanged(BindingList<SearchViewItem>? viewItem)
+    {
+        
+        if (viewItem is null)
+        {
+            return;
+        }
+
+        for (var i = 0; i < viewItem.Count; i++)
+        {
+            if (viewItem[i].icon == null)
+            {
+                viewItem[i].icon = (Icon)_fromFile.GetIcon(viewItem[i].fileInfo.FullName).Clone();
+            }
+        }
+        
+    }
     partial void OnSearchChanged(string? value)
     {
         if (value == null || value == "")
         {
-            //ReloadApps();
+            
             LoadLast();
             return;
         }
 
+        
         value = value.ToLowerInvariant();
 
         if (IntPtr.Size == 8)
@@ -98,7 +117,8 @@ public partial class SearchViewModel : ObservableRecipient
         var sorted = filtered.OrderByDescending(x => x.Weight);
 
         // 将排序后的对象添加到Items集合中
-        foreach (var x in sorted) Items.Add(x.Item);
+        foreach (var x in sorted) Items.Add((SearchViewItem)x.Item.Clone());
+        OnItemsChanged(Items);
     }
 
 

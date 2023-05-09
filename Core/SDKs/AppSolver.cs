@@ -73,7 +73,7 @@ public partial class AppSolver
                     collection.Add(new SearchViewItem
                     {
                         keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = localName,
-                        fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName)
+                        fileType = FileType.App, icon = null
                     });
                 }
             }

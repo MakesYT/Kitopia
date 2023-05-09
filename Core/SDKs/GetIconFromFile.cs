@@ -5,10 +5,14 @@ namespace Core.SDKs;
 
 public class GetIconFromFile
 {
-    private static readonly Dictionary<string, Icon> icons = new();
+    private readonly Dictionary<string, Icon> icons = new();
 
-    public static void ClearCache()
+    public  void ClearCache()
     {
+        foreach (Icon iconsValue in icons.Values)
+        {
+            DestroyIcon(iconsValue.Handle);
+        }
         icons.Clear();
     }
     [DllImport("User32.dll")]
@@ -30,10 +34,15 @@ public class GetIconFromFile
         IntPtr hIcon //A handle to the icon to be destroyed. The icon must not be in use.
     );
 
-    public static Icon GetIcon(string path)
+    public  Icon GetIcon(string path)
     {
+        
         if (path.ToLower().EndsWith(".exe") || path.ToLower().EndsWith(".lnk")|| path.ToLower().EndsWith(".msc")|| path.ToLower().EndsWith(".appref-ms"))
         {
+            if (icons.ContainsKey(path.Split("\\").Last()))
+            {
+                return icons[path.Split("\\").Last()];
+            }
             var iconTotalCount = PrivateExtractIcons(path, 0, 0, 0, null, null, 0, 0);
 
             //用于接收获取到的图标指针
@@ -52,6 +61,7 @@ public class GetIconFromFile
 
                 using (var icon = Icon.FromHandle(hIcons[i]))
                 {
+                    icons.Add(path.Split("\\").Last(),icon);
                     return icon;
                 }
             }
@@ -66,7 +76,7 @@ public class GetIconFromFile
             icons.Add(path.Split(".").Last(), icon1);
             return icon1;
         }
-
+       
         return Icon.ExtractAssociatedIcon((string)path);
     }
 }

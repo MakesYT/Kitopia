@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 using Core.ViewModel;
@@ -121,6 +123,7 @@ public partial class MainWindows : Window
                     }
                     else
                     {
+                        App.Current.Services.GetService<SearchViewModel>().ReloadApps();
                         App.Current.Services.GetService<SearchView>().Visibility = Visibility.Visible;
                         App.Current.Services.GetService<SearchView>().Topmost = true;
 

@@ -15,11 +15,19 @@ public class PathToImageConverter : IValueConverter
         if (value == null)
             return null;
         var icon = value as Icon;
-
-        return Imaging.CreateBitmapSourceFromHIcon(
-            icon.Handle,
-            new Int32Rect(0, 0, icon.Width, icon.Height),
-            BitmapSizeOptions.FromEmptyOptions());
+        try
+        {
+             return Imaging.CreateBitmapSourceFromHIcon(
+                        icon.Handle,
+                        new Int32Rect(0, 0, icon.Width, icon.Height),
+                        BitmapSizeOptions.FromEmptyOptions());
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return null;
+        }
+       
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

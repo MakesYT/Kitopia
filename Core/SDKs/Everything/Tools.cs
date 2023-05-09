@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Text;
 using Core.SDKs;
 
@@ -6,7 +7,7 @@ namespace Kitopia.SDKs.Everything;
 
 public class Tools
 {
-    public static void main(ref ObservableCollection<SearchViewItem> Items, string value)
+    public static void main(ref BindingList<SearchViewItem> Items, string value)
     {
         if (IntPtr.Size == 8)
             // 64-bit
@@ -16,7 +17,7 @@ public class Tools
             amd32(ref Items, value);
     }
 
-    public static void amd32(ref ObservableCollection<SearchViewItem> Items, string value)
+    public static void amd32(ref BindingList<SearchViewItem> Items, string value)
     {
         Everything32.Everything_Reset();
         Everything32.Everything_SetSearchW("*.docx|*.doc|*.xls|*.xlsx|*.pdf|*.ppt|*.pptx" + " " + value);
@@ -43,12 +44,12 @@ public class Tools
             Items.Add(new SearchViewItem
             {
                 IsVisible = true, fileInfo = fileInfo, fileName = fileInfo.Name, fileType = fileType,
-                icon = GetIconFromFile.GetIcon(fileInfo.FullName)
+                icon = null
             });
         }
     }
 
-    public static void amd64(ref ObservableCollection<SearchViewItem> Items, string value)
+    public static void amd64(ref BindingList<SearchViewItem> Items, string value)
     {
         Everything64.Everything_Reset();
         Everything64.Everything_SetSearchW("*.docx|*.doc|*.xls|*.xlsx|*.pdf|*.ppt|*.pptx" + " " + value);
@@ -75,7 +76,7 @@ public class Tools
             Items.Add(new SearchViewItem
             {
                 IsVisible = true, fileInfo = fileInfo, fileName = fileInfo.Name, fileType = fileType,
-                icon = GetIconFromFile.GetIcon(fileInfo.FullName)
+                icon = null
             });
         }
     }
