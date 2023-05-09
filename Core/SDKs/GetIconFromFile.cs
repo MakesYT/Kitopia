@@ -62,6 +62,7 @@ public class GetIconFromFile
                 using (var icon = Icon.FromHandle(hIcons[i]))
                 {
                     icons.Add(path.Split("\\").Last(),icon);
+                    
                     return icon;
                 }
             }
@@ -72,6 +73,29 @@ public class GetIconFromFile
         }
         else
         {
+            var iconTotalCount = PrivateExtractIcons(path, 0, 0, 0, null, null, 0, 0);
+
+            //用于接收获取到的图标指针
+            var hIcons = new IntPtr[iconTotalCount];
+            //对应的图标id
+            var ids = new int[iconTotalCount];
+            //成功获取到的图标个数
+            var successCount = PrivateExtractIcons((string)path, 0, 64, 64, hIcons, ids, iconTotalCount, 0);
+
+            //遍历并保存图标
+
+            for (var i = 0; i < successCount; i++)
+            {
+                //指针为空，跳过
+                if (hIcons[i] == IntPtr.Zero) continue;
+
+                using (var icon = Icon.FromHandle(hIcons[i]))
+                {
+                    icons.Add(path.Split("\\").Last(),icon);
+                    return icon;
+                }
+            }
+            
             var icon1 = Icon.ExtractAssociatedIcon((string)path);
             icons.Add(path.Split(".").Last(), icon1);
             return icon1;
@@ -79,4 +103,5 @@ public class GetIconFromFile
        
         return Icon.ExtractAssociatedIcon((string)path);
     }
+    
 }

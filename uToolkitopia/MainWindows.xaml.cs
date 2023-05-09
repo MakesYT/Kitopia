@@ -124,6 +124,7 @@ public partial class MainWindows : Window
                     else
                     {
                         App.Current.Services.GetService<SearchViewModel>().ReloadApps();
+                        App.Current.Services.GetService<SearchViewModel>().LoadLast();
                         App.Current.Services.GetService<SearchView>().Visibility = Visibility.Visible;
                         App.Current.Services.GetService<SearchView>().Topmost = true;
 

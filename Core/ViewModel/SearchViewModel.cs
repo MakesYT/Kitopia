@@ -65,9 +65,12 @@ public partial class SearchViewModel : ObservableRecipient
 
         for (var i = 0; i < viewItem.Count; i++)
         {
-            if (viewItem[i].icon == null)
+            if (viewItem[i].icon == null&&viewItem[i].fileType!=FileType.文件夹)
             {
+                
                 viewItem[i].icon = (Icon)_fromFile.GetIcon(viewItem[i].fileInfo.FullName).Clone();
+                
+                
             }
         }
         
@@ -81,6 +84,7 @@ public partial class SearchViewModel : ObservableRecipient
             return;
         }
 
+        
         
         value = value.ToLowerInvariant();
 
@@ -102,7 +106,33 @@ public partial class SearchViewModel : ObservableRecipient
         Tools.main(ref _items, value);
         GC.Collect();
 
-
+        if (value.Contains("\\")||value.Contains("/"))
+        {
+            
+            if (Path.HasExtension(value)&&File.Exists(value))
+            {
+                Items.Add(new SearchViewItem()
+                {
+                    fileInfo = new FileInfo(value),
+                    fileName = LnkSolver.GetLocalizedName(value),
+                    fileType = FileType.应用程序,
+                    IsVisible = true
+                });
+            }
+            else if (Directory.Exists(value))
+            {
+                Items.Add(new SearchViewItem()
+                                {
+                                    directoryInfo = new DirectoryInfo(value),
+                                    fileName = "打开此文件夹?",
+                                    fileType = FileType.文件夹,
+                                    icon = null,
+                                    IsVisible = true
+                                });
+            }
+            
+        }
+        
         // 使用LINQ语句来简化和优化筛选和排序逻辑，而不需要使用foreach循环和if判断
         // 根据给定的值，从集合中筛选出符合条件的SearchViewItem对象，并计算它们的权重
         var filtered = from item in _collection
@@ -125,8 +155,16 @@ public partial class SearchViewModel : ObservableRecipient
     [RelayCommand]
     public void OpenFile(SearchViewItem searchViewItem)
     {
-        ShellTools.ShellExecute(IntPtr.Zero, "open", searchViewItem.fileInfo.FullName, "", "",
-            ShellTools.ShowCommands.SW_SHOWNORMAL);
+        if (searchViewItem.fileInfo!=null)
+        {
+            ShellTools.ShellExecute(IntPtr.Zero, "open", searchViewItem.fileInfo.FullName, "", "",
+                        ShellTools.ShowCommands.SW_SHOWNORMAL);
+        }
+        if (searchViewItem.directoryInfo!=null)
+        {
+            ShellTools.ShellExecute(IntPtr.Zero, "open", searchViewItem.directoryInfo.FullName, "", "",
+                ShellTools.ShowCommands.SW_SHOWNORMAL);
+        }
 
         if (!ConfigManger.config.lastOpens.Contains(searchViewItem.fileName))
             ConfigManger.config.lastOpens.Insert(0, searchViewItem.fileName);

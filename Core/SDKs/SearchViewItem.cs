@@ -9,6 +9,7 @@ public class SearchViewItem: ICloneable
     public HashSet<string>? keys { set; get; }
     public FileType fileType { set; get; }
     public FileInfo? fileInfo { set; get; }
+    public DirectoryInfo? directoryInfo { set; get; }
     public Icon? icon { set; get; }
 
     public object Clone()
@@ -26,11 +27,12 @@ public class SearchViewItem: ICloneable
 
 public enum FileType
 {
-    App,
+    应用程序,
     Word文档,
     PPT文档,
     Excel文档,
     PDF文档,
     图像,
+    文件夹,
     None
 }

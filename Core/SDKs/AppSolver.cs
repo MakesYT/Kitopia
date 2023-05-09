@@ -63,7 +63,7 @@ public partial class AppSolver
                 var keys = new HashSet<string>();
 
                 //collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = fileInfo.Name.Replace(".lnk", ""), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
-                var localName = LnkSolver.GetLocalizedName(file).Result;
+                var localName = LnkSolver.GetLocalizedName(file);
                 nameSolver(keys, localName);
                 //nameSolver(keys, fileInfo.Name.Replace(".lnk", ""));
                 nameSolver(keys, refFileInfo.Name.Replace(".exe", ""));
@@ -73,7 +73,7 @@ public partial class AppSolver
                     collection.Add(new SearchViewItem
                     {
                         keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = localName,
-                        fileType = FileType.App, icon = null
+                        fileType = FileType.应用程序, icon = null
                     });
                 }
             }

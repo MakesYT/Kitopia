@@ -19,7 +19,7 @@ public class EnumToVisibilityConverter : IValueConverter
             {
                 switch ((FileType)value)
                 {
-                    case FileType.App: return Visibility.Visible;
+                    case FileType.应用程序: return Visibility.Visible;
                     default: return Visibility.Collapsed;
                 }
             }
@@ -27,7 +27,7 @@ public class EnumToVisibilityConverter : IValueConverter
             {
                 switch ((FileType)value)
                 {
-                    case FileType.App: return Visibility.Visible;
+                    case FileType.应用程序: return Visibility.Visible;
                     case FileType.Word文档: return Visibility.Visible;
                     case FileType.PPT文档: return Visibility.Visible;
                     case FileType.Excel文档: return Visibility.Visible;
@@ -40,7 +40,7 @@ public class EnumToVisibilityConverter : IValueConverter
             {
                 switch ((FileType)value)
                 {
-                    case FileType.App: return Visibility.Visible;
+                    case FileType.应用程序: return Visibility.Visible;
                     case FileType.Word文档: return Visibility.Visible;
                     case FileType.PPT文档: return Visibility.Visible;
                     case FileType.Excel文档: return Visibility.Visible;

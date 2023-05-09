@@ -88,11 +88,16 @@
                                     <Border Margin="6,0,0,0" Name="名称"
                                             hc:RelativePanel.RightOf="{Binding ElementName=图标}"
                                             hc:RelativePanel.AlignVerticalCenterWithPanel="True">
-                                        <hc:RunningBlock Focusable="False" Content="{Binding Path=fileName}"
-                                                         Runaway="False" OverridesDefaultStyle="False" AutoRun="True"
-                                                         Background="{x:Null}" BorderBrush="{x:Null}"
+                                        <StackPanel Margin="0" VerticalAlignment="Top">
+                                            <TextBlock VerticalAlignment="Center" Margin="0" Focusable="False" Text="{Binding Path=fileName}"
+                                                        
+                                                         Background="{x:Null}" 
                                                          FontWeight="Normal" FontSize="18" />
+                                            <TextBlock VerticalAlignment="Top" Margin="0" Text="{Binding Path=fileType}"></TextBlock>
+                                        </StackPanel>
+                                        
                                     </Border>
+                                    
                                     <Border Name="操作" hc:RelativePanel.AlignRightWithPanel="True"
                                             hc:RelativePanel.AlignVerticalCenterWithPanel="True">
                                         <hc:ButtonGroup Focusable="False">
