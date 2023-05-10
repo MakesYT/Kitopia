@@ -7,8 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Remove="Everything32.dll"/>
-        <None Remove="Everything64.dll"/>
+        <None Remove="Everything32.dll" />
+        <None Remove="Everything64.dll" />
     </ItemGroup>
 
     <ItemGroup>
@@ -24,12 +24,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.0"/>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
-        <PackageReference Include="NPinyinPro" Version="0.3.3"/>
-        <PackageReference Include="System.Drawing.Common" Version="7.0.0"/>
-        <PackageReference Include="System.Management" Version="7.0.1"/>
-        <PackageReference Include="System.Runtime.InteropServices" Version="4.3.0"/>
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+        <PackageReference Include="NPinyinPro" Version="0.3.3" />
+        <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
+        <PackageReference Include="System.Management" Version="7.0.1" />
+        <PackageReference Include="System.Runtime.InteropServices" Version="4.3.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -39,10 +39,6 @@
         <Content Include="Everything64.dll">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Folder Include="SDKs\Services\"/>
     </ItemGroup>
 
   <ItemGroup>

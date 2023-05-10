@@ -9,9 +9,7 @@
         d:DataContext="{d:DesignInstance localM:MainWindowsViewModel}"
         xmlns:localM="clr-namespace:Core.ViewModel;assembly=Core"
         Title="MainWindows" Height="1" Width="1" Loaded="Window_Loaded" Visibility="Collapsed">
-    <Window.DataContext>
-        <localM:MainWindowsViewModel IsActive="True" />
-    </Window.DataContext>
+    
     <Grid>
         <hc:NotifyIcon Text="Kitopia" IsBlink="true" Visibility="Visible">
             <hc:NotifyIcon.ContextContent>

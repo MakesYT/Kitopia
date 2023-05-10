@@ -2,26 +2,48 @@
 
 namespace Core.SDKs;
 
-public class SearchViewItem: ICloneable
+public class SearchViewItem: ICloneable,IDisposable
 {
-    public string? fileName { set; get; }
+    public string? FileName { set; get; }
     public bool? IsVisible { set; get; }
-    public HashSet<string>? keys { set; get; }
-    public FileType fileType { set; get; }
-    public FileInfo? fileInfo { set; get; }
-    public DirectoryInfo? directoryInfo { set; get; }
-    public Icon? icon { set; get; }
+    public HashSet<string>? Keys { set; get; }
+    public FileType FileType { set; get; }
+    public FileInfo? FileInfo { set; get; }
+    public DirectoryInfo? DirectoryInfo { set; get; }
+    public Icon? Icon { set; get; }
 
     public object Clone()
     {
         return new SearchViewItem()
         {
-            fileName = fileName,
+            FileName = FileName,
             IsVisible = IsVisible,
-            keys = new HashSet<string>(keys),
-            fileType = fileType,
-            fileInfo = new FileInfo(fileInfo.FullName),
+            Keys = new HashSet<string>(Keys!),
+            FileType = FileType,
+            FileInfo = FileInfo!=null?new FileInfo(FileInfo.FullName):null,
+            DirectoryInfo = DirectoryInfo!=null?new DirectoryInfo(DirectoryInfo.FullName):null,
         };
+    }
+
+    public void Dispose()
+    {
+        if (Icon != null)
+        {
+            Icon.Dispose();
+            Icon = null;
+        }
+
+        if (FileInfo != null)
+        {
+            FileInfo = null;
+            
+        }
+
+        if (Keys!=null)
+        {
+            Keys.Clear();
+            Keys = null;
+        }
     }
 }
 

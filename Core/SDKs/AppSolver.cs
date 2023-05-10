@@ -64,16 +64,16 @@ public partial class AppSolver
 
                 //collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = fileInfo.Name.Replace(".lnk", ""), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
                 var localName = LnkSolver.GetLocalizedName(file);
-                nameSolver(keys, localName);
+                NameSolver(keys, localName);
                 //nameSolver(keys, fileInfo.Name.Replace(".lnk", ""));
-                nameSolver(keys, refFileInfo.Name.Replace(".exe", ""));
+                NameSolver(keys, refFileInfo.Name.Replace(".exe", ""));
                 if (!names.Contains(localName))
                 {
                     names.Add(localName);
                     collection.Add(new SearchViewItem
                     {
-                        keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = localName,
-                        fileType = FileType.应用程序, icon = null
+                        Keys = keys, IsVisible = true, FileInfo = refFileInfo, FileName = localName,
+                        FileType = FileType.应用程序, Icon = null
                     });
                 }
             }
@@ -89,16 +89,14 @@ public partial class AppSolver
             AddUtil(keys, value.ToLowerInvariant());
             AddUtil(keys, Pinyin.GetInitials(value).Replace(" ", "").ToLowerInvariant());
             AddUtil(keys, Pinyin.GetPinyin(value).Replace(" ", "").ToLowerInvariant());
-            AddUtil(keys, GetRegex().Replace(value, "").ToLowerInvariant());
+            AddUtil(keys, Regex.Replace(value, "[^A-Z]","").ToLowerInvariant());
             CreateCombinations(keys, i + 1, value, initialArray);
         }
     }
-
-    [GeneratedRegex("[^A-Z]", RegexOptions.IgnoreCase)]
-    private static partial Regex GetRegex();
+    
 
     // 使用const或readonly修饰符来声明pattern字符串
-    public static void nameSolver(HashSet<string> keys, string name)
+    public static void NameSolver(HashSet<string> keys, string name)
     {
         var initials = name.Split(" ");
         CreateCombinations(keys, 0, "", initials);
@@ -106,7 +104,7 @@ public partial class AppSolver
         AddUtil(keys, Pinyin.GetInitials(name).Replace(" ", "").ToLowerInvariant());
         AddUtil(keys, Pinyin.GetPinyin(name).Replace(" ", "").ToLowerInvariant());
         AddUtil(keys,
-            string.Concat(GetRegex().Replace(name, "").ToLowerInvariant(), name.Last().ToString().ToLowerInvariant()));
+            string.Concat(Regex.Replace(name,"[^A-Z]", "").ToLowerInvariant(), name.Last().ToString().ToLowerInvariant()));
     }
 
     private static void AddUtil(HashSet<string> keys, string name)

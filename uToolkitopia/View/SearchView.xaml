@@ -45,7 +45,7 @@
                     Visibility="{Binding EverythingIsOk, Converter={StaticResource reverseBoolToVisibilityConverter}}"
                     Margin="0,0,0,0" />
         <DataGrid x:Name="dataGrid" SelectedIndex="{Binding SelectedIndex,Mode=TwoWay}" RowHeight="75"
-                  HeadersVisibility="None" MaxHeight="385 " ItemsSource="{Binding Items}" AutoGenerateColumns="False"
+                  HeadersVisibility="None" MaxHeight="390 " ItemsSource="{Binding Items}" AutoGenerateColumns="False"
                   Margin="0,10,0,0">
 
             <DataGrid.CellStyle>
@@ -83,17 +83,17 @@
                                             hc:RelativePanel.AlignLeftWithPanel="True"
                                             hc:RelativePanel.AlignVerticalCenterWithPanel="True">
                                         <Image Focusable="False" Width="48" Height="48"
-                                               Source="{Binding icon, Converter={StaticResource pathToImageConverter}}" />
+                                               Source="{Binding Icon, Converter={StaticResource pathToImageConverter}}" />
                                     </Border>
                                     <Border Margin="6,0,0,0" Name="名称"
                                             hc:RelativePanel.RightOf="{Binding ElementName=图标}"
                                             hc:RelativePanel.AlignVerticalCenterWithPanel="True">
                                         <StackPanel Margin="0" VerticalAlignment="Top">
-                                            <TextBlock VerticalAlignment="Center" Margin="0" Focusable="False" Text="{Binding Path=fileName}"
+                                            <TextBlock VerticalAlignment="Center" Margin="0" Focusable="False" Text="{Binding Path=FileName}"
                                                         
                                                          Background="{x:Null}" 
                                                          FontWeight="Normal" FontSize="18" />
-                                            <TextBlock VerticalAlignment="Top" Margin="0" Text="{Binding Path=fileType}"></TextBlock>
+                                            <TextBlock VerticalAlignment="Top" Margin="0" Text="{Binding Path=FileType}"></TextBlock>
                                         </StackPanel>
                                         
                                     </Border>
@@ -102,15 +102,15 @@
                                             hc:RelativePanel.AlignVerticalCenterWithPanel="True">
                                         <hc:ButtonGroup Focusable="False">
                                             <Button KeyboardNavigation.DirectionalNavigation="None" Content="管理员"
-                                                    Visibility="{Binding Path=fileType, Converter={StaticResource enumToVisibilityConverter}, ConverterParameter='RunAsAdmin'}"
+                                                    Visibility="{Binding Path=FileType, Converter={StaticResource enumToVisibilityConverter}, ConverterParameter='RunAsAdmin'}"
                                                     Command="{Binding Path=DataContext.RunAsAdminCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
                                                     CommandParameter="{Binding}" />
                                             <Button KeyboardNavigation.DirectionalNavigation="None" Content="文件夹"
-                                                    Visibility="{Binding Path=fileType, Converter={StaticResource enumToVisibilityConverter}, ConverterParameter='Folder'}"
+                                                    Visibility="{Binding Path=FileType, Converter={StaticResource enumToVisibilityConverter}, ConverterParameter='Folder'}"
                                                     Command="{Binding Path=DataContext.OpenFolderCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
                                                     CommandParameter="{Binding}" />
                                             <Button KeyboardNavigation.DirectionalNavigation="None" Content="控制台"
-                                                    Visibility="{Binding Path=fileType, Converter={StaticResource enumToVisibilityConverter}, ConverterParameter='Console'}"
+                                                    Visibility="{Binding Path=FileType, Converter={StaticResource enumToVisibilityConverter}, ConverterParameter='Console'}"
                                                     Command="{Binding Path=DataContext.OpenFolderInTerminalCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
                                                     CommandParameter="{Binding}" />
                                         </hc:ButtonGroup>

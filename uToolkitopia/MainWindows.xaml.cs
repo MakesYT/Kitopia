@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
+using Core.SDKs;
+using Core.SDKs.Services;
 using Core.ViewModel;
 using Kitopia.SDKs;
 using Kitopia.View;
@@ -36,9 +39,9 @@ public partial class MainWindows : Window
     {
         HotKeySettingsManager.Instance.RegisterGlobalHotKeyEvent += Instance_RegisterGlobalHotKeyEvent;
         Visibility = Visibility.Hidden;
-        App.Current.Services.GetService<SearchViewModel>().IsActive = true;
-        App.Current.Services.GetService<SearchView>().DataContext = App.Current.Services.GetService<SearchViewModel>();
-        App.Current.Services.GetService<SearchView>().Visibility = Visibility.Hidden;
+        ServiceManager.Services.GetService<SearchViewModel>().IsActive = true;
+        
+        ServiceManager.Services.GetService<SearchView>().Visibility = Visibility.Hidden;
         //Debug.WriteLine(App.Current.Services.GetService<SearchViewModel>().IsShow);
 
         //Debug.WriteLine(App.Current.Services.GetService<SearchViewModel>().IsShow);
@@ -85,7 +88,7 @@ public partial class MainWindows : Window
     /// </summary>
     /// <param name="hotKeyModelList">待注册热键的项</param>
     /// <returns>true:保存快捷键的值；false:弹出设置窗体</returns>
-    private bool InitHotKey(ObservableCollection<HotKeyModel> hotKeyModelList = null)
+    private bool InitHotKey(ObservableCollection<HotKeyModel> hotKeyModelList = null!)
     {
         var list = hotKeyModelList ?? HotKeySettingsManager.Instance.LoadDefaultHotKey();
         // 注册全局快捷键
@@ -117,19 +120,33 @@ public partial class MainWindows : Window
                 if (sid == m_HotKeySettings[EHotKeySetting.显示搜索框])
                 {
                     //Console.WriteLine(App.Current.Services.GetService<SearchView>().Visibility);
-                    if (App.Current.Services.GetService<SearchView>().Visibility == Visibility.Visible)
+                    if (ServiceManager.Services.GetService<SearchView>().Visibility == Visibility.Visible)
                     {
-                        App.Current.Services.GetService<SearchView>().Visibility = Visibility.Hidden;
+                        ServiceManager.Services.GetService<SearchView>().Visibility = Visibility.Hidden;
+                        //ServiceManager.Services.GetService<GetIconFromFile>().ClearCache();
+                        GC.Collect();
+                        ServiceManager.Services.GetService<SearchViewModel>().ReloadApps();
+                        ServiceManager.Services.GetService<SearchViewModel>().LoadLast();
                     }
                     else
                     {
-                        App.Current.Services.GetService<SearchViewModel>().ReloadApps();
-                        App.Current.Services.GetService<SearchViewModel>().LoadLast();
-                        App.Current.Services.GetService<SearchView>().Visibility = Visibility.Visible;
-                        App.Current.Services.GetService<SearchView>().Topmost = true;
-
-                        App.Current.Services.GetService<SearchView>().tx.Focus();
-                        App.Current.Services.GetService<SearchView>().Topmost = false;
+                        
+                        ServiceManager.Services.GetService<SearchView>().Visibility = Visibility.Visible;
+                        ServiceManager.Services.GetService<SearchView>().Topmost = true;
+                        ServiceManager.Services.GetService<SearchView>().tx.Focus();
+                        ServiceManager.Services.GetService<SearchView>().Topmost = false;
+                        IDataObject data = Clipboard.GetDataObject();
+                        if (data.GetDataPresent(DataFormats.Text))
+                        {
+                            string text = (string)data.GetData(DataFormats.Text);
+                            if (File.Exists(text)||Directory.Exists(text))
+                            {
+                                ServiceManager.Services.GetService<SearchViewModel>().Search = text;
+                               
+                            }
+                            
+                        } 
+                        ServiceManager.Services.GetService<SearchView>().tx.SelectAll();
                     }
                 }
 

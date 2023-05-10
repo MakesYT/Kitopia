@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using Core.SDKs;
+using Core.SDKs.Services;
 using Core.ViewModel;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -86,8 +87,7 @@ public partial class SearchView : Window
     {
         if (e.Key == Key.Enter)
         {
-            if (dataGrid.Items is not null)
-                App.Current.Services.GetService<SearchViewModel>().OpenFile((SearchViewItem)dataGrid.Items[0]);
+            ServiceManager.Services!.GetService<SearchViewModel>()!.OpenFile((SearchViewItem)dataGrid.Items[0]);
             e.Handled = true;
         }
         else if (e.Key == Key.Down)

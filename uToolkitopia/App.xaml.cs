@@ -4,7 +4,9 @@ using System.IO;
 using System.Net;
 using System.Windows;
 using System.Windows.Threading;
+using Core.SDKs;
 using Core.SDKs.Config;
+using Core.SDKs.Services;
 using Core.ViewModel;
 using IWshRuntimeLibrary;
 using Kitopia.View;
@@ -22,20 +24,10 @@ public sealed partial class App : Application
 
     public App()
     {
-        Services = ConfigureServices();
+        ServiceManager.Services = ConfigureServices();
         ConfigManger.Init();
     }
-
-    /// <summary>
-    ///     Gets the current <see cref="App" /> instance in use
-    /// </summary>
-    public new static App Current => (App)Application.Current;
-
-    /// <summary>
-    ///     Gets the <see cref="IServiceProvider" /> instance to resolve application services.
-    /// </summary>
-    public IServiceProvider Services { get; }
-
+    
     protected override void OnStartup(StartupEventArgs e)
     {
         DispatcherUnhandledException += App_DispatcherUnhandledException;
@@ -69,10 +61,17 @@ public sealed partial class App : Application
     private static IServiceProvider ConfigureServices()
     {
         var services = new ServiceCollection();
-        services.AddSingleton<SearchView>();
         services.AddSingleton<SearchViewModel>();
-        services.AddSingleton<MainWindows>();
+        services.AddSingleton<SearchView>(sq =>
+        {
+           return new SearchView() { DataContext = sq.GetService<SearchViewModel>() };
+        });
         services.AddSingleton<MainWindowsViewModel>();
+        services.AddSingleton<MainWindows>(sq =>
+        {
+            return new MainWindows() { DataContext = sq.GetService<MainWindowsViewModel>() };
+        });
+        services.AddSingleton<GetIconFromFile>();
         return services.BuildServiceProvider();
     }
 

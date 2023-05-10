@@ -13,7 +13,7 @@ public class 文件索引
 
 
         var set = new HashSet<string>();
-        AppSolver.nameSolver(set, "腾讯QQ");
+        AppSolver.NameSolver(set, "腾讯QQ");
         watch.Stop();
         // 获取执行时间，单位为毫秒
         var elapsedMs = watch.ElapsedMilliseconds;
@@ -29,7 +29,7 @@ public class 文件索引
 
 
         var set = new HashSet<string>();
-        AppSolver.nameSolver(set, "Adobe After Effects 2023");
+        AppSolver.NameSolver(set, "Adobe After Effects 2023");
         watch.Stop();
         // 获取执行时间，单位为毫秒
         var elapsedMs = watch.ElapsedMilliseconds;

@@ -10,7 +10,7 @@ public class HotKeyModel
     /// <summary>
     ///     设置项名称
     /// </summary>
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     /// <summary>
     ///     设置项快捷键是否可用
