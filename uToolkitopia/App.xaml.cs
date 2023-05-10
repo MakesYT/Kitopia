@@ -12,6 +12,7 @@ using IWshRuntimeLibrary;
 using Kitopia.View;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Win32;
 
 namespace Kitopia;
 
@@ -34,7 +35,7 @@ public sealed partial class App : Application
         Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
-        setAutoStartup();
+        SetAutoStartup();
         ServicePointManager.DefaultConnectionLimit = 10240;
         base.OnStartup(e);
     }
@@ -45,14 +46,21 @@ public sealed partial class App : Application
         base.OnExit(e);
     }
 
-    private void setAutoStartup()
+    private void SetAutoStartup()
     {
-        var startupPath = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
-        var shortcutPath = Path.Combine(startupPath, "Kitopia.lnk");
-        var shell = new WshShell();
-        var shortcut = (IWshShortcut)shell.CreateShortcut(shortcutPath);
-        shortcut.TargetPath = Process.GetCurrentProcess().MainModule.FileName;
-        shortcut.Save();
+        
+        
+        string strName = AppDomain.CurrentDomain.BaseDirectory + "Kitopia.exe";//获取要自动运行的应用程序名
+        if (!System.IO.File.Exists(strName))//判断要自动运行的应用程序文件是否存在
+            return;
+        RegistryKey registry = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run", true);//检索指定的子项
+        if (registry == null)//若指定的子项不存在
+            registry = Registry.CurrentUser.CreateSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run");//则创建指定的子项
+        registry.SetValue("Kitopia", $"\"{strName}\"");//设置该子项的新的“键值对”
+        
+
+        
+        
     }
 
     /// <summary>

@@ -57,6 +57,7 @@ public partial class AppSolver
         var refFileInfo = new FileInfo(LnkSolver.ResolveShortcut(file));
         if (refFileInfo.Exists)
             if (refFileInfo.Extension != ".url" && refFileInfo.Extension != ".txt" && refFileInfo.Extension != ".chm" &&
+                !refFileInfo.Name.Contains("powershell.exe") && !refFileInfo.Name.Contains("cmd.exe") &&
                 refFileInfo.Extension != ".pdf" && refFileInfo.Extension != ".bat" && !fileInfo.Name.Contains("install") &&
                 !fileInfo.Name.Contains("安装") && !fileInfo.Name.Contains("卸载"))
             {

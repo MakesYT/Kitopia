@@ -12,14 +12,14 @@ namespace Core.ViewModel;
 
 public partial class SearchViewModel : ObservableRecipient
 {
-    private List<SearchViewItem> _collection = new(); //存储本机所有软件
+    private List<SearchViewItem> _collection = new(250); //存储本机所有软件
 
 
     [ObservableProperty] private bool? _everythingIsOk;
 
-    [ObservableProperty] private BindingList<SearchViewItem> _items = new(); //搜索界面显示的软件
+    [ObservableProperty] private BindingList<SearchViewItem> _items = new BindingList<SearchViewItem>(); //搜索界面显示的软件
 
-    private List<string> _names = new(); //软件去重
+    private List<string> _names = new(250); //软件去重
 
     [ObservableProperty] private string? _search;
 
