@@ -5,8 +5,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Core.SDKs;
 using Core.SDKs.Config;
+using Core.SDKs.Everything;
 using Core.SDKs.Services;
-using Kitopia.SDKs.Everything;
+
 
 namespace Core.ViewModel;
 
@@ -89,7 +90,7 @@ public partial class SearchViewModel : ObservableRecipient
                                 (Icon)((GetIconFromFile)ServiceManager.Services!.GetService(typeof(GetIconFromFile))!)
                                 .GetIcon(t.FileInfo!.FullName).Clone();
                         }
-                        catch (Exception)
+                        catch (Exception e)
                         {
                             break;
                         }
@@ -140,7 +141,7 @@ public partial class SearchViewModel : ObservableRecipient
 
 
         
-        Tools.main( Items, value);
+        Tools.main( Items, value);//文档检索
         GC.Collect();
 
         if (value.Contains("\\")||value.Contains("/"))

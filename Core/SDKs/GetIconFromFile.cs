@@ -1,11 +1,12 @@
 ﻿using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Xml;
 
 namespace Core.SDKs;
 
 public class GetIconFromFile
 {
-    private readonly Dictionary<string, Icon> _icons = new();
+    private readonly Dictionary<string, Icon> _icons = new(250);
 
     public  void ClearCache()
     {
@@ -36,13 +37,84 @@ public class GetIconFromFile
 
     public  Icon GetIcon(string path)
     {
-        
-        if (path.ToLower().EndsWith(".exe") || path.ToLower().EndsWith(".lnk")|| path.ToLower().EndsWith(".msc")|| path.ToLower().EndsWith(".appref-ms"))
+        string cacheKey;
+        bool mscFile = false;
+        switch (path.ToLower().Split(".").Last())
         {
-            if (_icons.ContainsKey(path.Split("\\").Last()))
+            case "docx": case "doc": case "xls":
+            case "xlsx": case "pdf": case "ppt":
+            case "pptx":
             {
-                return _icons[path.Split("\\").Last()];
+                cacheKey = path.Split(".").Last();
+                break;
             }
+            case "msc":
+            {
+                cacheKey = path.Split("\\").Last();
+                mscFile = true;
+                break;
+            }
+            default:
+            {
+                cacheKey = path;
+                break;
+            }
+        }
+        if (cacheKey.Contains("taskschd"))
+        {
+            Console.WriteLine(1);
+        }
+        //缓存
+        if (_icons.TryGetValue(cacheKey, out var icon2))
+        {
+            return icon2;
+        }
+
+        if (mscFile)
+        {
+            int index = 0;
+            string dllPath;
+            XmlDocument xd = new XmlDocument();
+            xd.Load(path);//加载xml文档
+            XmlNode rootNode = xd.SelectSingleNode("MMC_ConsoleFile");//得到xml文档的根节点
+            XmlNode BinaryStorage=rootNode.SelectSingleNode("VisualAttributes").SelectSingleNode("Icon");
+            index=int.Parse(((XmlElement)BinaryStorage).GetAttribute("Index"));
+            dllPath = ((XmlElement)BinaryStorage).GetAttribute("File");
+
+            dllPath = System.Environment.SystemDirectory + "\\" + dllPath.Split("\\").Last();
+            path = dllPath;
+            if (cacheKey.Contains("taskschd.msc"))
+            {
+                index += 1;
+            }
+            
+            var iconTotalCount = PrivateExtractIcons(dllPath, index, 0, 0, null!, null!, 0, 0);
+
+            //用于接收获取到的图标指针
+            var hIcons = new IntPtr[iconTotalCount];
+            //对应的图标id
+            var ids = new int[iconTotalCount];
+            //成功获取到的图标个数
+            var successCount = PrivateExtractIcons((string)dllPath, index, 48, 48, hIcons, ids, iconTotalCount, 0);
+            for (var i = 0; i < successCount; i++)
+            {
+                //指针为空，跳过
+                if (hIcons[i] == IntPtr.Zero) continue;
+
+                using (var icon = Icon.FromHandle(hIcons[i]))
+                {
+                    Icon independenceIcon = (Icon)icon.Clone();
+                    DestroyIcon(icon.Handle);
+                    _icons.Add(cacheKey, independenceIcon);
+
+                    return independenceIcon;
+                }
+            }
+            
+        }
+        #region 获取64*64的尺寸Icon
+
+        {
             var iconTotalCount = PrivateExtractIcons(path, 0, 0, 0, null!, null!, 0, 0);
 
             //用于接收获取到的图标指针
@@ -50,7 +122,7 @@ public class GetIconFromFile
             //对应的图标id
             var ids = new int[iconTotalCount];
             //成功获取到的图标个数
-            var successCount = PrivateExtractIcons((string)path, 0, 64, 64, hIcons, ids, iconTotalCount, 0);
+            var successCount = PrivateExtractIcons((string)path, 0, 48, 48, hIcons, ids, iconTotalCount, 0);
 
             //遍历并保存图标
 
@@ -63,29 +135,37 @@ public class GetIconFromFile
                 {
                     Icon independenceIcon = (Icon)icon.Clone();
                     DestroyIcon(icon.Handle);
-                    _icons.Add(path.Split("\\").Last(),independenceIcon);
-                    
+                    _icons.Add(cacheKey, independenceIcon);
+
                     return independenceIcon;
                 }
             }
         }
-        else if (_icons.ContainsKey(path.Split(".").Last()))
-        {
-            return _icons[path.Split(".").Last()];
-        }
-        else
-        {
+
+        #endregion
+
+        
+        SHFILEINFO shinfo = new SHFILEINFO();
+        SHGetFileInfo(
+            path,
+            0, ref shinfo, (uint)Marshal.SizeOf(shinfo),
+              SHGFI_ICON|SHGFI_LARGEICON|SHGFI_USEFILEATTRIBUTES|SHGFI_OPENICON);
+        Icon independenceIcon12 = (Icon)System.Drawing.Icon.FromHandle(shinfo.hIcon).Clone();
+        DestroyIcon(shinfo.hIcon);
+        _icons.Add(cacheKey,independenceIcon12);
+        return independenceIcon12;
+        
+        #region 32*32的Icon
             var icon1 = Icon.ExtractAssociatedIcon((string)path);
             Icon independenceIcon1 = (Icon)icon1!.Clone();
             DestroyIcon(icon1.Handle);
-            _icons.Add(path.Split(".").Last(), independenceIcon1);
+            _icons.Add(cacheKey, independenceIcon1);
             return independenceIcon1;
-        }
-        var icon12 = Icon.ExtractAssociatedIcon((string)path);
-        Icon independenceIcon12 = (Icon)icon12!.Clone();
-        DestroyIcon(icon12.Handle);
         
-        return independenceIcon12;
+
+        #endregion
+        
+        
         
     }
     
@@ -105,6 +185,7 @@ public class GetIconFromFile
             0, ref shinfo, (uint)Marshal.SizeOf(shinfo),
             SHGFI_ICON | SHGFI_LARGEICON);
         Icon independenceIcon12 = (Icon)System.Drawing.Icon.FromHandle(shinfo.hIcon).Clone();
+        DestroyIcon(shinfo.hIcon);
         _icons.Add(path,independenceIcon12);
         return independenceIcon12;
     }
@@ -128,5 +209,7 @@ public class GetIconFromFile
     private const uint SHGFI_ICON = 0x100;
     private const uint SHGFI_LARGEICON = 0x0;
     private const uint SHGFI_SMALLICON = 0x000000001;
+    private const uint SHGFI_USEFILEATTRIBUTES = 0x000000010;
+    private const uint SHGFI_OPENICON  = 0x000000002;
     
 }

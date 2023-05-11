@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Interop;
@@ -10,6 +11,8 @@ namespace Kitopia.Converter;
 
 public class PathToImageConverter : IValueConverter
 {
+    [DllImport("gdi32.dll")]
+    public static extern bool DeleteObject(IntPtr hObject);
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value == null)
@@ -17,10 +20,13 @@ public class PathToImageConverter : IValueConverter
         var icon = value as Icon;
         try
         {
-             return Imaging.CreateBitmapSourceFromHIcon(
-                        icon.Handle,
-                        new Int32Rect(0, 0, icon.Width, icon.Height),
-                        BitmapSizeOptions.FromEmptyOptions());
+            IntPtr hIcon = icon.Handle;
+            var source = Imaging.CreateBitmapSourceFromHIcon(
+                hIcon,
+                new Int32Rect(0, 0, icon.Width, icon.Height),
+                BitmapSizeOptions.FromEmptyOptions());
+            DeleteObject(hIcon); // 释放图标句柄
+            return source;
         }
         catch (Exception e)
         {
@@ -34,4 +40,6 @@ public class PathToImageConverter : IValueConverter
     {
         throw new NotImplementedException();
     }
+
+   
 }

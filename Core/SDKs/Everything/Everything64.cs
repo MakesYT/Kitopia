@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Kitopia.SDKs.Everything;
+namespace Core.SDKs.Everything;
 
 public class Everything64
 {

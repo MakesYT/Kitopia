@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Text;
 using Core.SDKs;
 
-namespace Kitopia.SDKs.Everything;
+namespace Core.SDKs.Everything;
 
 public class Tools
 {

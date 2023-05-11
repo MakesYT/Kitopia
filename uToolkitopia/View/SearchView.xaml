@@ -75,7 +75,11 @@
                                 CommandParameter="{Binding SelectedValue, ElementName=dataGrid}"
                                 PreviewKeyDown="Button_PreviewKeyDown" BorderBrush="{x:Null}" Height="73" Margin="0"
                                 Width="764" Padding="0" hc:BorderElement.CornerRadius="0">
-
+                                <hc:Poptip.Instance>
+                                    <hc:Poptip PlacementType="TopLeft">
+                                        
+                                    </hc:Poptip>
+                                </hc:Poptip.Instance>
                                 <hc:RelativePanel Focusable="False" HorizontalAlignment="Left" Height="67" Width="749"
                                                   Margin="10,3,3,3">
 
