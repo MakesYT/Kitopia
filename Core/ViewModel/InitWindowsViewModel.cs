@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace Core.ViewModel;
 
-public partial class  MainWindowsViewModel : ObservableRecipient
+public partial class  InitWindowsViewModel : ObservableRecipient
 {
     [RelayCommand]
     public void Exit()

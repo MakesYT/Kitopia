@@ -12,13 +12,15 @@ using Core.ViewModel;
 using Kitopia.SDKs;
 using Kitopia.View;
 using Microsoft.Extensions.DependencyInjection;
+using Wpf.Ui.Controls;
+using MessageBox = System.Windows.MessageBox;
 
 namespace Kitopia;
 
 /// <summary>
 ///     MainWindows.xaml 的交互逻辑
 /// </summary>
-public partial class MainWindows : Window
+public partial class InitWindow 
 {
     /// <summary>
     ///     记录快捷键注册项的唯一标识符
@@ -30,22 +32,12 @@ public partial class MainWindows : Window
     /// </summary>
     private IntPtr m_Hwnd;
 
-    public MainWindows()
+    public InitWindow()
     {
         InitializeComponent();
+        DataContext = ServiceManager.Services.GetService<InitWindowsViewModel>();
     }
-
-    private void Window_Loaded(object sender, RoutedEventArgs e)
-    {
-        HotKeySettingsManager.Instance.RegisterGlobalHotKeyEvent += Instance_RegisterGlobalHotKeyEvent;
-        Visibility = Visibility.Hidden;
-        ServiceManager.Services.GetService<SearchViewModel>().IsActive = true;
-        
-        ServiceManager.Services.GetService<SearchView>().Visibility = Visibility.Hidden;
-        //Debug.WriteLine(App.Current.Services.GetService<SearchViewModel>().IsShow);
-
-        //Debug.WriteLine(App.Current.Services.GetService<SearchViewModel>().IsShow);
-    }
+    
 
     /// <summary>
     ///     WPF窗体的资源初始化完成，并且可以通过WindowInteropHelper获得该窗体的句柄用来与Win32交互后调用
@@ -57,8 +49,10 @@ public partial class MainWindows : Window
         // 获取窗体句柄
         m_Hwnd = new WindowInteropHelper(this).Handle;
         var hWndSource = HwndSource.FromHwnd(m_Hwnd);
+        
         // 添加处理程序
         if (hWndSource != null) hWndSource.AddHook(WndProc);
+        HotKeySettingsManager.Instance.RegisterGlobalHotKeyEvent += Instance_RegisterGlobalHotKeyEvent;
     }
 
     /// <summary>
@@ -120,33 +114,33 @@ public partial class MainWindows : Window
                 if (sid == m_HotKeySettings[EHotKeySetting.显示搜索框])
                 {
                     //Console.WriteLine(App.Current.Services.GetService<SearchView>().Visibility);
-                    if (ServiceManager.Services.GetService<SearchView>().Visibility == Visibility.Visible)
+                    if (ServiceManager.Services.GetService<SearchWindow>().Visibility == Visibility.Visible)
                     {
-                        ServiceManager.Services.GetService<SearchView>().Visibility = Visibility.Hidden;
-                        //ServiceManager.Services.GetService<GetIconFromFile>().ClearCache();
+                        ServiceManager.Services.GetService<SearchWindow>().Visibility = Visibility.Hidden;
+                        ServiceManager.Services.GetService<GetIconFromFile>().ClearCache();
                         GC.Collect();
-                        ServiceManager.Services.GetService<SearchViewModel>().ReloadApps();
-                        ServiceManager.Services.GetService<SearchViewModel>().LoadLast();
+                        ServiceManager.Services.GetService<SearchWindowViewModel>().ReloadApps();
+                        ServiceManager.Services.GetService<SearchWindowViewModel>().LoadLast();
                     }
                     else
                     {
                         
-                        ServiceManager.Services.GetService<SearchView>().Visibility = Visibility.Visible;
-                        ServiceManager.Services.GetService<SearchView>().Topmost = true;
-                        ServiceManager.Services.GetService<SearchView>().tx.Focus();
-                        ServiceManager.Services.GetService<SearchView>().Topmost = false;
+                        ServiceManager.Services.GetService<SearchWindow>().Visibility = Visibility.Visible;
+                        ServiceManager.Services.GetService<SearchWindow>().Topmost = true;
+                        ServiceManager.Services.GetService<SearchWindow>().tx.Focus();
+                        ServiceManager.Services.GetService<SearchWindow>().Topmost = false;
                         IDataObject data = Clipboard.GetDataObject();
                         if (data.GetDataPresent(DataFormats.Text))
                         {
                             string text = (string)data.GetData(DataFormats.Text);
                             if (File.Exists(text)||Directory.Exists(text))
                             {
-                                ServiceManager.Services.GetService<SearchViewModel>().Search = text;
+                                ServiceManager.Services.GetService<SearchWindowViewModel>().Search = text;
                                
                             }
                             
                         } 
-                        ServiceManager.Services.GetService<SearchView>().tx.SelectAll();
+                        ServiceManager.Services.GetService<SearchWindow>().tx.SelectAll();
                     }
                 }
 
@@ -158,6 +152,11 @@ public partial class MainWindows : Window
     }
 
     private void Button_Click(object sender, RoutedEventArgs e)
+    {
+        
+    }
+
+    private void MenuItem_Click(object sender, RoutedEventArgs e)
     {
         Environment.Exit(0);
     }

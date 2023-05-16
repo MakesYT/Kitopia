@@ -1,0 +1,25 @@
+﻿<Page x:Class="Kitopia.View.Pages.HomePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="clr-namespace:Core.ViewModel;assembly=Core"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:pages="clr-namespace:Core.ViewModel.Pages;assembly=Core"
+      ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
+      ui:Design.Foreground="{DynamicResource BodyColor}"
+      d:DataContext="{d:DesignInstance pages:HomePageViewModel,
+                                     IsDesignTimeCreatable=False}"
+      Foreground="{DynamicResource BodyColor}"
+      mc:Ignorable="d"
+      Title="HomePage" Height="450" Width="800">
+    <Page.Resources>
+        <Style TargetType="Border">
+           
+        </Style>
+    </Page.Resources>
+    <StackPanel>
+        <ui:TextBox Text="{Binding Name}"></ui:TextBox>
+        <ui:Button Content="2323232" Command="{Binding ClickCommand}"></ui:Button>
+    </StackPanel>
+</Page>

@@ -4,29 +4,47 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Threading;
 using Core.SDKs;
 using Core.SDKs.Services;
 using Core.ViewModel;
 using Microsoft.Extensions.DependencyInjection;
+using Wpf.Ui.Controls;
+using Wpf.Ui.Controls.Window;
 
 namespace Kitopia.View;
 
 /// <summary>
 ///     SearchView.xaml 的交互逻辑
 /// </summary>
-public partial class SearchView : Window
+public partial class SearchWindow : FluentWindow
 {
-    public SearchView()
+    public SearchWindow()
     {
         InitializeComponent();
+        
     }
 
+    public void Reload()
+    {
+        DispatcherFrame frame = new DispatcherFrame();
+
+        Dispatcher.CurrentDispatcher.BeginInvoke(new DispatcherOperationCallback(f =>
+
+        {
+            ((DispatcherFrame)f).Continue = false;
+            return null;
+        }), DispatcherPriority.Background, frame);
+
+        Dispatcher.PushFrame(frame);
+    }
+    
     private void w_Deactivated(object sender, EventArgs e)
     {
         Visibility = Visibility.Hidden;
         
     }
-
+    
     [DllImport("user32.dll", SetLastError = true)]
     private static extern IntPtr SetFocus(IntPtr hWnd);
 
@@ -87,7 +105,7 @@ public partial class SearchView : Window
     {
         if (e.Key == Key.Enter)
         {
-            ServiceManager.Services!.GetService<SearchViewModel>()!.OpenFile((SearchViewItem)dataGrid.Items[0]);
+            ServiceManager.Services!.GetService<SearchWindowViewModel>()!.OpenFile((SearchViewItem)dataGrid.Items[0]);
             e.Handled = true;
         }
         else if (e.Key == Key.Down)

@@ -1,0 +1,125 @@
+﻿<ui:FluentWindow x:Class="Kitopia.View.SearchWindow"
+        x:Name="w"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:localM="clr-namespace:Core.ViewModel;assembly=Core"
+        mc:Ignorable="d" 
+        WindowStartupLocation="Manual"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        ExtendsContentIntoTitleBar="True"
+        WindowBackdropType="Acrylic"
+        WindowCornerPreference="Round"
+        Top="{Binding Source={x:Static SystemParameters.PrimaryScreenHeight}, Converter={StaticResource doubleQuarterConverter}}"
+        d:DataContext="{d:DesignInstance localM:SearchWindowViewModel}"
+        ShowInTaskbar="False"
+        Title="SearchView" Window.SizeToContent="Height" Width="800"  Deactivated="w_Deactivated"
+        Activated="w_Activated">
+    <ui:FluentWindow.InputBindings>
+        <KeyBinding Command="ApplicationCommands.Close" Key="Esc" />
+    </ui:FluentWindow.InputBindings>
+    <ui:FluentWindow.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.Close" Executed="w_Deactivated" />
+    </ui:FluentWindow.CommandBindings>
+    
+    <ui:FluentWindow.Left>
+        <MultiBinding Converter="{StaticResource doubleHalfConverter}">
+
+            <Binding Source="{x:Static SystemParameters.PrimaryScreenWidth}" />
+
+            <Binding ElementName="w" Path="Width" />
+
+        </MultiBinding>
+    </ui:FluentWindow.Left>
+
+    <StackPanel Margin="10" x:Name="stackPanel">
+        
+        <ui:TextBox VerticalContentAlignment="Center" VerticalAlignment="Center"     IsTabStop="False" FocusVisualStyle="{x:Null}" ClearButtonEnabled="True"
+                    PlaceholderEnabled="True" PlaceholderText="搜索..." AcceptsReturn="False" PreviewKeyDown="tx_KeyDown" x:Name="tx"
+                     AcceptsTab="False" FontSize="32"
+                    Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}">
+            
+            
+        </ui:TextBox>
+
+        
+        <ui:InfoBar  Focusable="False"  Title="警告" Message ="Everything服务未运行,无法搜索文档,请检查" Severity="Warning" IsOpen="True"
+                      Visibility="{Binding EverythingIsOk, Converter={StaticResource reverseBoolToVisibilityConverter}}"
+                     />
+        <ui:DataGrid VerticalScrollBarVisibility="Visible" IsReadOnly="True" x:Name="dataGrid"  RowHeight="75" GridLinesVisibility="None"
+                  HeadersVisibility="None" MaxHeight="385 " ItemsSource="{Binding Items}" AutoGenerateColumns="False"
+                  Margin="0,10,0,0">
+            
+            <DataGrid.CellStyle>
+                <Style TargetType="DataGridCell">
+                    <Setter Property="Margin" Value="0" />
+                    <Setter Property="Focusable" Value="False" />
+                    <Setter Property="IsTabStop" Value="False" />
+                    <Setter Property="Foreground" Value="Transparent" />
+                    <Setter Property="BorderBrush" Value="Transparent" />
+                    <Setter Property="Background" Value="Transparent"></Setter>
+                </Style>
+            </DataGrid.CellStyle>
+            <DataGrid.RowStyle>
+                <!-- 根据条件设置行的可见性 -->
+                <Style TargetType="DataGridRow">
+                    <Setter Property="Visibility"
+                            Value="{Binding IsVisible, Converter={StaticResource boolToVisibilityConverter}}" />
+                    <Setter Property="Focusable" Value="False" />
+                    <Setter Property="IsTabStop" Value="False" />
+                    <Setter Property="Foreground" Value="Transparent" />
+                    <Setter Property="BorderBrush" Value="Transparent" />
+                    <Setter Property="Background" Value="Transparent"></Setter>
+                </Style>
+            </DataGrid.RowStyle>
+            <DataGrid.Columns>
+                <DataGridTemplateColumn x:Name="dataGridTemplateColumn" Header="Button" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ui:Button 
+                                Command="{Binding Path=DataContext.OpenFileCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:FluentWindow}}}"
+                                CommandParameter="{Binding SelectedValue, ElementName=dataGrid}" Background="Transparent"
+                                PreviewKeyDown="Button_PreviewKeyDown"  Height="72" Margin="0"
+                                Width="762" Padding="3">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="48" />
+                                        <ColumnDefinition Width="505 " />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Image HorizontalAlignment="Left"  Focusable="False" Width="48" Height="48"
+                                           Source="{Binding Icon, Converter={StaticResource pathToImageConverter}}" />
+                                    <StackPanel Grid.Column="1" Margin="5" VerticalAlignment="Top">
+                                        <TextBlock VerticalAlignment="Center" Margin="0" Focusable="False" Text="{Binding Path=FileName}"
+                                                        
+                                                   Background="{x:Null}" 
+                                                   FontWeight="Normal" FontSize="18" />
+                                        <TextBlock VerticalAlignment="Top" Margin="0" Text="{Binding Path=FileType}"></TextBlock>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal" Focusable="False">
+                                        <ui:Button KeyboardNavigation.DirectionalNavigation="None" Content="管理员"
+                                                   Visibility="{Binding Path=FileType, Converter={StaticResource enumToVisibilityConverter}, ConverterParameter='RunAsAdmin'}"
+                                                   Command="{Binding Path=DataContext.RunAsAdminCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:FluentWindow}}}"
+                                                   CommandParameter="{Binding  }" />
+                                        <ui:Button KeyboardNavigation.DirectionalNavigation="None" Content="文件夹"
+                                                   Visibility="{Binding Path=FileType, Converter={StaticResource enumToVisibilityConverter}, ConverterParameter='Folder'}"
+                                                   Command="{Binding Path=DataContext.OpenFolderCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:FluentWindow}}}"
+                                                   CommandParameter="{Binding}" />
+                                        <ui:Button KeyboardNavigation.DirectionalNavigation="None" Content="控制台"
+                                                   Visibility="{Binding Path=FileType, Converter={StaticResource enumToVisibilityConverter}, ConverterParameter='Console'}"
+                                                   Command="{Binding Path=DataContext.OpenFolderInTerminalCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:FluentWindow}}}"
+                                                   CommandParameter="{Binding}" />
+                                    </StackPanel>
+                                </Grid>
+                            </ui:Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+
+        </ui:DataGrid>
+    </StackPanel>
+
+
+</ui:FluentWindow>

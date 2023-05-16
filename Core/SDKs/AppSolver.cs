@@ -1,5 +1,5 @@
-﻿using System.Text.RegularExpressions;
-using NPinyin;
+﻿using NPinyin;
+using static System.Text.RegularExpressions.Regex;
 
 namespace Core.SDKs;
 
@@ -71,11 +71,15 @@ public partial class AppSolver
                 if (!names.Contains(localName))
                 {
                     names.Add(localName);
-                    collection.Add(new SearchViewItem
+                    lock (collection)
                     {
-                        Keys = keys, IsVisible = true, FileInfo = refFileInfo, FileName = localName,
-                        FileType = FileType.应用程序, Icon = null
-                    });
+                        collection.Add(new SearchViewItem
+                            {
+                                Keys = keys, IsVisible = true, FileInfo = refFileInfo, FileName = localName,
+                                FileType = FileType.应用程序, Icon = null
+                            });
+                    }
+                     
                 }
             }
     }
@@ -90,7 +94,7 @@ public partial class AppSolver
             AddUtil(keys, value.ToLowerInvariant());
             AddUtil(keys, Pinyin.GetInitials(value).Replace(" ", "").ToLowerInvariant());
             AddUtil(keys, Pinyin.GetPinyin(value).Replace(" ", "").ToLowerInvariant());
-            AddUtil(keys, Regex.Replace(value, "[^A-Z]","").ToLowerInvariant());
+            AddUtil(keys, MyRegex().Replace(value, "").ToLowerInvariant());
             CreateCombinations(keys, i + 1, value, initialArray);
         }
     }
@@ -105,7 +109,7 @@ public partial class AppSolver
         AddUtil(keys, Pinyin.GetInitials(name).Replace(" ", "").ToLowerInvariant());
         AddUtil(keys, Pinyin.GetPinyin(name).Replace(" ", "").ToLowerInvariant());
         AddUtil(keys,
-            string.Concat(Regex.Replace(name,"[^A-Z]", "").ToLowerInvariant(), name.Last().ToString().ToLowerInvariant()));
+            string.Concat(MyRegex().Replace(name, "").ToLowerInvariant(), name.Last().ToString().ToLowerInvariant()));
     }
 
     private static void AddUtil(HashSet<string> keys, string name)
@@ -116,4 +120,8 @@ public partial class AppSolver
 
         keys.Add(name);
     }
+
+    [System.Text.RegularExpressions.GeneratedRegex("[^A-Z]")]
+    private static partial System.Text.RegularExpressions.Regex MyRegex();
+    
 }

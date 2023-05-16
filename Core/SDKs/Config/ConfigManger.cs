@@ -8,7 +8,7 @@ public class ConfigManger
 
     public static void Init()
     {
-        var configF = new FileInfo(Directory.GetCurrentDirectory() + "//config.json");
+        var configF = new FileInfo(AppDomain.CurrentDomain.BaseDirectory + "config.json");
         if (!configF.Exists)
         {
             var j = JsonConvert.SerializeObject(new Config(), Formatting.Indented);
@@ -23,7 +23,7 @@ public class ConfigManger
 
     public static void Save()
     {
-        var configF = new FileInfo(Directory.GetCurrentDirectory() + "//config.json");
+        var configF = new FileInfo(AppDomain.CurrentDomain.BaseDirectory + "config.json");
 
         File.WriteAllText(configF.FullName, JsonConvert.SerializeObject(config, Formatting.Indented));
     }

@@ -8,6 +8,7 @@ using Core.SDKs;
 using Core.SDKs.Config;
 using Core.SDKs.Services;
 using Core.ViewModel;
+using Core.ViewModel.Pages;
 using IWshRuntimeLibrary;
 using Kitopia.View;
 using log4net;
@@ -27,17 +28,24 @@ public sealed partial class App : Application
     {
         ServiceManager.Services = ConfigureServices();
         ConfigManger.Init();
+        var initWindow = ServiceManager.Services.GetService<InitWindow>();
+        initWindow.Show();
+        Application.Current.MainWindow= ServiceManager.Services.GetService<MainWindow>();
     }
     
     protected override void OnStartup(StartupEventArgs e)
     {
-        DispatcherUnhandledException += App_DispatcherUnhandledException;
-        Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
-        AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+        #if !DEBUG
+                DispatcherUnhandledException += App_DispatcherUnhandledException;
+                Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
+                AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+        #endif
+        
 
         SetAutoStartup();
         ServicePointManager.DefaultConnectionLimit = 10240;
         base.OnStartup(e);
+        
     }
 
     protected override void OnExit(ExitEventArgs e)
@@ -69,16 +77,31 @@ public sealed partial class App : Application
     private static IServiceProvider ConfigureServices()
     {
         var services = new ServiceCollection();
-        services.AddSingleton<SearchViewModel>();
-        services.AddSingleton<SearchView>(sq =>
+        services.AddSingleton<SearchWindowViewModel>((e) =>
         {
-           return new SearchView() { DataContext = sq.GetService<SearchViewModel>() };
+            return new SearchWindowViewModel() { IsActive = true };
         });
-        services.AddSingleton<MainWindowsViewModel>();
-        services.AddSingleton<MainWindows>(sq =>
+        services.AddSingleton<SearchWindow>(sq =>
         {
-            return new MainWindows() { DataContext = sq.GetService<MainWindowsViewModel>() };
+           return new SearchWindow() { DataContext = sq.GetService<SearchWindowViewModel>() };
         });
+        services.AddSingleton<InitWindowsViewModel>((e) =>
+        {
+            return new InitWindowsViewModel() { IsActive = true };
+        });
+        services.AddTransient<InitWindow>(sq =>
+        {
+            return new InitWindow() { DataContext = sq.GetService<InitWindowsViewModel>() };
+        });
+        services.AddSingleton<MainWindowViewModel>((e) =>
+        {
+            return new MainWindowViewModel() { IsActive = true };
+        });
+        services.AddSingleton<MainWindow>(sq =>
+        {
+            return new MainWindow() { DataContext = sq.GetService<MainWindowViewModel>() };
+        });
+        services.AddSingleton<HomePageViewModel>();
         services.AddSingleton<GetIconFromFile>();
         return services.BuildServiceProvider();
     }

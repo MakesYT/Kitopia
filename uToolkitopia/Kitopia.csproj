@@ -30,6 +30,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\wpfui\src\Wpf.Ui\Wpf.Ui.csproj" />
         <ProjectReference Include="..\Core\Core.csproj" />
     </ItemGroup>
 
@@ -41,6 +42,19 @@
         <Reference Include="Interop.IWshRuntimeLibrary">
             <HintPath>..\Core\obj\Debug\net7.0\Interop.IWshRuntimeLibrary.dll</HintPath>
         </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Page Update="View\Pages\HomePage.xaml">
+        <Generator>MSBuild:Compile</Generator>
+        <XamlRuntime>Wpf</XamlRuntime>
+        <SubType>Designer</SubType>
+      </Page>
+      <Page Update="View\Pages\SettingPage.xaml">
+        <Generator>MSBuild:Compile</Generator>
+        <XamlRuntime>Wpf</XamlRuntime>
+        <SubType>Designer</SubType>
+      </Page>
     </ItemGroup>
 
 </Project>

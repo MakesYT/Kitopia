@@ -11,14 +11,14 @@ using Core.SDKs.Services;
 
 namespace Core.ViewModel;
 
-public partial class SearchViewModel : ObservableRecipient
+public partial class SearchWindowViewModel : ObservableRecipient
 {
     private List<SearchViewItem> _collection = new(250); //存储本机所有软件
 
 
     [ObservableProperty] private bool? _everythingIsOk;
 
-    [ObservableProperty] private BindingList<SearchViewItem> _items = new BindingList<SearchViewItem>(); //搜索界面显示的软件
+    [ObservableProperty] public BindingList<SearchViewItem> _items = new BindingList<SearchViewItem>(); //搜索界面显示的软件
 
     private List<string> _names = new(250); //软件去重
 
@@ -27,7 +27,7 @@ public partial class SearchViewModel : ObservableRecipient
 
     [ObservableProperty] private int? _selectedIndex = -1;
 
-    public SearchViewModel()
+    public SearchWindowViewModel()
     {
         ReloadApps();
         LoadLast();
@@ -55,7 +55,7 @@ public partial class SearchViewModel : ObservableRecipient
             searchViewItem.Dispose(); 
         }
         Items.Clear();
-        Items.RaiseListChangedEvents = false;
+        //Items.RaiseListChangedEvents = false;
         if (ConfigManger.config!.lastOpens.Any())
             foreach (var searchViewItem in ConfigManger.config.lastOpens.SelectMany(name1 => _collection.Where(
                          searchViewItem => searchViewItem.FileName!.Equals(name1))))
@@ -63,7 +63,7 @@ public partial class SearchViewModel : ObservableRecipient
                 Items.Add((SearchViewItem)searchViewItem.Clone());
             }
 
-        Items.RaiseListChangedEvents = true;
+        //Items.RaiseListChangedEvents = true;
         OnItemsChanged(Items);
     }
 
@@ -185,7 +185,7 @@ public partial class SearchViewModel : ObservableRecipient
         var sorted = filtered.OrderByDescending(x => x.Weight);
 
         // 将排序后的对象添加到Items集合中
-        Items.RaiseListChangedEvents = false;
+        //Items.RaiseListChangedEvents = false;
         int count = 0; // 计数器变量
         int limit = 100; // 限制次数
         foreach (var x in sorted)
@@ -197,78 +197,82 @@ public partial class SearchViewModel : ObservableRecipient
             Items.Add((SearchViewItem)x.Item.Clone()); // 添加元素
             count++; // 计数器加一
         }
-        Items.RaiseListChangedEvents = true;
+        //Items.RaiseListChangedEvents = true;
         OnItemsChanged(Items);
     }
 
 
     [RelayCommand]
-    public void OpenFile(SearchViewItem searchViewItem)
+    public void OpenFile(object searchViewItem)
     {
-        if (searchViewItem.FileInfo!=null)
+        var item = (SearchViewItem)searchViewItem;
+        if (item.FileInfo!=null)
         {
-            ShellTools.ShellExecute(IntPtr.Zero, "open", searchViewItem.FileInfo.FullName, "", "",
+            ShellTools.ShellExecute(IntPtr.Zero, "open", item.FileInfo.FullName, "", "",
                         ShellTools.ShowCommands.SW_SHOWNORMAL);
         }
-        if (searchViewItem.DirectoryInfo!=null)
+        if (item.DirectoryInfo!=null)
         {
-            ShellTools.ShellExecute(IntPtr.Zero, "open", searchViewItem.DirectoryInfo.FullName, "", "",
+            ShellTools.ShellExecute(IntPtr.Zero, "open", item.DirectoryInfo.FullName, "", "",
                 ShellTools.ShowCommands.SW_SHOWNORMAL);
         }
 
-        if (!ConfigManger.config!.lastOpens.Contains(searchViewItem.FileName!))
-            ConfigManger.config.lastOpens.Insert(0, searchViewItem.FileName!);
+        if (!ConfigManger.config!.lastOpens.Contains(item.FileName!))
+            ConfigManger.config.lastOpens.Insert(0, item.FileName!);
         if (ConfigManger.config.lastOpens.Count > 4) ConfigManger.config.lastOpens.RemoveAt(4);
         Search = "";
         ConfigManger.Save();
     }
 
     [RelayCommand]
-    public void OpenFolder(SearchViewItem searchViewItem)
+    public void OpenFolder(object searchViewItem)
     {
-        ShellTools.ShellExecute(IntPtr.Zero, "open", searchViewItem.FileInfo!.DirectoryName!, "", "",
+        var item = (SearchViewItem)searchViewItem;
+        ShellTools.ShellExecute(IntPtr.Zero, "open", item.FileInfo!.DirectoryName!, "", "",
             ShellTools.ShowCommands.SW_SHOWNORMAL);
 
-        if (!ConfigManger.config!.lastOpens.Contains(searchViewItem.FileName!))
-            ConfigManger.config.lastOpens.Insert(0, searchViewItem.FileName!);
+        if (!ConfigManger.config!.lastOpens.Contains(item.FileName!))
+            ConfigManger.config.lastOpens.Insert(0, item.FileName!);
         if (ConfigManger.config.lastOpens.Count() > 4) ConfigManger.config.lastOpens.RemoveAt(4);
         Search = "";
         ConfigManger.Save();
     }
 
     [RelayCommand]
-    public void RunAsAdmin(SearchViewItem searchViewItem)
+    public void RunAsAdmin(object searchViewItem)
     {
-        ShellTools.ShellExecute(IntPtr.Zero, "runas", searchViewItem.FileInfo!.FullName, "", "",
+        var item = (SearchViewItem)searchViewItem;
+        ShellTools.ShellExecute(IntPtr.Zero, "runas", item.FileInfo!.FullName, "", "",
             ShellTools.ShowCommands.SW_SHOWNORMAL);
 
-        if (!ConfigManger.config!.lastOpens.Contains(searchViewItem.FileName!))
-            ConfigManger.config.lastOpens.Insert(0, searchViewItem.FileName!);
+        if (!ConfigManger.config!.lastOpens.Contains(item.FileName!))
+            ConfigManger.config.lastOpens.Insert(0, item.FileName!);
         if (ConfigManger.config.lastOpens.Count() > 4) ConfigManger.config.lastOpens.RemoveAt(4);
         Search = "";
         ConfigManger.Save();
     }
 
     [RelayCommand]
-    public void OpenFolderInTerminal(SearchViewItem searchViewItem)
+    public void OpenFolderInTerminal(object searchViewItem)
     {
+        var item = (SearchViewItem)searchViewItem;
         ProcessStartInfo startInfo = new ProcessStartInfo();
         startInfo.FileName = "cmd.exe";
 
-        if (searchViewItem.FileInfo!=null)
+        if (item.FileInfo!=null)
         {
-            startInfo.WorkingDirectory = searchViewItem.FileInfo.DirectoryName;
+            startInfo.WorkingDirectory = item.FileInfo.DirectoryName;
             
         }
-        if (searchViewItem.DirectoryInfo!=null)
+        if (item.DirectoryInfo!=null)
         {
-            startInfo.WorkingDirectory = searchViewItem.DirectoryInfo.FullName;
+            startInfo.WorkingDirectory = item.DirectoryInfo.FullName;
             
         }
         Process.Start(startInfo);
 
-        if (!ConfigManger.config!.lastOpens.Contains(searchViewItem.FileName!))
-            ConfigManger.config.lastOpens.Insert(0, searchViewItem.FileName!);
+        if (!ConfigManger.config!.lastOpens.Contains(item.FileName!))
+            ConfigManger.config.lastOpens.Insert(0, item.FileName!);
         if (ConfigManger.config.lastOpens.Count() > 4) ConfigManger.config.lastOpens.RemoveAt(4);
         Search = "";
         ConfigManger.Save();
