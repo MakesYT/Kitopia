@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Drawing;
+using System.Formats.Asn1;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
@@ -9,6 +11,7 @@ using Core.SDKs;
 using Core.SDKs.Services;
 using Core.ViewModel;
 using Microsoft.Extensions.DependencyInjection;
+using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 using Wpf.Ui.Controls.Window;
 
@@ -24,20 +27,23 @@ public partial class SearchWindow : FluentWindow
         InitializeComponent();
         
     }
-
-    public void Reload()
+    protected override void OnSourceInitialized(EventArgs e)
     {
-        DispatcherFrame frame = new DispatcherFrame();
-
-        Dispatcher.CurrentDispatcher.BeginInvoke(new DispatcherOperationCallback(f =>
-
+        base.OnSourceInitialized(e);
+        // 获取窗体句柄
+        IntPtr m_Hwnd = new WindowInteropHelper(this).Handle;
+        Wpf.Ui.Appearance.Theme.Changed += ((theme, accent) =>
         {
-            ((DispatcherFrame)f).Continue = false;
-            return null;
-        }), DispatcherPriority.Background, frame);
+            WindowBackdrop.ApplyBackdrop(m_Hwnd, WindowBackdropType.Acrylic);
+        });
 
-        Dispatcher.PushFrame(frame);
     }
+
+    private void ChangeTheme(ThemeType currentTheme, Color systemAccent)
+    {
+        
+    }
+    
     
     private void w_Deactivated(object sender, EventArgs e)
     {

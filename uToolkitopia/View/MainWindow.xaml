@@ -7,12 +7,14 @@
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:pages="clr-namespace:Kitopia.View.Pages"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:viewModel="clr-namespace:Core.ViewModel;assembly=Core"
         mc:Ignorable="d" Closing="MainWindow_OnClosing"
         WindowStartupLocation="CenterScreen" 
         ExtendsContentIntoTitleBar="True"
         WindowBackdropType="Acrylic"
         WindowCornerPreference="Round"
-        Title="Kitopia" Height="742" Width="1200" >
+        d:DataContext="{d:DesignInstance viewModel:MainWindowViewModel}"
+        Title="Kitopia" Height="742" Width="1200" Visibility="Hidden">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="167*"/>
@@ -22,6 +24,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
+        
         <ui:NavigationView Grid.Row="1"  PaneDisplayMode="LeftFluent" Grid.ColumnSpan="2" >
 
             <ui:NavigationView.MenuItems>
@@ -37,7 +40,7 @@
                         <ui:SymbolIcon Symbol="PaintBrush24"></ui:SymbolIcon>
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
-                <ui:NavigationViewItem Content="设置" FontSize="14" Cursor="Hand">
+                <ui:NavigationViewItem Content="设置" FontSize="14" Cursor="Hand" TargetPageType="pages:SettingPage">
                     <ui:NavigationViewItem.Icon>
                         <ui:SymbolIcon Symbol="Settings24"></ui:SymbolIcon>
                     </ui:NavigationViewItem.Icon>

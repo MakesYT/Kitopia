@@ -14,14 +14,14 @@
              Title="MainWindows" Height="10" Width="10">
     
     <Grid>
-       <ui:NotifyIcon x:Name="NotifyIcon" TooltipText="Kitopia" >
-           <ui:NotifyIcon.Menu>
+        <ui:NotifyIcon x:Name="NotifyIcon" TooltipText="Kitopia" >
+            <ui:NotifyIcon.Menu>
                
-               <ContextMenu><!--ViewModel绑定无效-->
-                   <MenuItem Header="退出" Click="MenuItem_Click" />
-               </ContextMenu>
-           </ui:NotifyIcon.Menu>
-       </ui:NotifyIcon>
+                <ContextMenu>
+                    <MenuItem Header="退出" Click="MenuItem_Click" />
+                </ContextMenu>
+            </ui:NotifyIcon.Menu>
+        </ui:NotifyIcon>
 
     </Grid>
 </Window>

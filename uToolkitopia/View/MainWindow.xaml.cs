@@ -25,7 +25,11 @@ public partial class MainWindow : FluentWindow
         IntPtr m_Hwnd = new WindowInteropHelper(this).Handle;
         var hWndSource = HwndSource.FromHwnd(m_Hwnd);
         ServiceManager.Services.GetService<InitWindow>().NotifyIcon.HookWindow = hWndSource;
-
+        Wpf.Ui.Appearance.Theme.Changed += ((theme, accent) =>
+        {
+            WindowBackdrop.ApplyBackdrop(m_Hwnd, WindowBackdropType.Acrylic);
+        });
+        
     }
 
     private void MainWindow_OnClosing(object? sender, CancelEventArgs e)
@@ -40,6 +44,6 @@ public partial class MainWindow : FluentWindow
         var currentTheme = Wpf.Ui.Appearance.Theme.GetAppTheme();
 
         Wpf.Ui.Appearance.Theme.Apply(currentTheme == Wpf.Ui.Appearance.ThemeType.Light ? Wpf.Ui.Appearance.ThemeType.Dark : Wpf.Ui.Appearance.ThemeType.Light);
-        ServiceManager.Services.GetService<SearchWindow>().Reload();
+        
     }
 }

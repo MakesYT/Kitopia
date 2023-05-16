@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 using Core.SDKs;
+using Core.SDKs.Config;
 using Core.SDKs.Services;
 using Core.ViewModel;
 using Kitopia.SDKs;
@@ -36,6 +37,12 @@ public partial class InitWindow
     {
         InitializeComponent();
         DataContext = ServiceManager.Services.GetService<InitWindowsViewModel>();
+        var currentTheme = Wpf.Ui.Appearance.Theme.GetAppTheme();
+        if (ConfigManger.config.themeFollowSys&&!Wpf.Ui.Appearance.Theme.IsAppMatchesSystem())
+        {
+            Wpf.Ui.Appearance.Theme.Apply(currentTheme == Wpf.Ui.Appearance.ThemeType.Light ? Wpf.Ui.Appearance.ThemeType.Dark : Wpf.Ui.Appearance.ThemeType.Light);
+        }
+        
     }
     
 
@@ -158,6 +165,12 @@ public partial class InitWindow
 
     private void MenuItem_Click(object sender, RoutedEventArgs e)
     {
+        ConfigManger.Save();
         Environment.Exit(0);
+    }
+
+    private void NotifyIcon_OnLeftDoubleClick(NotifyIcon sender, RoutedEventArgs e)
+    {
+        ServiceManager.Services.GetService<MainWindow>().Visibility = Visibility.Visible;
     }
 }

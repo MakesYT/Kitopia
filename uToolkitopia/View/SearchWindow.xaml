@@ -14,6 +14,7 @@
         Top="{Binding Source={x:Static SystemParameters.PrimaryScreenHeight}, Converter={StaticResource doubleQuarterConverter}}"
         d:DataContext="{d:DesignInstance localM:SearchWindowViewModel}"
         ShowInTaskbar="False"
+        Background="Black"
         Title="SearchView" Window.SizeToContent="Height" Width="800"  Deactivated="w_Deactivated"
         Activated="w_Activated">
     <ui:FluentWindow.InputBindings>

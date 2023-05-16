@@ -10,6 +10,7 @@ using Core.SDKs.Services;
 using Core.ViewModel;
 using Core.ViewModel.Pages;
 using IWshRuntimeLibrary;
+using Kitopia.Services;
 using Kitopia.View;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
@@ -77,6 +78,8 @@ public sealed partial class App : Application
     private static IServiceProvider ConfigureServices()
     {
         var services = new ServiceCollection();
+        services.AddSingleton<GetIconFromFile>();
+        services.AddTransient<IThemeChange,ThemeChange>();
         services.AddSingleton<SearchWindowViewModel>((e) =>
         {
             return new SearchWindowViewModel() { IsActive = true };
@@ -89,7 +92,7 @@ public sealed partial class App : Application
         {
             return new InitWindowsViewModel() { IsActive = true };
         });
-        services.AddTransient<InitWindow>(sq =>
+        services.AddSingleton<InitWindow>(sq =>
         {
             return new InitWindow() { DataContext = sq.GetService<InitWindowsViewModel>() };
         });
@@ -102,7 +105,7 @@ public sealed partial class App : Application
             return new MainWindow() { DataContext = sq.GetService<MainWindowViewModel>() };
         });
         services.AddSingleton<HomePageViewModel>();
-        services.AddSingleton<GetIconFromFile>();
+        
         return services.BuildServiceProvider();
     }
 

@@ -41,8 +41,4 @@
         </Content>
     </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="SDKs\Services\" />
-  </ItemGroup>
-
 </Project>
