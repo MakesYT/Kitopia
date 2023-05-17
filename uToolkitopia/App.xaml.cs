@@ -195,13 +195,11 @@ public sealed partial class App : Application
                 e.Handled = true;
                 if (e.Exception.InnerException == null)
                 {
-                    log.Error("（1）发生了一个错误！" + Environment.NewLine
-                                            + "（2）错误源：" + e.Exception.Source + Environment.NewLine
-                                            + "（3）详细信息：" + e.Exception.Message + Environment.NewLine);
+                    log.Error(e.Exception.StackTrace);
                     var error = new ErrorDialog("", "（1）发生了一个错误！" + Environment.NewLine
                                                                   + "（2）错误源：" + e.Exception.Source +
                                                                   Environment.NewLine
-                                                                  + "（3）详细信息：" + e.Exception.Message +
+                                                                  + "（3）详细信息：" + e.Exception.StackTrace +
                                                                   Environment.NewLine);
                     error.ShowDialog();
 
