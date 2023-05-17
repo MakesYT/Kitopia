@@ -20,6 +20,7 @@
             <crt:ReverseBoolToVisibilityConverter x:Key="reverseBoolToVisibilityConverter" />
             <crt:BoolToVisibilityConverter x:Key="boolToVisibilityConverter" />
             <crt:PathToImageConverter x:Key="pathToImageConverter" />
+            <crt:ReverseBool x:Key="ReverseBool" />
         </ResourceDictionary>
 
     </Application.Resources>

@@ -17,7 +17,7 @@
         Title="Kitopia" Height="742" Width="1200" Visibility="Hidden">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="167*"/>
+            <ColumnDefinition Width="50"/>
             <ColumnDefinition Width="1033*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -35,11 +35,6 @@
                 </ui:NavigationViewItem>
             </ui:NavigationView.MenuItems>
             <ui:NavigationView.FooterMenuItems>
-                <ui:NavigationViewItem Content="切换主题" FontSize="12" Cursor="Hand" Click="ThemeButton_OnClick">
-                    <ui:NavigationViewItem.Icon>
-                        <ui:SymbolIcon Symbol="PaintBrush24"></ui:SymbolIcon>
-                    </ui:NavigationViewItem.Icon>
-                </ui:NavigationViewItem>
                 <ui:NavigationViewItem Content="设置" FontSize="14" Cursor="Hand" TargetPageType="pages:SettingPage">
                     <ui:NavigationViewItem.Icon>
                         <ui:SymbolIcon Symbol="Settings24"></ui:SymbolIcon>

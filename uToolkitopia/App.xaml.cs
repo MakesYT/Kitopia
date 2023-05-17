@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Windows;
@@ -9,12 +8,16 @@ using Core.SDKs.Config;
 using Core.SDKs.Services;
 using Core.ViewModel;
 using Core.ViewModel.Pages;
-using IWshRuntimeLibrary;
 using Kitopia.Services;
 using Kitopia.View;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Win32;
+using Wpf.Ui.Controls.SnackbarControl;
+using Wpf.Ui.Services;
+using MessageBox = Wpf.Ui.Controls.MessageBoxControl.MessageBox;
+using MessageBoxResult = Wpf.Ui.Controls.MessageBoxControl.MessageBoxResult;
 
 namespace Kitopia;
 
@@ -28,25 +31,30 @@ public sealed partial class App : Application
     public App()
     {
         ServiceManager.Services = ConfigureServices();
+        log.Info("Ioc初始化完成");
         ConfigManger.Init();
+        log.Info("配置文件初始化完成");
+        
         var initWindow = ServiceManager.Services.GetService<InitWindow>();
         initWindow.Show();
-        Application.Current.MainWindow= ServiceManager.Services.GetService<MainWindow>();
+        Current.MainWindow= ServiceManager.Services.GetService<MainWindow>();
     }
     
     protected override void OnStartup(StartupEventArgs e)
     {
         #if !DEBUG
+                log.Info("异常捕获");
                 DispatcherUnhandledException += App_DispatcherUnhandledException;
                 Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
                 AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         #endif
-        
-
-        SetAutoStartup();
         ServicePointManager.DefaultConnectionLimit = 10240;
         base.OnStartup(e);
-        
+        if (ConfigManger.config.autoStart)
+        {
+            log.Info("设置开机自启");
+            SetAutoStartup();
+        }
     }
 
     protected override void OnExit(ExitEventArgs e)
@@ -57,18 +65,59 @@ public sealed partial class App : Application
 
     private void SetAutoStartup()
     {
-        
-        
         string strName = AppDomain.CurrentDomain.BaseDirectory + "Kitopia.exe";//获取要自动运行的应用程序名
-        if (!System.IO.File.Exists(strName))//判断要自动运行的应用程序文件是否存在
+        if (!File.Exists(strName))//判断要自动运行的应用程序文件是否存在
             return;
         RegistryKey registry = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run", true);//检索指定的子项
         if (registry == null)//若指定的子项不存在
             registry = Registry.CurrentUser.CreateSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run");//则创建指定的子项
-        registry.SetValue("Kitopia", $"\"{strName}\"");//设置该子项的新的“键值对”
-        
-
-        
+        if (registry.GetValue("Kitopia") is null)
+        {
+            MessageBox msg = new MessageBox();
+            msg.Title = "Kitopia";
+            msg.Content = "是否设置开机自启?\n可能被杀毒软件阻止      ";
+            msg.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            msg.CloseButtonText = "取消";
+            msg.PrimaryButtonText = "确定";
+            msg.FontSize = 15;
+            var task = msg.ShowDialogAsync();
+            // 使用ContinueWith来在任务完成后执行一个回调函数
+            task.ContinueWith(e =>
+            {
+                MessageBoxResult result = e.Result;
+                switch (result)
+                {
+                    case MessageBoxResult.Primary:
+                    {
+                        log.Info("用户确认启用开机自启");
+                        try
+                        {
+                            registry.SetValue("Kitopia", $"\"{strName}\""); //设置该子项的新的“键值对”
+                            new ToastContentBuilder()
+                                .AddText("开机自启设置成功")
+                                .Show();
+                        }
+                        catch (Exception exception)
+                        {
+                            log.Error("开机自启设置失败");
+                            log.Error(exception.StackTrace);
+                            new ToastContentBuilder()
+                                .AddText("开机自启设置失败,请检查杀毒软件后重试")
+                                .Show();
+                            
+                        }
+                        
+                        break;
+                    }
+                    case MessageBoxResult.None:
+                    {
+                        log.Info("用户取消启用开机自启");
+                        break;
+                    }
+                }
+                
+            });
+        }
         
     }
 
@@ -80,32 +129,36 @@ public sealed partial class App : Application
         var services = new ServiceCollection();
         services.AddSingleton<GetIconFromFile>();
         services.AddTransient<IThemeChange,ThemeChange>();
-        services.AddSingleton<SearchWindowViewModel>((e) =>
+        services.AddTransient<IToastService,ToastService>();
+        services.AddSingleton<SearchWindowViewModel>(e =>
         {
-            return new SearchWindowViewModel() { IsActive = true };
+            return new SearchWindowViewModel { IsActive = true };
         });
         services.AddSingleton<SearchWindow>(sq =>
         {
-           return new SearchWindow() { DataContext = sq.GetService<SearchWindowViewModel>() };
+           return new SearchWindow { DataContext = sq.GetService<SearchWindowViewModel>() };
         });
-        services.AddSingleton<InitWindowsViewModel>((e) =>
+        services.AddSingleton<InitWindowsViewModel>(e =>
         {
-            return new InitWindowsViewModel() { IsActive = true };
+            return new InitWindowsViewModel { IsActive = true };
         });
         services.AddSingleton<InitWindow>(sq =>
         {
-            return new InitWindow() { DataContext = sq.GetService<InitWindowsViewModel>() };
+            return new InitWindow { DataContext = sq.GetService<InitWindowsViewModel>() };
         });
-        services.AddSingleton<MainWindowViewModel>((e) =>
+        services.AddSingleton<MainWindowViewModel>(e =>
         {
-            return new MainWindowViewModel() { IsActive = true };
+            return new MainWindowViewModel { IsActive = true };
         });
         services.AddSingleton<MainWindow>(sq =>
         {
-            return new MainWindow() { DataContext = sq.GetService<MainWindowViewModel>() };
+            return new MainWindow { DataContext = sq.GetService<MainWindowViewModel>() };
         });
         services.AddSingleton<HomePageViewModel>();
-        
+        services.AddSingleton<SettingPageViewModel>(e =>
+        {
+            return new SettingPageViewModel { IsActive = true };
+        });
         return services.BuildServiceProvider();
     }
 
@@ -120,7 +173,7 @@ public sealed partial class App : Application
         // Current.Dispatcher.BeginInvoke(new Action(delegate
         // {
 
-
+        log.Error(e.ExceptionObject);
         var error = new ErrorDialog("", "（1）发生了一个错误！" + Environment.NewLine
                                                       + e.ExceptionObject);
         error.ShowDialog();
@@ -188,8 +241,8 @@ public sealed partial class App : Application
             catch (Exception e2)
             {
                 //此时程序出现严重异常，将强制结束退出
-                
-                MessageBox.Show("程序发生致命错误，将终止，");
+                log.Error(e2.StackTrace);
+                System.Windows.MessageBox.Show("程序发生致命错误，将终止，");
             }
         })).Wait();
     }

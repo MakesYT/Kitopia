@@ -21,6 +21,13 @@ public class ThemeChange:IThemeChange
         }
     }
 
+    public void changeAnother()
+    {
+        var currentTheme = Wpf.Ui.Appearance.Theme.GetAppTheme();
+
+        Wpf.Ui.Appearance.Theme.Apply(currentTheme == Wpf.Ui.Appearance.ThemeType.Light ? Wpf.Ui.Appearance.ThemeType.Dark : Wpf.Ui.Appearance.ThemeType.Light);
+    }
+
     public void followSys(bool follow)
     {
         ConfigManger.config.themeFollowSys = follow;
@@ -28,7 +35,7 @@ public class ThemeChange:IThemeChange
         if (follow)
         {
             var currentTheme = Wpf.Ui.Appearance.Theme.GetAppTheme();
-            if (Wpf.Ui.Appearance.Theme.IsAppMatchesSystem())
+            if (!Wpf.Ui.Appearance.Theme.IsAppMatchesSystem())
             {
                 Wpf.Ui.Appearance.Theme.Apply(currentTheme == Wpf.Ui.Appearance.ThemeType.Light ? Wpf.Ui.Appearance.ThemeType.Dark : Wpf.Ui.Appearance.ThemeType.Light);
             }

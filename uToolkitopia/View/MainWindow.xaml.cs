@@ -41,9 +41,7 @@ public partial class MainWindow : FluentWindow
 
     private void ThemeButton_OnClick(object sender, RoutedEventArgs e)
     {
-        var currentTheme = Wpf.Ui.Appearance.Theme.GetAppTheme();
-
-        Wpf.Ui.Appearance.Theme.Apply(currentTheme == Wpf.Ui.Appearance.ThemeType.Light ? Wpf.Ui.Appearance.ThemeType.Dark : Wpf.Ui.Appearance.ThemeType.Light);
+        
         
     }
 }
