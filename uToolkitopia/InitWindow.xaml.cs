@@ -41,6 +41,9 @@ public partial class InitWindow
         if (ConfigManger.config.themeFollowSys&&!Wpf.Ui.Appearance.Theme.IsAppMatchesSystem())
         {
             Wpf.Ui.Appearance.Theme.Apply(currentTheme == Wpf.Ui.Appearance.ThemeType.Light ? Wpf.Ui.Appearance.ThemeType.Dark : Wpf.Ui.Appearance.ThemeType.Light);
+        }else if (ConfigManger.config.isDark)
+        {
+            Wpf.Ui.Appearance.Theme.Apply(Wpf.Ui.Appearance.ThemeType.Dark);
         }
         
     }
@@ -124,10 +127,6 @@ public partial class InitWindow
                     if (ServiceManager.Services.GetService<SearchWindow>().Visibility == Visibility.Visible)
                     {
                         ServiceManager.Services.GetService<SearchWindow>().Visibility = Visibility.Hidden;
-                        ServiceManager.Services.GetService<GetIconFromFile>().ClearCache();
-                        GC.Collect();
-                        ServiceManager.Services.GetService<SearchWindowViewModel>().ReloadApps();
-                        ServiceManager.Services.GetService<SearchWindowViewModel>().LoadLast();
                     }
                     else
                     {
@@ -136,18 +135,30 @@ public partial class InitWindow
                         ServiceManager.Services.GetService<SearchWindow>().Topmost = true;
                         ServiceManager.Services.GetService<SearchWindow>().tx.Focus();
                         ServiceManager.Services.GetService<SearchWindow>().Topmost = false;
-                        IDataObject data = Clipboard.GetDataObject();
-                        if (data.GetDataPresent(DataFormats.Text))
+                        if (ConfigManger.config.canReadClipboard)
                         {
-                            string text = (string)data.GetData(DataFormats.Text);
-                            if (File.Exists(text)||Directory.Exists(text))
+                            IDataObject data = Clipboard.GetDataObject();
+                            if (data.GetDataPresent(DataFormats.Text))
                             {
-                                ServiceManager.Services.GetService<SearchWindowViewModel>().Search = text;
-                               
-                            }
-                            
-                        } 
+                                string text = (string)data.GetData(DataFormats.Text);
+                                if (text.StartsWith("\""))
+                                {
+                                    text=text.Replace("\"", "");
+                                }
+                                if (File.Exists(text)||Directory.Exists(text))
+                                {
+                                    ServiceManager.Services.GetService<SearchWindowViewModel>().Search = text;
+                                   
+                                }
+                                
+                            } 
+                        }
+                        
                         ServiceManager.Services.GetService<SearchWindow>().tx.SelectAll();
+                        ThreadPool.QueueUserWorkItem((e) =>
+                        {
+                            ServiceManager.Services.GetService<SearchWindowViewModel>().ReloadApps();
+                        });
                     }
                 }
 

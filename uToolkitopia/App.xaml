@@ -21,6 +21,8 @@
             <crt:BoolToVisibilityConverter x:Key="boolToVisibilityConverter" />
             <crt:PathToImageConverter x:Key="pathToImageConverter" />
             <crt:ReverseBool x:Key="ReverseBool" />
+            <crt:IntToIconSymbol x:Key="IntToIconSymbol"/>
+            <crt:IfNullVisibilityHidden x:Key="IfNullVisibilityHidden"/>
         </ResourceDictionary>
 
     </Application.Resources>

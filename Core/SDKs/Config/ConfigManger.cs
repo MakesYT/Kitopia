@@ -4,7 +4,7 @@ namespace Core.SDKs.Config;
 
 public class ConfigManger
 {
-    public static Config? config;
+    public static Config config;
 
     public static void Init()
     {

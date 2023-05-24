@@ -44,7 +44,7 @@
         </ui:TextBox>
 
         
-        <ui:InfoBar  Focusable="False"  Title="警告" Message ="Everything服务未运行,无法搜索文档,请检查" Severity="Warning" IsOpen="True"
+        <ui:InfoBar  Focusable="False"  Title="警告" Message ="Everything服务未运行,无法搜索文档,请检查" Severity="Warning" IsOpen="{Binding EverythingIsOk, Converter={StaticResource ReverseBool}}"
                       Visibility="{Binding EverythingIsOk, Converter={StaticResource reverseBoolToVisibilityConverter}}"
                      />
         <ui:DataGrid VerticalScrollBarVisibility="Visible" IsReadOnly="True" x:Name="dataGrid"  RowHeight="75" GridLinesVisibility="None"
@@ -82,14 +82,21 @@
                                 CommandParameter="{Binding SelectedValue, ElementName=dataGrid}" Background="Transparent"
                                 PreviewKeyDown="Button_PreviewKeyDown"  Height="72" Margin="0"
                                 Width="762" Padding="3">
-                                <Grid>
+                                <Grid HorizontalAlignment="Left" >
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="48" />
                                         <ColumnDefinition Width="505 " />
-                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="200" />
                                     </Grid.ColumnDefinitions>
-                                    <Image HorizontalAlignment="Left"  Focusable="False" Width="48" Height="48"
+                                    <Image Grid.Column="0" HorizontalAlignment="Left"  Focusable="False" Width="48" Height="48"
                                            Source="{Binding Icon, Converter={StaticResource pathToImageConverter}}" />
+                                    <ui:Button Visibility="{Binding IconSymbol,Converter={StaticResource IfNullVisibilityHidden}}" Height="48" Width="48" FontSize="48" Margin="0" Padding="0" Background="{x:Null}" IsEnabled="False" PressedForeground="{x:Null}" MouseOverBackground="{x:Null}" MouseOverBorderBrush="{x:Null}" PressedBackground="{x:Null}" PressedBorderBrush="{x:Null}" BorderBrush="{x:Null}">
+                                        <ui:Button.Icon>
+                                            <ui:SymbolIcon   Height="48" Width="48"
+                                                           Symbol="{Binding IconSymbol,Converter={StaticResource IntToIconSymbol},Mode=OneWay}" />
+                                        </ui:Button.Icon>
+                                    </ui:Button>
+                                    
                                     <StackPanel Grid.Column="1" Margin="5" VerticalAlignment="Top">
                                         <TextBlock VerticalAlignment="Center" Margin="0" Focusable="False" Text="{Binding Path=FileName}"
                                                         

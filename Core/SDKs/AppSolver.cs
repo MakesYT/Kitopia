@@ -53,7 +53,6 @@ public partial class AppSolver
     private static void AppSolverA( List<SearchViewItem> collection,  List<string> names, string file)
     {
         var fileInfo = new FileInfo(file);
-
         var refFileInfo = new FileInfo(LnkSolver.ResolveShortcut(file));
         if (refFileInfo.Exists)
             if (refFileInfo.Extension != ".url" && refFileInfo.Extension != ".txt" && refFileInfo.Extension != ".chm" &&

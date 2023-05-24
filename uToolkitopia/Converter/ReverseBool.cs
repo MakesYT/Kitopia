@@ -7,9 +7,12 @@ namespace Kitopia.Converter;
 
 public class ReverseBool : IValueConverter
 {
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    public object Convert(object? value, Type targetType, object parameter, CultureInfo culture)
     {
-        
+        if (value is null)
+        {
+            return false;
+        }
         return (bool)!(bool)value;
     }
 

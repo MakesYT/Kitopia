@@ -10,6 +10,13 @@ public class SearchViewItem: ICloneable,IDisposable
     public FileType FileType { set; get; }
     public FileInfo? FileInfo { set; get; }
     public DirectoryInfo? DirectoryInfo { set; get; }
+    public string? Url { set; get; }
+
+    public int IconSymbol
+    {
+        set;
+        get;
+    } = 0;
     public Icon? Icon { set; get; }
 
     public object Clone()
@@ -50,6 +57,7 @@ public class SearchViewItem: ICloneable,IDisposable
 public enum FileType
 {
     应用程序,
+    URL,
     Word文档,
     PPT文档,
     Excel文档,
