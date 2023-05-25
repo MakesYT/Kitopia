@@ -1,9 +1,9 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Core.SDKs;
+namespace Core.SDKs.Tools;
 
-public class LnkSolver
+public class LnkTools
 {
     [Flags]
     public enum SIGDN : uint

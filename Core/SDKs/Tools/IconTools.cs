@@ -1,10 +1,11 @@
 ﻿using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Xml;
+using Core.SDKs.Services;
 
-namespace Core.SDKs;
+namespace Core.SDKs.Tools;
 
-public class GetIconFromFile
+public class IconTools
 {
     private readonly Dictionary<string, Icon> _icons = new(250);
 
@@ -168,8 +169,30 @@ public class GetIconFromFile
         
         
     }
-    
-    
+
+    public Icon? GetFormClipboard()
+    {
+        Bitmap? bitmap =
+            ((IClipboardService)ServiceManager.Services.GetService(typeof(IClipboardService)))
+            .GetBitmap();
+        if (bitmap is null)
+        {
+            return null;
+        }
+        var image = bitmap.GetThumbnailImage (48, 48, null, IntPtr.Zero); // 获取指定大小的缩略图
+        IconConverter converter = new IconConverter (); // 创建转换器对象
+        byte[] bytes = converter.ConvertTo (image, typeof(byte[])) as byte[]; // 将 image 转换为字节数组
+        Icon icon = converter.ConvertFrom (bytes) as Icon; // 将字节数组转换为 icon 对象
+        MemoryStream ms = new MemoryStream (); // 创建内存流
+        icon.Save (ms); // 将 icon 保存到流中
+        ms.Position = 0; // 重置流位置
+        icon = new Icon (ms); // 从流中创建 icon 对象
+        ms.Close (); // 关闭流
+        Icon independenceIcon12 = (Icon)icon.Clone();
+        DestroyIcon(icon.Handle);
+        //_icons.Add(cacheKey,independenceIcon12);
+        return independenceIcon12;
+    }
 
     
 

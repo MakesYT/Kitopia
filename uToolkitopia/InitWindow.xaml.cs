@@ -130,7 +130,7 @@ public partial class InitWindow
                     }
                     else
                     {
-                        
+                        ServiceManager.Services.GetService<SearchWindowViewModel>().CheckClipboard();
                         ServiceManager.Services.GetService<SearchWindow>().Visibility = Visibility.Visible;
                         ServiceManager.Services.GetService<SearchWindow>().Topmost = true;
                         ServiceManager.Services.GetService<SearchWindow>().tx.Focus();
@@ -157,6 +157,7 @@ public partial class InitWindow
                         ServiceManager.Services.GetService<SearchWindow>().tx.SelectAll();
                         ThreadPool.QueueUserWorkItem((e) =>
                         {
+                            
                             ServiceManager.Services.GetService<SearchWindowViewModel>().ReloadApps();
                         });
                     }

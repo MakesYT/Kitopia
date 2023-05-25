@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Core.SDKs;
+namespace Core.SDKs.Tools;
 
 public class ShellTools
 {

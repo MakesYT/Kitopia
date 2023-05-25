@@ -94,10 +94,7 @@ public partial class SettingPageViewModel: ObservableRecipient
         else
         {
             RegistryKey registry = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run", true);//检索指定的子项
-            if (registry != null) //若指定的子项不存在
-            {
-                registry.DeleteValue("Kitopia");
-            }
+            registry?.DeleteValue("Kitopia");
         }
     }
 

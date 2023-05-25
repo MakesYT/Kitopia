@@ -1,9 +1,9 @@
 ﻿using NPinyin;
 using static System.Text.RegularExpressions.Regex;
 
-namespace Core.SDKs;
+namespace Core.SDKs.Tools;
 
-public partial class AppSolver
+public partial class AppTools
 {
     public static void GetAllApps( List<SearchViewItem> collection,  List<string> names)
     {
@@ -53,7 +53,7 @@ public partial class AppSolver
     private static void AppSolverA( List<SearchViewItem> collection,  List<string> names, string file)
     {
         var fileInfo = new FileInfo(file);
-        var refFileInfo = new FileInfo(LnkSolver.ResolveShortcut(file));
+        var refFileInfo = new FileInfo(LnkTools.ResolveShortcut(file));
         if (refFileInfo.Exists)
             if (refFileInfo.Extension != ".url" && refFileInfo.Extension != ".txt" && refFileInfo.Extension != ".chm" &&
                 !refFileInfo.Name.Contains("powershell.exe") && !refFileInfo.Name.Contains("cmd.exe") &&
@@ -63,7 +63,7 @@ public partial class AppSolver
                 var keys = new HashSet<string>();
 
                 //collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = fileInfo.Name.Replace(".lnk", ""), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
-                var localName = LnkSolver.GetLocalizedName(file);
+                var localName = LnkTools.GetLocalizedName(file);
                 NameSolver(keys, localName);
                 //nameSolver(keys, fileInfo.Name.Replace(".lnk", ""));
                 NameSolver(keys, refFileInfo.Name.Replace(".exe", ""));

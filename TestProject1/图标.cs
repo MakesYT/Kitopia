@@ -1,6 +1,7 @@
 ﻿using System.Drawing;
 using System.Xml;
 using Core.SDKs;
+using Core.SDKs.Tools;
 
 namespace TestProject1;
 [TestClass]
@@ -9,13 +10,13 @@ public class 图标
     [TestMethod]
     public void FolderIcon()
     {
-        GetIconFromFile getIconFromFile = new GetIconFromFile();
-        Icon d = getIconFromFile.GetIcon("C:\\Windows\\system32\\WF.msc");
+        IconTools iconTools = new IconTools();
+        Icon d = iconTools.GetIcon("C:\\Windows\\system32\\WF.msc");
     }
     [TestMethod]
     public void MscIcon()
     {
-        GetIconFromFile getIconFromFile = new GetIconFromFile();
+        IconTools iconTools = new IconTools();
         XmlDocument xd = new XmlDocument();
         xd.Load("C:\\Windows\\system32\\taskschd.msc");//加载xml文档
         XmlNode rootNode = xd.SelectSingleNode("MMC_ConsoleFile");//得到xml文档的根节点

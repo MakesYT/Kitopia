@@ -63,6 +63,7 @@ public enum FileType
     Excel文档,
     PDF文档,
     图像,
+    剪贴板图像,
     文件夹,
     None
 }

@@ -6,6 +6,7 @@ using System.Windows.Threading;
 using Core.SDKs;
 using Core.SDKs.Config;
 using Core.SDKs.Services;
+using Core.SDKs.Tools;
 using Core.ViewModel;
 using Core.ViewModel.Pages;
 using Kitopia.Services;
@@ -127,9 +128,10 @@ public sealed partial class App : Application
     private static IServiceProvider ConfigureServices()
     {
         var services = new ServiceCollection();
-        services.AddSingleton<GetIconFromFile>();
+        services.AddSingleton<IconTools>();
         services.AddTransient<IThemeChange,ThemeChange>();
         services.AddTransient<IToastService,ToastService>();
+        services.AddTransient<IClipboardService,ClipboardService>();
         services.AddSingleton<SearchWindowViewModel>(e =>
         {
             return new SearchWindowViewModel { IsActive = true };

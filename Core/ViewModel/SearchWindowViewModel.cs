@@ -7,6 +7,8 @@ using Core.SDKs;
 using Core.SDKs.Config;
 using Core.SDKs.Everything;
 using Core.SDKs.Services;
+using Core.SDKs.Tools;
+using AppTools = Core.SDKs.Tools.AppTools;
 
 
 namespace Core.ViewModel;
@@ -36,30 +38,78 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
     public void ReloadApps()
     {
-        AppSolver.GetAllApps( _collection,  _names);
+        AppTools.GetAllApps( _collection,  _names);
     }
 
+    public void CheckClipboard()
+    {
+        if (!ConfigManger.config.canReadClipboard)
+        {
+            if (Items.First().FileType==FileType.剪贴板图像)
+            {
+                Items.RemoveAt(0);
+            }
+            return;
+        }
+        if ( ((IClipboardService)ServiceManager.Services.GetService(typeof(IClipboardService))).IsBitmap())
+        {
+            if (Items.Count((_items)=>_items.FileType==FileType.剪贴板图像)>=1)
+            {
+                return;
+            }
+            Items.Insert(0,new SearchViewItem()
+            {
+                FileName = "保存剪贴板图像?",
+                FileType = FileType.剪贴板图像,
+                IconSymbol = 0xE357,
+                Icon = null,
+                IsVisible = true
+            });
+        }
+        else if (Items.First().FileType==FileType.剪贴板图像)
+        {
+            Items.RemoveAt(0);
+        }
+    }
     public void LoadLast()
     {
+       
         if (!string.IsNullOrEmpty(Search))
         {
             return;
         }
+
+        
         foreach (var searchViewItem in Items)
         {
             searchViewItem.Dispose(); 
         }
-        Items.Clear();
+        Items.Clear(); 
+        
         //Items.RaiseListChangedEvents = false;
         if (ConfigManger.config!.lastOpens.Any())
+        {
+            int limit =0;
             foreach (var searchViewItem in ConfigManger.config.lastOpens.SelectMany(name1 => _collection.Where(
                          searchViewItem => searchViewItem.FileName!.Equals(name1))))
             {
+                if (limit>=ConfigManger.config.maxHistory)
+                {
+                    break;
+                }
                 Items.Add((SearchViewItem)searchViewItem.Clone());
+                limit++;
             }
-        
+        }
         //Items.RaiseListChangedEvents = true;
-        OnItemsChanged(Items);
+        CheckClipboard();
+        OnItemsChanged(Items);        
+
+        GetItemsIcon();
+    }
+
+    partial void OnItemsChanged(BindingList<SearchViewItem> value)
+    {
         GetItemsIcon();
     }
 
@@ -75,15 +125,19 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     switch (t.FileType)
                     {
                         case FileType.文件夹:
-                            t.Icon = (Icon)((GetIconFromFile)ServiceManager.Services!.GetService(typeof(GetIconFromFile))!)
+                            t.Icon = (Icon)((IconTools)ServiceManager.Services!.GetService(typeof(IconTools))!)
                                                             .ExtractFromPath(t.DirectoryInfo!.FullName).Clone();
                             break;
                         case FileType.URL:
                             break;
+                        case FileType.剪贴板图像:
+                        {
+                            break;
+                        }
                         default:
                             
                             t.Icon =
-                                (Icon)((GetIconFromFile)ServiceManager.Services!.GetService(typeof(GetIconFromFile))!)
+                                (Icon)((IconTools)ServiceManager.Services!.GetService(typeof(IconTools))!)
                                 .GetIcon(t.FileInfo!.FullName).Clone();
                             break;
                     }
@@ -128,7 +182,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
             }
             Tools.main(Items, value);//Everything文档检索
         }
-        GC.Collect();
+        
 
         if (value.Contains("\\")||value.Contains("/"))
         {
@@ -138,7 +192,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 Items.Add(new SearchViewItem()
                 {
                     FileInfo = new FileInfo(value),
-                    FileName = "打开文件:"+LnkSolver.GetLocalizedName(value)+"?",
+                    FileName = "打开文件:"+LnkTools.GetLocalizedName(value)+"?",
                     FileType = FileType.应用程序,
                     IsVisible = true
                 });
@@ -156,6 +210,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
             }
             
         }
+
         
         // 使用LINQ语句来简化和优化筛选和排序逻辑，而不需要使用foreach循环和if判断
         // 根据给定的值，从集合中筛选出符合条件的SearchViewItem对象，并计算它们的权重
@@ -174,17 +229,29 @@ public partial class SearchWindowViewModel : ObservableRecipient
         //Items.RaiseListChangedEvents = false;
         int count = 0; // 计数器变量
         int limit = 100; // 限制次数
+        int nowIndex = 0;
         foreach (var x in sorted)
         {
             if (count >= limit) // 如果达到了限制
             {
                 break; // 跳出循环
             }
-            Items.Add((SearchViewItem)x.Item.Clone()); // 添加元素
-            count++; // 计数器加一
+
+            if (ConfigManger.config.lastOpens.Contains(x.Item.FileName))
+            {
+                Items.Insert(nowIndex,(SearchViewItem)x.Item.Clone()); // 添加元素
+                nowIndex++;
+                count++; // 计数器加一
+            }
+            else
+            {
+                Items.Add((SearchViewItem)x.Item.Clone()); // 添加元素
+                count++; // 计数器加一
+            }
+            
         }
         //Items.RaiseListChangedEvents = true;
-        if (Items.Count<=10&& !(Path.HasExtension(value) && File.Exists(value))&&!Directory.Exists(value))
+        if (Items.Count<=0&& !(Path.HasExtension(value) && File.Exists(value))&&!Directory.Exists(value))
         {
             Items.Insert(0,new SearchViewItem()
             {
@@ -222,9 +289,19 @@ public partial class SearchWindowViewModel : ObservableRecipient
             Search = "";
             return;
         }
-        if (!ConfigManger.config!.lastOpens.Contains(item.FileName!))
+
+        if (item.FileType==FileType.剪贴板图像)
+        {
+            string fileName= ((IClipboardService)ServiceManager.Services.GetService(typeof(IClipboardService))).saveBitmap();
+            ShellTools.ShellExecute(IntPtr.Zero, "open", "explorer.exe", "/select,"+fileName, "",
+                ShellTools.ShowCommands.SW_SHOWNORMAL);
+            return;
+        }
+
+        if (ConfigManger.config!.lastOpens.Contains(item.FileName!))
+            ConfigManger.config.lastOpens.Remove(item.FileName!);
             ConfigManger.config.lastOpens.Insert(0, item.FileName!);
-        if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
+        //if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
         Search = "";
         ConfigManger.Save();
     }
@@ -233,12 +310,13 @@ public partial class SearchWindowViewModel : ObservableRecipient
     public void OpenFolder(object searchViewItem)
     {
         var item = (SearchViewItem)searchViewItem;
-        ShellTools.ShellExecute(IntPtr.Zero, "open", item.FileInfo!.DirectoryName!, "", "",
+        ShellTools.ShellExecute(IntPtr.Zero, "open", "explorer.exe", "/select,"+item.FileInfo.FullName, "",
             ShellTools.ShowCommands.SW_SHOWNORMAL);
 
-        if (!ConfigManger.config!.lastOpens.Contains(item.FileName!))
-            ConfigManger.config.lastOpens.Insert(0, item.FileName!);
-        if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
+        if (ConfigManger.config!.lastOpens.Contains(item.FileName!))
+            ConfigManger.config.lastOpens.Remove(item.FileName!);
+        ConfigManger.config.lastOpens.Insert(0, item.FileName!);
+        //if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
         Search = "";
         ConfigManger.Save();
     }
@@ -250,9 +328,10 @@ public partial class SearchWindowViewModel : ObservableRecipient
         ShellTools.ShellExecute(IntPtr.Zero, "runas", item.FileInfo!.FullName, "", "",
             ShellTools.ShowCommands.SW_SHOWNORMAL);
 
-        if (!ConfigManger.config!.lastOpens.Contains(item.FileName!))
-            ConfigManger.config.lastOpens.Insert(0, item.FileName!);
-        if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
+        if (ConfigManger.config!.lastOpens.Contains(item.FileName!))
+            ConfigManger.config.lastOpens.Remove(item.FileName!);
+        ConfigManger.config.lastOpens.Insert(0, item.FileName!);
+        //if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
         Search = "";
         ConfigManger.Save();
     }
@@ -276,9 +355,10 @@ public partial class SearchWindowViewModel : ObservableRecipient
         }
         Process.Start(startInfo);
 
-        if (!ConfigManger.config!.lastOpens.Contains(item.FileName!))
-            ConfigManger.config.lastOpens.Insert(0, item.FileName!);
-        if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
+        if (ConfigManger.config!.lastOpens.Contains(item.FileName!))
+            ConfigManger.config.lastOpens.Remove(item.FileName!);
+        ConfigManger.config.lastOpens.Insert(0, item.FileName!);
+        //if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
         Search = "";
         ConfigManger.Save();
     }

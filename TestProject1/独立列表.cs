@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using Core.SDKs;
+using Core.SDKs.Tools;
 
 namespace TestProject1;
 [TestClass]
@@ -8,7 +9,7 @@ public class 独立列表
     [TestMethod]
     public void deepClone()
     {
-        GetIconFromFile d = new GetIconFromFile();
+        IconTools d = new IconTools();
         List<SearchViewItem> a=new List<SearchViewItem>()
         {
             new SearchViewItem()

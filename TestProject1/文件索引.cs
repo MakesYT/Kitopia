@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Core.SDKs;
+using Core.SDKs.Tools;
 
 namespace TestProject1;
 
@@ -13,7 +14,7 @@ public class 文件索引
 
 
         var set = new HashSet<string>();
-        AppSolver.NameSolver(set, "腾讯QQ");
+        AppTools.NameSolver(set, "腾讯QQ");
         watch.Stop();
         // 获取执行时间，单位为毫秒
         var elapsedMs = watch.ElapsedMilliseconds;
@@ -29,7 +30,7 @@ public class 文件索引
 
 
         var set = new HashSet<string>();
-        AppSolver.NameSolver(set, "Adobe After Effects 2023");
+        AppTools.NameSolver(set, "Adobe After Effects 2023");
         watch.Stop();
         // 获取执行时间，单位为毫秒
         var elapsedMs = watch.ElapsedMilliseconds;
@@ -45,7 +46,7 @@ public class 文件索引
         var names = new List<string>(); //软件去重
         var watch = Stopwatch.StartNew();
 
-        AppSolver.GetAllApps( collection,  names);
+        AppTools.GetAllApps( collection,  names);
         watch.Stop();
         // 获取执行时间，单位为毫秒
         var elapsedMs = watch.ElapsedMilliseconds;
