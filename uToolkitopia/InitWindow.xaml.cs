@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Interop;
 using Core.SDKs;
 using Core.SDKs.Config;
+using Core.SDKs.HotKey;
 using Core.SDKs.Services;
 using Core.ViewModel;
 using Kitopia.SDKs;
@@ -26,7 +27,7 @@ public partial class InitWindow
     /// <summary>
     ///     记录快捷键注册项的唯一标识符
     /// </summary>
-    private Dictionary<EHotKeySetting, int> m_HotKeySettings = new();
+    private Dictionary<string, int> m_HotKeySettings = new();
 
     /// <summary>
     ///     当前窗口句柄
@@ -47,8 +48,6 @@ public partial class InitWindow
         }
         
     }
-    
-
     /// <summary>
     ///     WPF窗体的资源初始化完成，并且可以通过WindowInteropHelper获得该窗体的句柄用来与Win32交互后调用
     /// </summary>
@@ -62,7 +61,6 @@ public partial class InitWindow
         
         // 添加处理程序
         if (hWndSource != null) hWndSource.AddHook(WndProc);
-        HotKeySettingsManager.Instance.RegisterGlobalHotKeyEvent += Instance_RegisterGlobalHotKeyEvent;
     }
 
     /// <summary>
@@ -75,26 +73,14 @@ public partial class InitWindow
         // 注册热键
         InitHotKey();
     }
-
-    /// <summary>
-    ///     通知注册系统快捷键事件处理函数
-    /// </summary>
-    /// <param name="hotKeyModelList"></param>
-    /// <returns></returns>
-    private bool Instance_RegisterGlobalHotKeyEvent(List<HotKeyModel> hotKeyModelList)
-    {
-        return InitHotKey(hotKeyModelList);
-    }
-
-
     /// <summary>
     ///     初始化注册快捷键
     /// </summary>
     /// <param name="hotKeyModelList">待注册热键的项</param>
     /// <returns>true:保存快捷键的值；false:弹出设置窗体</returns>
-    private bool InitHotKey(List<HotKeyModel> hotKeyModelList = null!)
+    private bool InitHotKey()
     {
-        var list = hotKeyModelList ?? ConfigManger.config.hotKeys;
+        var list = ConfigManger.config.hotKeys;
         // 注册全局快捷键
         var failList = HotKeyHelper.RegisterGlobalHotKey(list, m_Hwnd, out m_HotKeySettings);
         if (string.IsNullOrEmpty(failList))
@@ -119,9 +105,9 @@ public partial class InitWindow
     {
         switch (msg)
         {
-            case HotKeyManager.WM_HOTKEY:
+            case HotKeyTools.WM_HOTKEY:
                 var sid = wideParam.ToInt32();
-                if (sid == m_HotKeySettings[EHotKeySetting.显示搜索框])
+                if (sid == m_HotKeySettings["显示搜索框"])
                 {
                     //Console.WriteLine(App.Current.Services.GetService<SearchView>().Visibility);
                     if (ServiceManager.Services.GetService<SearchWindow>().Visibility == Visibility.Visible)

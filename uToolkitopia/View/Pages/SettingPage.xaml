@@ -6,26 +6,45 @@
       xmlns:local="clr-namespace:Core.ViewModel;assembly=Core"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:pages="clr-namespace:Core.ViewModel.Pages;assembly=Core"
-      
+
       d:DataContext="{d:DesignInstance pages:SettingPageViewModel,
                                      IsDesignTimeCreatable=False}"
       ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
       ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+
       mc:Ignorable="d"
       Title="HomePage">
-    
+
     <Page.Resources>
-        
+       
     </Page.Resources>
-    <StackPanel Margin="42">
-        <Expander Header="个性化" FontSize="25" IsExpanded="True" FontWeight="Medium">
-            <Expander.Content>
-                <Expander Header="主题" FontSize="20" IsExpanded="True" >
+    <ui:DynamicScrollViewer>
+        <StackPanel Margin="42">
+            <Expander Header="个性化" FontSize="25" IsExpanded="True" FontWeight="Medium">
+                <Expander.Content>
+                    <Expander Header="主题" FontSize="20" IsExpanded="True">
                         <Expander.Content>
                             <StackPanel>
-                                
-                                <ui:ToggleSwitch Margin="0,10,0,0" Content="跟随系统" IsChecked="{Binding ThemeFollowSys}"></ui:ToggleSwitch>
+                                <ui:Card>
+                                    <Grid VerticalAlignment="Center" Height="35">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                            <TextBlock Margin="0" Focusable="False" Text="主题颜色跟随系统"
+                                                       FontSize="15"
+                                                       Background="{x:Null}"
+                                                       FontWeight="Normal" />
+                                        </StackPanel>
+                                        <ui:ToggleSwitch Grid.Column="2" Content=""
+                                                         IsChecked="{Binding ThemeFollowSys}">
+                                        </ui:ToggleSwitch>
+                                    </Grid>
+                                </ui:Card>
+
                                 <RadioButton
                                     Visibility="{Binding ThemeFollowSys,Converter={StaticResource reverseBoolToVisibilityConverter}}"
                                     Margin="0,12,0,0"
@@ -47,28 +66,91 @@
                             </StackPanel>
                         </Expander.Content>
                     </Expander>
-            </Expander.Content>
-        </Expander>
-        <Expander Header="通用" FontSize="25" IsExpanded="True">
-            <Expander.Content>
-                <StackPanel>
-                    <ui:ToggleSwitch Margin="0,10,0,0" Content="开机自动启动(可能被杀毒软件阻止)" IsChecked="{Binding AutoStart}"></ui:ToggleSwitch> 
-                </StackPanel>
-            </Expander.Content>
-        </Expander>
-        <Expander Header="搜索框" FontSize="25" IsExpanded="True">
-            <Expander.Content>
-                <StackPanel >
-                    <ui:ToggleSwitch Margin="0,10,0,0" Content="允许程序调用Everything索引文档" IsChecked="{Binding UseEverything}"></ui:ToggleSwitch>
-                    <ui:ToggleSwitch Margin="0,10,0,0" Content="允许程序读取剪贴板内容" IsChecked="{Binding CanReadClipboard}"></ui:ToggleSwitch>
-                    <StackPanel VerticalAlignment="Center" Margin="0,10,0,0" Orientation="Horizontal">
-                        <ComboBox ItemsSource="{Binding MaxHistoryOptions}" SelectedValue="{Binding MaxHistory}"/>
-                        <TextBlock VerticalAlignment="Center" FontSize="15"> 最大历史数量</TextBlock>
-                    </StackPanel>
-                    
-                </StackPanel>
-            </Expander.Content>
-        </Expander>
+                </Expander.Content>
+            </Expander>
+            <Expander Header="通用" FontSize="25" IsExpanded="True">
+                <Expander.Content>
+                    <StackPanel>
+                        <ui:Card>
+                            <Grid VerticalAlignment="Center" Height="35">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock Margin="0" Focusable="False" Text="开机自动启动(可能被杀毒软件阻止)"
+                                               FontSize="15"
+                                               Background="{x:Null}"
+                                               FontWeight="Normal" />
+                                </StackPanel>
+                                <ui:ToggleSwitch Grid.Column="2" Content="" IsChecked="{Binding AutoStart}"></ui:ToggleSwitch>
+                            </Grid>
+                        </ui:Card>
 
-    </StackPanel>
+
+                    </StackPanel>
+                </Expander.Content>
+            </Expander>
+            <Expander Header="搜索框" FontSize="25" IsExpanded="True">
+                <Expander.Content>
+                    <StackPanel>
+                        <ui:Card>
+                            <Grid VerticalAlignment="Center" Height="35"> 
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock Margin="0" Focusable="False" Text="允许程序调用Everything索引文档"
+                                               FontSize="15"
+                                               Background="{x:Null}"
+                                               FontWeight="Normal" />
+                                </StackPanel>
+                                <ui:ToggleSwitch Grid.Column="2" Content="" IsChecked="{Binding UseEverything}"></ui:ToggleSwitch>
+                            </Grid>
+                        </ui:Card>
+                        <ui:Card >
+                            <Grid VerticalAlignment="Center" Height="35">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock Margin="0" Focusable="False" Text="允许程序读取剪贴板内容"
+                                               FontSize="15"
+                                               Background="{x:Null}"
+                                               FontWeight="Normal" />
+                                </StackPanel>
+                                <ui:ToggleSwitch Grid.Column="2" Content="" IsChecked="{Binding CanReadClipboard}"></ui:ToggleSwitch>
+                            </Grid>
+                        </ui:Card>
+
+                        <ui:Card >
+                            <Grid VerticalAlignment="Center" Height="35">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock Margin="0" Focusable="False" Text="最大历史数量"
+                                               FontSize="15"
+                                               Background="{x:Null}"
+                                               FontWeight="Normal" />
+                                </StackPanel>
+                                <ComboBox  Margin="0" Grid.Column="2" ItemsSource="{Binding MaxHistoryOptions}"
+                                          SelectedValue="{Binding MaxHistory}" />
+                            </Grid>
+                        </ui:Card>
+
+
+                    </StackPanel>
+                </Expander.Content>
+            </Expander>
+
+        </StackPanel>
+    </ui:DynamicScrollViewer>
 </Page>

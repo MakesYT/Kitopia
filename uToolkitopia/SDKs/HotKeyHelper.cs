@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Input;
 using Core.SDKs;
+using Core.SDKs.HotKey;
 
 namespace Kitopia.SDKs;
 
@@ -10,10 +11,8 @@ namespace Kitopia.SDKs;
 /// </summary>
 public class HotKeyHelper
 {
-    /// <summary>
-    ///     记录快捷键注册项的唯一标识符
-    /// </summary>
-    private static readonly Dictionary<EHotKeySetting, int> m_HotKeySettingsDic = new();
+    
+    private static readonly Dictionary<string, int> m_HotKeySettingsDic = new();
 
     /// <summary>
     ///     注册全局快捷键
@@ -23,7 +22,7 @@ public class HotKeyHelper
     /// <param name="hotKeySettingsDic">快捷键注册项的唯一标识符字典</param>
     /// <returns>返回注册失败项的拼接字符串</returns>
     public static string RegisterGlobalHotKey(IEnumerable<HotKeyModel> hotKeyModelList, IntPtr hwnd,
-        out Dictionary<EHotKeySetting, int> hotKeySettingsDic)
+        out Dictionary<string, int> hotKeySettingsDic)
     {
         var failList = string.Empty;
         foreach (var item in hotKeyModelList)
@@ -66,20 +65,20 @@ public class HotKeyHelper
     private static bool RegisterHotKey(HotKeyModel hotKeyModel, IntPtr hWnd)
     {
         var fsModifierKey = new ModifierKeys();
-        var hotKeySetting = (EHotKeySetting)Enum.Parse(typeof(EHotKeySetting), hotKeyModel.Name);
+        var hotKeySetting = hotKeyModel.Name;
 
         if (!m_HotKeySettingsDic.ContainsKey(hotKeySetting))
         {
             // 全局原子不会在应用程序终止时自动删除。每次调用GlobalAddAtom函数，必须相应的调用GlobalDeleteAtom函数删除原子。
-            if (HotKeyManager.GlobalFindAtom(hotKeySetting.ToString()) != 0)
-                HotKeyManager.GlobalDeleteAtom(HotKeyManager.GlobalFindAtom(hotKeySetting.ToString()));
+            if (HotKeyTools.GlobalFindAtom(hotKeySetting.ToString()) != 0)
+                HotKeyTools.GlobalDeleteAtom(HotKeyTools.GlobalFindAtom(hotKeySetting.ToString()));
             // 获取唯一标识符
-            m_HotKeySettingsDic[hotKeySetting] = HotKeyManager.GlobalAddAtom(hotKeySetting.ToString());
+            m_HotKeySettingsDic[hotKeySetting] = HotKeyTools.GlobalAddAtom(hotKeySetting.ToString());
         }
         else
         {
             // 注销旧的热键
-            HotKeyManager.UnregisterHotKey(hWnd, m_HotKeySettingsDic[hotKeySetting]);
+            HotKeyTools.UnregisterHotKey(hWnd, m_HotKeySettingsDic[hotKeySetting]);
         }
 
         if (!hotKeyModel.IsUsable)
@@ -101,7 +100,7 @@ public class HotKeyHelper
         else if (hotKeyModel.IsSelectCtrl && hotKeyModel.IsSelectShift && hotKeyModel.IsSelectAlt)
             fsModifierKey = ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt;
 
-        return HotKeyManager.RegisterHotKey(hWnd, m_HotKeySettingsDic[hotKeySetting], fsModifierKey,
+        return HotKeyTools.RegisterHotKey(hWnd, m_HotKeySettingsDic[hotKeySetting], fsModifierKey,
             (int)hotKeyModel.SelectKey);
     }
 }

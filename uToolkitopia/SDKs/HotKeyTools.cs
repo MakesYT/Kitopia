@@ -7,7 +7,7 @@ namespace Kitopia.SDKs;
 /// <summary>
 ///     热键管理器
 /// </summary>
-public class HotKeyManager
+public class HotKeyTools
 {
     /// <summary>
     ///     热键消息，在用户键入被RegisterHotKey函数注册的热键时发送

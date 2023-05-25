@@ -1,4 +1,4 @@
-﻿namespace Core.SDKs;
+﻿namespace Core.SDKs.HotKey;
 
 /// <summary>
 ///     快捷键模型

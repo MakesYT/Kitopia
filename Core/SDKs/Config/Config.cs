@@ -1,4 +1,6 @@
-﻿namespace Core.SDKs.Config;
+﻿using Core.SDKs.HotKey;
+
+namespace Core.SDKs.Config;
 
 public record Config
 {
@@ -15,7 +17,7 @@ public record Config
     {
         new HotKeyModel
         {
-            Name = EHotKeySetting.显示搜索框.ToString(), IsUsable = true, IsSelectCtrl = false, IsSelectAlt = true,
+            Name = "显示搜索框", IsUsable = true, IsSelectCtrl = false, IsSelectAlt = true,
             IsSelectShift = false, SelectKey = EKey.Space
         }
     };
