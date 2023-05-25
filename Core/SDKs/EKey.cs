@@ -1,4 +1,4 @@
-﻿namespace Kitopia.SDKs;
+﻿namespace Core.SDKs;
 
 /// <summary>
 ///     自定义按键枚举

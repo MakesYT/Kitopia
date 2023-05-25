@@ -11,5 +11,13 @@ public record Config
     public bool canReadClipboard = true;
     public int maxHistory = 4;
     public List<string> lastOpens = new();
+    public List<HotKeyModel> hotKeys = new()
+    {
+        new HotKeyModel
+        {
+            Name = EHotKeySetting.显示搜索框.ToString(), IsUsable = true, IsSelectCtrl = false, IsSelectAlt = true,
+            IsSelectShift = false, SelectKey = EKey.Space
+        }
+    };
 
 }

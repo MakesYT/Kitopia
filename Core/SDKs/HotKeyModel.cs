@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Kitopia.SDKs;
+﻿namespace Core.SDKs;
 
 /// <summary>
 ///     快捷键模型

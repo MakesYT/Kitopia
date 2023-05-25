@@ -81,7 +81,7 @@ public partial class InitWindow
     /// </summary>
     /// <param name="hotKeyModelList"></param>
     /// <returns></returns>
-    private bool Instance_RegisterGlobalHotKeyEvent(ObservableCollection<HotKeyModel> hotKeyModelList)
+    private bool Instance_RegisterGlobalHotKeyEvent(List<HotKeyModel> hotKeyModelList)
     {
         return InitHotKey(hotKeyModelList);
     }
@@ -92,9 +92,9 @@ public partial class InitWindow
     /// </summary>
     /// <param name="hotKeyModelList">待注册热键的项</param>
     /// <returns>true:保存快捷键的值；false:弹出设置窗体</returns>
-    private bool InitHotKey(ObservableCollection<HotKeyModel> hotKeyModelList = null!)
+    private bool InitHotKey(List<HotKeyModel> hotKeyModelList = null!)
     {
-        var list = hotKeyModelList ?? HotKeySettingsManager.Instance.LoadDefaultHotKey();
+        var list = hotKeyModelList ?? ConfigManger.config.hotKeys;
         // 注册全局快捷键
         var failList = HotKeyHelper.RegisterGlobalHotKey(list, m_Hwnd, out m_HotKeySettings);
         if (string.IsNullOrEmpty(failList))

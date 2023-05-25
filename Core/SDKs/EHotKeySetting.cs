@@ -1,4 +1,4 @@
-﻿namespace Kitopia.SDKs;
+﻿namespace Core.SDKs;
 
 /// <summary>
 ///     快捷键设置项枚举

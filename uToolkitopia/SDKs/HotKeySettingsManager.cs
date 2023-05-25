@@ -1,4 +1,6 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using Core.SDKs;
 
 namespace Kitopia.SDKs;
 
@@ -11,7 +13,7 @@ public class HotKeySettingsManager
     ///     通知注册系统快捷键委托
     /// </summary>
     /// <param name="hotKeyModelList"></param>
-    public delegate bool RegisterGlobalHotKeyHandler(ObservableCollection<HotKeyModel> hotKeyModelList);
+    public delegate bool RegisterGlobalHotKeyHandler(List<HotKeyModel> hotKeyModelList);
 
     private static HotKeySettingsManager m_Instance;
 
@@ -24,9 +26,9 @@ public class HotKeySettingsManager
     ///     加载默认快捷键
     /// </summary>
     /// <returns></returns>
-    public ObservableCollection<HotKeyModel> LoadDefaultHotKey()
+    public List<HotKeyModel> LoadDefaultHotKey()
     {
-        var hotKeyList = new ObservableCollection<HotKeyModel>();
+        var hotKeyList = new List<HotKeyModel>();
         hotKeyList.Add(new HotKeyModel
         {
             Name = EHotKeySetting.显示搜索框.ToString(), IsUsable = true, IsSelectCtrl = false, IsSelectAlt = true,
@@ -37,7 +39,7 @@ public class HotKeySettingsManager
 
     public event RegisterGlobalHotKeyHandler RegisterGlobalHotKeyEvent;
 
-    public bool RegisterGlobalHotKey(ObservableCollection<HotKeyModel> hotKeyModelList)
+    public bool RegisterGlobalHotKey(List<HotKeyModel> hotKeyModelList)
     {
         if (RegisterGlobalHotKeyEvent != null) return RegisterGlobalHotKeyEvent(hotKeyModelList);
         return false;
