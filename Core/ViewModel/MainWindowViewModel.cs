@@ -13,10 +13,5 @@ public partial class MainWindowViewModel: ObservableRecipient
         Environment.Exit(0);
     }
 
-    [RelayCommand]
-    public void ChangeTheme()
-    {
-        ((IThemeChange)ServiceManager.Services.GetService(typeof(IThemeChange))).changeAnother();
-        WeakReferenceMessenger.Default.Send("f","themeChange");
-    }
+    
 }

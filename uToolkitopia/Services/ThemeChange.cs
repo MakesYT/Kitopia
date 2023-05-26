@@ -30,8 +30,6 @@ public class ThemeChange:IThemeChange
 
     public void followSys(bool follow)
     {
-        ConfigManger.config.themeFollowSys = follow;
-        ConfigManger.Save();
         if (follow)
         {
             var currentTheme = Wpf.Ui.Appearance.Theme.GetAppTheme();

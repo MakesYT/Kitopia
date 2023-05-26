@@ -2,5 +2,4 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <SolidColorBrush x:Key="BodyColor"
                      Color="Black" />
-    <!-- <Color x:Key="SystemAccentColorSecondary">#0A9A36</Color> -->
 </ResourceDictionary>

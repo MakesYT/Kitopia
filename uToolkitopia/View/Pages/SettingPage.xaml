@@ -6,7 +6,7 @@
       xmlns:local="clr-namespace:Core.ViewModel;assembly=Core"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:pages="clr-namespace:Core.ViewModel.Pages;assembly=Core"
-
+      xmlns:kitopia="clr-namespace:Kitopia.Controls"
       d:DataContext="{d:DesignInstance pages:SettingPageViewModel,
                                      IsDesignTimeCreatable=False}"
       ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
@@ -17,136 +17,41 @@
       Title="HomePage">
 
     <Page.Resources>
-       
+        
     </Page.Resources>
     <ui:DynamicScrollViewer>
         <StackPanel Margin="42">
             <Expander Header="个性化" FontSize="25" IsExpanded="True" FontWeight="Medium">
                 <Expander.Content>
-                    <Expander Header="主题" FontSize="20" IsExpanded="True">
-                        <Expander.Content>
-                            <StackPanel>
-                                <ui:Card>
-                                    <Grid VerticalAlignment="Center" Height="35">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                            <TextBlock Margin="0" Focusable="False" Text="主题颜色跟随系统"
-                                                       FontSize="15"
-                                                       Background="{x:Null}"
-                                                       FontWeight="Normal" />
-                                        </StackPanel>
-                                        <ui:ToggleSwitch Grid.Column="2" Content=""
-                                                         IsChecked="{Binding ThemeFollowSys}">
-                                        </ui:ToggleSwitch>
-                                    </Grid>
-                                </ui:Card>
 
-                                <RadioButton
-                                    Visibility="{Binding ThemeFollowSys,Converter={StaticResource reverseBoolToVisibilityConverter}}"
-                                    Margin="0,12,0,0"
-                                    Command="{Binding changeThemeCommand, Mode=OneWay}"
-                                    CommandParameter="theme_light"
-                                    Content="浅色"
-                                    GroupName="themeSelect"
-                                    IsEnabled="{Binding ThemeFollowSys,Converter={StaticResource ReverseBool}}"
-                                    IsChecked="{Binding CurrentThemeIsDark, Converter={StaticResource ReverseBool},Mode=OneWay}" />
-                                <RadioButton
-                                    Visibility="{Binding ThemeFollowSys,Converter={StaticResource reverseBoolToVisibilityConverter}}"
-                                    Margin="0,8,0,0"
-                                    Command="{Binding changeThemeCommand, Mode=OneWay}"
-                                    CommandParameter="theme_dark"
-                                    Content="深色"
-                                    GroupName="themeSelect"
-                                    IsEnabled="{Binding ThemeFollowSys,Converter={StaticResource ReverseBool}}"
-                                    IsChecked="{Binding CurrentThemeIsDark,Mode=OneWay}" />
-                            </StackPanel>
-                        </Expander.Content>
-                    </Expander>
+                    <StackPanel>
+                        <kitopia:SettingItems Title="主题颜色" Description="跟随系统,深色还是浅色?"> 
+                            <ComboBox ItemsSource="{Binding ThemeChoiceOptions}" SelectedValue="{Binding ThemeChoice}" />
+                        </kitopia:SettingItems>
+                    </StackPanel>
                 </Expander.Content>
             </Expander>
             <Expander Header="通用" FontSize="25" IsExpanded="True">
                 <Expander.Content>
                     <StackPanel>
-                        <ui:Card>
-                            <Grid VerticalAlignment="Center" Height="35">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                    <TextBlock Margin="0" Focusable="False" Text="开机自动启动(可能被杀毒软件阻止)"
-                                               FontSize="15"
-                                               Background="{x:Null}"
-                                               FontWeight="Normal" />
-                                </StackPanel>
-                                <ui:ToggleSwitch Grid.Column="2" Content="" IsChecked="{Binding AutoStart}"></ui:ToggleSwitch>
-                            </Grid>
-                        </ui:Card>
-
-
+                        <kitopia:SettingItems Title="开机自动启动" Description="可能被杀毒软件阻止"> 
+                            <ui:ToggleSwitch IsChecked="{Binding AutoStart}"></ui:ToggleSwitch>
+                        </kitopia:SettingItems>
                     </StackPanel>
                 </Expander.Content>
             </Expander>
             <Expander Header="搜索框" FontSize="25" IsExpanded="True">
                 <Expander.Content>
                     <StackPanel>
-                        <ui:Card>
-                            <Grid VerticalAlignment="Center" Height="35"> 
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                    <TextBlock Margin="0" Focusable="False" Text="允许程序调用Everything索引文档"
-                                               FontSize="15"
-                                               Background="{x:Null}"
-                                               FontWeight="Normal" />
-                                </StackPanel>
-                                <ui:ToggleSwitch Grid.Column="2" Content="" IsChecked="{Binding UseEverything}"></ui:ToggleSwitch>
-                            </Grid>
-                        </ui:Card>
-                        <ui:Card >
-                            <Grid VerticalAlignment="Center" Height="35">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                    <TextBlock Margin="0" Focusable="False" Text="允许程序读取剪贴板内容"
-                                               FontSize="15"
-                                               Background="{x:Null}"
-                                               FontWeight="Normal" />
-                                </StackPanel>
-                                <ui:ToggleSwitch Grid.Column="2" Content="" IsChecked="{Binding CanReadClipboard}"></ui:ToggleSwitch>
-                            </Grid>
-                        </ui:Card>
-
-                        <ui:Card >
-                            <Grid VerticalAlignment="Center" Height="35">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                    <TextBlock Margin="0" Focusable="False" Text="最大历史数量"
-                                               FontSize="15"
-                                               Background="{x:Null}"
-                                               FontWeight="Normal" />
-                                </StackPanel>
-                                <ComboBox  Margin="0" Grid.Column="2" ItemsSource="{Binding MaxHistoryOptions}"
-                                          SelectedValue="{Binding MaxHistory}" />
-                            </Grid>
-                        </ui:Card>
-
-
+                        <kitopia:SettingItems Title="允许程序调用Everything索引文档" Description="索引文档依赖于此功能"> 
+                            <ui:ToggleSwitch Content="" IsChecked="{Binding UseEverything}"></ui:ToggleSwitch>
+                        </kitopia:SettingItems>
+                        <kitopia:SettingItems Title="允许程序读取剪贴板内容" Description="自动读取剪贴板路径和剪贴板图像保存依赖于此权限"> 
+                            <ui:ToggleSwitch Content="" IsChecked="{Binding CanReadClipboard}"></ui:ToggleSwitch>
+                        </kitopia:SettingItems>
+                        <kitopia:SettingItems Title="最大历史数量" Description="决定在搜索框无搜索内容时显示最近打开软件的数量"> 
+                            <ComboBox ItemsSource="{Binding MaxHistoryOptions}" SelectedValue="{Binding MaxHistory}" />
+                        </kitopia:SettingItems>
                     </StackPanel>
                 </Expander.Content>
             </Expander>

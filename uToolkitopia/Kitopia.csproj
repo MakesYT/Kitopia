@@ -22,7 +22,6 @@
 
     <ItemGroup>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.0" />
-        <PackageReference Include="HandyControl" Version="3.4.0" />
         <PackageReference Include="log4net" Version="2.0.15" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
         <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
@@ -52,6 +51,11 @@
         <SubType>Designer</SubType>
       </Page>
       <Page Update="View\Pages\SettingPage.xaml">
+        <Generator>MSBuild:Compile</Generator>
+        <XamlRuntime>Wpf</XamlRuntime>
+        <SubType>Designer</SubType>
+      </Page>
+      <Page Update="Controls\SettingItems">
         <Generator>MSBuild:Compile</Generator>
         <XamlRuntime>Wpf</XamlRuntime>
         <SubType>Designer</SubType>

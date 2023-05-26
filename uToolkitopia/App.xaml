@@ -3,16 +3,17 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:crt="clr-namespace:Kitopia.Converter"
+             xmlns:c="clr-namespace:Kitopia.Assets"
              StartupUri="InitWindow.xaml">
     <Application.Resources>
 
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/HandyControl;component/Themes/SkinDefault.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HandyControl;component/Themes/Theme.xaml" />
                 <ui:ThemesDictionary Theme="Light" />
                 <ui:ControlsDictionary />
                 <ResourceDictionary Source="Assets/ColorDr.xaml"></ResourceDictionary>
+                <c:ColorD></c:ColorD>
+                <ResourceDictionary Source="Controls/SettingItems.xaml"></ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
             <crt:DoubleHalfConverter x:Key="doubleHalfConverter" />
             <crt:DoubleQuarterConverter x:Key="doubleQuarterConverter" />

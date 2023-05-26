@@ -15,35 +15,50 @@ public partial class SettingPageViewModel: ObservableRecipient
     private static readonly ILog log = LogManager.GetLogger("SettingPageViewModel");
     public SettingPageViewModel()
     {
-        CurrentThemeIsDark = ConfigManger.config.isDark;
-        ThemeFollowSys = ConfigManger.config.themeFollowSys;
+        ThemeChoice = ConfigManger.config.themeChoice;
         AutoStart =ConfigManger.config.autoStart;
         UseEverything = ConfigManger.config.useEverything;
         MaxHistory = ConfigManger.config.maxHistory;
         CanReadClipboard = ConfigManger.config.canReadClipboard;
-        WeakReferenceMessenger.Default.Register<string,string>(this,"themeChange", (r, m) =>
-        {
-            CurrentThemeIsDark = ((IThemeChange)ServiceManager.Services.GetService(typeof(IThemeChange))).isDark();
-        });
-        
+
     }
-    [ObservableProperty] public bool currentThemeIsDark = false;
-    [ObservableProperty] public bool themeFollowSys = false;
     [ObservableProperty] public bool autoStart = true;
     [ObservableProperty] public bool useEverything = true;
     [ObservableProperty] public bool canReadClipboard = true;
     [ObservableProperty] public int maxHistory = 4;
     [ObservableProperty]
     private IList<int> _maxHistoryOptions = new ObservableCollection<int>{1,2,3,4,5,6,7,8,9,10};
-    [RelayCommand]
-    public void changeTheme(string name)
+    [ObservableProperty] public string themeChoice = "跟随系统";
+    [ObservableProperty]
+    private IList<string> _themeChoiceOptions = new ObservableCollection<string>{"跟随系统","深色","浅色"};
+
+    partial void OnThemeChoiceChanged(string value)
     {
-        ((IThemeChange)ServiceManager.Services.GetService(typeof(IThemeChange))).changeTo(name);
-        CurrentThemeIsDark = ((IThemeChange)ServiceManager.Services.GetService(typeof(IThemeChange))).isDark();
-        ConfigManger.config.isDark = CurrentThemeIsDark;
+        switch (value)
+        {
+            case "跟随系统":
+            {
+                ((IThemeChange)ServiceManager.Services.GetService(typeof(IThemeChange))).followSys(true);
+                break;
+            }
+            case "深色":
+            {
+                ((IThemeChange)ServiceManager.Services.GetService(typeof(IThemeChange))).followSys(false);
+                ((IThemeChange)ServiceManager.Services.GetService(typeof(IThemeChange))).changeTo("theme_dark");
+                break;
+            }
+            case "浅色":
+            {
+                ((IThemeChange)ServiceManager.Services.GetService(typeof(IThemeChange))).followSys(false);
+                ((IThemeChange)ServiceManager.Services.GetService(typeof(IThemeChange))).changeTo("theme_light");
+                break;
+            }
+        }
+        ConfigManger.config.themeChoice = value;
         ConfigManger.Save();
     }
 
+    
 
     partial void OnMaxHistoryChanged(int value)
     {
@@ -55,14 +70,6 @@ public partial class SettingPageViewModel: ObservableRecipient
     {
         ConfigManger.config.canReadClipboard = value;
         ConfigManger.Save();
-    }
-
-    
-    
-    partial void OnThemeFollowSysChanged(bool value)
-    {
-        ((IThemeChange)ServiceManager.Services.GetService(typeof(IThemeChange))).followSys(value);
-        CurrentThemeIsDark = ((IThemeChange)ServiceManager.Services.GetService(typeof(IThemeChange))).isDark();
     }
 
     partial void OnAutoStartChanged(bool value)

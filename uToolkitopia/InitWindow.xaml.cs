@@ -39,10 +39,10 @@ public partial class InitWindow
         InitializeComponent();
         DataContext = ServiceManager.Services.GetService<InitWindowsViewModel>();
         var currentTheme = Wpf.Ui.Appearance.Theme.GetAppTheme();
-        if (ConfigManger.config.themeFollowSys&&!Wpf.Ui.Appearance.Theme.IsAppMatchesSystem())
+        if (ConfigManger.config.themeChoice=="跟随系统"&&!Wpf.Ui.Appearance.Theme.IsAppMatchesSystem())
         {
             Wpf.Ui.Appearance.Theme.Apply(currentTheme == Wpf.Ui.Appearance.ThemeType.Light ? Wpf.Ui.Appearance.ThemeType.Dark : Wpf.Ui.Appearance.ThemeType.Light);
-        }else if (ConfigManger.config.isDark)
+        }else if (ConfigManger.config.themeChoice=="深色")
         {
             Wpf.Ui.Appearance.Theme.Apply(Wpf.Ui.Appearance.ThemeType.Dark);
         }

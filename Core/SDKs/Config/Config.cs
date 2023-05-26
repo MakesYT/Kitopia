@@ -6,8 +6,8 @@ public record Config
 {
     public int verInt = 0;
     public string ver = "dev in dev";
-    public bool isDark = false;
-    public bool themeFollowSys = true;
+    public string themeChoice = "跟随系统";
+    public string themeColor = "#EC407A";
     public bool autoStart = true;
     public bool useEverything = true;
     public bool canReadClipboard = true;

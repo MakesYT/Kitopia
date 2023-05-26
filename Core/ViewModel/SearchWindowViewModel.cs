@@ -66,7 +66,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 IsVisible = true
             });
         }
-        else if (Items.First().FileType==FileType.剪贴板图像)
+        else if (Items.Count>0&& Items.First().FileType==FileType.剪贴板图像)
         {
             Items.RemoveAt(0);
         }
