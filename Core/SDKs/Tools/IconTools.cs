@@ -7,16 +7,23 @@ namespace Core.SDKs.Tools;
 
 public class IconTools
 {
-    private readonly Dictionary<string, Icon> _icons = new(250);
+    private const uint SHGFI_ICON = 0x100;
+    private const uint SHGFI_LARGEICON = 0x0;
+    private const uint SHGFI_SMALLICON = 0x000000001;
+    private const uint SHGFI_USEFILEATTRIBUTES = 0x000000010;
+    private const uint SHGFI_OPENICON = 0x000000002;
+    private static readonly Dictionary<string, Icon> _icons = new(250);
 
-    public  void ClearCache()
+    public void ClearCache()
     {
         foreach (Icon iconsValue in _icons.Values)
         {
             iconsValue.Dispose();
         }
+
         _icons.Clear();
     }
+
     [DllImport("User32.dll")]
     public static extern int PrivateExtractIcons(
         string lpszFile, //file name
@@ -36,14 +43,18 @@ public class IconTools
         IntPtr hIcon //A handle to the icon to be destroyed. The icon must not be in use.
     );
 
-    public  Icon GetIcon(string path)
+    public Icon GetIcon(string path)
     {
         string cacheKey;
         bool mscFile = false;
         switch (path.ToLower().Split(".").Last())
         {
-            case "docx": case "doc": case "xls":
-            case "xlsx": case "pdf": case "ppt":
+            case "docx":
+            case "doc":
+            case "xls":
+            case "xlsx":
+            case "pdf":
+            case "ppt":
             case "pptx":
             {
                 cacheKey = path.Split(".").Last();
@@ -61,10 +72,7 @@ public class IconTools
                 break;
             }
         }
-        if (cacheKey.Contains("taskschd"))
-        {
-            Console.WriteLine(1);
-        }
+
         //缓存
         if (_icons.TryGetValue(cacheKey, out var icon2))
         {
@@ -76,10 +84,10 @@ public class IconTools
             int index = 0;
             string dllPath;
             XmlDocument xd = new XmlDocument();
-            xd.Load(path);//加载xml文档
-            XmlNode rootNode = xd.SelectSingleNode("MMC_ConsoleFile");//得到xml文档的根节点
-            XmlNode BinaryStorage=rootNode.SelectSingleNode("VisualAttributes").SelectSingleNode("Icon");
-            index=int.Parse(((XmlElement)BinaryStorage).GetAttribute("Index"));
+            xd.Load(path); //加载xml文档
+            XmlNode rootNode = xd.SelectSingleNode("MMC_ConsoleFile"); //得到xml文档的根节点
+            XmlNode BinaryStorage = rootNode.SelectSingleNode("VisualAttributes").SelectSingleNode("Icon");
+            index = int.Parse(((XmlElement)BinaryStorage).GetAttribute("Index"));
             dllPath = ((XmlElement)BinaryStorage).GetAttribute("File");
 
             dllPath = System.Environment.SystemDirectory + "\\" + dllPath.Split("\\").Last();
@@ -88,7 +96,7 @@ public class IconTools
             {
                 index += 1;
             }
-            
+
             var iconTotalCount = PrivateExtractIcons(dllPath, index, 0, 0, null!, null!, 0, 0);
 
             //用于接收获取到的图标指针
@@ -111,8 +119,8 @@ public class IconTools
                     return independenceIcon;
                 }
             }
-            
         }
+
         #region 获取64*64的尺寸Icon
 
         {
@@ -145,29 +153,26 @@ public class IconTools
 
         #endregion
 
-        
+
         SHFILEINFO shinfo = new SHFILEINFO();
         SHGetFileInfo(
             path,
             0, ref shinfo, (uint)Marshal.SizeOf(shinfo),
-              SHGFI_ICON|SHGFI_LARGEICON|SHGFI_USEFILEATTRIBUTES|SHGFI_OPENICON);
+            SHGFI_ICON | SHGFI_LARGEICON | SHGFI_USEFILEATTRIBUTES | SHGFI_OPENICON);
         Icon independenceIcon12 = (Icon)System.Drawing.Icon.FromHandle(shinfo.hIcon).Clone();
         DestroyIcon(shinfo.hIcon);
-        _icons.Add(cacheKey,independenceIcon12);
+        _icons.Add(cacheKey, independenceIcon12);
         return independenceIcon12;
-        
+
         #region 32*32的Icon
-            var icon1 = Icon.ExtractAssociatedIcon((string)path);
-            Icon independenceIcon1 = (Icon)icon1!.Clone();
-            DestroyIcon(icon1.Handle);
-            _icons.Add(cacheKey, independenceIcon1);
-            return independenceIcon1;
-        
+
+        var icon1 = Icon.ExtractAssociatedIcon((string)path);
+        Icon independenceIcon1 = (Icon)icon1!.Clone();
+        DestroyIcon(icon1.Handle);
+        _icons.Add(cacheKey, independenceIcon1);
+        return independenceIcon1;
 
         #endregion
-        
-        
-        
     }
 
     public Icon? GetFormClipboard()
@@ -179,22 +184,22 @@ public class IconTools
         {
             return null;
         }
-        var image = bitmap.GetThumbnailImage (48, 48, null, IntPtr.Zero); // 获取指定大小的缩略图
-        IconConverter converter = new IconConverter (); // 创建转换器对象
-        byte[] bytes = converter.ConvertTo (image, typeof(byte[])) as byte[]; // 将 image 转换为字节数组
-        Icon icon = converter.ConvertFrom (bytes) as Icon; // 将字节数组转换为 icon 对象
-        MemoryStream ms = new MemoryStream (); // 创建内存流
-        icon.Save (ms); // 将 icon 保存到流中
+
+        var image = bitmap.GetThumbnailImage(48, 48, null, IntPtr.Zero); // 获取指定大小的缩略图
+        IconConverter converter = new IconConverter(); // 创建转换器对象
+        byte[] bytes = converter.ConvertTo(image, typeof(byte[])) as byte[]; // 将 image 转换为字节数组
+        Icon icon = converter.ConvertFrom(bytes) as Icon; // 将字节数组转换为 icon 对象
+        MemoryStream ms = new MemoryStream(); // 创建内存流
+        icon.Save(ms); // 将 icon 保存到流中
         ms.Position = 0; // 重置流位置
-        icon = new Icon (ms); // 从流中创建 icon 对象
-        ms.Close (); // 关闭流
+        icon = new Icon(ms); // 从流中创建 icon 对象
+        ms.Close(); // 关闭流
         Icon independenceIcon12 = (Icon)icon.Clone();
         DestroyIcon(icon.Handle);
         //_icons.Add(cacheKey,independenceIcon12);
         return independenceIcon12;
     }
 
-    
 
     public Icon ExtractFromPath(string path)
     {
@@ -202,6 +207,7 @@ public class IconTools
         {
             return fromPath;
         }
+
         SHFILEINFO shinfo = new SHFILEINFO();
         SHGetFileInfo(
             path,
@@ -209,9 +215,13 @@ public class IconTools
             SHGFI_ICON | SHGFI_LARGEICON);
         Icon independenceIcon12 = (Icon)System.Drawing.Icon.FromHandle(shinfo.hIcon).Clone();
         DestroyIcon(shinfo.hIcon);
-        _icons.Add(path,independenceIcon12);
+        _icons.Add(path, independenceIcon12);
         return independenceIcon12;
     }
+
+    [DllImport("shell32.dll")]
+    private static extern IntPtr SHGetFileInfo(string pszPath, uint dwFileAttributes, ref SHFILEINFO psfi,
+        uint cbSizeFileInfo, uint uFlags);
 
 //Struct used by SHGetFileInfo function
     [StructLayout(LayoutKind.Sequential)]
@@ -220,19 +230,11 @@ public class IconTools
         public IntPtr hIcon;
         public int iIcon;
         public uint dwAttributes;
+
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
         public string szDisplayName;
+
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 80)]
         public string szTypeName;
     };
-
-    [DllImport("shell32.dll")]
-    private static extern IntPtr SHGetFileInfo(string pszPath, uint dwFileAttributes, ref SHFILEINFO psfi, uint cbSizeFileInfo, uint uFlags);
-
-    private const uint SHGFI_ICON = 0x100;
-    private const uint SHGFI_LARGEICON = 0x0;
-    private const uint SHGFI_SMALLICON = 0x000000001;
-    private const uint SHGFI_USEFILEATTRIBUTES = 0x000000010;
-    private const uint SHGFI_OPENICON  = 0x000000002;
-    
 }

@@ -1,86 +1,145 @@
-﻿using NPinyin;
+﻿using Core.SDKs.Config;
+using NPinyin;
 using static System.Text.RegularExpressions.Regex;
 
 namespace Core.SDKs.Tools;
 
 public partial class AppTools
 {
-    public static void GetAllApps( List<SearchViewItem> collection,  List<string> names)
+    public static void GetAllApps(List<SearchViewItem> collection, List<string> names)
     {
         List<Task> taskList = new List<Task>();
 
-        foreach (var file in Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "*.lnk"))
+        foreach (var file in Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                     "*.lnk"))
             taskList.Add(Task.Run(() =>
             {
-                AppSolverA( collection,  names, file);
+                AppSolverA(collection, names, file);
             }));
-            
-        foreach (var file in Directory.EnumerateFiles("C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs", "*.lnk")) 
+
+        foreach (var file in Directory.EnumerateFiles("C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs",
+                     "*.lnk"))
             taskList.Add(Task.Run(() =>
             {
-                AppSolverA( collection,  names, file);
+                AppSolverA(collection, names, file);
             }));
-        foreach (var path in Directory.EnumerateDirectories("C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs", "*", SearchOption.AllDirectories))
+        foreach (var path in Directory.EnumerateDirectories("C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs",
+                     "*", SearchOption.AllDirectories))
         {
-            foreach (var file in Directory.EnumerateFiles(path, "*.lnk")) 
+            foreach (var file in Directory.EnumerateFiles(path, "*.lnk"))
                 taskList.Add(Task.Run(() =>
                 {
-                    AppSolverA( collection,  names, file);
+                    AppSolverA(collection, names, file);
                 }));
             foreach (var file in Directory.EnumerateFiles(path, "*.appref-ms"))
                 taskList.Add(Task.Run(() =>
                 {
-                    AppSolverA( collection,  names, file);
+                    AppSolverA(collection, names, file);
                 }));
         }
 
-        foreach (var path in Directory.EnumerateDirectories(Environment.GetFolderPath(Environment.SpecialFolder.Programs), "*", SearchOption.AllDirectories))
+        foreach (var file in ConfigManger.config.customCollections)
         {
-            foreach (var file in Directory.EnumerateFiles(path, "*.lnk")) 
+            taskList.Add(Task.Run(() =>
+            {
+                AppSolverA(collection, names, file, true);
+            }));
+        }
+
+        foreach (var path in Directory.EnumerateDirectories(
+                     Environment.GetFolderPath(Environment.SpecialFolder.Programs), "*", SearchOption.AllDirectories))
+        {
+            foreach (var file in Directory.EnumerateFiles(path, "*.lnk"))
                 taskList.Add(Task.Run(() =>
                 {
-                    AppSolverA( collection,  names, file);
+                    AppSolverA(collection, names, file);
                 }));
             foreach (var file in Directory.EnumerateFiles(path, "*.appref-ms"))
                 taskList.Add(Task.Run(() =>
                 {
-                    AppSolverA( collection,  names, file);
+                    AppSolverA(collection, names, file);
                 }));
         }
+
         Task.WaitAll(taskList.ToArray());
     }
 
-    private static void AppSolverA( List<SearchViewItem> collection,  List<string> names, string file)
+    public static void AppSolverA(List<SearchViewItem> collection, List<string> names, string file, bool star = false)
     {
+        if (star)
+        {
+            if (names.Contains(file))
+            {
+                return;
+            }
+
+            names.Add(file);
+            if (Path.HasExtension(file) && File.Exists(file))
+            {
+                var keys = new HashSet<string>();
+                NameSolver(keys, LnkTools.GetLocalizedName(file));
+                collection.Add(new SearchViewItem()
+                {
+                    FileInfo = new FileInfo(file),
+                    FileName = "打开文件:" + LnkTools.GetLocalizedName(file) + "?",
+                    FileType = FileType.文件,
+                    Keys = keys,
+                    IsStared = true,
+                    IsVisible = true
+                });
+            }
+            else if (Directory.Exists(file))
+            {
+                var keys = new HashSet<string>();
+                NameSolver(keys, file.Split("\\").Last());
+                collection.Add(new SearchViewItem()
+                {
+                    DirectoryInfo = new DirectoryInfo(file),
+                    FileName = "打开" + file.Split("\\").Last() + "?",
+                    FileType = FileType.文件夹,
+                    IsStared = true,
+                    Keys = keys,
+                    Icon = null,
+                    IsVisible = true
+                });
+            }
+
+            return;
+        }
+
         var fileInfo = new FileInfo(file);
         var refFileInfo = new FileInfo(LnkTools.ResolveShortcut(file));
         if (refFileInfo.Exists)
-            if (refFileInfo.Extension != ".url" && refFileInfo.Extension != ".txt" && refFileInfo.Extension != ".chm" &&
-                !refFileInfo.Name.Contains("powershell.exe") && !refFileInfo.Name.Contains("cmd.exe") &&
-                refFileInfo.Extension != ".pdf" && refFileInfo.Extension != ".bat" && !fileInfo.Name.Contains("install") &&
-                !fileInfo.Name.Contains("安装") && !fileInfo.Name.Contains("卸载"))
+            if (names.Contains(refFileInfo.FullName))
             {
-                var keys = new HashSet<string>();
+                return;
+            }
 
-                //collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = fileInfo.Name.Replace(".lnk", ""), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
-                var localName = LnkTools.GetLocalizedName(file);
-                NameSolver(keys, localName);
-                //nameSolver(keys, fileInfo.Name.Replace(".lnk", ""));
-                NameSolver(keys, refFileInfo.Name.Replace(".exe", ""));
-                if (!names.Contains(localName))
+        names.Add(refFileInfo.FullName);
+        if (refFileInfo.Extension != ".url" && refFileInfo.Extension != ".txt" && refFileInfo.Extension != ".chm" &&
+            !refFileInfo.Name.Contains("powershell.exe") && !refFileInfo.Name.Contains("cmd.exe") &&
+            refFileInfo.Extension != ".pdf" && refFileInfo.Extension != ".bat" && !fileInfo.Name.Contains("install") &&
+            !fileInfo.Name.Contains("安装") && !fileInfo.Name.Contains("卸载"))
+        {
+            var keys = new HashSet<string>();
+
+            //collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = fileInfo.Name.Replace(".lnk", ""), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
+            var localName = LnkTools.GetLocalizedName(file);
+            NameSolver(keys, localName);
+            //nameSolver(keys, fileInfo.Name.Replace(".lnk", ""));
+            NameSolver(keys, refFileInfo.Name.Replace(".exe", ""));
+
+            {
+                lock (collection)
                 {
-                    names.Add(localName);
-                    lock (collection)
+                    collection.Add(new SearchViewItem
                     {
-                        collection.Add(new SearchViewItem
-                            {
-                                Keys = keys, IsVisible = true, FileInfo = refFileInfo, FileName = localName,
-                                FileType = FileType.应用程序, Icon = null
-                            });
-                    }
-                     
+                        Keys = keys, IsVisible = true, FileInfo = refFileInfo, FileName = localName,
+                        FileType = FileType.应用程序, Icon = null
+                    });
                 }
             }
+        }
     }
 
 
@@ -97,7 +156,7 @@ public partial class AppTools
             CreateCombinations(keys, i + 1, value, initialArray);
         }
     }
-    
+
 
     // 使用const或readonly修饰符来声明pattern字符串
     public static void NameSolver(HashSet<string> keys, string name)
@@ -122,5 +181,4 @@ public partial class AppTools
 
     [System.Text.RegularExpressions.GeneratedRegex("[^A-Z]")]
     private static partial System.Text.RegularExpressions.Regex MyRegex();
-    
 }

@@ -362,3 +362,8 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /.idea/.idea.Kitopia/.idea
+/TestProject1/aaa.cs
+/uToolkitopia/Kitopia - Backup (1).csproj
+/uToolkitopia/Kitopia - Backup.csproj
+/.editorconfig
+/.vsconfig

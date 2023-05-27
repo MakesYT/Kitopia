@@ -11,9 +11,9 @@
             <ResourceDictionary.MergedDictionaries>
                 <ui:ThemesDictionary Theme="Light" />
                 <ui:ControlsDictionary />
-                <ResourceDictionary Source="Assets/ColorDr.xaml"></ResourceDictionary>
-                <c:ColorD></c:ColorD>
-                <ResourceDictionary Source="Controls/SettingItems.xaml"></ResourceDictionary>
+                <ResourceDictionary Source="Assets/ColorDr.xaml" />
+                <c:ColorD />
+                <ResourceDictionary Source="Controls/SettingItems.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <crt:DoubleHalfConverter x:Key="doubleHalfConverter" />
             <crt:DoubleQuarterConverter x:Key="doubleQuarterConverter" />
@@ -24,6 +24,7 @@
             <crt:ReverseBool x:Key="ReverseBool" />
             <crt:IntToIconSymbol x:Key="IntToIconSymbol"/>
             <crt:IfNullVisibilityHidden x:Key="IfNullVisibilityHidden"/>
+            <crt:StarBoolToText x:Key="StarBoolToText"/>
         </ResourceDictionary>
 
     </Application.Resources>

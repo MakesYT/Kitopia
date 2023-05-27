@@ -33,6 +33,7 @@ public class EnumToVisibilityConverter : IValueConverter
                     case FileType.Excel文档: return Visibility.Visible;
                     case FileType.PDF文档: return Visibility.Visible;
                     case FileType.图像: return Visibility.Visible;
+                    case FileType.文件: return Visibility.Visible;
                     default: return Visibility.Collapsed;
                 }
             }
@@ -46,6 +47,16 @@ public class EnumToVisibilityConverter : IValueConverter
                     case FileType.Excel文档: return Visibility.Visible;
                     case FileType.PDF文档: return Visibility.Visible;
                     case FileType.图像: return Visibility.Visible;
+                    case FileType.文件夹: return Visibility.Visible;
+                    case FileType.文件: return Visibility.Visible;
+                    default: return Visibility.Collapsed;
+                }
+            }
+            case "Star":
+            {
+                switch ((FileType)value)
+                {
+                    case FileType.文件: return Visibility.Visible;
                     case FileType.文件夹: return Visibility.Visible;
                     default: return Visibility.Collapsed;
                 }

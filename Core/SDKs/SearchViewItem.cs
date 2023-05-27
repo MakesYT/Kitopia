@@ -2,22 +2,67 @@
 
 namespace Core.SDKs;
 
-public class SearchViewItem: ICloneable,IDisposable
+public class SearchViewItem : ICloneable, IDisposable
 {
-    public string? FileName { set; get; }
-    public bool? IsVisible { set; get; }
-    public HashSet<string>? Keys { set; get; }
-    public FileType FileType { set; get; }
-    public FileInfo? FileInfo { set; get; }
-    public DirectoryInfo? DirectoryInfo { set; get; }
-    public string? Url { set; get; }
+    public string? FileName
+    {
+        set;
+        get;
+    }
+
+    public bool? IsVisible
+    {
+        set;
+        get;
+    }
+
+    public bool IsStared
+    {
+        set;
+        get;
+    } = false;
+
+    public HashSet<string>? Keys
+    {
+        set;
+        get;
+    }
+
+    public FileType FileType
+    {
+        set;
+        get;
+    }
+
+    public FileInfo? FileInfo
+    {
+        set;
+        get;
+    }
+
+    public DirectoryInfo? DirectoryInfo
+    {
+        set;
+        get;
+    }
+
+    public string? Url
+    {
+        set;
+        get;
+    }
 
     public int IconSymbol
     {
         set;
         get;
     } = 0;
-    public Icon? Icon { set; get; }
+
+    public Icon? Icon
+    {
+        set;
+        get;
+    }
 
     public object Clone()
     {
@@ -27,8 +72,9 @@ public class SearchViewItem: ICloneable,IDisposable
             IsVisible = IsVisible,
             Keys = new HashSet<string>(Keys!),
             FileType = FileType,
-            FileInfo = FileInfo!=null?new FileInfo(FileInfo.FullName):null,
-            DirectoryInfo = DirectoryInfo!=null?new DirectoryInfo(DirectoryInfo.FullName):null,
+            IsStared = IsStared,
+            FileInfo = FileInfo != null ? new FileInfo(FileInfo.FullName) : null,
+            DirectoryInfo = DirectoryInfo != null ? new DirectoryInfo(DirectoryInfo.FullName) : null,
         };
     }
 
@@ -43,10 +89,9 @@ public class SearchViewItem: ICloneable,IDisposable
         if (FileInfo != null)
         {
             FileInfo = null;
-            
         }
 
-        if (Keys!=null)
+        if (Keys != null)
         {
             Keys.Clear();
             Keys = null;
@@ -65,5 +110,6 @@ public enum FileType
     图像,
     剪贴板图像,
     文件夹,
+    文件,
     None
 }

@@ -37,15 +37,12 @@
         <ui:TextBox VerticalContentAlignment="Center" VerticalAlignment="Center"     IsTabStop="False" FocusVisualStyle="{x:Null}" ClearButtonEnabled="True"
                     PlaceholderEnabled="True" PlaceholderText="搜索..." AcceptsReturn="False" PreviewKeyDown="tx_KeyDown" x:Name="tx"
                     AcceptsTab="False" FontSize="32" 
-                    Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}">
-            
-            
-        </ui:TextBox>
+                    Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}" />
 
-        
+
         <ui:InfoBar  Focusable="False"  Title="警告" Message ="Everything服务未运行,无法搜索文档,请检查" Severity="Warning" IsOpen="{Binding EverythingIsOk, Converter={StaticResource ReverseBool}}"
-                      Visibility="{Binding EverythingIsOk, Converter={StaticResource reverseBoolToVisibilityConverter}}" IsClosable="False"
-                     />
+                     Visibility="{Binding EverythingIsOk, Converter={StaticResource reverseBoolToVisibilityConverter}}" IsClosable="False"
+        />
         <ui:DataGrid VerticalScrollBarVisibility="Visible" IsReadOnly="True" x:Name="dataGrid"  RowHeight="75" GridLinesVisibility="None"
                   HeadersVisibility="None" MaxHeight="385"  ItemsSource="{Binding Items}" AutoGenerateColumns="False"
                   Margin="0,10,0,0">
@@ -57,7 +54,7 @@
                     <Setter Property="IsTabStop" Value="False" />
                     <Setter Property="Foreground" Value="Transparent" />
                     <Setter Property="BorderBrush" Value="Transparent" />
-                    <Setter Property="Background" Value="Transparent"></Setter>
+                    <Setter Property="Background" Value="Transparent" />
                 </Style>
             </DataGrid.CellStyle>
             <DataGrid.RowStyle>
@@ -69,7 +66,7 @@
                     <Setter Property="IsTabStop" Value="False" />
                     <Setter Property="Foreground" Value="Transparent" />
                     <Setter Property="BorderBrush" Value="Transparent" />
-                    <Setter Property="Background" Value="Transparent"></Setter>
+                    <Setter Property="Background" Value="Transparent" />
                 </Style>
             </DataGrid.RowStyle>
             <DataGrid.Columns>
@@ -81,7 +78,7 @@
                                 CommandParameter="{Binding SelectedValue, ElementName=dataGrid}" Background="Transparent"
                                 PreviewKeyDown="Button_PreviewKeyDown"  Height="72" Margin="0"
                                 Width="762" Padding="3">
-                                <Grid HorizontalAlignment="Left" >
+                                <Grid HorizontalAlignment="Left" Margin="5,0,0,0">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="48" />
                                         <ColumnDefinition Width="505 " />
@@ -101,21 +98,41 @@
                                                         
                                                    Background="{x:Null}" 
                                                    FontWeight="Normal" FontSize="18" />
-                                        <TextBlock VerticalAlignment="Top" Margin="0" Text="{Binding Path=FileType}"></TextBlock>
+                                        <TextBlock VerticalAlignment="Top" Margin="0" Text="{Binding Path=FileType}" />
                                     </StackPanel>
                                     <StackPanel Grid.Column="2" Orientation="Horizontal" Focusable="False">
-                                        <ui:Button KeyboardNavigation.DirectionalNavigation="None" Content="管理员"
+                                        <ui:Button KeyboardNavigation.DirectionalNavigation="None" FontSize="26" ToolTip="以管理员身份运行"
                                                    Visibility="{Binding Path=FileType, Converter={StaticResource enumToVisibilityConverter}, ConverterParameter='RunAsAdmin'}"
                                                    Command="{Binding Path=DataContext.RunAsAdminCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:FluentWindow}}}"
-                                                   CommandParameter="{Binding  }" />
-                                        <ui:Button KeyboardNavigation.DirectionalNavigation="None" Content="文件夹"
+                                                   CommandParameter="{Binding  }" >
+                                            <ui:Button.Icon>
+                                                <ui:SymbolIcon Symbol="WindowShield20" />
+                                            </ui:Button.Icon>
+                                        </ui:Button>
+                                        <ui:Button KeyboardNavigation.DirectionalNavigation="None" FontSize="26" ToolTip="打开文件所在文件夹"
                                                    Visibility="{Binding Path=FileType, Converter={StaticResource enumToVisibilityConverter}, ConverterParameter='Folder'}"
                                                    Command="{Binding Path=DataContext.OpenFolderCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:FluentWindow}}}"
-                                                   CommandParameter="{Binding}" />
-                                        <ui:Button KeyboardNavigation.DirectionalNavigation="None" Content="控制台"
+                                                   CommandParameter="{Binding}" >
+                                            <ui:Button.Icon>
+                                                <ui:SymbolIcon Symbol="Folder20" />
+                                            </ui:Button.Icon>
+                                        </ui:Button>
+                                        <ui:Button KeyboardNavigation.DirectionalNavigation="None" FontSize="26" ToolTip="在终端中打开文件夹/文件所在文件夹"
                                                    Visibility="{Binding Path=FileType, Converter={StaticResource enumToVisibilityConverter}, ConverterParameter='Console'}"
                                                    Command="{Binding Path=DataContext.OpenFolderInTerminalCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:FluentWindow}}}"
-                                                   CommandParameter="{Binding}" />
+                                                   CommandParameter="{Binding}" >
+                                            <ui:Button.Icon>
+                                                <ui:SymbolIcon Symbol="WindowConsole20" />
+                                            </ui:Button.Icon>
+                                        </ui:Button>
+                                        <ui:Button KeyboardNavigation.DirectionalNavigation="None" FontSize="26" ToolTip="{Binding IsStared,Converter={StaticResource StarBoolToText}}"
+                                                   Visibility="{Binding Path=FileType, Converter={StaticResource enumToVisibilityConverter}, ConverterParameter='Star'}"
+                                                   Command="{Binding Path=DataContext.StarCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:FluentWindow}}}"
+                                                   CommandParameter="{Binding}" >
+                                            <ui:Button.Icon>
+                                                <ui:SymbolIcon Symbol="Star20" Filled="{Binding IsStared}" />
+                                            </ui:Button.Icon>
+                                        </ui:Button>
                                     </StackPanel>
                                 </Grid>
                             </ui:Button>
