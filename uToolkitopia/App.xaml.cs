@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
 using Core.SDKs;
@@ -31,30 +34,57 @@ public sealed partial class App : Application
 
     public App()
     {
-        ServiceManager.Services = ConfigureServices();
-        log.Info("Ioc初始化完成");
-        ConfigManger.Init();
-        log.Info("配置文件初始化完成");
-        
-        var initWindow = ServiceManager.Services.GetService<InitWindow>();
-        initWindow.Show();
-        Current.MainWindow= ServiceManager.Services.GetService<MainWindow>();
     }
-    
+
+    [DllImport("user32.dll", EntryPoint = "SetForegroundWindow", SetLastError = true)]
+    public static extern void SetForegroundWindow(IntPtr hwnd);
+
     protected override void OnStartup(StartupEventArgs e)
     {
-        #if !DEBUG
-                log.Info("异常捕获");
-                DispatcherUnhandledException += App_DispatcherUnhandledException;
-                Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
-                AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-        #endif
-        ServicePointManager.DefaultConnectionLimit = 10240;
-        base.OnStartup(e);
-        if (ConfigManger.config.autoStart)
+        /*创建具有唯一名称的互斥锁*/
+        var appMutex = new Mutex(true, "Kitopia", out var createdNew);
+
+        if (!createdNew)
         {
-            log.Info("设置开机自启");
-            SetAutoStartup();
+            var current = Process.GetCurrentProcess();
+
+            foreach (var process in Process.GetProcessesByName(current.ProcessName))
+            {
+                if (process.Id != current.Id)
+                {
+                    SetForegroundWindow(process.MainWindowHandle);
+                    break;
+                }
+            }
+
+            System.Windows.MessageBox.Show("不能同时开启两个应用", "Kitopia");
+            Shutdown();
+        }
+        else
+        {
+#if !DEBUG
+            log.Info("异常捕获");
+            DispatcherUnhandledException += App_DispatcherUnhandledException;
+            Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+#endif
+            ServiceManager.Services = ConfigureServices();
+            log.Info("Ioc初始化完成");
+            ConfigManger.Init();
+            log.Info("配置文件初始化完成");
+
+            var initWindow = ServiceManager.Services.GetService<InitWindow>();
+            initWindow.Show();
+            Current.MainWindow = ServiceManager.Services.GetService<MainWindow>();
+            ServicePointManager.DefaultConnectionLimit = 10240;
+
+            if (ConfigManger.config.autoStart)
+            {
+                log.Info("设置开机自启");
+                SetAutoStartup();
+            }
+
+            base.OnStartup(e);
         }
     }
 
@@ -66,12 +96,14 @@ public sealed partial class App : Application
 
     private void SetAutoStartup()
     {
-        string strName = AppDomain.CurrentDomain.BaseDirectory + "Kitopia.exe";//获取要自动运行的应用程序名
-        if (!File.Exists(strName))//判断要自动运行的应用程序文件是否存在
+        string strName = AppDomain.CurrentDomain.BaseDirectory + "Kitopia.exe"; //获取要自动运行的应用程序名
+        if (!File.Exists(strName)) //判断要自动运行的应用程序文件是否存在
             return;
-        RegistryKey registry = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run", true);//检索指定的子项
-        if (registry == null)//若指定的子项不存在
-            registry = Registry.CurrentUser.CreateSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run");//则创建指定的子项
+        RegistryKey registry =
+            Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run", true); //检索指定的子项
+        if (registry == null) //若指定的子项不存在
+            registry = Registry.CurrentUser.CreateSubKey(
+                "Software\\Microsoft\\Windows\\CurrentVersion\\Run"); //则创建指定的子项
         if (registry.GetValue("Kitopia") is null)
         {
             MessageBox msg = new MessageBox();
@@ -105,9 +137,8 @@ public sealed partial class App : Application
                             new ToastContentBuilder()
                                 .AddText("开机自启设置失败,请检查杀毒软件后重试")
                                 .Show();
-                            
                         }
-                        
+
                         break;
                     }
                     case MessageBoxResult.None:
@@ -116,10 +147,8 @@ public sealed partial class App : Application
                         break;
                     }
                 }
-                
             });
         }
-        
     }
 
     /// <summary>
@@ -129,16 +158,16 @@ public sealed partial class App : Application
     {
         var services = new ServiceCollection();
         services.AddSingleton<IconTools>();
-        services.AddTransient<IThemeChange,ThemeChange>();
-        services.AddTransient<IToastService,ToastService>();
-        services.AddTransient<IClipboardService,ClipboardService>();
+        services.AddTransient<IThemeChange, ThemeChange>();
+        services.AddTransient<IToastService, ToastService>();
+        services.AddTransient<IClipboardService, ClipboardService>();
         services.AddSingleton<SearchWindowViewModel>(e =>
         {
             return new SearchWindowViewModel { IsActive = true };
         });
         services.AddSingleton<SearchWindow>(sq =>
         {
-           return new SearchWindow { DataContext = sq.GetService<SearchWindowViewModel>() };
+            return new SearchWindow { DataContext = sq.GetService<SearchWindowViewModel>() };
         });
         services.AddSingleton<InitWindowsViewModel>(e =>
         {
