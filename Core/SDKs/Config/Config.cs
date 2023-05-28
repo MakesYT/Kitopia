@@ -6,6 +6,7 @@ public record Config
 {
     public bool autoStart = true;
     public bool canReadClipboard = true;
+
     public List<string> customCollections = new();
 
     public List<HotKeyModel> hotKeys = new()
@@ -16,6 +17,8 @@ public record Config
             IsSelectShift = false, SelectKey = EKey.Space
         }
     };
+
+    public int inputSmoothingMilliseconds = 50;
 
     public List<string> lastOpens = new();
     public int maxHistory = 4;

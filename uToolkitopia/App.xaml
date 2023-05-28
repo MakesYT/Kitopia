@@ -25,6 +25,7 @@
             <crt:IntToIconSymbol x:Key="IntToIconSymbol"/>
             <crt:IfNullVisibilityHidden x:Key="IfNullVisibilityHidden"/>
             <crt:StarBoolToText x:Key="StarBoolToText"/>
+            <crt:SearchItemToInfo x:Key="SearchItemToInfo"/>
         </ResourceDictionary>
 
     </Application.Resources>

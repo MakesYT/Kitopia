@@ -73,7 +73,7 @@
                 <DataGridTemplateColumn x:Name="dataGridTemplateColumn" Header="Button" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <ui:Button 
+                            <ui:Button ToolTip="{Binding Path=. ,Converter={StaticResource SearchItemToInfo}}"
                                 Command="{Binding Path=DataContext.OpenFileCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:FluentWindow}}}"
                                 CommandParameter="{Binding SelectedValue, ElementName=dataGrid}" Background="Transparent"
                                 PreviewKeyDown="Button_PreviewKeyDown"  Height="72" Margin="0"
@@ -81,12 +81,12 @@
                                 <Grid HorizontalAlignment="Left" Margin="5,0,0,0">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="48" />
-                                        <ColumnDefinition Width="505 " />
-                                        <ColumnDefinition Width="200" />
+                                        <ColumnDefinition Width="500 " />
+                                        <ColumnDefinition Width="195" />
                                     </Grid.ColumnDefinitions>
                                     <Image Grid.Column="0" HorizontalAlignment="Left"  Focusable="False" Width="48" Height="48"
                                            Source="{Binding Icon, Converter={StaticResource pathToImageConverter}}" />
-                                    <ui:Button Visibility="{Binding IconSymbol,Converter={StaticResource IfNullVisibilityHidden}}" Height="48" Width="48" FontSize="48" Margin="0" Padding="0" Background="{x:Null}" IsEnabled="False" PressedForeground="{x:Null}" MouseOverBackground="{x:Null}" MouseOverBorderBrush="{x:Null}" PressedBackground="{x:Null}" PressedBorderBrush="{x:Null}" BorderBrush="{x:Null}">
+                                    <ui:Button Grid.Column="0" Visibility="{Binding IconSymbol,Converter={StaticResource IfNullVisibilityHidden}}" Height="48" Width="48" FontSize="48" Margin="0" Padding="0" Background="{x:Null}" IsEnabled="False" PressedForeground="{x:Null}" MouseOverBackground="{x:Null}" MouseOverBorderBrush="{x:Null}" PressedBackground="{x:Null}" PressedBorderBrush="{x:Null}" BorderBrush="{x:Null}">
                                         <ui:Button.Icon>
                                             <ui:SymbolIcon   Height="48" Width="48"
                                                            Symbol="{Binding IconSymbol,Converter={StaticResource IntToIconSymbol},Mode=OneWay}" />
@@ -100,8 +100,8 @@
                                                    FontWeight="Normal" FontSize="18" />
                                         <TextBlock VerticalAlignment="Top" Margin="0" Text="{Binding Path=FileType}" />
                                     </StackPanel>
-                                    <StackPanel Grid.Column="2" Orientation="Horizontal" Focusable="False">
-                                        <ui:Button KeyboardNavigation.DirectionalNavigation="None" FontSize="26" ToolTip="以管理员身份运行"
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal" Focusable="False" HorizontalAlignment="Right">
+                                        <ui:Button KeyboardNavigation.DirectionalNavigation="None" FontSize="26" ToolTip="以管理员身份运行" Background="{x:Null}"
                                                    Visibility="{Binding Path=FileType, Converter={StaticResource enumToVisibilityConverter}, ConverterParameter='RunAsAdmin'}"
                                                    Command="{Binding Path=DataContext.RunAsAdminCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:FluentWindow}}}"
                                                    CommandParameter="{Binding  }" >
@@ -109,7 +109,7 @@
                                                 <ui:SymbolIcon Symbol="WindowShield20" />
                                             </ui:Button.Icon>
                                         </ui:Button>
-                                        <ui:Button KeyboardNavigation.DirectionalNavigation="None" FontSize="26" ToolTip="打开文件所在文件夹"
+                                        <ui:Button KeyboardNavigation.DirectionalNavigation="None" FontSize="26" ToolTip="打开文件所在文件夹" Background="{x:Null}"
                                                    Visibility="{Binding Path=FileType, Converter={StaticResource enumToVisibilityConverter}, ConverterParameter='Folder'}"
                                                    Command="{Binding Path=DataContext.OpenFolderCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:FluentWindow}}}"
                                                    CommandParameter="{Binding}" >
@@ -117,7 +117,7 @@
                                                 <ui:SymbolIcon Symbol="Folder20" />
                                             </ui:Button.Icon>
                                         </ui:Button>
-                                        <ui:Button KeyboardNavigation.DirectionalNavigation="None" FontSize="26" ToolTip="在终端中打开文件夹/文件所在文件夹"
+                                        <ui:Button KeyboardNavigation.DirectionalNavigation="None" FontSize="26" ToolTip="在终端中打开文件夹/文件所在文件夹" Background="{x:Null}"
                                                    Visibility="{Binding Path=FileType, Converter={StaticResource enumToVisibilityConverter}, ConverterParameter='Console'}"
                                                    Command="{Binding Path=DataContext.OpenFolderInTerminalCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:FluentWindow}}}"
                                                    CommandParameter="{Binding}" >
@@ -125,7 +125,8 @@
                                                 <ui:SymbolIcon Symbol="WindowConsole20" />
                                             </ui:Button.Icon>
                                         </ui:Button>
-                                        <ui:Button KeyboardNavigation.DirectionalNavigation="None" FontSize="26" ToolTip="{Binding IsStared,Converter={StaticResource StarBoolToText}}"
+                                        <ui:Button KeyboardNavigation.DirectionalNavigation="None" FontSize="26" 
+                                                   ToolTip="{Binding IsStared,Converter={StaticResource StarBoolToText}}" Background="{x:Null}"
                                                    Visibility="{Binding Path=FileType, Converter={StaticResource enumToVisibilityConverter}, ConverterParameter='Star'}"
                                                    Command="{Binding Path=DataContext.StarCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:FluentWindow}}}"
                                                    CommandParameter="{Binding}" >

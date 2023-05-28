@@ -114,7 +114,7 @@ public class IconTools
                 {
                     Icon independenceIcon = (Icon)icon.Clone();
                     DestroyIcon(icon.Handle);
-                    _icons.Add(cacheKey, independenceIcon);
+                    _icons.TryAdd(cacheKey, independenceIcon);
 
                     return independenceIcon;
                 }
@@ -144,7 +144,7 @@ public class IconTools
                 {
                     Icon independenceIcon = (Icon)icon.Clone();
                     DestroyIcon(icon.Handle);
-                    _icons.Add(cacheKey, independenceIcon);
+                    _icons.TryAdd(cacheKey, independenceIcon);
 
                     return independenceIcon;
                 }
@@ -161,7 +161,7 @@ public class IconTools
             SHGFI_ICON | SHGFI_LARGEICON | SHGFI_USEFILEATTRIBUTES | SHGFI_OPENICON);
         Icon independenceIcon12 = (Icon)System.Drawing.Icon.FromHandle(shinfo.hIcon).Clone();
         DestroyIcon(shinfo.hIcon);
-        _icons.Add(cacheKey, independenceIcon12);
+        _icons.TryAdd(cacheKey, independenceIcon12);
         return independenceIcon12;
 
         #region 32*32的Icon
@@ -169,7 +169,7 @@ public class IconTools
         var icon1 = Icon.ExtractAssociatedIcon((string)path);
         Icon independenceIcon1 = (Icon)icon1!.Clone();
         DestroyIcon(icon1.Handle);
-        _icons.Add(cacheKey, independenceIcon1);
+        _icons.TryAdd(cacheKey, independenceIcon1);
         return independenceIcon1;
 
         #endregion
@@ -215,7 +215,7 @@ public class IconTools
             SHGFI_ICON | SHGFI_LARGEICON);
         Icon independenceIcon12 = (Icon)System.Drawing.Icon.FromHandle(shinfo.hIcon).Clone();
         DestroyIcon(shinfo.hIcon);
-        _icons.Add(path, independenceIcon12);
+        _icons.TryAdd(path, independenceIcon12);
         return independenceIcon12;
     }
 

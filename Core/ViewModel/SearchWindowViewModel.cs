@@ -22,11 +22,11 @@ public partial class SearchWindowViewModel : ObservableRecipient
     [ObservableProperty] public BindingList<SearchViewItem> _items = new(); //搜索界面显示的软件
     private List<string> _names = new(250); //软件去重
 
-
     [ObservableProperty] private string? _search;
 
 
     [ObservableProperty] private int? _selectedIndex = -1;
+    private Stopwatch _stopwatch = new();
 
     public SearchWindowViewModel()
     {
@@ -161,6 +161,16 @@ public partial class SearchWindowViewModel : ObservableRecipient
             return;
         }
 
+        if (_stopwatch.IsRunning)
+        {
+            if (_stopwatch.ElapsedMilliseconds <= ConfigManger.config.inputSmoothingMilliseconds)
+            {
+                return;
+            }
+        }
+
+        _stopwatch.Reset();
+        _stopwatch.Start();
         foreach (var searchViewItem in Items)
         {
             searchViewItem.Dispose();

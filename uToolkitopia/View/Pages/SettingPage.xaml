@@ -35,7 +35,7 @@
                 <Expander.Content>
                     <StackPanel>
                         <kitopia:SettingItems Title="开机自动启动" Description="可能被杀毒软件阻止"> 
-                            <ui:ToggleSwitch IsChecked="{Binding AutoStart}"></ui:ToggleSwitch>
+                            <ui:ToggleSwitch IsChecked="{Binding AutoStart}" />
                         </kitopia:SettingItems>
                     </StackPanel>
                 </Expander.Content>
@@ -44,13 +44,22 @@
                 <Expander.Content>
                     <StackPanel>
                         <kitopia:SettingItems Title="允许程序调用Everything索引文档" Description="索引文档依赖于此功能"> 
-                            <ui:ToggleSwitch Content="" IsChecked="{Binding UseEverything}"></ui:ToggleSwitch>
+                            <ui:ToggleSwitch Content="" IsChecked="{Binding UseEverything}" />
                         </kitopia:SettingItems>
                         <kitopia:SettingItems Title="允许程序读取剪贴板内容" Description="自动读取剪贴板路径和剪贴板图像保存依赖于此权限"> 
-                            <ui:ToggleSwitch Content="" IsChecked="{Binding CanReadClipboard}"></ui:ToggleSwitch>
+                            <ui:ToggleSwitch Content="" IsChecked="{Binding CanReadClipboard}" />
                         </kitopia:SettingItems>
                         <kitopia:SettingItems Title="最大历史数量" Description="决定在搜索框无搜索内容时显示最近打开软件的数量"> 
                             <ComboBox ItemsSource="{Binding MaxHistoryOptions}" SelectedValue="{Binding MaxHistory}" />
+                        </kitopia:SettingItems>
+                        <kitopia:SettingItems Title="输入平滑延时" Description="在指定时间内不处理数据以减轻性能消耗">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding InputSmoothingMilliseconds}" FontSize="14" VerticalAlignment="Center" />
+                                <Slider Margin="10,0,0,0" TickFrequency="10" IsSnapToTickEnabled="True" Maximum="200" Minimum="0" Value="{Binding InputSmoothingMilliseconds}"
+                                        VerticalAlignment="Center"
+                                        ToolTip="{Binding Value, RelativeSource={RelativeSource Self}}" AutoToolTipPlacement="TopLeft"/>
+                            </StackPanel> 
+                            
                         </kitopia:SettingItems>
                     </StackPanel>
                 </Expander.Content>
