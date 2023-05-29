@@ -1,4 +1,6 @@
-﻿using Core.SDKs.HotKey;
+﻿using System.Runtime.Serialization;
+using Core.SDKs.HotKey;
+using Newtonsoft.Json;
 
 namespace Core.SDKs.Config;
 
@@ -27,4 +29,11 @@ public record Config
     public bool useEverything = true;
     public string ver = "dev in dev";
     public int verInt = 0;
+
+    [OnDeserializing]
+    private void OnDeserializing(StreamingContext context) //反序列化时hotkeys的默认值会被添加,需要先清空
+    {
+        // 清空hotKeys列表
+        hotKeys.Clear();
+    }
 }
