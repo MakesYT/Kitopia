@@ -1,28 +1,30 @@
 ﻿<ui:FluentWindow x:Class="Kitopia.View.SearchWindow"
-        x:Name="w"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:localM="clr-namespace:Core.ViewModel;assembly=Core"
-        mc:Ignorable="d" 
-        WindowStartupLocation="Manual"
-        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-        ExtendsContentIntoTitleBar="True"
-        WindowBackdropType="Acrylic"
-        WindowCornerPreference="Round"
-        Top="{Binding Source={x:Static SystemParameters.PrimaryScreenHeight}, Converter={StaticResource doubleQuarterConverter}}"
-        d:DataContext="{d:DesignInstance localM:SearchWindowViewModel}"
-        ShowInTaskbar="False"
-        Title="SearchView" Window.SizeToContent="Height" Width="800"  Deactivated="w_Deactivated"
-        Activated="w_Activated">
+                 x:Name="w"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:localM="clr-namespace:Core.ViewModel;assembly=Core"
+                 mc:Ignorable="d"
+                 WindowStartupLocation="Manual"
+                 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                 xmlns:kitopia="clr-namespace:Kitopia"
+                 xmlns:controls="clr-namespace:Kitopia.Controls"
+                 ExtendsContentIntoTitleBar="True"
+                 WindowBackdropType="Acrylic"
+                 WindowCornerPreference="Round"
+                 Top="{Binding Source={x:Static SystemParameters.PrimaryScreenHeight}, Converter={StaticResource doubleQuarterConverter}}"
+                 d:DataContext="{d:DesignInstance localM:SearchWindowViewModel}"
+                 ShowInTaskbar="False"
+                 Title="SearchView" Window.SizeToContent="Height" Width="800" Deactivated="w_Deactivated"
+                 Activated="w_Activated">
     <ui:FluentWindow.InputBindings>
         <KeyBinding Command="ApplicationCommands.Close" Key="Esc" />
     </ui:FluentWindow.InputBindings>
     <ui:FluentWindow.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Close" Executed="w_Deactivated" />
     </ui:FluentWindow.CommandBindings>
-    
+
     <ui:FluentWindow.Left>
         <MultiBinding Converter="{StaticResource doubleHalfConverter}">
 
@@ -32,21 +34,27 @@
 
         </MultiBinding>
     </ui:FluentWindow.Left>
-
-    <StackPanel Margin="10"  MinHeight="150">
-        <ui:TextBox VerticalContentAlignment="Center" VerticalAlignment="Center"     IsTabStop="False" FocusVisualStyle="{x:Null}" ClearButtonEnabled="True"
-                    PlaceholderEnabled="True" PlaceholderText="搜索..." AcceptsReturn="False" PreviewKeyDown="tx_KeyDown" x:Name="tx"
-                    AcceptsTab="False" FontSize="32" 
+    <Window.Resources>
+        
+    </Window.Resources>
+    <StackPanel Margin="10" MinHeight="150">
+        <ui:TextBox VerticalContentAlignment="Center" VerticalAlignment="Center" IsTabStop="False"
+                    FocusVisualStyle="{x:Null}" ClearButtonEnabled="True"
+                    PlaceholderEnabled="True" PlaceholderText="搜索..." AcceptsReturn="False" PreviewKeyDown="tx_KeyDown"
+                    x:Name="tx"
+                    AcceptsTab="False" FontSize="32"
                     Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}" />
 
 
-        <ui:InfoBar  Focusable="False"  Title="警告" Message ="Everything服务未运行,无法搜索文档,请检查" Severity="Warning" IsOpen="{Binding EverythingIsOk, Converter={StaticResource ReverseBool}}"
-                     Visibility="{Binding EverythingIsOk, Converter={StaticResource reverseBoolToVisibilityConverter}}" IsClosable="False"
-        />
-        <ui:DataGrid VerticalScrollBarVisibility="Visible" IsReadOnly="True" x:Name="dataGrid"  RowHeight="75" GridLinesVisibility="None"
-                  HeadersVisibility="None" MaxHeight="385"  ItemsSource="{Binding Items}" AutoGenerateColumns="False"
-                  Margin="0,10,0,0">
-            
+        <ui:InfoBar Focusable="False" Title="警告" Message="Everything服务未运行,无法搜索文档,请检查" Severity="Warning"
+                    IsOpen="{Binding EverythingIsOk, Converter={StaticResource ReverseBool}}"
+                    Visibility="{Binding EverythingIsOk, Converter={StaticResource reverseBoolToVisibilityConverter}}"
+                    IsClosable="False" />
+        <ui:DataGrid VerticalScrollBarVisibility="Visible" IsReadOnly="True" x:Name="dataGrid" RowHeight="75"
+                     GridLinesVisibility="None"
+                     HeadersVisibility="None" MaxHeight="385" ItemsSource="{Binding Items}" AutoGenerateColumns="False"
+                     Margin="0,10,0,0">
+
             <DataGrid.CellStyle>
                 <Style TargetType="DataGridCell">
                     <Setter Property="Margin" Value="0" />
@@ -74,62 +82,86 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ui:Button ToolTip="{Binding Path=. ,Converter={StaticResource SearchItemToInfo}}"
-                                Command="{Binding Path=DataContext.OpenFileCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:FluentWindow}}}"
-                                CommandParameter="{Binding SelectedValue, ElementName=dataGrid}" Background="Transparent"
-                                PreviewKeyDown="Button_PreviewKeyDown"  Height="72" Margin="0"
-                                Width="762" Padding="3">
+                                       Command="{Binding Path=DataContext.OpenFileCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:FluentWindow}}}"
+                                       CommandParameter="{Binding SelectedValue, ElementName=dataGrid}"
+                                       Background="Transparent"
+                                       PreviewKeyDown="Button_PreviewKeyDown" Height="72" Margin="0"
+                                       Width="762" Padding="3">
                                 <Grid HorizontalAlignment="Left" Margin="5,0,0,0">
                                     <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="30" />
                                         <ColumnDefinition Width="48" />
-                                        <ColumnDefinition Width="500 " />
+                                        <ColumnDefinition Width="470 " />
                                         <ColumnDefinition Width="195" />
                                     </Grid.ColumnDefinitions>
-                                    <Image Grid.Column="0" HorizontalAlignment="Left"  Focusable="False" Width="48" Height="48"
-                                           Source="{Binding Icon, Converter={StaticResource pathToImageConverter}}" />
-                                    <ui:Button Grid.Column="0" Visibility="{Binding IconSymbol,Converter={StaticResource IfNullVisibilityHidden}}" Height="48" Width="48" FontSize="48" Margin="0" Padding="0" Background="{x:Null}" IsEnabled="False" PressedForeground="{x:Null}" MouseOverBackground="{x:Null}" MouseOverBorderBrush="{x:Null}" PressedBackground="{x:Null}" PressedBorderBrush="{x:Null}" BorderBrush="{x:Null}">
+                                    <ui:Button KeyboardNavigation.DirectionalNavigation="None" FontSize="26"
+                                               ToolTip="{Binding IsPined,Converter={StaticResource StarBoolToText},ConverterParameter='Pin'}"
+                                               Background="{x:Null}" Tag="{Binding IsPined}" 
+                                               Command="{Binding Path=DataContext.PinCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:FluentWindow}}}"
+                                               CommandParameter="{Binding}" Padding="2">
                                         <ui:Button.Icon>
-                                            <ui:SymbolIcon   Height="48" Width="48"
+                                            <ui:SymbolIcon Symbol="Pin20" Filled="{Binding IsPined}" />
+                                        </ui:Button.Icon>
+                                    </ui:Button>
+                                    <Image Grid.Column="1" HorizontalAlignment="Left" Focusable="False" Width="48"
+                                           Height="48"
+                                           Source="{Binding Icon, Converter={StaticResource pathToImageConverter}}" />
+                                    <ui:Button Grid.Column="1"
+                                               Visibility="{Binding IconSymbol,Converter={StaticResource IfNullVisibilityHidden}}"
+                                               Height="48" Width="48" FontSize="48" Margin="0" Padding="0"
+                                               Background="{x:Null}" IsEnabled="False" PressedForeground="{x:Null}"
+                                               MouseOverBackground="{x:Null}" MouseOverBorderBrush="{x:Null}"
+                                               PressedBackground="{x:Null}" PressedBorderBrush="{x:Null}"
+                                               BorderBrush="{x:Null}">
+                                        <ui:Button.Icon>
+                                            <ui:SymbolIcon Height="48" Width="48"
                                                            Symbol="{Binding IconSymbol,Converter={StaticResource IntToIconSymbol},Mode=OneWay}" />
                                         </ui:Button.Icon>
                                     </ui:Button>
-                                    
-                                    <StackPanel Grid.Column="1" Margin="5" VerticalAlignment="Top">
-                                        <TextBlock VerticalAlignment="Center" Margin="0" Focusable="False" Text="{Binding Path=FileName}"
-                                                        
-                                                   Background="{x:Null}" 
+
+                                    <StackPanel Grid.Column="2" Margin="5" VerticalAlignment="Top">
+                                        <TextBlock VerticalAlignment="Center" Margin="0" Focusable="False"
+                                                   Text="{Binding Path=FileName}"
+
+                                                   Background="{x:Null}"
                                                    FontWeight="Normal" FontSize="18" />
                                         <TextBlock VerticalAlignment="Top" Margin="0" Text="{Binding Path=FileType}" />
                                     </StackPanel>
-                                    <StackPanel Grid.Column="2" Orientation="Horizontal" Focusable="False" HorizontalAlignment="Right">
-                                        <ui:Button KeyboardNavigation.DirectionalNavigation="None" FontSize="26" ToolTip="以管理员身份运行" Background="{x:Null}"
+                                    <StackPanel Grid.Column="3" Orientation="Horizontal" Focusable="False"
+                                                HorizontalAlignment="Right">
+                                        <ui:Button KeyboardNavigation.DirectionalNavigation="None" FontSize="26"
+                                                   ToolTip="以管理员身份运行" Background="{x:Null}"
                                                    Visibility="{Binding Path=FileType, Converter={StaticResource enumToVisibilityConverter}, ConverterParameter='RunAsAdmin'}"
                                                    Command="{Binding Path=DataContext.RunAsAdminCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:FluentWindow}}}"
-                                                   CommandParameter="{Binding  }" >
+                                                   CommandParameter="{Binding  }">
                                             <ui:Button.Icon>
                                                 <ui:SymbolIcon Symbol="WindowShield20" />
                                             </ui:Button.Icon>
                                         </ui:Button>
-                                        <ui:Button KeyboardNavigation.DirectionalNavigation="None" FontSize="26" ToolTip="打开文件所在文件夹" Background="{x:Null}"
+                                        <ui:Button KeyboardNavigation.DirectionalNavigation="None" FontSize="26"
+                                                   ToolTip="打开文件所在文件夹" Background="{x:Null}"
                                                    Visibility="{Binding Path=FileType, Converter={StaticResource enumToVisibilityConverter}, ConverterParameter='Folder'}"
                                                    Command="{Binding Path=DataContext.OpenFolderCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:FluentWindow}}}"
-                                                   CommandParameter="{Binding}" >
+                                                   CommandParameter="{Binding}">
                                             <ui:Button.Icon>
                                                 <ui:SymbolIcon Symbol="Folder20" />
                                             </ui:Button.Icon>
                                         </ui:Button>
-                                        <ui:Button KeyboardNavigation.DirectionalNavigation="None" FontSize="26" ToolTip="在终端中打开文件夹/文件所在文件夹" Background="{x:Null}"
+                                        <ui:Button KeyboardNavigation.DirectionalNavigation="None" FontSize="26"
+                                                   ToolTip="在终端中打开文件夹/文件所在文件夹" Background="{x:Null}"
                                                    Visibility="{Binding Path=FileType, Converter={StaticResource enumToVisibilityConverter}, ConverterParameter='Console'}"
                                                    Command="{Binding Path=DataContext.OpenFolderInTerminalCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:FluentWindow}}}"
-                                                   CommandParameter="{Binding}" >
+                                                   CommandParameter="{Binding}">
                                             <ui:Button.Icon>
                                                 <ui:SymbolIcon Symbol="WindowConsole20" />
                                             </ui:Button.Icon>
                                         </ui:Button>
-                                        <ui:Button KeyboardNavigation.DirectionalNavigation="None" FontSize="26" 
-                                                   ToolTip="{Binding IsStared,Converter={StaticResource StarBoolToText}}" Background="{x:Null}"
+                                        <ui:Button KeyboardNavigation.DirectionalNavigation="None" FontSize="26"
+                                                   ToolTip="{Binding IsStared,Converter={StaticResource StarBoolToText},ConverterParameter='Star'}"
+                                                   Background="{x:Null}"
                                                    Visibility="{Binding Path=FileType, Converter={StaticResource enumToVisibilityConverter}, ConverterParameter='Star'}"
                                                    Command="{Binding Path=DataContext.StarCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:FluentWindow}}}"
-                                                   CommandParameter="{Binding}" >
+                                                   CommandParameter="{Binding}">
                                             <ui:Button.Icon>
                                                 <ui:SymbolIcon Symbol="Star20" Filled="{Binding IsStared}" />
                                             </ui:Button.Icon>

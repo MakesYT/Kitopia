@@ -83,6 +83,7 @@ public partial class AppTools
                     FileInfo = new FileInfo(file),
                     FileName = "打开文件:" + LnkTools.GetLocalizedName(file) + "?",
                     FileType = FileType.文件,
+                    OnlyKey = file,
                     Keys = keys,
                     IsStared = true,
                     IsVisible = true
@@ -98,6 +99,7 @@ public partial class AppTools
                     FileName = "打开" + file.Split("\\").Last() + "?",
                     FileType = FileType.文件夹,
                     IsStared = true,
+                    OnlyKey = file,
                     Keys = keys,
                     Icon = null,
                     IsVisible = true
@@ -135,6 +137,7 @@ public partial class AppTools
                     collection.Add(new SearchViewItem
                     {
                         Keys = keys, IsVisible = true, FileInfo = refFileInfo, FileName = localName,
+                        OnlyKey = refFileInfo.FullName,
                         FileType = FileType.应用程序, Icon = null
                     });
                 }

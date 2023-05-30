@@ -22,6 +22,12 @@ public class SearchViewItem : ICloneable, IDisposable
         get;
     } = false;
 
+    public bool IsPined
+    {
+        set;
+        get;
+    } = false;
+
     public HashSet<string>? Keys
     {
         set;
@@ -41,6 +47,12 @@ public class SearchViewItem : ICloneable, IDisposable
     }
 
     public DirectoryInfo? DirectoryInfo
+    {
+        set;
+        get;
+    }
+
+    public string OnlyKey
     {
         set;
         get;
@@ -73,6 +85,7 @@ public class SearchViewItem : ICloneable, IDisposable
             Keys = new HashSet<string>(Keys!),
             FileType = FileType,
             IsStared = IsStared,
+            OnlyKey = OnlyKey,
             FileInfo = FileInfo != null ? new FileInfo(FileInfo.FullName) : null,
             DirectoryInfo = DirectoryInfo != null ? new DirectoryInfo(DirectoryInfo.FullName) : null,
         };

@@ -7,17 +7,17 @@ namespace Core.SDKs.Everything;
 
 public class Tools
 {
-    public static void main( BindingList<SearchViewItem> Items, string value)
+    public static void main(BindingList<SearchViewItem> Items, string value)
     {
         if (IntPtr.Size == 8)
             // 64-bit
-            amd64( Items, value);
+            amd64(Items, value);
         else
             // 32-bit
-            amd32( Items, value);
+            amd32(Items, value);
     }
 
-    public static void amd32( BindingList<SearchViewItem> Items, string value)
+    public static void amd32(BindingList<SearchViewItem> Items, string value)
     {
         Everything32.Everything_Reset();
         Everything32.Everything_SetSearchW("*.docx|*.doc|*.xls|*.xlsx|*.pdf|*.ppt|*.pptx" + " " + value);
@@ -44,12 +44,13 @@ public class Tools
             Items.Add(new SearchViewItem
             {
                 IsVisible = true, FileInfo = fileInfo, FileName = fileInfo.Name, FileType = fileType,
+                OnlyKey = fileInfo.FullName,
                 Icon = null
             });
         }
     }
 
-    public static void amd64( BindingList<SearchViewItem> Items, string value)
+    public static void amd64(BindingList<SearchViewItem> Items, string value)
     {
         Everything64.Everything_Reset();
         Everything64.Everything_SetSearchW("*.docx|*.doc|*.xls|*.xlsx|*.pdf|*.ppt|*.pptx" + " " + value);
@@ -76,6 +77,7 @@ public class Tools
             Items.Add(new SearchViewItem
             {
                 IsVisible = true, FileInfo = fileInfo, FileName = fileInfo.Name, FileType = fileType,
+                OnlyKey = fileInfo.FullName,
                 Icon = null
             });
         }

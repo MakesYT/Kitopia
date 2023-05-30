@@ -14,14 +14,27 @@ public class StarBoolToText : IValueConverter
             return "";
         }
 
-        if ((bool)value)
+        if (parameter.Equals("Star"))
         {
-            return "取消收藏";
-        }
-        else
-        {
+            if ((bool)value)
+            {
+                return "取消收藏";
+            }
+
             return "收藏";
         }
+
+        if (parameter.Equals("Pin"))
+        {
+            if ((bool)value)
+            {
+                return "取消常驻";
+            }
+
+            return "常驻";
+        }
+
+        return "";
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -6,9 +6,9 @@ namespace Core.SDKs.Config;
 
 public record Config
 {
+    public List<string> alwayShows = new();
     public bool autoStart = true;
     public bool canReadClipboard = true;
-
     public List<string> customCollections = new();
 
     public List<HotKeyModel> hotKeys = new()
@@ -22,13 +22,15 @@ public record Config
 
     public int inputSmoothingMilliseconds = 50;
 
+
     public List<string> lastOpens = new();
     public int maxHistory = 4;
     public string themeChoice = "跟随系统";
     public string themeColor = "#EC407A";
     public bool useEverything = true;
-    public string ver = "dev in dev";
+    public string ver = "0.0.2";
     public int verInt = 0;
+
 
     [OnDeserializing]
     private void OnDeserializing(StreamingContext context) //反序列化时hotkeys的默认值会被添加,需要先清空
