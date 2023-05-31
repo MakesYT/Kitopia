@@ -1,28 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
-using Core.SDKs;
 using Core.SDKs.Config;
-using Core.SDKs.HotKey;
 using Core.SDKs.Services;
 using Core.ViewModel;
 using Kitopia.SDKs;
 using Kitopia.View;
+using log4net;
 using Microsoft.Extensions.DependencyInjection;
 using Wpf.Ui.Controls;
-using MessageBox = System.Windows.MessageBox;
 
 namespace Kitopia;
 
 /// <summary>
 ///     MainWindows.xaml 的交互逻辑
 /// </summary>
-public partial class InitWindow 
+public partial class InitWindow
 {
     /// <summary>
     ///     记录快捷键注册项的唯一标识符
@@ -34,20 +30,35 @@ public partial class InitWindow
     /// </summary>
     private IntPtr m_Hwnd;
 
+    private static readonly ILog log = LogManager.GetLogger(nameof(InitWindow));
+
     public InitWindow()
     {
         InitializeComponent();
         DataContext = ServiceManager.Services.GetService<InitWindowsViewModel>();
         var currentTheme = Wpf.Ui.Appearance.Theme.GetAppTheme();
-        if (ConfigManger.config.themeChoice=="跟随系统"&&!Wpf.Ui.Appearance.Theme.IsAppMatchesSystem())
+        if (ConfigManger.config.themeChoice == "跟随系统" && !Wpf.Ui.Appearance.Theme.IsAppMatchesSystem())
         {
-            Wpf.Ui.Appearance.Theme.Apply(currentTheme == Wpf.Ui.Appearance.ThemeType.Light ? Wpf.Ui.Appearance.ThemeType.Dark : Wpf.Ui.Appearance.ThemeType.Light);
-        }else if (ConfigManger.config.themeChoice=="深色")
+            if (ConfigManger.config.debugMode)
+            {
+                log.Debug("主题跟随系统,当前不符合切换主题");
+            }
+
+            Wpf.Ui.Appearance.Theme.Apply(currentTheme == Wpf.Ui.Appearance.ThemeType.Light
+                ? Wpf.Ui.Appearance.ThemeType.Dark
+                : Wpf.Ui.Appearance.ThemeType.Light);
+        }
+        else if (ConfigManger.config.themeChoice == "深色")
         {
+            if (ConfigManger.config.debugMode)
+            {
+                log.Debug("主题切换到深色");
+            }
+
             Wpf.Ui.Appearance.Theme.Apply(Wpf.Ui.Appearance.ThemeType.Dark);
         }
-        
     }
+
     /// <summary>
     ///     WPF窗体的资源初始化完成，并且可以通过WindowInteropHelper获得该窗体的句柄用来与Win32交互后调用
     /// </summary>
@@ -58,7 +69,7 @@ public partial class InitWindow
         // 获取窗体句柄
         m_Hwnd = new WindowInteropHelper(this).Handle;
         var hWndSource = HwndSource.FromHwnd(m_Hwnd);
-        
+
         // 添加处理程序
         if (hWndSource != null) hWndSource.AddHook(WndProc);
     }
@@ -71,8 +82,14 @@ public partial class InitWindow
     {
         base.OnContentRendered(e);
         // 注册热键
+        if (ConfigManger.config.debugMode)
+        {
+            log.Debug("注册热键");
+        }
+
         InitHotKey();
     }
+
     /// <summary>
     ///     初始化注册快捷键
     /// </summary>
@@ -85,10 +102,10 @@ public partial class InitWindow
         var failList = HotKeyHelper.RegisterGlobalHotKey(list, m_Hwnd, out m_HotKeySettings);
         if (string.IsNullOrEmpty(failList))
             return true;
-        var mbResult = MessageBox.Show(string.Format("无法注册下列快捷键\n\r{0}是否要改变这些快捷键？", failList), "提示",
-            MessageBoxButton.YesNo);
+        var mbResult = MessageBox.Show(string.Format("无法注册下列快捷键\n\r{0}程序退出？", failList), "提示",
+            MessageBoxButton.OK);
         // 弹出热键设置窗体
-
+        Environment.Exit(0);
         return true;
     }
 
@@ -109,6 +126,11 @@ public partial class InitWindow
                 var sid = wideParam.ToInt32();
                 if (sid == m_HotKeySettings["显示搜索框"])
                 {
+                    if (ConfigManger.config.debugMode)
+                    {
+                        log.Debug("显示搜索框热键被触发");
+                    }
+
                     //Console.WriteLine(App.Current.Services.GetService<SearchView>().Visibility);
                     if (ServiceManager.Services.GetService<SearchWindow>().Visibility == Visibility.Visible)
                     {
@@ -129,21 +151,19 @@ public partial class InitWindow
                                 string text = (string)data.GetData(DataFormats.Text);
                                 if (text.StartsWith("\""))
                                 {
-                                    text=text.Replace("\"", "");
+                                    text = text.Replace("\"", "");
                                 }
-                                if (File.Exists(text)||Directory.Exists(text))
+
+                                if (File.Exists(text) || Directory.Exists(text))
                                 {
                                     ServiceManager.Services.GetService<SearchWindowViewModel>().Search = text;
-                                   
                                 }
-                                
-                            } 
+                            }
                         }
-                        
+
                         ServiceManager.Services.GetService<SearchWindow>().tx.SelectAll();
                         ThreadPool.QueueUserWorkItem((e) =>
                         {
-                            
                             ServiceManager.Services.GetService<SearchWindowViewModel>().ReloadApps();
                         });
                     }
@@ -158,7 +178,6 @@ public partial class InitWindow
 
     private void Button_Click(object sender, RoutedEventArgs e)
     {
-        
     }
 
     private void MenuItem_Click(object sender, RoutedEventArgs e)

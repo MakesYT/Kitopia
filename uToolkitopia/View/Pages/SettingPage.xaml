@@ -3,7 +3,6 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:local="clr-namespace:Core.ViewModel;assembly=Core"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:pages="clr-namespace:Core.ViewModel.Pages;assembly=Core"
       xmlns:kitopia="clr-namespace:Kitopia.Controls"
@@ -36,6 +35,9 @@
                     <StackPanel>
                         <kitopia:SettingItems Title="开机自动启动" Description="可能被杀毒软件阻止"> 
                             <ui:ToggleSwitch IsChecked="{Binding AutoStart}" />
+                        </kitopia:SettingItems>
+                        <kitopia:SettingItems Title="调试模式" Description="非必要不开启,重启软件后完全生效"> 
+                            <ui:ToggleSwitch IsChecked="{Binding DebugMode}" />
                         </kitopia:SettingItems>
                     </StackPanel>
                 </Expander.Content>

@@ -6,7 +6,6 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
-using Core.SDKs;
 using Core.SDKs.Config;
 using Core.SDKs.Services;
 using Core.SDKs.Tools;
@@ -18,8 +17,6 @@ using log4net;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Win32;
-using Wpf.Ui.Controls.SnackbarControl;
-using Wpf.Ui.Services;
 using MessageBox = Wpf.Ui.Controls.MessageBoxControl.MessageBox;
 using MessageBoxResult = Wpf.Ui.Controls.MessageBoxControl.MessageBoxResult;
 
@@ -72,6 +69,11 @@ public sealed partial class App : Application
             log.Info("Ioc初始化完成");
             ConfigManger.Init();
             log.Info("配置文件初始化完成");
+            if (ConfigManger.config.debugMode)
+            {
+                log.Debug("注意Debug模式已启用,如非必要请关闭该模式");
+                System.Windows.MessageBox.Show("注意Debug模式已启用,如非必要请关闭该模式", "Kitopia");
+            }
 
             var initWindow = ServiceManager.Services.GetService<InitWindow>();
             initWindow.Show();
@@ -148,6 +150,10 @@ public sealed partial class App : Application
                     }
                 }
             });
+        }
+        else if (ConfigManger.config.debugMode)
+        {
+            log.Debug("程序自启已存在");
         }
     }
 

@@ -1,5 +1,4 @@
-﻿using System.Collections.Specialized;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -9,13 +8,13 @@ using Core.SDKs.Config;
 using Core.SDKs.Everything;
 using Core.SDKs.Services;
 using Core.SDKs.Tools;
-using AppTools = Core.SDKs.Tools.AppTools;
-
+using log4net;
 
 namespace Core.ViewModel;
 
 public partial class SearchWindowViewModel : ObservableRecipient
 {
+    private static readonly ILog log = LogManager.GetLogger(nameof(SearchWindowViewModel));
     private List<SearchViewItem> _collection = new(250); //存储本机所有软件
 
     [ObservableProperty] private bool? _everythingIsOk = true;
@@ -44,6 +43,11 @@ public partial class SearchWindowViewModel : ObservableRecipient
     {
         if (!ConfigManger.config.canReadClipboard)
         {
+            if (ConfigManger.config.debugMode)
+            {
+                log.Debug("没有读取剪贴板授权");
+            }
+
             if (Items.First().FileType == FileType.剪贴板图像)
             {
                 Items.RemoveAt(0);
@@ -54,6 +58,11 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
         if (((IClipboardService)ServiceManager.Services.GetService(typeof(IClipboardService))).IsBitmap())
         {
+            if (ConfigManger.config.debugMode)
+            {
+                log.Debug("剪贴板有图像信息");
+            }
+
             if (Items.Count((_items) => _items.FileType == FileType.剪贴板图像) >= 1)
             {
                 return;
@@ -71,6 +80,11 @@ public partial class SearchWindowViewModel : ObservableRecipient
         }
         else if (Items.Count > 0 && Items.First().FileType == FileType.剪贴板图像)
         {
+            if (ConfigManger.config.debugMode)
+            {
+                log.Debug("剪贴板没有图像信息,但第一项是图片信息删除");
+            }
+
             Items.RemoveAt(0);
         }
     }
@@ -82,6 +96,10 @@ public partial class SearchWindowViewModel : ObservableRecipient
             return;
         }
 
+        if (ConfigManger.config.debugMode)
+        {
+            log.Debug("加载历史记录");
+        }
 
         foreach (var searchViewItem in Items)
         {
@@ -93,10 +111,20 @@ public partial class SearchWindowViewModel : ObservableRecipient
         //Items.RaiseListChangedEvents = false;
         if (ConfigManger.config!.alwayShows.Any())
         {
+            if (ConfigManger.config.debugMode)
+            {
+                log.Debug("加载常驻");
+            }
+
             foreach (var searchViewItem in ConfigManger.config.alwayShows.SelectMany(name1 => _collection.Where(
                          searchViewItem => searchViewItem.OnlyKey!.Equals(name1))))
             {
                 var item = (SearchViewItem)searchViewItem.Clone();
+                if (ConfigManger.config.debugMode)
+                {
+                    log.Debug("加载常驻:" + item.OnlyKey);
+                }
+
                 item.IsPined = true;
                 Items.Add(item);
                 limit++;
@@ -105,15 +133,30 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
         if (ConfigManger.config!.lastOpens.Any())
         {
+            if (ConfigManger.config.debugMode)
+            {
+                log.Debug("加载历史");
+            }
+
             foreach (var searchViewItem in ConfigManger.config.lastOpens.SelectMany(name1 => _collection.Where(
                          searchViewItem => searchViewItem.OnlyKey!.Equals(name1))))
             {
                 if (limit >= ConfigManger.config.maxHistory)
                 {
+                    if (ConfigManger.config.debugMode)
+                    {
+                        log.Debug("超过历史记录限制,当前" + limit);
+                    }
+
                     break;
                 }
 
                 var item = (SearchViewItem)searchViewItem.Clone();
+                if (ConfigManger.config.debugMode)
+                {
+                    log.Debug("加载历史:" + item.OnlyKey);
+                }
+
                 if (!Items.Any((e) => e.OnlyKey.Equals(item.OnlyKey)))
                 {
                     Items.Add(item);
@@ -136,6 +179,11 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
     private void GetItemsIcon()
     {
+        if (ConfigManger.config.debugMode)
+        {
+            log.Debug("加载图标");
+        }
+
         Task.Run(() =>
         {
             try
@@ -178,6 +226,11 @@ public partial class SearchWindowViewModel : ObservableRecipient
             return;
         }
 
+        if (ConfigManger.config.debugMode)
+        {
+            log.Debug("搜索变更:" + value);
+        }
+
         if (_stopwatch.IsRunning)
         {
             if (_stopwatch.ElapsedMilliseconds <= ConfigManger.config.inputSmoothingMilliseconds)
@@ -199,6 +252,11 @@ public partial class SearchWindowViewModel : ObservableRecipient
         value = value.ToLowerInvariant();
         if (ConfigManger.config.useEverything)
         {
+            if (ConfigManger.config.debugMode)
+            {
+                log.Debug("everything检测");
+            }
+
             if (IntPtr.Size == 8)
             {
                 // 64-bit
@@ -218,8 +276,18 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
         if (value.Contains("\\") || value.Contains("/"))
         {
+            if (ConfigManger.config.debugMode)
+            {
+                log.Debug("检测路径");
+            }
+
             if (Path.HasExtension(value) && File.Exists(value))
             {
+                if (ConfigManger.config.debugMode)
+                {
+                    log.Debug("检测到文件路径");
+                }
+
                 Items.Add(new SearchViewItem()
                 {
                     FileInfo = new FileInfo(value),
@@ -231,6 +299,11 @@ public partial class SearchWindowViewModel : ObservableRecipient
             }
             else if (Directory.Exists(value))
             {
+                if (ConfigManger.config.debugMode)
+                {
+                    log.Debug("检测到文件夹路径");
+                }
+
                 Items.Add(new SearchViewItem()
                 {
                     DirectoryInfo = new DirectoryInfo(value),
@@ -271,12 +344,22 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
             if (ConfigManger.config.lastOpens.Contains(x.Item.OnlyKey))
             {
+                if (ConfigManger.config.debugMode)
+                {
+                    log.Debug("添加提高权重的搜索结果" + x.Item.OnlyKey);
+                }
+
                 Items.Insert(nowIndex, (SearchViewItem)x.Item.Clone()); // 添加元素
                 nowIndex++;
                 count++; // 计数器加一
             }
             else
             {
+                if (ConfigManger.config.debugMode)
+                {
+                    log.Debug("添加搜索结果" + x.Item.OnlyKey);
+                }
+
                 Items.Add((SearchViewItem)x.Item.Clone()); // 添加元素
                 count++; // 计数器加一
             }
@@ -286,6 +369,11 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
         if (Items.Count <= 0 && !(Path.HasExtension(value) && File.Exists(value)) && !Directory.Exists(value))
         {
+            if (ConfigManger.config.debugMode)
+            {
+                log.Debug("无搜索项目,添加网页搜索");
+            }
+
             Items.Insert(0, new SearchViewItem()
             {
                 Url = "https://www.bing.com/search?q=" + value,
@@ -306,6 +394,8 @@ public partial class SearchWindowViewModel : ObservableRecipient
     public void OpenFile(object searchViewItem)
     {
         var item = (SearchViewItem)searchViewItem;
+        log.Debug("打开指定内容" + item.OnlyKey);
+
         if (item.FileInfo != null)
         {
             ShellTools.ShellExecute(IntPtr.Zero, "open", item.FileInfo.FullName, "", "",
@@ -347,6 +437,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
     public void OpenFolder(object searchViewItem)
     {
         var item = (SearchViewItem)searchViewItem;
+        log.Debug("打开指定内容文件夹" + item.OnlyKey);
         ShellTools.ShellExecute(IntPtr.Zero, "open", "explorer.exe", "/select," + item.FileInfo.FullName, "",
             ShellTools.ShowCommands.SW_SHOWNORMAL);
 
@@ -362,6 +453,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
     public void RunAsAdmin(object searchViewItem)
     {
         var item = (SearchViewItem)searchViewItem;
+        log.Debug("以管理员身份打开指定内容" + item.OnlyKey);
         ShellTools.ShellExecute(IntPtr.Zero, "runas", item.FileInfo!.FullName, "", "",
             ShellTools.ShowCommands.SW_SHOWNORMAL);
 
@@ -377,6 +469,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
     public void Star(object searchViewItem)
     {
         var item = (SearchViewItem)searchViewItem;
+        log.Debug("添加/移除收藏" + item.OnlyKey);
         int index = Items.IndexOf(item);
         Items[index].IsStared = !Items[index].IsStared;
         Items.ResetItem(index);
@@ -419,6 +512,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
     public void Pin(object searchViewItem)
     {
         var item = (SearchViewItem)searchViewItem;
+        log.Debug("添加常驻" + item.OnlyKey);
         int index = Items.IndexOf(item);
         Items[index].IsPined = !Items[index].IsPined;
         Items.ResetItem(index);
@@ -436,6 +530,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
     public void OpenFolderInTerminal(object searchViewItem)
     {
         var item = (SearchViewItem)searchViewItem;
+        log.Debug("打开指定内容在终端中" + item.OnlyKey);
         ProcessStartInfo startInfo = new ProcessStartInfo();
         startInfo.FileName = "cmd.exe";
 

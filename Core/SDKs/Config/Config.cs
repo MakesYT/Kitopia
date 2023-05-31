@@ -1,14 +1,24 @@
 ﻿using System.Runtime.Serialization;
 using Core.SDKs.HotKey;
-using Newtonsoft.Json;
 
 namespace Core.SDKs.Config;
 
 public record Config
 {
-    public List<string> alwayShows = new();
+    public int verInt = 0;
+    public string ver = "0.0.2";
+    public bool useEverything = true;
     public bool autoStart = true;
     public bool canReadClipboard = true;
+    public bool debugMode = false;
+    public string themeChoice = "跟随系统";
+    public string themeColor = "#EC407A";
+    public int maxHistory = 4;
+    public int inputSmoothingMilliseconds = 50;
+
+
+    public List<string> alwayShows = new();
+
     public List<string> customCollections = new();
 
     public List<HotKeyModel> hotKeys = new()
@@ -20,16 +30,11 @@ public record Config
         }
     };
 
-    public int inputSmoothingMilliseconds = 50;
-
 
     public List<string> lastOpens = new();
-    public int maxHistory = 4;
-    public string themeChoice = "跟随系统";
-    public string themeColor = "#EC407A";
-    public bool useEverything = true;
-    public string ver = "0.0.2";
-    public int verInt = 0;
+
+
+    public List<string> errorLnk = new();
 
 
     [OnDeserializing]

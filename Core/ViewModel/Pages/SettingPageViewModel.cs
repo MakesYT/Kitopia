@@ -1,8 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using System.Reflection.PortableExecutable;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.Config;
 using Core.SDKs.Services;
 using log4net;
@@ -26,6 +23,7 @@ public partial class SettingPageViewModel : ObservableRecipient
     [ObservableProperty] public int maxHistory = 4;
     [ObservableProperty] public string themeChoice = "跟随系统";
     [ObservableProperty] public bool useEverything = true;
+    [ObservableProperty] public bool debugMode = false;
 
     public SettingPageViewModel()
     {
@@ -34,6 +32,7 @@ public partial class SettingPageViewModel : ObservableRecipient
         UseEverything = ConfigManger.config.useEverything;
         MaxHistory = ConfigManger.config.maxHistory;
         CanReadClipboard = ConfigManger.config.canReadClipboard;
+        DebugMode = ConfigManger.config.debugMode;
     }
 
     partial void OnThemeChoiceChanged(string value)
@@ -66,6 +65,12 @@ public partial class SettingPageViewModel : ObservableRecipient
     partial void OnInputSmoothingMillisecondsChanged(int value)
     {
         ConfigManger.config.inputSmoothingMilliseconds = value;
+        ConfigManger.Save();
+    }
+
+    partial void OnDebugModeChanged(bool value)
+    {
+        ConfigManger.config.debugMode = value;
         ConfigManger.Save();
     }
 

@@ -1,13 +1,23 @@
-﻿using Core.SDKs.Config;
+﻿using System.Text;
+using Core.SDKs.Config;
+using Core.SDKs.Services;
+using log4net;
 using NPinyin;
-using static System.Text.RegularExpressions.Regex;
 
 namespace Core.SDKs.Tools;
 
 public partial class AppTools
 {
+    private static readonly ILog log = LogManager.GetLogger(nameof(AppTools));
+    private static readonly List<string> ErrorLnkList = new();
+
     public static void GetAllApps(List<SearchViewItem> collection, List<string> names)
     {
+        if (ConfigManger.config.debugMode)
+        {
+            log.Debug("索引全部软件及收藏项目");
+        }
+
         List<Task> taskList = new List<Task>();
 
         foreach (var file in Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
@@ -62,18 +72,76 @@ public partial class AppTools
         }
 
         Task.WaitAll(taskList.ToArray());
+        if (ErrorLnkList.Any())
+        {
+            StringBuilder c = new StringBuilder("检测到多个无效的快捷方式\n需要Kitopia帮你清理吗?(该功能每个错误快捷方式只提示一次)\n以下为无效的快捷方式列表:\n");
+            foreach (string s in ErrorLnkList)
+            {
+                c.AppendLine(s);
+            }
+
+            log.Debug(c.ToString());
+            ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))).showMessageBox("Kitopia建议",
+                c.ToString(),
+                (() =>
+                {
+                    foreach (var s in ErrorLnkList)
+                    {
+                        log.Debug("删除无效快捷方式:" + s);
+                        try
+                        {
+                            File.Delete(s);
+                        }
+                        catch (Exception e)
+                        {
+                            log.Debug("添加无效快捷方式记录:" + s);
+                            ConfigManger.config.errorLnk.Add(s);
+                            ConfigManger.Save();
+                        }
+                    }
+
+                    ErrorLnkList.Clear();
+                }), (() =>
+                {
+                    foreach (var s in ErrorLnkList)
+                    {
+                        log.Debug("添加无效快捷方式记录:" + s);
+                        ConfigManger.config.errorLnk.Add(s);
+                        ConfigManger.Save();
+                    }
+
+                    log.Debug("取消删除无效快捷方式");
+                    ErrorLnkList.Clear();
+                }));
+        }
     }
 
     public static void AppSolverA(List<SearchViewItem> collection, List<string> names, string file, bool star = false)
     {
+        if (ConfigManger.config.debugMode)
+        {
+            log.Debug("索引:" + file);
+        }
+
         if (star)
         {
+            if (ConfigManger.config.debugMode)
+            {
+                log.Debug("索引为收藏项目:" + file);
+            }
+
             if (names.Contains(file))
             {
+                if (ConfigManger.config.debugMode)
+                {
+                    log.Debug("重复跳过索引:" + file);
+                }
+
                 return;
             }
 
             names.Add(file);
+
             if (Path.HasExtension(file) && File.Exists(file))
             {
                 var keys = new HashSet<string>();
@@ -106,16 +174,43 @@ public partial class AppTools
                 });
             }
 
+            if (ConfigManger.config.debugMode)
+            {
+                log.Debug("完成索引:" + file);
+            }
+
             return;
         }
 
         var fileInfo = new FileInfo(file);
         var refFileInfo = new FileInfo(LnkTools.ResolveShortcut(file));
         if (refFileInfo.Exists)
+        {
             if (names.Contains(refFileInfo.FullName))
             {
+                if (ConfigManger.config.debugMode)
+                {
+                    log.Debug("重复索引:" + file);
+                }
+
                 return;
             }
+        }
+        else
+        {
+            if (ConfigManger.config.debugMode)
+            {
+                log.Debug("无效索引:" + file);
+            }
+
+            if (!ErrorLnkList.Contains(file) && !ConfigManger.config.errorLnk.Contains(file))
+            {
+                ErrorLnkList.Add(file);
+            }
+
+            return;
+        }
+
 
         names.Add(refFileInfo.FullName);
         if (refFileInfo.Extension != ".url" && refFileInfo.Extension != ".txt" && refFileInfo.Extension != ".chm" &&
@@ -141,6 +236,17 @@ public partial class AppTools
                         FileType = FileType.应用程序, Icon = null
                     });
                 }
+            }
+            if (ConfigManger.config.debugMode)
+            {
+                log.Debug("完成索引:" + file);
+            }
+        }
+        else
+        {
+            if (ConfigManger.config.debugMode)
+            {
+                log.Debug("不符合要求跳过索引:" + file);
             }
         }
     }
@@ -184,4 +290,9 @@ public partial class AppTools
 
     [System.Text.RegularExpressions.GeneratedRegex("[^A-Z]")]
     private static partial System.Text.RegularExpressions.Regex MyRegex();
+
+    public static List<string> GetErrorLnks()
+    {
+        return ErrorLnkList;
+    }
 }
