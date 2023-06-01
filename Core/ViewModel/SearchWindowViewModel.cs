@@ -515,7 +515,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
         log.Debug("添加常驻" + item.OnlyKey);
         int index = Items.IndexOf(item);
         Items[index].IsPined = !Items[index].IsPined;
-        Items.ResetItem(index);
+        //Items.ResetItem(index);
         if (ConfigManger.config!.alwayShows.Contains(item.OnlyKey!))
             ConfigManger.config.alwayShows.Remove(item.OnlyKey!);
         if (item.IsPined) //收藏操作

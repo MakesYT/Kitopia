@@ -17,8 +17,8 @@ using log4net;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Win32;
-using MessageBox = Wpf.Ui.Controls.MessageBoxControl.MessageBox;
-using MessageBoxResult = Wpf.Ui.Controls.MessageBoxControl.MessageBoxResult;
+using MessageBox = Kitopia.Controls.MessageBoxControl.MessageBox;
+using MessageBoxResult = Kitopia.Controls.MessageBoxControl.MessageBoxResult;
 
 namespace Kitopia;
 

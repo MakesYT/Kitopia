@@ -200,7 +200,7 @@ public partial class AppTools
         {
             if (ConfigManger.config.debugMode)
             {
-                log.Debug("无效索引:" + file);
+                log.Debug("无效索引:\n" + file + "\n目标位置:" + refFileInfo.FullName);
             }
 
             if (!ErrorLnkList.Contains(file) && !ConfigManger.config.errorLnk.Contains(file))

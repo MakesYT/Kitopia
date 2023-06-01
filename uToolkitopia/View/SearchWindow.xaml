@@ -8,7 +8,6 @@
                  mc:Ignorable="d"
                  WindowStartupLocation="Manual"
                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-                 xmlns:kitopia="clr-namespace:Kitopia"
                  xmlns:controls="clr-namespace:Kitopia.Controls"
                  ExtendsContentIntoTitleBar="True"
                  WindowBackdropType="Acrylic"
@@ -94,15 +93,10 @@
                                         <ColumnDefinition Width="470 " />
                                         <ColumnDefinition Width="195" />
                                     </Grid.ColumnDefinitions>
-                                    <ui:Button KeyboardNavigation.DirectionalNavigation="None" FontSize="26"
-                                               ToolTip="{Binding IsPined,Converter={StaticResource StarBoolToText},ConverterParameter='Pin'}"
-                                               Background="{x:Null}" Tag="{Binding IsPined}" 
+                                    <controls:PinButton KeyboardNavigation.DirectionalNavigation="None" FontSize="26"
+                                                        Background="{x:Null}" Tag="{Binding IsPined}" IsChecked="{Binding IsPined}"
                                                Command="{Binding Path=DataContext.PinCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:FluentWindow}}}"
-                                               CommandParameter="{Binding}" Padding="2">
-                                        <ui:Button.Icon>
-                                            <ui:SymbolIcon Symbol="Pin20" Filled="{Binding IsPined}" />
-                                        </ui:Button.Icon>
-                                    </ui:Button>
+                                               CommandParameter="{Binding}" Padding="2" />
                                     <Image Grid.Column="1" HorizontalAlignment="Left" Focusable="False" Width="48"
                                            Height="48"
                                            Source="{Binding Icon, Converter={StaticResource pathToImageConverter}}" />

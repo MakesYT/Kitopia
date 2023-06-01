@@ -4,8 +4,8 @@ using Core.SDKs.Config;
 using Core.SDKs.Services;
 using log4net;
 using Microsoft.Toolkit.Uwp.Notifications;
-using MessageBox = Wpf.Ui.Controls.MessageBoxControl.MessageBox;
-using MessageBoxResult = Wpf.Ui.Controls.MessageBoxControl.MessageBoxResult;
+using MessageBox = Kitopia.Controls.MessageBoxControl.MessageBox;
+using MessageBoxResult = Kitopia.Controls.MessageBoxControl.MessageBoxResult;
 
 namespace Kitopia.Services;
 

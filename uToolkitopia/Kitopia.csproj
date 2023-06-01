@@ -65,6 +65,15 @@
             <XamlRuntime>Wpf</XamlRuntime>
             <SubType>Designer</SubType>
         </Page>
+        <Page Update="Controls\MessageBoxControl\MessageBox.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>Wpf</XamlRuntime>
+            <SubType>Designer</SubType>
+        </Page>
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="Controls\MessageBoxControl\MessageBox.bmp"/>
     </ItemGroup>
 
 </Project>
