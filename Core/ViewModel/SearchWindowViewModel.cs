@@ -172,10 +172,6 @@ public partial class SearchWindowViewModel : ObservableRecipient
         GetItemsIcon();
     }
 
-    partial void OnItemsChanged(BindingList<SearchViewItem> value)
-    {
-        GetItemsIcon();
-    }
 
     private void GetItemsIcon()
     {
@@ -213,7 +209,6 @@ public partial class SearchWindowViewModel : ObservableRecipient
             }
             catch (Exception)
             {
-                GetItemsIcon();
             }
         });
     }
@@ -374,7 +369,8 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 log.Debug("无搜索项目,添加网页搜索");
             }
 
-            Items.Insert(0, new SearchViewItem()
+
+            Items.Add(new SearchViewItem()
             {
                 Url = "https://www.bing.com/search?q=" + value,
                 FileName = "在网页中搜索" + value,
@@ -382,6 +378,30 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 OnlyKey = "https://www.bing.com/search?q=" + value,
                 Icon = null,
                 IconSymbol = 62555,
+                IsVisible = true
+            });
+            if (value.Contains("."))
+            {
+                Items.Add(new SearchViewItem()
+                {
+                    Url = value,
+                    FileName = "打开网页:" + value,
+                    FileType = FileType.URL,
+                    OnlyKey = value,
+                    Icon = null,
+                    IconSymbol = 62555,
+                    IsVisible = true
+                });
+            }
+
+            Items.Add(new SearchViewItem()
+            {
+                Url = value,
+                FileName = "执行命令:" + value,
+                FileType = FileType.命令,
+                OnlyKey = value,
+                Icon = null,
+                IconSymbol = 61039,
                 IsVisible = true
             });
         }
@@ -425,6 +445,13 @@ public partial class SearchWindowViewModel : ObservableRecipient
             return;
         }
 
+        if (item.FileType == FileType.命令)
+        {
+            ShellTools.ShellExecute(IntPtr.Zero, "open", "cmd.exe", item.OnlyKey, "",
+                ShellTools.ShowCommands.SW_SHOWNORMAL);
+            return;
+        }
+
         if (ConfigManger.config!.lastOpens.Contains(item.OnlyKey!))
             ConfigManger.config.lastOpens.Remove(item.OnlyKey!);
         ConfigManger.config.lastOpens.Insert(0, item.OnlyKey!);
@@ -454,7 +481,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
     {
         var item = (SearchViewItem)searchViewItem;
         log.Debug("以管理员身份打开指定内容" + item.OnlyKey);
-        ShellTools.ShellExecute(IntPtr.Zero, "runas", item.FileInfo!.FullName, "", "",
+        ShellTools.ShellExecute(IntPtr.Zero, "runas", item.OnlyKey, "", "",
             ShellTools.ShowCommands.SW_SHOWNORMAL);
 
         if (ConfigManger.config!.lastOpens.Contains(item.OnlyKey!))

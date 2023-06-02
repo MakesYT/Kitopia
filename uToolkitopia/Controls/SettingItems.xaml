@@ -21,11 +21,21 @@
                     <ui:Card>
                         <Grid VerticalAlignment="Center" Height="35" >
                             <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="36" />
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <ContentPresenter
+                                x:Name="ControlIcon"
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Left"
+                                Content="{TemplateBinding Icon}"
+                                Focusable="False"
+                                TextElement.FontSize="{Binding Path=FontSize,RelativeSource={RelativeSource TemplatedParent}}"
+                                TextElement.Foreground="{TemplateBinding Foreground}" />
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                 <TextBlock Margin="0" Focusable="False" Text="{Binding Title, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
                                            FontSize="15"
                                            Background="{x:Null}"
@@ -38,7 +48,7 @@
                             </StackPanel>
                             <ContentControl
                                 x:Name="ContentPresenter"
-                                Grid.Column="2"
+                                Grid.Column="3"
                                 VerticalAlignment="Center"
                                 Content="{TemplateBinding Content}"
                                 TextElement.Foreground="{TemplateBinding Foreground}" />

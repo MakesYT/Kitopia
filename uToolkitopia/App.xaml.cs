@@ -191,8 +191,8 @@ public sealed partial class App : Application
         {
             return new MainWindow { DataContext = sq.GetService<MainWindowViewModel>() };
         });
-        services.AddSingleton<HomePageViewModel>();
-        services.AddSingleton<SettingPageViewModel>(e =>
+        services.AddTransient<HomePageViewModel>();
+        services.AddTransient<SettingPageViewModel>(e =>
         {
             return new SettingPageViewModel { IsActive = true };
         });

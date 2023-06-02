@@ -124,5 +124,6 @@ public enum FileType
     剪贴板图像,
     文件夹,
     文件,
+    命令,
     None
 }

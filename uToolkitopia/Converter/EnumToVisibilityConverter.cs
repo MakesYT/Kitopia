@@ -20,6 +20,7 @@ public class EnumToVisibilityConverter : IValueConverter
                 switch ((FileType)value)
                 {
                     case FileType.应用程序: return Visibility.Visible;
+                    case FileType.命令: return Visibility.Visible;
                     default: return Visibility.Collapsed;
                 }
             }

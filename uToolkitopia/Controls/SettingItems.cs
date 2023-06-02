@@ -4,12 +4,12 @@
 // All Rights Reserved.
 
 using System.ComponentModel;
-using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
+using Wpf.Ui.Controls.IconElements;
+using Wpf.Ui.Converters;
 
 namespace Kitopia.Controls;
-
 
 public class SettingItems : ContentControl
 {
@@ -19,17 +19,31 @@ public class SettingItems : ContentControl
         get => (string)GetValue(TitleProperty);
         set => SetValue(TitleProperty, value);
     }
+
     public static readonly DependencyProperty TitleProperty = DependencyProperty.Register(nameof(Title),
         typeof(string), typeof(TextBlock),
         new PropertyMetadata(""));
-    [Bindable(true), Category("Title")]
+
+    [Bindable(true), Category("Description")]
     public string Description
     {
         get => (string)GetValue(DescriptionProperty);
         set => SetValue(DescriptionProperty, value);
     }
+
     public static readonly DependencyProperty DescriptionProperty = DependencyProperty.Register(nameof(Description),
         typeof(string), typeof(TextBlock),
         new PropertyMetadata(""));
-    
+
+
+    [Bindable(true), Category("Appearance")]
+    public IconElement? Icon
+    {
+        get => (IconElement)GetValue(IconProperty);
+        set => SetValue(IconProperty, value);
+    }
+
+    public static readonly DependencyProperty IconProperty = DependencyProperty.Register(nameof(Icon),
+        typeof(IconElement), typeof(SettingItems),
+        new PropertyMetadata(null, null, IconSourceElementConverter.ConvertToIconElement));
 }
