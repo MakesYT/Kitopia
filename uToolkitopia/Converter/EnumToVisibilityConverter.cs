@@ -62,6 +62,14 @@ public class EnumToVisibilityConverter : IValueConverter
                     default: return Visibility.Collapsed;
                 }
             }
+            case "Pin":
+            {
+                switch ((FileType)value)
+                {
+                    case FileType.剪贴板图像: return Visibility.Hidden;
+                    default: return Visibility.Visible;
+                }
+            }
             default: return Visibility.Collapsed;
         }
     }

@@ -127,6 +127,11 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
                 item.IsPined = true;
                 Items.Add(item);
+                ThreadPool.QueueUserWorkItem(a =>
+                {
+                    GetIconInItems(item);
+                });
+
                 limit++;
             }
         }
@@ -160,6 +165,10 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 if (!Items.Any((e) => e.OnlyKey.Equals(item.OnlyKey)))
                 {
                     Items.Add(item);
+                    ThreadPool.QueueUserWorkItem(a =>
+                    {
+                        GetIconInItems(item);
+                    });
                     limit++;
                 }
             }
@@ -169,48 +178,36 @@ public partial class SearchWindowViewModel : ObservableRecipient
         CheckClipboard();
         OnItemsChanged(Items);
 
-        GetItemsIcon();
+        // GetItemsIcon();
     }
 
-
-    private void GetItemsIcon()
+    private void GetIconInItems(SearchViewItem t)
     {
-        if (ConfigManger.config.debugMode)
+        try
         {
-            log.Debug("加载图标");
-        }
-
-        Task.Run(() =>
-        {
-            try
+            if (t.Icon != null) return;
+            switch (t.FileType)
             {
-                foreach (var t in Items)
+                case FileType.文件夹:
+                    t.Icon = (Icon)((IconTools)ServiceManager.Services!.GetService(typeof(IconTools))!)
+                        .ExtractFromPath(t.DirectoryInfo!.FullName).Clone();
+                    break;
+                case FileType.URL:
+                    break;
+                case FileType.剪贴板图像:
                 {
-                    if (t.Icon != null) continue;
-                    switch (t.FileType)
-                    {
-                        case FileType.文件夹:
-                            t.Icon = (Icon)((IconTools)ServiceManager.Services!.GetService(typeof(IconTools))!)
-                                .ExtractFromPath(t.DirectoryInfo!.FullName).Clone();
-                            break;
-                        case FileType.URL:
-                            break;
-                        case FileType.剪贴板图像:
-                        {
-                            break;
-                        }
-                        default:
-
-                            t.Icon = (Icon)((IconTools)ServiceManager.Services!.GetService(typeof(IconTools))!)
-                                .GetIcon(t.FileInfo!.FullName).Clone();
-                            break;
-                    }
+                    break;
                 }
+                default:
+
+                    t.Icon = (Icon)((IconTools)ServiceManager.Services!.GetService(typeof(IconTools))!)
+                        .GetIcon(t.FileInfo!.FullName).Clone();
+                    break;
             }
-            catch (Exception)
-            {
-            }
-        });
+        }
+        catch (Exception e)
+        {
+        }
     }
 
     partial void OnSearchChanged(string? value)
@@ -337,6 +334,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 break; // 跳出循环
             }
 
+            var searchViewItem = (SearchViewItem)x.Item.Clone();
             if (ConfigManger.config.lastOpens.Contains(x.Item.OnlyKey))
             {
                 if (ConfigManger.config.debugMode)
@@ -344,7 +342,16 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     log.Debug("添加提高权重的搜索结果" + x.Item.OnlyKey);
                 }
 
-                Items.Insert(nowIndex, (SearchViewItem)x.Item.Clone()); // 添加元素
+                if (ConfigManger.config.alwayShows.Contains(searchViewItem.OnlyKey))
+                {
+                    searchViewItem.IsPined = true;
+                }
+
+                Items.Insert(nowIndex, searchViewItem); // 添加元素
+                ThreadPool.QueueUserWorkItem(a =>
+                {
+                    GetIconInItems(searchViewItem);
+                });
                 nowIndex++;
                 count++; // 计数器加一
             }
@@ -355,7 +362,16 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     log.Debug("添加搜索结果" + x.Item.OnlyKey);
                 }
 
-                Items.Add((SearchViewItem)x.Item.Clone()); // 添加元素
+                if (ConfigManger.config.alwayShows.Contains(searchViewItem.OnlyKey))
+                {
+                    searchViewItem.IsPined = true;
+                }
+
+                Items.Add(searchViewItem); // 添加元素
+                ThreadPool.QueueUserWorkItem(a =>
+                {
+                    GetIconInItems(searchViewItem);
+                });
                 count++; // 计数器加一
             }
         }
@@ -370,7 +386,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
             }
 
 
-            Items.Add(new SearchViewItem()
+            var searchViewItem = new SearchViewItem()
             {
                 Url = "https://www.bing.com/search?q=" + value,
                 FileName = "在网页中搜索" + value,
@@ -379,10 +395,11 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 Icon = null,
                 IconSymbol = 62555,
                 IsVisible = true
-            });
+            };
+            Items.Add(searchViewItem);
             if (value.Contains("."))
             {
-                Items.Add(new SearchViewItem()
+                var viewItem = new SearchViewItem()
                 {
                     Url = value,
                     FileName = "打开网页:" + value,
@@ -391,10 +408,11 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     Icon = null,
                     IconSymbol = 62555,
                     IsVisible = true
-                });
+                };
+                Items.Add(viewItem);
             }
 
-            Items.Add(new SearchViewItem()
+            var item = new SearchViewItem()
             {
                 Url = value,
                 FileName = "执行命令:" + value,
@@ -403,10 +421,9 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 Icon = null,
                 IconSymbol = 61039,
                 IsVisible = true
-            });
+            };
+            Items.Add(item);
         }
-
-        GetItemsIcon();
     }
 
 
@@ -416,38 +433,16 @@ public partial class SearchWindowViewModel : ObservableRecipient
         var item = (SearchViewItem)searchViewItem;
         log.Debug("打开指定内容" + item.OnlyKey);
 
-        if (item.FileInfo != null)
+        if (!item.OnlyKey.Equals("ClipboardImageData"))
         {
-            ShellTools.ShellExecute(IntPtr.Zero, "open", item.FileInfo.FullName, "", "",
+            ShellTools.ShellExecute(IntPtr.Zero, "open", item.OnlyKey, "", "",
                 ShellTools.ShowCommands.SW_SHOWNORMAL);
         }
-
-        if (item.DirectoryInfo != null)
-        {
-            ShellTools.ShellExecute(IntPtr.Zero, "open", item.DirectoryInfo.FullName, "", "",
-                ShellTools.ShowCommands.SW_SHOWNORMAL);
-        }
-
-        if (item.Url != null)
-        {
-            ShellTools.ShellExecute(IntPtr.Zero, "open", item.Url, "", "",
-                ShellTools.ShowCommands.SW_SHOWNORMAL);
-            Search = "";
-            return;
-        }
-
-        if (item.FileType == FileType.剪贴板图像)
+        else
         {
             string fileName = ((IClipboardService)ServiceManager.Services.GetService(typeof(IClipboardService)))
                 .saveBitmap();
             ShellTools.ShellExecute(IntPtr.Zero, "open", "explorer.exe", "/select," + fileName, "",
-                ShellTools.ShowCommands.SW_SHOWNORMAL);
-            return;
-        }
-
-        if (item.FileType == FileType.命令)
-        {
-            ShellTools.ShellExecute(IntPtr.Zero, "open", "cmd.exe", item.OnlyKey, "",
                 ShellTools.ShowCommands.SW_SHOWNORMAL);
             return;
         }

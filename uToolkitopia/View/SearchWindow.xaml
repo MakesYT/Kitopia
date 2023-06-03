@@ -94,6 +94,7 @@
                                         <ColumnDefinition Width="195" />
                                     </Grid.ColumnDefinitions>
                                     <controls:PinButton KeyboardNavigation.DirectionalNavigation="None" FontSize="26"
+                                                        Visibility="{Binding Path=FileType, Converter={StaticResource enumToVisibilityConverter}, ConverterParameter='Pin'}"
                                                         Background="{x:Null}" Tag="{Binding IsPined}" IsChecked="{Binding IsPined}"
                                                Command="{Binding Path=DataContext.PinCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:FluentWindow}}}"
                                                CommandParameter="{Binding}" Padding="2" />
