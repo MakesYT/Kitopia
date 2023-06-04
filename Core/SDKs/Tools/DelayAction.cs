@@ -4,7 +4,7 @@ namespace Core.SDKs.Tools
 {
     public class DelayAction
     {
-        System.Timers.Timer _timerDbc;
+        private System.Timers.Timer? _timerDbc;
         System.Timers.Timer _timerTrt;
 
         /// <summary>
