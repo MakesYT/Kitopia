@@ -67,6 +67,7 @@ public class EnumToVisibilityConverter : IValueConverter
                 switch ((FileType)value)
                 {
                     case FileType.剪贴板图像: return Visibility.Hidden;
+                    case FileType.数学运算: return Visibility.Hidden;
                     default: return Visibility.Visible;
                 }
             }

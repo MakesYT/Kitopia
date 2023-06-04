@@ -1,23 +1,21 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Text;
-using Core.SDKs;
 
 namespace Core.SDKs.Everything;
 
 public class Tools
 {
-    public static void main(BindingList<SearchViewItem> Items, string value)
+    public static void main(BindingList<SearchViewItem> Items, string value, Action<SearchViewItem> action)
     {
         if (IntPtr.Size == 8)
             // 64-bit
-            amd64(Items, value);
+            amd64(Items, value, action);
         else
             // 32-bit
-            amd32(Items, value);
+            amd32(Items, value, action);
     }
 
-    public static void amd32(BindingList<SearchViewItem> Items, string value)
+    public static void amd32(BindingList<SearchViewItem> Items, string value, Action<SearchViewItem> action)
     {
         Everything32.Everything_Reset();
         Everything32.Everything_SetSearchW("*.docx|*.doc|*.xls|*.xlsx|*.pdf|*.ppt|*.pptx" + " " + value);
@@ -41,16 +39,18 @@ public class Tools
                 fileType = FileType.Excel文档;
             else if (fileInfo.Extension == ".ppt" || fileInfo.Extension == ".pptx") fileType = FileType.PPT文档;
 
-            Items.Add(new SearchViewItem
+            var searchViewItem = new SearchViewItem
             {
                 IsVisible = true, FileInfo = fileInfo, FileName = fileInfo.Name, FileType = fileType,
                 OnlyKey = fileInfo.FullName,
                 Icon = null
-            });
+            };
+            Items.Add(searchViewItem);
+            action.Invoke(searchViewItem);
         }
     }
 
-    public static void amd64(BindingList<SearchViewItem> Items, string value)
+    public static void amd64(BindingList<SearchViewItem> Items, string value, Action<SearchViewItem> action)
     {
         Everything64.Everything_Reset();
         Everything64.Everything_SetSearchW("*.docx|*.doc|*.xls|*.xlsx|*.pdf|*.ppt|*.pptx" + " " + value);
@@ -74,12 +74,14 @@ public class Tools
                 fileType = FileType.Excel文档;
             else if (fileInfo.Extension == ".ppt" || fileInfo.Extension == ".pptx") fileType = FileType.PPT文档;
 
-            Items.Add(new SearchViewItem
+            var searchViewItem = new SearchViewItem
             {
                 IsVisible = true, FileInfo = fileInfo, FileName = fileInfo.Name, FileType = fileType,
                 OnlyKey = fileInfo.FullName,
                 Icon = null
-            });
+            };
+            Items.Add(searchViewItem);
+            action.Invoke(searchViewItem);
         }
     }
 }

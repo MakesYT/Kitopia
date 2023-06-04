@@ -125,5 +125,6 @@ public enum FileType
     文件夹,
     文件,
     命令,
+    数学运算,
     None
 }

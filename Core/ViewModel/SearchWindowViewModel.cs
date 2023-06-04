@@ -215,20 +215,20 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
     partial void OnSearchChanged(string? value)
     {
-        if (string.IsNullOrEmpty(value))
-        {
-            LoadLast();
-            return;
-        }
-
-        if (ConfigManger.config.debugMode)
-        {
-            log.Debug("搜索变更:" + value);
-        }
-
         TaskScheduler scheduler = TaskScheduler.FromCurrentSynchronizationContext();
         searchDelayAction.Debounce(ConfigManger.config.inputSmoothingMilliseconds, scheduler, () =>
         {
+            if (string.IsNullOrEmpty(Search))
+            {
+                LoadLast();
+                return;
+            }
+
+            if (ConfigManger.config.debugMode)
+            {
+                log.Debug("搜索变更:" + Search);
+            }
+
             foreach (var searchViewItem in Items)
             {
                 searchViewItem.Dispose();
@@ -236,8 +236,12 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
             Items.Clear();
 
+            if (Search is null)
+            {
+                return;
+            }
 
-            value = value.ToLowerInvariant();
+            value = Search.ToLowerInvariant();
             if (ConfigManger.config.useEverything)
             {
                 if (ConfigManger.config.debugMode)
@@ -258,7 +262,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     EverythingIsOk = Everything32.Everything_QueryW(true);
                 }
 
-                Tools.main(Items, value); //Everything文档检索
+                Tools.main(Items, value, GetIconInItems); //Everything文档检索
             }
 
 
@@ -430,7 +434,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
         var item = (SearchViewItem)searchViewItem;
         log.Debug("打开指定内容" + item.OnlyKey);
 
-        if (!item.OnlyKey.Equals("ClipboardImageData"))
+        if (!item.OnlyKey.Equals("ClipboardImageData") && !item.OnlyKey.Equals("Math"))
         {
             ShellTools.ShellExecute(IntPtr.Zero, "open", item.OnlyKey, "", "",
                 ShellTools.ShowCommands.SW_SHOWNORMAL);

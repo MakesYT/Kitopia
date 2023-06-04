@@ -24,10 +24,11 @@ namespace Core.SDKs.Tools
                         _timerDbc.Stop();
                         _timerDbc.Close();
                         _timerDbc = null;
-                        lock (invoker)
+
                         {
                             Task.Factory.StartNew(action, CancellationToken.None, TaskCreationOptions.None, invoker)
                                 .Wait();
+
                             //action.Invoke();
                         }
                     };
