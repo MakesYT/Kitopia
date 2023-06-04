@@ -210,6 +210,9 @@ public partial class SearchWindowViewModel : ObservableRecipient
         }
     }
 
+    private System.Timers.Timer _searchTimerDbc;
+    private DelayAction searchDelayAction = new DelayAction();
+
     partial void OnSearchChanged(string? value)
     {
         if (string.IsNullOrEmpty(value))
@@ -223,207 +226,201 @@ public partial class SearchWindowViewModel : ObservableRecipient
             log.Debug("搜索变更:" + value);
         }
 
-        if (_stopwatch.IsRunning)
+        TaskScheduler scheduler = TaskScheduler.FromCurrentSynchronizationContext();
+        searchDelayAction.Debounce(ConfigManger.config.inputSmoothingMilliseconds, scheduler, () =>
         {
-            if (_stopwatch.ElapsedMilliseconds <= ConfigManger.config.inputSmoothingMilliseconds)
+            foreach (var searchViewItem in Items)
             {
-                return;
-            }
-        }
-
-        _stopwatch.Reset();
-        _stopwatch.Start();
-        foreach (var searchViewItem in Items)
-        {
-            searchViewItem.Dispose();
-        }
-
-        Items.Clear();
-
-
-        value = value.ToLowerInvariant();
-        if (ConfigManger.config.useEverything)
-        {
-            if (ConfigManger.config.debugMode)
-            {
-                log.Debug("everything检测");
+                searchViewItem.Dispose();
             }
 
-            if (IntPtr.Size == 8)
-            {
-                // 64-bit
-                Everything64.Everything_SetMax(1);
-                EverythingIsOk = Everything64.Everything_QueryW(true);
-            }
-            else
-            {
-                // 32-bit
-                Everything32.Everything_SetMax(1);
-                EverythingIsOk = Everything32.Everything_QueryW(true);
-            }
-
-            Tools.main(Items, value); //Everything文档检索
-        }
+            Items.Clear();
 
 
-        if (value.Contains("\\") || value.Contains("/"))
-        {
-            if (ConfigManger.config.debugMode)
-            {
-                log.Debug("检测路径");
-            }
-
-            if (Path.HasExtension(value) && File.Exists(value))
+            value = value.ToLowerInvariant();
+            if (ConfigManger.config.useEverything)
             {
                 if (ConfigManger.config.debugMode)
                 {
-                    log.Debug("检测到文件路径");
+                    log.Debug("everything检测");
                 }
 
-                Items.Add(new SearchViewItem()
+                if (IntPtr.Size == 8)
                 {
-                    FileInfo = new FileInfo(value),
-                    FileName = "打开文件:" + LnkTools.GetLocalizedName(value) + "?",
-                    OnlyKey = value,
-                    FileType = FileType.文件,
-                    IsVisible = true
-                });
+                    // 64-bit
+                    Everything64.Everything_SetMax(1);
+                    EverythingIsOk = Everything64.Everything_QueryW(true);
+                }
+                else
+                {
+                    // 32-bit
+                    Everything32.Everything_SetMax(1);
+                    EverythingIsOk = Everything32.Everything_QueryW(true);
+                }
+
+                Tools.main(Items, value); //Everything文档检索
             }
-            else if (Directory.Exists(value))
+
+
+            if (value.Contains("\\") || value.Contains("/"))
             {
                 if (ConfigManger.config.debugMode)
                 {
-                    log.Debug("检测到文件夹路径");
+                    log.Debug("检测路径");
                 }
 
-                Items.Add(new SearchViewItem()
+                if (Path.HasExtension(value) && File.Exists(value))
                 {
-                    DirectoryInfo = new DirectoryInfo(value),
-                    FileName = "打开" + value.Split("\\").Last() + "?",
-                    FileType = FileType.文件夹,
-                    OnlyKey = value,
-                    Icon = null,
-                    IsVisible = true
-                });
+                    if (ConfigManger.config.debugMode)
+                    {
+                        log.Debug("检测到文件路径");
+                    }
+
+                    Items.Add(new SearchViewItem()
+                    {
+                        FileInfo = new FileInfo(value),
+                        FileName = "打开文件:" + LnkTools.GetLocalizedName(value) + "?",
+                        OnlyKey = value,
+                        FileType = FileType.文件,
+                        IsVisible = true
+                    });
+                }
+                else if (Directory.Exists(value))
+                {
+                    if (ConfigManger.config.debugMode)
+                    {
+                        log.Debug("检测到文件夹路径");
+                    }
+
+                    Items.Add(new SearchViewItem()
+                    {
+                        DirectoryInfo = new DirectoryInfo(value),
+                        FileName = "打开" + value.Split("\\").Last() + "?",
+                        FileType = FileType.文件夹,
+                        OnlyKey = value,
+                        Icon = null,
+                        IsVisible = true
+                    });
+                }
             }
-        }
 
 
-        // 使用LINQ语句来简化和优化筛选和排序逻辑，而不需要使用foreach循环和if判断
-        // 根据给定的值，从集合中筛选出符合条件的SearchViewItem对象，并计算它们的权重
-        var filtered = from item in _collection.AsParallel()
-            let keys = item.Keys.Where(key => !string.IsNullOrEmpty(key)).AsParallel() // 排除空的键
-            let weight = keys.Count(key => key.Contains(value)) * 2 // 统计包含给定值的键的数量
-                         + keys.Count(key => key.StartsWith(value)) * 3 // 统计以给定值开头的键的数量，并乘以500
-                         + keys.Count(key => key.Equals(value)) * 5 // 统计等于给定值的键的数量，并乘以1000
-            where weight > 0 // 只选择权重为正的对象
-            select new { Item = item, Weight = weight }; // 创建一个包含对象和权重属性的匿名类型
+            // 使用LINQ语句来简化和优化筛选和排序逻辑，而不需要使用foreach循环和if判断
+            // 根据给定的值，从集合中筛选出符合条件的SearchViewItem对象，并计算它们的权重
+            var filtered = from item in _collection.AsParallel()
+                let keys = item.Keys.Where(key => !string.IsNullOrEmpty(key)).AsParallel() // 排除空的键
+                let weight = keys.Count(key => key.Contains(value)) * 2 // 统计包含给定值的键的数量
+                             + keys.Count(key => key.StartsWith(value)) * 3 // 统计以给定值开头的键的数量，并乘以500
+                             + keys.Count(key => key.Equals(value)) * 5 // 统计等于给定值的键的数量，并乘以1000
+                where weight > 0 // 只选择权重为正的对象
+                select new { Item = item, Weight = weight }; // 创建一个包含对象和权重属性的匿名类型
 
-        // 按照权重降序排序筛选出的对象
-        var sorted = filtered.OrderByDescending(x => x.Weight);
+            // 按照权重降序排序筛选出的对象
+            var sorted = filtered.OrderByDescending(x => x.Weight);
 
-        // 将排序后的对象添加到Items集合中
-        //Items.RaiseListChangedEvents = false;
-        int count = 0; // 计数器变量
-        int limit = 100; // 限制次数
-        int nowIndex = 0;
-        foreach (var x in sorted)
-        {
-            if (count >= limit) // 如果达到了限制
+            // 将排序后的对象添加到Items集合中
+            //Items.RaiseListChangedEvents = false;
+            int count = 0; // 计数器变量
+            int limit = 100; // 限制次数
+            int nowIndex = 0;
+            foreach (var x in sorted)
             {
-                break; // 跳出循环
-            }
+                if (count >= limit) // 如果达到了限制
+                {
+                    break; // 跳出循环
+                }
 
-            var searchViewItem = (SearchViewItem)x.Item.Clone();
-            if (ConfigManger.config.lastOpens.Contains(x.Item.OnlyKey))
+                var searchViewItem = (SearchViewItem)x.Item.Clone();
+                if (ConfigManger.config.lastOpens.Contains(x.Item.OnlyKey))
+                {
+                    if (ConfigManger.config.debugMode)
+                    {
+                        log.Debug("添加提高权重的搜索结果" + x.Item.OnlyKey);
+                    }
+
+                    if (ConfigManger.config.alwayShows.Contains(searchViewItem.OnlyKey))
+                    {
+                        searchViewItem.IsPined = true;
+                    }
+
+                    Items.Insert(nowIndex, searchViewItem); // 添加元素
+                    ThreadPool.QueueUserWorkItem(a =>
+                    {
+                        GetIconInItems(searchViewItem);
+                    });
+                    nowIndex++;
+                    count++; // 计数器加一
+                }
+                else
+                {
+                    if (ConfigManger.config.debugMode)
+                    {
+                        log.Debug("添加搜索结果" + x.Item.OnlyKey);
+                    }
+
+                    if (ConfigManger.config.alwayShows.Contains(searchViewItem.OnlyKey))
+                    {
+                        searchViewItem.IsPined = true;
+                    }
+
+                    Items.Add(searchViewItem); // 添加元素
+                    ThreadPool.QueueUserWorkItem(a =>
+                    {
+                        GetIconInItems(searchViewItem);
+                    });
+                    count++; // 计数器加一
+                }
+            }
+            //Items.RaiseListChangedEvents = true;
+
+
+            if (Items.Count <= 0 && !(Path.HasExtension(value) && File.Exists(value)) && !Directory.Exists(value))
             {
                 if (ConfigManger.config.debugMode)
                 {
-                    log.Debug("添加提高权重的搜索结果" + x.Item.OnlyKey);
+                    log.Debug("无搜索项目,添加网页搜索");
                 }
 
-                if (ConfigManger.config.alwayShows.Contains(searchViewItem.OnlyKey))
+
+                var searchViewItem = new SearchViewItem()
                 {
-                    searchViewItem.IsPined = true;
-                }
-
-                Items.Insert(nowIndex, searchViewItem); // 添加元素
-                ThreadPool.QueueUserWorkItem(a =>
-                {
-                    GetIconInItems(searchViewItem);
-                });
-                nowIndex++;
-                count++; // 计数器加一
-            }
-            else
-            {
-                if (ConfigManger.config.debugMode)
-                {
-                    log.Debug("添加搜索结果" + x.Item.OnlyKey);
-                }
-
-                if (ConfigManger.config.alwayShows.Contains(searchViewItem.OnlyKey))
-                {
-                    searchViewItem.IsPined = true;
-                }
-
-                Items.Add(searchViewItem); // 添加元素
-                ThreadPool.QueueUserWorkItem(a =>
-                {
-                    GetIconInItems(searchViewItem);
-                });
-                count++; // 计数器加一
-            }
-        }
-        //Items.RaiseListChangedEvents = true;
-
-
-        if (Items.Count <= 0 && !(Path.HasExtension(value) && File.Exists(value)) && !Directory.Exists(value))
-        {
-            if (ConfigManger.config.debugMode)
-            {
-                log.Debug("无搜索项目,添加网页搜索");
-            }
-
-
-            var searchViewItem = new SearchViewItem()
-            {
-                Url = "https://www.bing.com/search?q=" + value,
-                FileName = "在网页中搜索" + value,
-                FileType = FileType.URL,
-                OnlyKey = "https://www.bing.com/search?q=" + value,
-                Icon = null,
-                IconSymbol = 62555,
-                IsVisible = true
-            };
-            Items.Add(searchViewItem);
-            if (value.Contains("."))
-            {
-                var viewItem = new SearchViewItem()
-                {
-                    Url = value,
-                    FileName = "打开网页:" + value,
+                    Url = "https://www.bing.com/search?q=" + value,
+                    FileName = "在网页中搜索" + value,
                     FileType = FileType.URL,
-                    OnlyKey = value,
+                    OnlyKey = "https://www.bing.com/search?q=" + value,
                     Icon = null,
                     IconSymbol = 62555,
                     IsVisible = true
                 };
-                Items.Add(viewItem);
-            }
+                Items.Add(searchViewItem);
+                if (value.Contains("."))
+                {
+                    var viewItem = new SearchViewItem()
+                    {
+                        Url = value,
+                        FileName = "打开网页:" + value,
+                        FileType = FileType.URL,
+                        OnlyKey = value,
+                        Icon = null,
+                        IconSymbol = 62555,
+                        IsVisible = true
+                    };
+                    Items.Add(viewItem);
+                }
 
-            var item = new SearchViewItem()
-            {
-                Url = value,
-                FileName = "执行命令:" + value,
-                FileType = FileType.命令,
-                OnlyKey = value,
-                Icon = null,
-                IconSymbol = 61039,
-                IsVisible = true
-            };
-            Items.Add(item);
-        }
+                var item = new SearchViewItem()
+                {
+                    Url = value,
+                    FileName = "执行命令:" + value,
+                    FileType = FileType.命令,
+                    OnlyKey = value,
+                    Icon = null,
+                    IconSymbol = 61039,
+                    IsVisible = true
+                };
+                Items.Add(item);
+            }
+        });
     }
 
 
