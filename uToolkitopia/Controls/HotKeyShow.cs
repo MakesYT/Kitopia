@@ -3,10 +3,22 @@
 // Copyright (C) Leszek Pomianowski and WPF UI Contributors.
 // All Rights Reserved.
 
+using System.ComponentModel;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace Kitopia.Controls;
 
-public class HotKeyShow : Button
+public class HotKeyShow : Wpf.Ui.Controls.Button
 {
+    [Bindable(true), Category("KeyName")]
+    public string KeyName
+    {
+        get => (string)GetValue(KeyNameProperty);
+        set => SetValue(KeyNameProperty, value);
+    }
+
+    public static readonly DependencyProperty KeyNameProperty = DependencyProperty.Register(nameof(KeyName),
+        typeof(string), typeof(Button),
+        new PropertyMetadata(""));
 }

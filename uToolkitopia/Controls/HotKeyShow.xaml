@@ -15,50 +15,52 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:converter="clr-namespace:Kitopia.Converter">
     <converter:StarBoolToText x:Key="StarBoolToText"/>
-    
-    <Style x:Key="DefaultPinButtonStyle" TargetType="{x:Type controls:HotKeyShow}">
-        <Setter Property="Background">
-            <Setter.Value>
-                <SolidColorBrush Color="{DynamicResource ControlFillColorDefault}" />
-            </Setter.Value>
-        </Setter>
-        <Setter Property="Foreground">
-            <Setter.Value>
-                <SolidColorBrush Color="{DynamicResource TextFillColorPrimary}" />
-            </Setter.Value>
-        </Setter>
+    <DrawingImage x:Key="_WinImage">
+        <DrawingImage.Drawing>
+            <DrawingGroup ClipGeometry="M0,0 V129 H129 V0 H0 Z">
+                <GeometryDrawing Brush="#FFFFFF" Geometry="F1 M129,129z M0,0z M0.5,61.5L61.5,61.5 61.5,0.5 0.5,0.5 0.5,61.5z M0.5,128.5L61.5,128.5 61.5,67.5 0.5,67.5 0.5,128.5z M67.5,0.5L67.5,61.5 128.5,61.5 128.5,0.5 67.5,0.5z M67.5,128.5L128.5,128.5 128.5,67.5 67.5,67.5 67.5,128.5z" />
+                <GeometryDrawing Geometry="F1 M129,129z M0,0z M0.5,61.5L61.5,61.5 61.5,0.5 0.5,0.5 0.5,61.5z M0.5,128.5L61.5,128.5 61.5,67.5 0.5,67.5 0.5,128.5z M67.5,0.5L67.5,61.5 128.5,61.5 128.5,0.5 67.5,0.5z M67.5,128.5L128.5,128.5 128.5,67.5 67.5,67.5 67.5,128.5z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#FFFFFF" Thickness="1" StartLineCap="Flat" EndLineCap="Flat" LineJoin="Miter" />
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+    <Style x:Key="DefaultHotKeyShowStyle" TargetType="{x:Type controls:HotKeyShow}">
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="KeyName" Value="s" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type controls:HotKeyShow}">
-                    <Grid Margin="{TemplateBinding Padding}" Background="Transparent">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        
-                        <Grid
-                            x:Name="ChevronGrid"
-                            Grid.Column="1"
-                            Margin="0"
-                            VerticalAlignment="Center"
-                            Background="Transparent"
-                            RenderTransformOrigin="0.5, 0.5">
-                            <Grid.RenderTransform>
-                                <RotateTransform Angle="0" />
-                            </Grid.RenderTransform>
+                    <ui:Button Padding="10" Margin="0">
+                        <StackPanel Orientation="Horizontal" Height="{TemplateBinding Height}" >
+                            <controls:HotKeyShowItme Appearance="Primary" FontSize="20" Content="Ctrl" Margin="0" Height="40"/>
+
+
+                            <controls:HotKeyShowItme Appearance="Primary" Height="40" Margin="5,0,0,0">
+                                <controls:HotKeyShowItme.Icon>
+                                    <ui:ImageIcon Source="{StaticResource _WinImage}" Width="26" Height="26" />
+                                </controls:HotKeyShowItme.Icon>
+                            </controls:HotKeyShowItme>
+                            <controls:HotKeyShowItme Appearance="Primary" FontSize="20" Content="Alt" Margin="5,0,0,0" Height="40"/>
+                            <controls:HotKeyShowItme Appearance="Primary" FontSize="20" Content="Shift" Margin="5,0,0,0" Height="40"/>
+                            <controls:HotKeyShowItme Appearance="Primary" FontSize="20" Content="{TemplateBinding KeyName}" Margin="5,0,20,0" Height="40"/>
                             <ui:SymbolIcon
                                 x:Name="ControlChevronIcon"
-                                
                                 Foreground="{TemplateBinding Foreground}"
-                                
-                                Symbol="Pin20" />
-                        </Grid>
-                    </Grid>
+                                Symbol="Edit20" />
+                        </StackPanel>
+                        
+                    </ui:Button>
+                    
+                    
                     
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
-    
-    <Style BasedOn="{StaticResource DefaultPinButtonStyle}" TargetType="{x:Type controls:HotKeyShow}" />
+
+    <Style BasedOn="{StaticResource DefaultHotKeyShowStyle}" TargetType="{x:Type controls:HotKeyShow}" />
 </ResourceDictionary>

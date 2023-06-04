@@ -15,11 +15,12 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
     
     <Style TargetType="{x:Type controls:SettingItems}">
+        <Setter Property="Padding" Value="14,16,14,16" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type controls:SettingItems}">
-                    <ui:Card>
-                        <Grid VerticalAlignment="Center" Height="35" >
+                    <ui:Card Padding="{TemplateBinding Padding}">
+                        <Grid VerticalAlignment="Center" >
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="36" />
                                 <ColumnDefinition Width="*" />
@@ -51,6 +52,7 @@
                                 Grid.Column="3"
                                 VerticalAlignment="Center"
                                 Content="{TemplateBinding Content}"
+                                Padding="{TemplateBinding Padding}"
                                 TextElement.Foreground="{TemplateBinding Foreground}" />
                         </Grid>
                     </ui:Card>

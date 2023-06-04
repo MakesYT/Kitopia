@@ -16,6 +16,8 @@
                 <ResourceDictionary Source="Controls/SettingItems.xaml" />
                 <ResourceDictionary Source="Controls/PinButton.xaml" />
                 <ResourceDictionary Source="Controls/MessageBoxControl/MessageBox.xaml" />
+                <ResourceDictionary Source="Controls/HotKeyShow.xaml" />
+                <ResourceDictionary Source="Controls/HotKeyShowItme.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <crt:DoubleHalfConverter x:Key="doubleHalfConverter" />
             <crt:DoubleQuarterConverter x:Key="doubleQuarterConverter" />

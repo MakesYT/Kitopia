@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -306,6 +307,41 @@ public partial class SearchWindowViewModel : ObservableRecipient
                         IsVisible = true
                     });
                 }
+
+                return;
+            }
+
+            char[] operators = new[] { '*', '+', '-', '/' };
+            if (value.IndexOfAny(operators) > 0)
+            {
+                try
+                {
+                    DataTable dt = new DataTable();
+                    int result = (int)dt.Compute(value, null);
+                    Items.Add(new SearchViewItem()
+                    {
+                        FileName = "=" + result,
+                        FileType = FileType.数学运算,
+                        OnlyKey = value,
+                        Icon = null,
+                        IconSymbol = 61547,
+                        IsVisible = true
+                    });
+                }
+                catch (Exception e)
+                {
+                    Items.Add(new SearchViewItem()
+                    {
+                        FileName = "错误的表达式",
+                        FileType = FileType.数学运算,
+                        OnlyKey = value,
+                        Icon = null,
+                        IconSymbol = 61547,
+                        IsVisible = true
+                    });
+                }
+
+                return;
             }
 
 
