@@ -213,10 +213,10 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
     private System.Timers.Timer _searchTimerDbc;
     private DelayAction searchDelayAction = new DelayAction();
+    TaskScheduler scheduler = TaskScheduler.FromCurrentSynchronizationContext();
 
     partial void OnSearchChanged(string? value)
     {
-        TaskScheduler scheduler = TaskScheduler.FromCurrentSynchronizationContext();
         searchDelayAction.Debounce(ConfigManger.config.inputSmoothingMilliseconds, scheduler, () =>
         {
             if (string.IsNullOrEmpty(Search))
@@ -465,63 +465,72 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
 
     [RelayCommand]
-    public void OpenFile(object searchViewItem)
+    public async Task OpenFile(object searchViewItem)
     {
-        var item = (SearchViewItem)searchViewItem;
-        log.Debug("打开指定内容" + item.OnlyKey);
-
-        if (!item.OnlyKey.Equals("ClipboardImageData") && !item.OnlyKey.Equals("Math"))
+        await Task.Run(() =>
         {
-            ShellTools.ShellExecute(IntPtr.Zero, "open", item.OnlyKey, "", "",
-                ShellTools.ShowCommands.SW_SHOWNORMAL);
-        }
-        else
-        {
-            string fileName = ((IClipboardService)ServiceManager.Services.GetService(typeof(IClipboardService)))
-                .saveBitmap();
-            ShellTools.ShellExecute(IntPtr.Zero, "open", "explorer.exe", "/select," + fileName, "",
-                ShellTools.ShowCommands.SW_SHOWNORMAL);
-            return;
-        }
+            var item = (SearchViewItem)searchViewItem;
+            log.Debug("打开指定内容" + item.OnlyKey);
 
-        if (ConfigManger.config!.lastOpens.Contains(item.OnlyKey!))
-            ConfigManger.config.lastOpens.Remove(item.OnlyKey!);
-        ConfigManger.config.lastOpens.Insert(0, item.OnlyKey!);
-        //if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
-        Search = "";
-        ConfigManger.Save();
+            if (!item.OnlyKey.Equals("ClipboardImageData") && !item.OnlyKey.Equals("Math"))
+            {
+                ShellTools.ShellExecute(IntPtr.Zero, "open", item.OnlyKey, "", "",
+                    ShellTools.ShowCommands.SW_SHOWNORMAL);
+            }
+            else
+            {
+                string fileName = ((IClipboardService)ServiceManager.Services.GetService(typeof(IClipboardService)))
+                    .saveBitmap();
+                ShellTools.ShellExecute(IntPtr.Zero, "open", "explorer.exe", "/select," + fileName, "",
+                    ShellTools.ShowCommands.SW_SHOWNORMAL);
+                return;
+            }
+
+            if (ConfigManger.config!.lastOpens.Contains(item.OnlyKey!))
+                ConfigManger.config.lastOpens.Remove(item.OnlyKey!);
+            ConfigManger.config.lastOpens.Insert(0, item.OnlyKey!);
+            //if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
+            Search = "";
+            ConfigManger.Save();
+        });
     }
 
     [RelayCommand]
-    public void OpenFolder(object searchViewItem)
+    public async Task OpenFolder(object searchViewItem)
     {
-        var item = (SearchViewItem)searchViewItem;
-        log.Debug("打开指定内容文件夹" + item.OnlyKey);
-        ShellTools.ShellExecute(IntPtr.Zero, "open", "explorer.exe", "/select," + item.FileInfo.FullName, "",
-            ShellTools.ShowCommands.SW_SHOWNORMAL);
+        await Task.Run(() =>
+        {
+            var item = (SearchViewItem)searchViewItem;
+            log.Debug("打开指定内容文件夹" + item.OnlyKey);
+            ShellTools.ShellExecute(IntPtr.Zero, "open", "explorer.exe", "/select," + item.FileInfo.FullName, "",
+                ShellTools.ShowCommands.SW_SHOWNORMAL);
 
-        if (ConfigManger.config!.lastOpens.Contains(item.OnlyKey!))
-            ConfigManger.config.lastOpens.Remove(item.OnlyKey!);
-        ConfigManger.config.lastOpens.Insert(0, item.OnlyKey!);
-        //if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
-        Search = "";
-        ConfigManger.Save();
+            if (ConfigManger.config!.lastOpens.Contains(item.OnlyKey!))
+                ConfigManger.config.lastOpens.Remove(item.OnlyKey!);
+            ConfigManger.config.lastOpens.Insert(0, item.OnlyKey!);
+            //if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
+            Search = "";
+            ConfigManger.Save();
+        });
     }
 
     [RelayCommand]
-    public void RunAsAdmin(object searchViewItem)
+    public async Task RunAsAdmin(object searchViewItem)
     {
-        var item = (SearchViewItem)searchViewItem;
-        log.Debug("以管理员身份打开指定内容" + item.OnlyKey);
-        ShellTools.ShellExecute(IntPtr.Zero, "runas", item.OnlyKey, "", "",
-            ShellTools.ShowCommands.SW_SHOWNORMAL);
+        await Task.Run(() =>
+        {
+            var item = (SearchViewItem)searchViewItem;
+            log.Debug("以管理员身份打开指定内容" + item.OnlyKey);
+            ShellTools.ShellExecute(IntPtr.Zero, "runas", item.OnlyKey, "", "",
+                ShellTools.ShowCommands.SW_SHOWNORMAL);
 
-        if (ConfigManger.config!.lastOpens.Contains(item.OnlyKey!))
-            ConfigManger.config.lastOpens.Remove(item.OnlyKey!);
-        ConfigManger.config.lastOpens.Insert(0, item.OnlyKey!);
-        //if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
-        Search = "";
-        ConfigManger.Save();
+            if (ConfigManger.config!.lastOpens.Contains(item.OnlyKey!))
+                ConfigManger.config.lastOpens.Remove(item.OnlyKey!);
+            ConfigManger.config.lastOpens.Insert(0, item.OnlyKey!);
+            //if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
+            Search = "";
+            ConfigManger.Save();
+        });
     }
 
     [RelayCommand]
@@ -586,30 +595,33 @@ public partial class SearchWindowViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    public void OpenFolderInTerminal(object searchViewItem)
+    public async Task OpenFolderInTerminal(object searchViewItem)
     {
-        var item = (SearchViewItem)searchViewItem;
-        log.Debug("打开指定内容在终端中" + item.OnlyKey);
-        ProcessStartInfo startInfo = new ProcessStartInfo();
-        startInfo.FileName = "cmd.exe";
-
-        if (item.FileInfo != null)
+        await Task.Run(() =>
         {
-            startInfo.WorkingDirectory = item.FileInfo.DirectoryName;
-        }
+            var item = (SearchViewItem)searchViewItem;
+            log.Debug("打开指定内容在终端中" + item.OnlyKey);
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.FileName = "cmd.exe";
 
-        if (item.DirectoryInfo != null)
-        {
-            startInfo.WorkingDirectory = item.DirectoryInfo.FullName;
-        }
+            if (item.FileInfo != null)
+            {
+                startInfo.WorkingDirectory = item.FileInfo.DirectoryName;
+            }
 
-        Process.Start(startInfo);
+            if (item.DirectoryInfo != null)
+            {
+                startInfo.WorkingDirectory = item.DirectoryInfo.FullName;
+            }
 
-        if (ConfigManger.config!.lastOpens.Contains(item.OnlyKey!))
-            ConfigManger.config.lastOpens.Remove(item.OnlyKey!);
-        ConfigManger.config.lastOpens.Insert(0, item.OnlyKey!);
-        //if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
-        Search = "";
-        ConfigManger.Save();
+            Process.Start(startInfo);
+
+            if (ConfigManger.config!.lastOpens.Contains(item.OnlyKey!))
+                ConfigManger.config.lastOpens.Remove(item.OnlyKey!);
+            ConfigManger.config.lastOpens.Insert(0, item.OnlyKey!);
+            //if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
+            Search = "";
+            ConfigManger.Save();
+        });
     }
 }
