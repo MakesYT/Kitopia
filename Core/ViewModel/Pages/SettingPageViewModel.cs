@@ -127,9 +127,16 @@ public partial class SettingPageViewModel : ObservableRecipient
         }
         else
         {
-            RegistryKey registry =
-                Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run", true); //检索指定的子项
-            registry?.DeleteValue("Kitopia");
+            try
+            {
+                RegistryKey registry =
+                    Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                        true); //检索指定的子项
+                registry?.DeleteValue("Kitopia");
+            }
+            catch (Exception e)
+            {
+            }
         }
     }
 
