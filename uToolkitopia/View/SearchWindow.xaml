@@ -65,7 +65,6 @@
                 </Style>
             </DataGrid.CellStyle>
             <DataGrid.RowStyle>
-                <!-- 根据条件设置行的可见性 -->
                 <Style TargetType="DataGridRow">
                     <Setter Property="Visibility"
                             Value="{Binding IsVisible, Converter={StaticResource boolToVisibilityConverter}}" />
