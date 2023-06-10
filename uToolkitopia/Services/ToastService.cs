@@ -25,7 +25,7 @@ public class ToastService : IToastService
             .Show();
     }
 
-    public void showMessageBox(string Title, string Content, Action yesAction, Action noAction)
+    public void showMessageBox(string Title, string Content, Action? yesAction, Action? noAction)
     {
         Application.Current.Dispatcher.Invoke(() =>
         {
@@ -33,7 +33,11 @@ public class ToastService : IToastService
             msg.Title = Title;
             msg.Content = Content;
             msg.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            msg.CloseButtonText = "取消";
+            if (noAction is not null)
+            {
+                msg.CloseButtonText = "取消";
+            }
+
             msg.PrimaryButtonText = "确定";
             msg.FontSize = 15;
             var task = msg.ShowDialogAsync();

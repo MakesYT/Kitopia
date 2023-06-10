@@ -281,14 +281,16 @@ public partial class SearchWindowViewModel : ObservableRecipient
                         log.Debug("检测到文件路径");
                     }
 
-                    Items.Add(new SearchViewItem()
+                    SearchViewItem searchViewItem = new SearchViewItem()
                     {
                         FileInfo = new FileInfo(value),
                         FileName = "打开文件:" + LnkTools.GetLocalizedName(value) + "?",
                         OnlyKey = value,
                         FileType = FileType.文件,
                         IsVisible = true
-                    });
+                    };
+                    GetIconInItems(searchViewItem);
+                    Items.Add(searchViewItem);
                 }
                 else if (Directory.Exists(value))
                 {
@@ -297,7 +299,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                         log.Debug("检测到文件夹路径");
                     }
 
-                    Items.Add(new SearchViewItem()
+                    var searchViewItem = new SearchViewItem()
                     {
                         DirectoryInfo = new DirectoryInfo(value),
                         FileName = "打开" + value.Split("\\").Last() + "?",
@@ -305,7 +307,9 @@ public partial class SearchWindowViewModel : ObservableRecipient
                         OnlyKey = value,
                         Icon = null,
                         IsVisible = true
-                    });
+                    };
+                    GetIconInItems(searchViewItem);
+                    Items.Add(searchViewItem);
                 }
 
                 return;
@@ -481,6 +485,13 @@ public partial class SearchWindowViewModel : ObservableRecipient
             {
                 string fileName = ((IClipboardService)ServiceManager.Services.GetService(typeof(IClipboardService)))
                     .saveBitmap();
+                if (string.IsNullOrEmpty(fileName))
+                {
+                    log.Error("剪贴板图片保存失败");
+                    ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))).show("剪贴板图片保存失败");
+                    return;
+                }
+
                 ShellTools.ShellExecute(IntPtr.Zero, "open", "explorer.exe", "/select," + fileName, "",
                     ShellTools.ShowCommands.SW_SHOWNORMAL);
                 return;

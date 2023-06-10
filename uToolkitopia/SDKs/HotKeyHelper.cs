@@ -94,20 +94,26 @@ public class HotKeyHelper
             return true;
 
         // 注册热键
-        if (hotKeyModel.IsSelectCtrl && !hotKeyModel.IsSelectShift && !hotKeyModel.IsSelectAlt)
-            fsModifierKey = ModifierKeys.Control;
-        else if (!hotKeyModel.IsSelectCtrl && hotKeyModel.IsSelectShift && !hotKeyModel.IsSelectAlt)
-            fsModifierKey = ModifierKeys.Shift;
-        else if (!hotKeyModel.IsSelectCtrl && !hotKeyModel.IsSelectShift && hotKeyModel.IsSelectAlt)
-            fsModifierKey = ModifierKeys.Alt;
-        else if (hotKeyModel.IsSelectCtrl && hotKeyModel.IsSelectShift && !hotKeyModel.IsSelectAlt)
-            fsModifierKey = ModifierKeys.Control | ModifierKeys.Shift;
-        else if (hotKeyModel.IsSelectCtrl && !hotKeyModel.IsSelectShift && hotKeyModel.IsSelectAlt)
-            fsModifierKey = ModifierKeys.Control | ModifierKeys.Alt;
-        else if (!hotKeyModel.IsSelectCtrl && hotKeyModel.IsSelectShift && hotKeyModel.IsSelectAlt)
-            fsModifierKey = ModifierKeys.Shift | ModifierKeys.Alt;
-        else if (hotKeyModel.IsSelectCtrl && hotKeyModel.IsSelectShift && hotKeyModel.IsSelectAlt)
-            fsModifierKey = ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt;
+        if (hotKeyModel.IsSelectShift)
+        {
+            fsModifierKey |= ModifierKeys.Shift;
+        }
+
+        if (hotKeyModel.IsSelectWin)
+        {
+            fsModifierKey |= ModifierKeys.Windows;
+        }
+
+        if (hotKeyModel.IsSelectAlt)
+        {
+            fsModifierKey |= ModifierKeys.Alt;
+        }
+
+        if (hotKeyModel.IsSelectCtrl)
+        {
+            fsModifierKey |= ModifierKeys.Control;
+        }
+
 
         return HotKeyTools.RegisterHotKey(hWnd, m_HotKeySettingsDic[hotKeySetting], fsModifierKey,
             (int)hotKeyModel.SelectKey);

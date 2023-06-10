@@ -11,6 +11,30 @@ namespace Kitopia.Controls;
 
 public class HotKeyShow : Wpf.Ui.Controls.Button
 {
+    public enum KeyTypeE
+    {
+        CtrlAlt = 1010,
+        CtrlShift = 1100,
+        CtrlShiftAlt = 1110,
+        Alt = 0010,
+        AltShift = 0110,
+        Win = 0001,
+        WinShift = 0101,
+        WinAlt = 0011,
+        Shift = 0100
+    }
+
+    [Bindable(true), Category("KeyType")]
+    public KeyTypeE KeyType
+    {
+        get => (KeyTypeE)GetValue(KeyTypeProperty);
+        set => SetValue(KeyTypeProperty, value);
+    }
+
+    public static readonly DependencyProperty KeyTypeProperty = DependencyProperty.Register(nameof(KeyType),
+        typeof(KeyTypeE), typeof(Button),
+        new PropertyMetadata(KeyTypeE.Alt));
+
     [Bindable(true), Category("KeyName")]
     public string KeyName
     {
@@ -20,5 +44,5 @@ public class HotKeyShow : Wpf.Ui.Controls.Button
 
     public static readonly DependencyProperty KeyNameProperty = DependencyProperty.Register(nameof(KeyName),
         typeof(string), typeof(Button),
-        new PropertyMetadata(""));
+        new PropertyMetadata("空格"));
 }

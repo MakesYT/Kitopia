@@ -30,6 +30,8 @@
             <crt:IfNullVisibilityHidden x:Key="IfNullVisibilityHidden"/>
             <crt:StarBoolToText x:Key="StarBoolToText"/>
             <crt:SearchItemToInfo x:Key="SearchItemToInfo"/>
+            <crt:HotKeysToHotKeyShow x:Key="HotKeysToHotKeyShow"/>
+            <crt:HotKeysToKeyName x:Key="HotKeysToKeyName"/>
         </ResourceDictionary>
 
     </Application.Resources>

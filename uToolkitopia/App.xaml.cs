@@ -151,6 +151,51 @@ public sealed partial class App : Application
                 }
             });
         }
+        else if (!registry.GetValue("Kitopia").Equals($"\"{strName}\""))
+        {
+            MessageBox msg = new MessageBox();
+            msg.Title = "Kitopia";
+            msg.Content = "是否重新设置开机自启?当前自启与程序不符\n可能被杀毒软件阻止      ";
+            msg.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            msg.CloseButtonText = "取消";
+            msg.PrimaryButtonText = "确定";
+            msg.FontSize = 15;
+            var task = msg.ShowDialogAsync();
+            // 使用ContinueWith来在任务完成后执行一个回调函数
+            task.ContinueWith(e =>
+            {
+                MessageBoxResult result = e.Result;
+                switch (result)
+                {
+                    case MessageBoxResult.Primary:
+                    {
+                        log.Info("用户确认启用开机自启");
+                        try
+                        {
+                            registry.SetValue("Kitopia", $"\"{strName}\""); //设置该子项的新的“键值对”
+                            new ToastContentBuilder()
+                                .AddText("开机自启设置成功")
+                                .Show();
+                        }
+                        catch (Exception exception)
+                        {
+                            log.Error("开机自启设置失败");
+                            log.Error(exception.StackTrace);
+                            new ToastContentBuilder()
+                                .AddText("开机自启设置失败,请检查杀毒软件后重试")
+                                .Show();
+                        }
+
+                        break;
+                    }
+                    case MessageBoxResult.None:
+                    {
+                        log.Info("用户取消启用开机自启");
+                        break;
+                    }
+                }
+            });
+        }
         else if (ConfigManger.config.debugMode)
         {
             log.Debug("程序自启已存在");

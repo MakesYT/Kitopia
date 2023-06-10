@@ -5,7 +5,7 @@
 /// </summary>
 public enum EKey
 {
-    Space = 32,
+    空格 = 32,
     Left = 37,
     Up = 38,
     Right = 39,

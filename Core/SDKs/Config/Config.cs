@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System.ComponentModel;
+using System.Runtime.Serialization;
 using Core.SDKs.HotKey;
 
 namespace Core.SDKs.Config;
@@ -21,12 +22,12 @@ public record Config
 
     public List<string> customCollections = new();
 
-    public List<HotKeyModel> hotKeys = new()
+    public BindingList<HotKeyModel> hotKeys = new()
     {
         new HotKeyModel
         {
-            Name = "显示搜索框", IsUsable = true, IsSelectCtrl = false, IsSelectAlt = true,
-            IsSelectShift = false, SelectKey = EKey.Space
+            Name = "显示搜索框", IsUsable = true, IsSelectCtrl = false, IsSelectAlt = true, IsSelectWin = false,
+            IsSelectShift = false, SelectKey = EKey.空格
         }
     };
 

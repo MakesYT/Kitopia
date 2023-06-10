@@ -1,6 +1,9 @@
 ﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.Config;
+using Core.SDKs.HotKey;
 using Core.SDKs.Services;
 using log4net;
 using Microsoft.Win32;
@@ -24,6 +27,7 @@ public partial class SettingPageViewModel : ObservableRecipient
     [ObservableProperty] public string themeChoice = "跟随系统";
     [ObservableProperty] public bool useEverything = true;
     [ObservableProperty] public bool debugMode = false;
+    [ObservableProperty] public BindingList<HotKeyModel> hotKeys;
 
     public SettingPageViewModel()
     {
@@ -33,7 +37,14 @@ public partial class SettingPageViewModel : ObservableRecipient
         MaxHistory = ConfigManger.config.maxHistory;
         CanReadClipboard = ConfigManger.config.canReadClipboard;
         DebugMode = ConfigManger.config.debugMode;
+        HotKeys = ConfigManger.config.hotKeys;
+        WeakReferenceMessenger.Default.Register<string, string>(this, "hotkey", (r, m) =>
+        {
+            HotKeys = ConfigManger.config.hotKeys;
+            OnPropertyChanged(nameof(HotKeys));
+        });
     }
+
 
     partial void OnThemeChoiceChanged(string value)
     {

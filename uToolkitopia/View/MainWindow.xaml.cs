@@ -1,23 +1,20 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Windows;
-using System.Windows.Data;
 using System.Windows.Interop;
 using Core.SDKs.Services;
-using Kitopia.SDKs;
 using Microsoft.Extensions.DependencyInjection;
-using Wpf.Ui.Controls.Navigation;
 using Wpf.Ui.Controls.Window;
 
 namespace Kitopia.View;
 
-public partial class MainWindow : FluentWindow
+public partial class MainWindow
 {
     public MainWindow()
     {
         InitializeComponent();
-        
     }
+
     protected override void OnSourceInitialized(EventArgs e)
     {
         base.OnSourceInitialized(e);
@@ -29,7 +26,6 @@ public partial class MainWindow : FluentWindow
         {
             WindowBackdrop.ApplyBackdrop(m_Hwnd, WindowBackdropType.Acrylic);
         });
-        
     }
 
     private void MainWindow_OnClosing(object? sender, CancelEventArgs e)
@@ -41,7 +37,5 @@ public partial class MainWindow : FluentWindow
 
     private void ThemeButton_OnClick(object sender, RoutedEventArgs e)
     {
-        
-        
     }
 }

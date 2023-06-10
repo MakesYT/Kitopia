@@ -15,9 +15,6 @@ using Wpf.Ui.Controls;
 
 namespace Kitopia;
 
-/// <summary>
-///     MainWindows.xaml 的交互逻辑
-/// </summary>
 public partial class InitWindow
 {
     /// <summary>
@@ -95,7 +92,7 @@ public partial class InitWindow
     /// </summary>
     /// <param name="hotKeyModelList">待注册热键的项</param>
     /// <returns>true:保存快捷键的值；false:弹出设置窗体</returns>
-    private bool InitHotKey()
+    public bool InitHotKey()
     {
         var list = ConfigManger.config.hotKeys;
         // 注册全局快捷键

@@ -1,24 +1,30 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using Core.SDKs.Services;
 using Core.ViewModel.Pages;
+using Kitopia.Controls;
+using Kitopia.Controls.HotKeyEditor;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Kitopia.View.Pages;
 
-public partial class SettingPage :  Page
+public partial class SettingPage : Page
 {
-  
     public SettingPage()
     {
-       
         DataContext = ServiceManager.Services.GetService<SettingPageViewModel>();
         InitializeComponent();
     }
 
-    private void NumberBox_OnValueChanged(object sender, RoutedEventArgs e)
+
+    private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
     {
-        Console.WriteLine(2);
+        HotKeyEditorWindow hotKeyEditor = new HotKeyEditorWindow(((HotKeyShow)sender).Tag.ToString());
+        hotKeyEditor.Height = ServiceManager.Services.GetService<MainWindow>().Height / 2;
+        hotKeyEditor.Width = ServiceManager.Services.GetService<MainWindow>().Width / 2;
+        hotKeyEditor.Owner = ServiceManager.Services.GetService<MainWindow>();
+        hotKeyEditor.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+        hotKeyEditor.Title = "修改快捷键";
+        hotKeyEditor.ShowDialog();
     }
 }
