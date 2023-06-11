@@ -34,9 +34,9 @@ public partial class InitWindow
         InitializeComponent();
         DataContext = ServiceManager.Services.GetService<InitWindowsViewModel>();
         var currentTheme = Wpf.Ui.Appearance.Theme.GetAppTheme();
-        if (ConfigManger.config.themeChoice == "跟随系统" && !Wpf.Ui.Appearance.Theme.IsAppMatchesSystem())
+        if (ConfigManger.Config.themeChoice == "跟随系统" && !Wpf.Ui.Appearance.Theme.IsAppMatchesSystem())
         {
-            if (ConfigManger.config.debugMode)
+            if (ConfigManger.Config.debugMode)
             {
                 log.Debug("主题跟随系统,当前不符合切换主题");
             }
@@ -45,9 +45,9 @@ public partial class InitWindow
                 ? Wpf.Ui.Appearance.ThemeType.Dark
                 : Wpf.Ui.Appearance.ThemeType.Light);
         }
-        else if (ConfigManger.config.themeChoice == "深色")
+        else if (ConfigManger.Config.themeChoice == "深色")
         {
-            if (ConfigManger.config.debugMode)
+            if (ConfigManger.Config.debugMode)
             {
                 log.Debug("主题切换到深色");
             }
@@ -79,7 +79,7 @@ public partial class InitWindow
     {
         base.OnContentRendered(e);
         // 注册热键
-        if (ConfigManger.config.debugMode)
+        if (ConfigManger.Config.debugMode)
         {
             log.Debug("注册热键");
         }
@@ -94,7 +94,7 @@ public partial class InitWindow
     /// <returns>true:保存快捷键的值；false:弹出设置窗体</returns>
     public bool InitHotKey()
     {
-        var list = ConfigManger.config.hotKeys;
+        var list = ConfigManger.Config.hotKeys;
         // 注册全局快捷键
         var failList = HotKeyHelper.RegisterGlobalHotKey(list, m_Hwnd, out m_HotKeySettings);
         if (string.IsNullOrEmpty(failList))
@@ -123,7 +123,7 @@ public partial class InitWindow
                 var sid = wideParam.ToInt32();
                 if (sid == m_HotKeySettings["显示搜索框"])
                 {
-                    if (ConfigManger.config.debugMode)
+                    if (ConfigManger.Config.debugMode)
                     {
                         log.Debug("显示搜索框热键被触发");
                     }
@@ -140,7 +140,7 @@ public partial class InitWindow
                         ServiceManager.Services.GetService<SearchWindow>().Topmost = true;
                         ServiceManager.Services.GetService<SearchWindow>().tx.Focus();
                         ServiceManager.Services.GetService<SearchWindow>().Topmost = false;
-                        if (ConfigManger.config.canReadClipboard)
+                        if (ConfigManger.Config.canReadClipboard)
                         {
                             IDataObject data = Clipboard.GetDataObject();
                             if (data.GetDataPresent(DataFormats.Text))

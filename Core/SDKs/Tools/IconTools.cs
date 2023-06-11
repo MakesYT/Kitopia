@@ -46,7 +46,7 @@ public class IconTools
     public Icon GetIcon(string path)
     {
         string cacheKey;
-        bool mscFile = false;
+        var mscFile = false;
         switch (path.ToLower().Split(".").Last())
         {
             case "docx":
@@ -81,7 +81,7 @@ public class IconTools
 
         if (mscFile)
         {
-            int index = 0;
+            var index = 0;
             string dllPath;
             XmlDocument xd = new XmlDocument();
             xd.Load(path); //加载xml文档

@@ -69,7 +69,7 @@ public sealed partial class App : Application
             log.Info("Ioc初始化完成");
             ConfigManger.Init();
             log.Info("配置文件初始化完成");
-            if (ConfigManger.config.debugMode)
+            if (ConfigManger.Config.debugMode)
             {
                 log.Debug("注意Debug模式已启用,如非必要请关闭该模式");
                 System.Windows.MessageBox.Show("注意Debug模式已启用,如非必要请关闭该模式", "Kitopia");
@@ -80,7 +80,7 @@ public sealed partial class App : Application
             Current.MainWindow = ServiceManager.Services.GetService<MainWindow>();
             ServicePointManager.DefaultConnectionLimit = 10240;
 
-            if (ConfigManger.config.autoStart)
+            if (ConfigManger.Config.autoStart)
             {
                 log.Info("设置开机自启");
                 SetAutoStartup();
@@ -196,7 +196,7 @@ public sealed partial class App : Application
                 }
             });
         }
-        else if (ConfigManger.config.debugMode)
+        else if (ConfigManger.Config.debugMode)
         {
             log.Debug("程序自启已存在");
         }

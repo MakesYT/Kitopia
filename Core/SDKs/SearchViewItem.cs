@@ -20,7 +20,7 @@ public class SearchViewItem : ICloneable, IDisposable
     {
         set;
         get;
-    } = false;
+    }
 
     public bool IsPined
     {
@@ -56,7 +56,7 @@ public class SearchViewItem : ICloneable, IDisposable
     {
         set;
         get;
-    }
+    } = "";
 
     public string? Url
     {
@@ -68,7 +68,7 @@ public class SearchViewItem : ICloneable, IDisposable
     {
         set;
         get;
-    } = 0;
+    }
 
     public Icon? Icon
     {

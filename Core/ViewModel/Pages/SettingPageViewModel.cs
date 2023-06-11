@@ -20,27 +20,27 @@ public partial class SettingPageViewModel : ObservableRecipient
     [ObservableProperty]
     private IList<string> _themeChoiceOptions = new ObservableCollection<string> { "跟随系统", "深色", "浅色" };
 
-    [ObservableProperty] public bool autoStart = true;
-    [ObservableProperty] public bool canReadClipboard = true;
-    [ObservableProperty] public int inputSmoothingMilliseconds = 50;
-    [ObservableProperty] public int maxHistory = 4;
-    [ObservableProperty] public string themeChoice = "跟随系统";
-    [ObservableProperty] public bool useEverything = true;
-    [ObservableProperty] public bool debugMode = false;
-    [ObservableProperty] public BindingList<HotKeyModel> hotKeys;
+    [ObservableProperty] private bool _autoStart = true;
+    [ObservableProperty] private bool _canReadClipboard = true;
+    [ObservableProperty] private int _inputSmoothingMilliseconds = 50;
+    [ObservableProperty] private int _maxHistory = 4;
+    [ObservableProperty] private string _themeChoice = "跟随系统";
+    [ObservableProperty] private bool _useEverything = true;
+    [ObservableProperty] private bool _debugMode;
+    [ObservableProperty] private BindingList<HotKeyModel> _hotKeys;
 
     public SettingPageViewModel()
     {
-        ThemeChoice = ConfigManger.config.themeChoice;
-        AutoStart = ConfigManger.config.autoStart;
-        UseEverything = ConfigManger.config.useEverything;
-        MaxHistory = ConfigManger.config.maxHistory;
-        CanReadClipboard = ConfigManger.config.canReadClipboard;
-        DebugMode = ConfigManger.config.debugMode;
-        HotKeys = ConfigManger.config.hotKeys;
-        WeakReferenceMessenger.Default.Register<string, string>(this, "hotkey", (r, m) =>
+        ThemeChoice = ConfigManger.Config.themeChoice;
+        AutoStart = ConfigManger.Config.autoStart;
+        UseEverything = ConfigManger.Config.useEverything;
+        MaxHistory = ConfigManger.Config.maxHistory;
+        CanReadClipboard = ConfigManger.Config.canReadClipboard;
+        DebugMode = ConfigManger.Config.debugMode;
+        HotKeys = ConfigManger.Config.hotKeys;
+        WeakReferenceMessenger.Default.Register<string, string>(this, "hotkey", (_, _) =>
         {
-            HotKeys = ConfigManger.config.hotKeys;
+            HotKeys = ConfigManger.Config.hotKeys;
             OnPropertyChanged(nameof(HotKeys));
         });
     }
@@ -69,38 +69,38 @@ public partial class SettingPageViewModel : ObservableRecipient
             }
         }
 
-        ConfigManger.config.themeChoice = value;
+        ConfigManger.Config.themeChoice = value;
         ConfigManger.Save();
     }
 
     partial void OnInputSmoothingMillisecondsChanged(int value)
     {
-        ConfigManger.config.inputSmoothingMilliseconds = value;
+        ConfigManger.Config.inputSmoothingMilliseconds = value;
         ConfigManger.Save();
     }
 
     partial void OnDebugModeChanged(bool value)
     {
-        ConfigManger.config.debugMode = value;
+        ConfigManger.Config.debugMode = value;
         ConfigManger.Save();
     }
 
 
     partial void OnMaxHistoryChanged(int value)
     {
-        ConfigManger.config.maxHistory = value;
+        ConfigManger.Config.maxHistory = value;
         ConfigManger.Save();
     }
 
     partial void OnCanReadClipboardChanged(bool value)
     {
-        ConfigManger.config.canReadClipboard = value;
+        ConfigManger.Config.canReadClipboard = value;
         ConfigManger.Save();
     }
 
     partial void OnAutoStartChanged(bool value)
     {
-        ConfigManger.config.autoStart = value;
+        ConfigManger.Config.autoStart = value;
         ConfigManger.Save();
         if (value)
         {
@@ -134,7 +134,7 @@ public partial class SettingPageViewModel : ObservableRecipient
                         true); //检索指定的子项
                 registry?.DeleteValue("Kitopia");
             }
-            catch (Exception e)
+            catch (Exception)
             {
             }
         }
@@ -142,7 +142,7 @@ public partial class SettingPageViewModel : ObservableRecipient
 
     partial void OnUseEverythingChanged(bool value)
     {
-        ConfigManger.config.useEverything = value;
+        ConfigManger.Config.useEverything = value;
         ((SearchWindowViewModel)ServiceManager.Services.GetService(typeof(SearchWindowViewModel))).EverythingIsOk =
             !value;
         ConfigManger.Save();

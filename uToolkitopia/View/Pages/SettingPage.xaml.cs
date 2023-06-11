@@ -3,7 +3,6 @@ using System.Windows.Controls;
 using Core.SDKs.Services;
 using Core.ViewModel.Pages;
 using Kitopia.Controls;
-using Kitopia.Controls.HotKeyEditor;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Kitopia.View.Pages;

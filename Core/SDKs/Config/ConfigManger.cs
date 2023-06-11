@@ -1,10 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using log4net;
+using Newtonsoft.Json;
 
 namespace Core.SDKs.Config;
 
 public class ConfigManger
 {
-    public static Config config;
+    public static Config Config = new();
+    private static readonly ILog Log = LogManager.GetLogger(nameof(ConfigManger));
 
     public static void Init()
     {
@@ -16,8 +18,16 @@ public class ConfigManger
         }
 
         var json = File.ReadAllText(configF.FullName);
-
-        config = JsonConvert.DeserializeObject<Config>(json);
+        try
+        {
+            Config = JsonConvert.DeserializeObject<Config>(json)!;
+        }
+        catch (Exception e)
+        {
+            Log.Error(e);
+            Log.Error("配置文件加载失败");
+            Config = new Config();
+        }
     }
 
 
@@ -25,6 +35,6 @@ public class ConfigManger
     {
         var configF = new FileInfo(AppDomain.CurrentDomain.BaseDirectory + "config.json");
 
-        File.WriteAllText(configF.FullName, JsonConvert.SerializeObject(config, Formatting.Indented));
+        File.WriteAllText(configF.FullName, JsonConvert.SerializeObject(Config, Formatting.Indented));
     }
 }

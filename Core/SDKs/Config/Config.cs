@@ -39,6 +39,8 @@ public record Config
 
 
     [OnDeserializing]
+    // ReSharper disable once UnusedMember.Local
+    // ReSharper disable once UnusedParameter.Local
     private void OnDeserializing(StreamingContext context) //反序列化时hotkeys的默认值会被添加,需要先清空
     {
         // 清空hotKeys列表

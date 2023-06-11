@@ -8,7 +8,7 @@ using Core.SDKs.HotKey;
 using Core.SDKs.Services;
 using Wpf.Ui.Controls.Window;
 
-namespace Kitopia.Controls.HotKeyEditor;
+namespace Kitopia.View;
 
 public partial class HotKeyEditorWindow : FluentWindow
 {
@@ -17,9 +17,8 @@ public partial class HotKeyEditorWindow : FluentWindow
     public HotKeyEditorWindow(string name)
     {
         this.name = name;
-        DataContext = new HotKeyEditorViewModel();
         InitializeComponent();
-        var hotKeyModel = ConfigManger.config.hotKeys.FirstOrDefault((e) =>
+        var hotKeyModel = ConfigManger.Config.hotKeys.FirstOrDefault((e) =>
         {
             if (e.Name.Equals(name))
             {
@@ -100,7 +99,7 @@ public partial class HotKeyEditorWindow : FluentWindow
 
     private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
     {
-        var hotKeyModel = ConfigManger.config.hotKeys.FirstOrDefault((e) =>
+        var hotKeyModel = ConfigManger.Config.hotKeys.FirstOrDefault((e) =>
         {
             if (e.Name.Equals(name))
             {

@@ -11,7 +11,7 @@ public class ThemeChange : IThemeChange
 
     public void changeTo(string name)
     {
-        if (ConfigManger.config.debugMode)
+        if (ConfigManger.Config.debugMode)
         {
             log.Debug(nameof(ThemeChange) + "的接口" + nameof(changeTo) + "被调用");
         }
@@ -30,7 +30,7 @@ public class ThemeChange : IThemeChange
 
     public void changeAnother()
     {
-        if (ConfigManger.config.debugMode)
+        if (ConfigManger.Config.debugMode)
         {
             log.Debug(nameof(ThemeChange) + "的接口" + nameof(changeAnother) + "被调用");
         }
@@ -44,7 +44,7 @@ public class ThemeChange : IThemeChange
 
     public void followSys(bool follow)
     {
-        if (ConfigManger.config.debugMode)
+        if (ConfigManger.Config.debugMode)
         {
             log.Debug(nameof(ThemeChange) + "的接口" + nameof(follow) + "被调用");
         }
@@ -63,7 +63,7 @@ public class ThemeChange : IThemeChange
 
     public bool isDark()
     {
-        if (ConfigManger.config.debugMode)
+        if (ConfigManger.Config.debugMode)
         {
             log.Debug(nameof(ThemeChange) + "的接口" + nameof(isDark) + "被调用");
         }

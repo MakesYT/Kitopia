@@ -15,7 +15,7 @@ public class ToastService : IToastService
 
     public void show(string text)
     {
-        if (ConfigManger.config.debugMode)
+        if (ConfigManger.Config.debugMode)
         {
             log.Debug(nameof(ToastService) + "的接口" + nameof(show) + "被调用");
         }

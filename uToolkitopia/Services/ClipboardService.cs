@@ -14,7 +14,7 @@ public class ClipboardService : IClipboardService
 
     public bool IsBitmap()
     {
-        if (ConfigManger.config.debugMode)
+        if (ConfigManger.Config.debugMode)
         {
             log.Debug(nameof(ClipboardService) + "的接口" + nameof(IsBitmap) + "被调用");
         }
@@ -25,7 +25,7 @@ public class ClipboardService : IClipboardService
 
     public Bitmap? GetBitmap()
     {
-        if (ConfigManger.config.debugMode)
+        if (ConfigManger.Config.debugMode)
         {
             log.Debug(nameof(ClipboardService) + "的接口" + nameof(GetBitmap) + "被调用");
         }
@@ -42,7 +42,7 @@ public class ClipboardService : IClipboardService
     [STAThread]
     public string saveBitmap()
     {
-        if (ConfigManger.config.debugMode)
+        if (ConfigManger.Config.debugMode)
         {
             log.Debug(nameof(ClipboardService) + "的接口" + nameof(saveBitmap) + "被调用");
         }

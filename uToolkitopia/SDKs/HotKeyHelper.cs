@@ -51,7 +51,7 @@ public class HotKeyHelper
                     str += string.Format("+{0}", item.SelectKey);
                 str = string.Format("{0} ({1})\n\r", item.Name, str);
                 failList += str;
-                if (ConfigManger.config.debugMode)
+                if (ConfigManger.Config.debugMode)
                 {
                     log.Debug("注册热键失败:" + str);
                 }
@@ -71,7 +71,7 @@ public class HotKeyHelper
     {
         var fsModifierKey = new ModifierKeys();
         var hotKeySetting = hotKeyModel.Name;
-        if (ConfigManger.config.debugMode)
+        if (ConfigManger.Config.debugMode)
         {
             log.Debug("注册热键:" + hotKeySetting);
         }

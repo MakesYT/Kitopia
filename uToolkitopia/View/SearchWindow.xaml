@@ -51,7 +51,7 @@
                     IsClosable="False" />
         <ui:DataGrid VerticalScrollBarVisibility="Visible" IsReadOnly="True" x:Name="dataGrid" RowHeight="75"
                      GridLinesVisibility="None"
-                     HeadersVisibility="None" MaxHeight="385" ItemsSource="{Binding Items}" AutoGenerateColumns="False"
+                     HeadersVisibility="None" MaxHeight="385" ItemsSource="{Binding Items,UpdateSourceTrigger=PropertyChanged}" AutoGenerateColumns="False"
                      Margin="0,10,0,0">
 
             <DataGrid.CellStyle>

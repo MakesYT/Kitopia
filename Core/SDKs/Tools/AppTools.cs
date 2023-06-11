@@ -13,7 +13,7 @@ public partial class AppTools
 
     public static void GetAllApps(List<SearchViewItem> collection, List<string> names)
     {
-        if (ConfigManger.config.debugMode)
+        if (ConfigManger.Config.debugMode)
         {
             log.Debug("索引全部软件及收藏项目");
         }
@@ -48,7 +48,7 @@ public partial class AppTools
                 }));
         }
 
-        foreach (var file in ConfigManger.config.customCollections)
+        foreach (var file in ConfigManger.Config.customCollections)
         {
             taskList.Add(Task.Run(() =>
             {
@@ -75,13 +75,13 @@ public partial class AppTools
         if (ErrorLnkList.Any())
         {
             StringBuilder c = new StringBuilder("检测到多个无效的快捷方式\n需要Kitopia帮你清理吗?(该功能每个错误快捷方式只提示一次)\n以下为无效的快捷方式列表:\n");
-            foreach (string s in ErrorLnkList)
+            foreach (var s in ErrorLnkList)
             {
                 c.AppendLine(s);
             }
 
             log.Debug(c.ToString());
-            ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))).showMessageBox("Kitopia建议",
+            ((IToastService)ServiceManager.Services!.GetService(typeof(IToastService))!).showMessageBox("Kitopia建议",
                 c.ToString(),
                 (() =>
                 {
@@ -92,10 +92,10 @@ public partial class AppTools
                         {
                             File.Delete(s);
                         }
-                        catch (Exception e)
+                        catch (Exception)
                         {
                             log.Debug("添加无效快捷方式记录:" + s);
-                            ConfigManger.config.errorLnk.Add(s);
+                            ConfigManger.Config.errorLnk.Add(s);
                             ConfigManger.Save();
                         }
                     }
@@ -106,7 +106,7 @@ public partial class AppTools
                     foreach (var s in ErrorLnkList)
                     {
                         log.Debug("添加无效快捷方式记录:" + s);
-                        ConfigManger.config.errorLnk.Add(s);
+                        ConfigManger.Config.errorLnk.Add(s);
                         ConfigManger.Save();
                     }
 
@@ -118,21 +118,21 @@ public partial class AppTools
 
     public static void AppSolverA(List<SearchViewItem> collection, List<string> names, string file, bool star = false)
     {
-        if (ConfigManger.config.debugMode)
+        if (ConfigManger.Config.debugMode)
         {
             log.Debug("索引:" + file);
         }
 
         if (star)
         {
-            if (ConfigManger.config.debugMode)
+            if (ConfigManger.Config.debugMode)
             {
                 log.Debug("索引为收藏项目:" + file);
             }
 
             if (names.Contains(file))
             {
-                if (ConfigManger.config.debugMode)
+                if (ConfigManger.Config.debugMode)
                 {
                     log.Debug("重复跳过索引:" + file);
                 }
@@ -174,7 +174,7 @@ public partial class AppTools
                 });
             }
 
-            if (ConfigManger.config.debugMode)
+            if (ConfigManger.Config.debugMode)
             {
                 log.Debug("完成索引:" + file);
             }
@@ -188,7 +188,7 @@ public partial class AppTools
         {
             if (names.Contains(refFileInfo.FullName))
             {
-                if (ConfigManger.config.debugMode)
+                if (ConfigManger.Config.debugMode)
                 {
                     log.Debug("重复索引:" + file);
                 }
@@ -198,12 +198,12 @@ public partial class AppTools
         }
         else
         {
-            if (ConfigManger.config.debugMode)
+            if (ConfigManger.Config.debugMode)
             {
                 log.Debug("无效索引:\n" + file + "\n目标位置:" + refFileInfo.FullName);
             }
 
-            if (!ErrorLnkList.Contains(file) && !ConfigManger.config.errorLnk.Contains(file))
+            if (!ErrorLnkList.Contains(file) && !ConfigManger.Config.errorLnk.Contains(file))
             {
                 ErrorLnkList.Add(file);
             }
@@ -237,14 +237,14 @@ public partial class AppTools
                     });
                 }
             }
-            if (ConfigManger.config.debugMode)
+            if (ConfigManger.Config.debugMode)
             {
                 log.Debug("完成索引:" + file);
             }
         }
         else
         {
-            if (ConfigManger.config.debugMode)
+            if (ConfigManger.Config.debugMode)
             {
                 log.Debug("不符合要求跳过索引:" + file);
             }

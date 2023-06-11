@@ -1,20 +1,12 @@
-﻿<ui:FluentWindow x:Class="Kitopia.Controls.HotKeyEditor.HotKeyEditorWindow"
+﻿<ui:FluentWindow x:Class="Kitopia.View.HotKeyEditorWindow"
                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                 xmlns:local="clr-namespace:Kitopia.Controls.HotKeyEditor"
                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-                 xmlns:converter="clr-namespace:Kitopia.Converter"
                  xmlns:controls="clr-namespace:Kitopia.Controls"
                  mc:Ignorable="d"
                  Title="HotKeyEditorWindow" Height="225" Width="400" KeyDown="HotKeyEditorWindow_OnKeyDown" KeyUp="HotKeyEditorWindow_OnKeyUp">
-    <ui:FluentWindow.Resources>
-        <local:ContentDialogButtonEnumToBoolConverter x:Key="EnumToBoolConverter" />
-        <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-
-        <CornerRadius x:Key="DialogFooterCornerRadius">0,0,8,8</CornerRadius>
-    </ui:FluentWindow.Resources>
     <Grid>
         <Grid Focusable="False">
             <Grid.Background>

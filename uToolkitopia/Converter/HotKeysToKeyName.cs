@@ -10,7 +10,7 @@ public class HotKeysToKeyName : IValueConverter
 {
     public object Convert(object? value, Type targetType, object parameter, CultureInfo culture)
     {
-        var hotKeyModel = ConfigManger.config.hotKeys.FirstOrDefault(e =>
+        var hotKeyModel = ConfigManger.Config.hotKeys.FirstOrDefault(e =>
         {
             if (e.Name.Equals(parameter))
             {
