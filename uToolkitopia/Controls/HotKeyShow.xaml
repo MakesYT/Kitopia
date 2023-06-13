@@ -32,25 +32,30 @@
     <Style x:Key="DefaultHotKeyShowStyle" TargetType="{x:Type controls:HotKeyShow}">
         <Setter Property="Padding" Value="0" />
         <Setter Property="Margin" Value="0" />
+        <Setter Property="Foreground">
+            <Setter.Value>
+                <SolidColorBrush Color="{DynamicResource TextFillColorPrimary}" />
+            </Setter.Value>
+        </Setter>
         <Setter Property="KeyName" Value="空格" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type controls:HotKeyShow}">
                     <ui:Button Padding="10" Margin="0" Command="{TemplateBinding Command}">
                         <StackPanel Orientation="Horizontal" Height="{TemplateBinding Height}">
-                            <controls:HotKeyShowItme x:Name="Ctrl" Appearance="Primary"
+                            <controls:HotKeyShowItme x:Name="Ctrl" Appearance="Primary" Foreground="{TemplateBinding Foreground}"
                                                      FontSize="20" Content="Ctrl" Margin="0" Height="40"/>
-                            <controls:HotKeyShowItme x:Name="Win" Appearance="Primary" Height="40"
+                            <controls:HotKeyShowItme x:Name="Win" Appearance="Primary" Height="40" Foreground="{TemplateBinding Foreground}"
                                                      Margin="5,0,0,0">
                                 <controls:HotKeyShowItme.Icon>
                                     <ui:ImageIcon Source="{StaticResource _WinImage}" Width="26" Height="26" />
                                 </controls:HotKeyShowItme.Icon>
                             </controls:HotKeyShowItme>
-                            <controls:HotKeyShowItme x:Name="Shift" Appearance="Primary" FontSize="20"
+                            <controls:HotKeyShowItme x:Name="Shift" Appearance="Primary" FontSize="20" Foreground="{TemplateBinding Foreground}"
                                                      Content="Shift" Margin="5,0,0,0" Height="40" />
-                            <controls:HotKeyShowItme x:Name="Alt" Appearance="Primary" FontSize="20" Content="Alt" Margin="5,0,0,0"
+                            <controls:HotKeyShowItme x:Name="Alt" Appearance="Primary" FontSize="20" Content="Alt" Margin="5,0,0,0" Foreground="{TemplateBinding Foreground}"
                                                      Height="40" />
-                            <controls:HotKeyShowItme x:Name="KeyName" Appearance="Primary" FontSize="20"
+                            <controls:HotKeyShowItme x:Name="KeyName" Appearance="Primary" FontSize="20" Foreground="{TemplateBinding Foreground}"
                                                      Content="{TemplateBinding KeyName}" Margin="5,0,20,0" Height="40" />
                             <ui:SymbolIcon
                                 x:Name="ControlChevronIcon"

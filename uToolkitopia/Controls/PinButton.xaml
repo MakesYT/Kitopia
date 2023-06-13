@@ -54,7 +54,7 @@
                             <ui:SymbolIcon
                                 x:Name="ControlChevronIcon"
                                 ToolTip="{Binding IsChecked,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource StarBoolToText},ConverterParameter='Pin'}"
-                                FontSize="{StaticResource ExpanderChevronSize}"
+                                FontSize="25"
                                 Foreground="{TemplateBinding Foreground}"
                                 Filled="{TemplateBinding IsChecked}"
                                 Symbol="Pin20" />

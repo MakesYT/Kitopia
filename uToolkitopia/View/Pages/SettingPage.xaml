@@ -18,7 +18,7 @@
     <Page.Resources>
         
     </Page.Resources>
-    <ui:DynamicScrollViewer>
+   
         <StackPanel Margin="42">
             <Expander Header="个性化" FontSize="25" IsExpanded="True" FontWeight="Medium">
                 <Expander.Content>
@@ -27,7 +27,7 @@
                         <kitopia:SettingItems Title="主题颜色" Description="跟随系统,深色还是浅色?"> 
                             <ComboBox ItemsSource="{Binding ThemeChoiceOptions}" SelectedValue="{Binding ThemeChoice}" />
                             <kitopia:SettingItems.Icon>
-                                <ui:SymbolIcon Symbol="PaintBrush20" />
+                                <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25"/>
                             </kitopia:SettingItems.Icon>
                         </kitopia:SettingItems>
                     </StackPanel>
@@ -39,13 +39,13 @@
                         <kitopia:SettingItems Title="开机自动启动" Description="可能被杀毒软件阻止"> 
                             <ui:ToggleSwitch IsChecked="{Binding AutoStart}" />
                             <kitopia:SettingItems.Icon>
-                                <ui:SymbolIcon Symbol="FlashAuto20" />
+                                <ui:SymbolIcon Symbol="FlashAuto20" FontSize="25"/>
                             </kitopia:SettingItems.Icon>
                         </kitopia:SettingItems>
                         <kitopia:SettingItems Title="调试模式" Description="非必要不开启,重启软件后完全生效"> 
                             <ui:ToggleSwitch IsChecked="{Binding DebugMode}" />
                             <kitopia:SettingItems.Icon>
-                                <ui:SymbolIcon Symbol="Bug20" />
+                                <ui:SymbolIcon Symbol="Bug20" FontSize="25"/>
                             </kitopia:SettingItems.Icon>
                         </kitopia:SettingItems>
                     </StackPanel>
@@ -59,25 +59,25 @@
                             <kitopia:HotKeyShow Tag="显示搜索框" Click="ButtonBase_OnClick" KeyType="{Binding HotKeys,Converter={StaticResource HotKeysToHotKeyShow},ConverterParameter='显示搜索框',Mode=OneWay,NotifyOnSourceUpdated=True,UpdateSourceTrigger=PropertyChanged}"
                                                 KeyName="{Binding HotKeys,Converter={StaticResource HotKeysToKeyName},ConverterParameter='显示搜索框',Mode=OneWay,NotifyOnSourceUpdated=True,UpdateSourceTrigger=PropertyChanged}"/>
                             <kitopia:SettingItems.Icon>
-                                <ui:SymbolIcon Symbol="Keyboard20" />
+                                <ui:SymbolIcon Symbol="Keyboard20" FontSize="25"/>
                             </kitopia:SettingItems.Icon>
                         </kitopia:SettingItems>
                         <kitopia:SettingItems Title="允许程序调用Everything索引文档" Description="索引文档依赖于此功能"> 
                             <ui:ToggleSwitch Content="" IsChecked="{Binding UseEverything}" />
                             <kitopia:SettingItems.Icon>
-                                <ui:SymbolIcon Symbol="DocumentSearch20" />
+                                <ui:SymbolIcon Symbol="DocumentSearch20" FontSize="25"/>
                             </kitopia:SettingItems.Icon>
                         </kitopia:SettingItems>
                         <kitopia:SettingItems Title="允许程序读取剪贴板内容" Description="自动读取剪贴板路径和剪贴板图像保存依赖于此权限"> 
                             <ui:ToggleSwitch Content="" IsChecked="{Binding CanReadClipboard}" />
                             <kitopia:SettingItems.Icon>
-                                <ui:SymbolIcon Symbol="ClipboardSearch20" />
+                                <ui:SymbolIcon Symbol="ClipboardSearch20" FontSize="25"/>
                             </kitopia:SettingItems.Icon>
                         </kitopia:SettingItems>
                         <kitopia:SettingItems Title="最大历史数量" Description="决定在搜索框无搜索内容时显示最近打开软件的数量"> 
                             <ComboBox ItemsSource="{Binding MaxHistoryOptions}" SelectedValue="{Binding MaxHistory}" />
                             <kitopia:SettingItems.Icon>
-                                <ui:SymbolIcon Symbol="History20" />
+                                <ui:SymbolIcon Symbol="History20" FontSize="25"/>
                             </kitopia:SettingItems.Icon>
                         </kitopia:SettingItems>
                         <kitopia:SettingItems Title="输入平滑延时" Description="在指定时间内不处理数据以减轻性能消耗">
@@ -89,7 +89,7 @@
                                 
                             </StackPanel>
                             <kitopia:SettingItems.Icon>
-                                <ui:SymbolIcon Symbol="TopSpeed20" />
+                                <ui:SymbolIcon Symbol="TopSpeed20" FontSize="25"/>
                             </kitopia:SettingItems.Icon>
                         </kitopia:SettingItems>
                     </StackPanel>
@@ -97,5 +97,5 @@
             </Expander>
 
         </StackPanel>
-    </ui:DynamicScrollViewer>
+    
 </Page>

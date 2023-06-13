@@ -18,61 +18,38 @@ public partial class AppTools
             log.Debug("索引全部软件及收藏项目");
         }
 
-        List<Task> taskList = new List<Task>();
+        // 创建一个空的文件路径集合
+        List<string> filePaths = new List<string>();
 
-        foreach (var file in Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                     "*.lnk"))
-            taskList.Add(Task.Run(() =>
-            {
-                AppSolverA(collection, names, file);
-            }));
+// 把桌面上的.lnk文件路径添加到集合中
+        filePaths.AddRange(Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+            "*.lnk"));
 
-        foreach (var file in Directory.EnumerateFiles("C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs",
-                     "*.lnk"))
-            taskList.Add(Task.Run(() =>
-            {
-                AppSolverA(collection, names, file);
-            }));
-        foreach (var path in Directory.EnumerateDirectories("C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs",
-                     "*", SearchOption.AllDirectories))
+// 把开始菜单中的.lnk和.appref-ms文件路径添加到集合中
+        filePaths.AddRange(Directory.EnumerateFiles(@"C:\ProgramData\Microsoft\Windows\Start Menu\Programs", "*.lnk",
+            SearchOption.AllDirectories));
+        filePaths.AddRange(Directory.EnumerateFiles(@"C:\ProgramData\Microsoft\Windows\Start Menu\Programs",
+            "*.appref-ms", SearchOption.AllDirectories));
+
+// 把自定义集合中的文件路径添加到集合中
+        filePaths.AddRange(ConfigManger.Config.customCollections);
+
+// 把程序文件夹中的.lnk和.appref-ms文件路径添加到集合中
+        filePaths.AddRange(Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Programs),
+            "*.lnk", SearchOption.AllDirectories));
+        filePaths.AddRange(Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Programs),
+            "*.appref-ms", SearchOption.AllDirectories));
+        var options = new ParallelOptions();
+        options.MaxDegreeOfParallelism = 256;
+// 使用Parallel.ForEach并行执行AppSolverA方法
+        Parallel.ForEach(filePaths, options, file =>
         {
-            foreach (var file in Directory.EnumerateFiles(path, "*.lnk"))
-                taskList.Add(Task.Run(() =>
-                {
-                    AppSolverA(collection, names, file);
-                }));
-            foreach (var file in Directory.EnumerateFiles(path, "*.appref-ms"))
-                taskList.Add(Task.Run(() =>
-                {
-                    AppSolverA(collection, names, file);
-                }));
-        }
+            AppSolverA(collection, names, file);
+        });
 
-        foreach (var file in ConfigManger.Config.customCollections)
-        {
-            taskList.Add(Task.Run(() =>
-            {
-                AppSolverA(collection, names, file, true);
-            }));
-        }
-
-        foreach (var path in Directory.EnumerateDirectories(
-                     Environment.GetFolderPath(Environment.SpecialFolder.Programs), "*", SearchOption.AllDirectories))
-        {
-            foreach (var file in Directory.EnumerateFiles(path, "*.lnk"))
-                taskList.Add(Task.Run(() =>
-                {
-                    AppSolverA(collection, names, file);
-                }));
-            foreach (var file in Directory.EnumerateFiles(path, "*.appref-ms"))
-                taskList.Add(Task.Run(() =>
-                {
-                    AppSolverA(collection, names, file);
-                }));
-        }
-
-        Task.WaitAll(taskList.ToArray());
         if (ErrorLnkList.Any())
+            //if (false)
+
         {
             StringBuilder c = new StringBuilder("检测到多个无效的快捷方式\n需要Kitopia帮你清理吗?(该功能每个错误快捷方式只提示一次)\n以下为无效的快捷方式列表:\n");
             foreach (var s in ErrorLnkList)
@@ -183,6 +160,7 @@ public partial class AppTools
         }
 
         var fileInfo = new FileInfo(file);
+
         var refFileInfo = new FileInfo(LnkTools.ResolveShortcut(file));
         if (refFileInfo.Exists)
         {
@@ -255,24 +233,32 @@ public partial class AppTools
     //Console.WriteLine();
     private static void CreateCombinations(HashSet<string> keys, int startIndex, string pair, string[] initialArray)
     {
+        // 遍历初始数组中的元素
         for (var i = startIndex; i < initialArray.Length; i++)
         {
-            var value = $"{pair}{initialArray[i]}";
-            AddUtil(keys, value.ToLowerInvariant());
-            AddUtil(keys, Pinyin.GetInitials(value).Replace(" ", "").ToLowerInvariant());
-            AddUtil(keys, Pinyin.GetPinyin(value).Replace(" ", "").ToLowerInvariant());
-            AddUtil(keys, MyRegex().Replace(value, "").ToLowerInvariant());
+            // 使用StringBuilder来拼接字符串
+            var value = new StringBuilder(pair).Append(initialArray[i]).ToString();
+
+            // 使用ToLowerInvariant方法来统一字符串的大小写
+            var lowerValue = value.ToLowerInvariant();
+
+            // 添加原始字符串、拼音首字母、拼音全拼和去除非字母字符后的字符串到HashSet中
+            AddUtil(keys, lowerValue);
+            AddUtil(keys, Pinyin.GetInitials(value).ToLowerInvariant());
+            AddUtil(keys, Pinyin.GetPinyin(value).ToLowerInvariant());
+            AddUtil(keys, MyRegex().Replace(lowerValue, ""));
+
+            // 递归调用自身方法，生成更长的字符串组合
             CreateCombinations(keys, i + 1, value, initialArray);
         }
     }
 
 
     // 使用const或readonly修饰符来声明pattern字符串
-    public static void NameSolver(HashSet<string> keys, string name)
+    public static async Task NameSolver(HashSet<string> keys, string name)
     {
         var initials = name.Split(" ");
         CreateCombinations(keys, 0, "", initials);
-
         AddUtil(keys, Pinyin.GetInitials(name).Replace(" ", "").ToLowerInvariant());
         AddUtil(keys, Pinyin.GetPinyin(name).Replace(" ", "").ToLowerInvariant());
         AddUtil(keys,
@@ -281,9 +267,11 @@ public partial class AppTools
 
     private static void AddUtil(HashSet<string> keys, string name)
     {
-        if (string.IsNullOrEmpty(name)) return;
+        if (string.IsNullOrEmpty(name) || name.Length <= 1)
+        {
+            return;
+        }
 
-        if (name.Length <= 1) return;
 
         keys.Add(name);
     }

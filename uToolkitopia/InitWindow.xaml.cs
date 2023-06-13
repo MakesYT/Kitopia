@@ -185,6 +185,6 @@ public partial class InitWindow
 
     private void NotifyIcon_OnLeftDoubleClick(NotifyIcon sender, RoutedEventArgs e)
     {
-        ServiceManager.Services.GetService<MainWindow>().Visibility = Visibility.Visible;
+        ServiceManager.Services.GetService<MainWindow>().Show();
     }
 }

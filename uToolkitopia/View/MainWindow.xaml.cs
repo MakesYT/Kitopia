@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Interop;
 using Core.SDKs.Services;
 using Microsoft.Extensions.DependencyInjection;
+using Wpf.Ui.Contracts;
 using Wpf.Ui.Controls.Window;
 
 namespace Kitopia.View;
@@ -13,6 +14,9 @@ public partial class MainWindow
     public MainWindow()
     {
         InitializeComponent();
+        NavigationView.SetServiceProvider(ServiceManager.Services!);
+
+        ServiceManager.Services!.GetService<INavigationService>()!.SetNavigationControl(NavigationView);
     }
 
     protected override void OnSourceInitialized(EventArgs e)

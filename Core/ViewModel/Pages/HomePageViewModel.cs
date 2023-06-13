@@ -1,15 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Core.SDKs.Services;
 
 namespace Core.ViewModel.Pages;
 
-public partial class HomePageViewModel: ObservableRecipient
+public partial class HomePageViewModel : ObservableRecipient
 {
-    [ObservableProperty] public string name = "2";
-
     [RelayCommand]
     public void Click()
     {
-        
+        ((INavigationPageService)ServiceManager.Services!.GetService(typeof(INavigationPageService))).Navigate("设置");
     }
 }

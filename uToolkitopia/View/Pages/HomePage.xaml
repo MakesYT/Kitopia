@@ -17,6 +17,6 @@
         <Style TargetType="Border" />
     </Page.Resources>
     <StackPanel>
-        <kitopia:HotKeyShow />
+        <kitopia:HotKeyShow Command="{Binding ClickCommand}"/>
     </StackPanel>
 </Page>
