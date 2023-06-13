@@ -46,4 +46,10 @@
       <Folder Include="SDKs\Msgs\" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Reference Include="PluginCore">
+            <HintPath>..\PluginCore\bin\Debug\net7.0-windows\PluginCore.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+
 </Project>

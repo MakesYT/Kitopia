@@ -3,17 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:local="clr-namespace:Kitopia.View"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:pages="clr-namespace:Kitopia.View.Pages"
-        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-        xmlns:viewModel="clr-namespace:Core.ViewModel;assembly=Core"
         mc:Ignorable="d" Closing="MainWindow_OnClosing"
         WindowStartupLocation="CenterScreen" 
         ExtendsContentIntoTitleBar="True"
         WindowBackdropType="Acrylic"
         WindowCornerPreference="Round"
-        d:DataContext="{d:DesignInstance viewModel:MainWindowViewModel}"
         Title="Kitopia" Height="742" Width="1200" Visibility="Hidden">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -25,19 +21,24 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         
-        <ui:NavigationView Grid.Row="1"  PaneDisplayMode="LeftFluent" Grid.ColumnSpan="2" >
+        <ui:NavigationView x:Name="NavigationView" Grid.Row="1"  PaneDisplayMode="LeftFluent" Grid.ColumnSpan="2" >
 
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem Content="主页" FontSize="14"  Cursor="Hand" TargetPageType="pages:HomePage">
                     <ui:NavigationViewItem.Icon>
-                        <ui:SymbolIcon Symbol="Home24"></ui:SymbolIcon>
+                        <ui:SymbolIcon Symbol="Home24" FontSize="25" />
+                    </ui:NavigationViewItem.Icon>
+                </ui:NavigationViewItem>
+                <ui:NavigationViewItem Content="插件" FontSize="14"  Cursor="Hand" TargetPageType="pages:HomePage">
+                    <ui:NavigationViewItem.Icon>
+                        <ui:SymbolIcon Symbol="Apps24" FontSize="25" />
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
             </ui:NavigationView.MenuItems>
             <ui:NavigationView.FooterMenuItems>
                 <ui:NavigationViewItem Content="设置" FontSize="14" Cursor="Hand" TargetPageType="pages:SettingPage">
                     <ui:NavigationViewItem.Icon>
-                        <ui:SymbolIcon Symbol="Settings24"></ui:SymbolIcon>
+                        <ui:SymbolIcon Symbol="Settings24" FontSize="25" />
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
             </ui:NavigationView.FooterMenuItems>

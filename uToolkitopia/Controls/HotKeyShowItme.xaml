@@ -38,7 +38,7 @@
         </Setter>
         <Setter Property="Foreground">
             <Setter.Value>
-                <SolidColorBrush Color="{DynamicResource TextFillColorPrimary}" />
+                <SolidColorBrush Color="White" />
             </Setter.Value>
         </Setter>
         <Setter Property="PressedForeground">
@@ -101,7 +101,7 @@
                                     Grid.Column="1"
                                     VerticalAlignment="Center"
                                     Content="{TemplateBinding Content}"
-                                    TextElement.Foreground="{TemplateBinding Foreground}" />
+                                    TextElement.Foreground="White" />
                             </Grid>
                         </Border>
                     </Border>

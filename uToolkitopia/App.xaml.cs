@@ -13,10 +13,13 @@ using Core.ViewModel;
 using Core.ViewModel.Pages;
 using Kitopia.Services;
 using Kitopia.View;
+using Kitopia.View.Pages;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Win32;
+using Wpf.Ui.Contracts;
+using Wpf.Ui.Services;
 using MessageBox = Kitopia.Controls.MessageBoxControl.MessageBox;
 using MessageBoxResult = Kitopia.Controls.MessageBoxControl.MessageBoxResult;
 
@@ -66,9 +69,12 @@ public sealed partial class App : Application
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 #endif
             ServiceManager.Services = ConfigureServices();
+
             log.Info("Ioc初始化完成");
             ConfigManger.Init();
             log.Info("配置文件初始化完成");
+            ServiceManager.Services.GetService<PluginManager>().Init();
+            log.Info("插件管理器初始化完成");
             if (ConfigManger.Config.debugMode)
             {
                 log.Debug("注意Debug模式已启用,如非必要请关闭该模式");
@@ -209,8 +215,11 @@ public sealed partial class App : Application
     {
         var services = new ServiceCollection();
         services.AddSingleton<IconTools>();
+        services.AddSingleton<PluginManager>();
         services.AddTransient<IThemeChange, ThemeChange>();
         services.AddTransient<IToastService, ToastService>();
+        services.AddSingleton<INavigationService, NavigationService>();
+        services.AddTransient<INavigationPageService, NavigationPageService>();
         services.AddTransient<IClipboardService, ClipboardService>();
         services.AddSingleton<SearchWindowViewModel>(e =>
         {
@@ -236,10 +245,21 @@ public sealed partial class App : Application
         {
             return new MainWindow { DataContext = sq.GetService<MainWindowViewModel>() };
         });
-        services.AddTransient<HomePageViewModel>();
         services.AddTransient<SettingPageViewModel>(e =>
         {
             return new SettingPageViewModel { IsActive = true };
+        });
+        services.AddTransient<SettingPage>(e =>
+        {
+            return new SettingPage() { DataContext = e.GetService<SettingPageViewModel>() };
+        });
+        services.AddTransient<HomePageViewModel>(e =>
+        {
+            return new HomePageViewModel { IsActive = true };
+        });
+        services.AddTransient<HomePage>(e =>
+        {
+            return new HomePage() { DataContext = e.GetService<HomePageViewModel>() };
         });
         return services.BuildServiceProvider();
     }

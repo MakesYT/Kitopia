@@ -1,7 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using Core.SDKs.Services;
-using Core.ViewModel.Pages;
 using Kitopia.Controls;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,10 +10,8 @@ public partial class SettingPage : Page
 {
     public SettingPage()
     {
-        DataContext = ServiceManager.Services.GetService<SettingPageViewModel>();
         InitializeComponent();
     }
-
 
     private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
     {
