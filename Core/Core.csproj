@@ -6,11 +6,14 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <DebugType>none</DebugType>
+    </PropertyGroup>
+
     <ItemGroup>
         <None Remove="Everything32.dll" />
         <None Remove="Everything64.dll" />
     </ItemGroup>
-
     <ItemGroup>
         <COMReference Include="IWshRuntimeLibrary">
             <WrapperTool>tlbimp</WrapperTool>
@@ -48,7 +51,7 @@
 
     <ItemGroup>
         <Reference Include="PluginCore">
-            <HintPath>..\PluginCore\bin\Debug\net7.0-windows\PluginCore.dll</HintPath>
+            <HintPath>..\PluginCore\bin\Release\net7.0-windows\PluginCore.dll</HintPath>
         </Reference>
     </ItemGroup>
 

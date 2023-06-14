@@ -93,14 +93,14 @@ public sealed partial class App : Application
         }
         else
         {
-            CheckAndDeleteLogFiles();
-
+            log.Info("程序启动");
 #if !DEBUG
             log.Info("异常捕获");
             DispatcherUnhandledException += App_DispatcherUnhandledException;
             Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 #endif
+            CheckAndDeleteLogFiles();
             AppDomain.CurrentDomain.ProcessExit += Application_ApplicationExit;
             ServiceManager.Services = ConfigureServices();
 

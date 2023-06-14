@@ -10,6 +10,10 @@
         <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <DebugType>none</DebugType>
+    </PropertyGroup>
+
     <ItemGroup>
         <None Remove="log4net.config" />
     </ItemGroup>
