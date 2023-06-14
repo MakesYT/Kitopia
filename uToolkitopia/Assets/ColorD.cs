@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Media;
-using Core.SDKs.Config;
+using Core.SDKs.Services.Config;
 
 namespace Kitopia.Assets;
 

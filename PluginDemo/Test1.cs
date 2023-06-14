@@ -1,5 +1,5 @@
 ﻿using System.Windows;
-using PluginCore;
+using PluginCore.Attribute;
 
 namespace PluginDemo;
 
@@ -10,4 +10,6 @@ public class Test1
     {
         MessageBox.Show("a");
     }
+
+    [ConfigField] public string name = "1";
 }

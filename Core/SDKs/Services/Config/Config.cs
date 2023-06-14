@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel;
 using System.Runtime.Serialization;
 using Core.SDKs.HotKey;
+using PluginCore;
 
-namespace Core.SDKs.Config;
+namespace Core.SDKs.Services.Config;
 
 public record Config
 {
@@ -35,7 +36,7 @@ public record Config
 
 
     public List<string> errorLnk = new();
-
+    public List<PluginInfo> EnabledPluginInfos = new();
 
     [OnDeserializing]
     // ReSharper disable once UnusedMember.Local

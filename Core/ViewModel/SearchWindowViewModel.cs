@@ -5,9 +5,9 @@ using System.Drawing;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Core.SDKs;
-using Core.SDKs.Config;
 using Core.SDKs.Everything;
 using Core.SDKs.Services;
+using Core.SDKs.Services.Config;
 using Core.SDKs.Tools;
 using log4net;
 

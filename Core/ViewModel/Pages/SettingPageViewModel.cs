@@ -2,9 +2,9 @@
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
-using Core.SDKs.Config;
 using Core.SDKs.HotKey;
 using Core.SDKs.Services;
+using Core.SDKs.Services.Config;
 using log4net;
 using Microsoft.Win32;
 

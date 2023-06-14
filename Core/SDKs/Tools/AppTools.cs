@@ -1,6 +1,6 @@
 ﻿using System.Text;
-using Core.SDKs.Config;
 using Core.SDKs.Services;
+using Core.SDKs.Services.Config;
 using log4net;
 using NPinyin;
 

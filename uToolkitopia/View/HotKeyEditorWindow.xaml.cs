@@ -3,9 +3,9 @@ using System.Windows;
 using System.Windows.Input;
 using Windows.System;
 using CommunityToolkit.Mvvm.Messaging;
-using Core.SDKs.Config;
 using Core.SDKs.HotKey;
 using Core.SDKs.Services;
+using Core.SDKs.Services.Config;
 using Wpf.Ui.Controls.Window;
 
 namespace Kitopia.View;
