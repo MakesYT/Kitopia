@@ -93,7 +93,7 @@ public partial class AppTools
 
     public static void AppSolverA(List<SearchViewItem> collection, List<string> names, string file, bool star = false)
     {
-        log.Debug("索引:" + file);
+        //log.Debug("索引:" + file);
 
 
         if (star)
@@ -157,7 +157,7 @@ public partial class AppTools
         {
             if (names.Contains(refFileInfo.FullName))
             {
-                log.Debug("重复索引:" + file);
+                //log.Debug("重复索引:" + file);
 
 
                 return;
