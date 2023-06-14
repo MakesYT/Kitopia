@@ -42,12 +42,7 @@
                                 <ui:SymbolIcon Symbol="FlashAuto20" FontSize="25"/>
                             </kitopia:SettingItems.Icon>
                         </kitopia:SettingItems>
-                        <kitopia:SettingItems Title="调试模式" Description="非必要不开启,重启软件后完全生效"> 
-                            <ui:ToggleSwitch IsChecked="{Binding DebugMode}" />
-                            <kitopia:SettingItems.Icon>
-                                <ui:SymbolIcon Symbol="Bug20" FontSize="25"/>
-                            </kitopia:SettingItems.Icon>
-                        </kitopia:SettingItems>
+                        
                     </StackPanel>
                 </Expander.Content>
             </Expander>

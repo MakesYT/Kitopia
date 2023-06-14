@@ -1,5 +1,4 @@
-﻿using Core.SDKs.Config;
-using Core.SDKs.Services;
+﻿using Core.SDKs.Services;
 using log4net;
 using Wpf.Ui.Appearance;
 
@@ -11,10 +10,8 @@ public class ThemeChange : IThemeChange
 
     public void changeTo(string name)
     {
-        if (ConfigManger.Config.debugMode)
-        {
-            log.Debug(nameof(ThemeChange) + "的接口" + nameof(changeTo) + "被调用");
-        }
+        log.Debug(nameof(ThemeChange) + "的接口" + nameof(changeTo) + "被调用");
+
 
         switch (name)
         {
@@ -30,10 +27,8 @@ public class ThemeChange : IThemeChange
 
     public void changeAnother()
     {
-        if (ConfigManger.Config.debugMode)
-        {
-            log.Debug(nameof(ThemeChange) + "的接口" + nameof(changeAnother) + "被调用");
-        }
+        log.Debug(nameof(ThemeChange) + "的接口" + nameof(changeAnother) + "被调用");
+
 
         var currentTheme = Wpf.Ui.Appearance.Theme.GetAppTheme();
 
@@ -44,10 +39,8 @@ public class ThemeChange : IThemeChange
 
     public void followSys(bool follow)
     {
-        if (ConfigManger.Config.debugMode)
-        {
-            log.Debug(nameof(ThemeChange) + "的接口" + nameof(follow) + "被调用");
-        }
+        log.Debug(nameof(ThemeChange) + "的接口" + nameof(follow) + "被调用");
+
 
         if (follow)
         {
@@ -63,10 +56,8 @@ public class ThemeChange : IThemeChange
 
     public bool isDark()
     {
-        if (ConfigManger.Config.debugMode)
-        {
-            log.Debug(nameof(ThemeChange) + "的接口" + nameof(isDark) + "被调用");
-        }
+        log.Debug(nameof(ThemeChange) + "的接口" + nameof(isDark) + "被调用");
+
 
         return Wpf.Ui.Appearance.Theme.GetAppTheme() == ThemeType.Dark;
     }

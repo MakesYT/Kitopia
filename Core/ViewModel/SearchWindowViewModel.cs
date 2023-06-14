@@ -43,10 +43,8 @@ public partial class SearchWindowViewModel : ObservableRecipient
     {
         if (!ConfigManger.Config.canReadClipboard)
         {
-            if (ConfigManger.Config.debugMode)
-            {
-                Log.Debug("没有读取剪贴板授权");
-            }
+            Log.Debug("没有读取剪贴板授权");
+
 
             if (Items.First().FileType == FileType.剪贴板图像)
             {
@@ -58,10 +56,8 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
         if (((IClipboardService)ServiceManager.Services!.GetService(typeof(IClipboardService))!).IsBitmap())
         {
-            if (ConfigManger.Config.debugMode)
-            {
-                Log.Debug("剪贴板有图像信息");
-            }
+            Log.Debug("剪贴板有图像信息");
+
 
             if (Items.Any(items => items.FileType == FileType.剪贴板图像))
             {
@@ -80,10 +76,8 @@ public partial class SearchWindowViewModel : ObservableRecipient
         }
         else if (Items.Count > 0 && Items.First().FileType == FileType.剪贴板图像)
         {
-            if (ConfigManger.Config.debugMode)
-            {
-                Log.Debug("剪贴板没有图像信息,但第一项是图片信息删除");
-            }
+            Log.Debug("剪贴板没有图像信息,但第一项是图片信息删除");
+
 
             Items.RemoveAt(0);
         }
@@ -96,10 +90,9 @@ public partial class SearchWindowViewModel : ObservableRecipient
             return;
         }
 
-        if (ConfigManger.Config.debugMode)
-        {
-            Log.Debug("加载历史记录");
-        }
+
+        Log.Debug("加载历史记录");
+
 
         foreach (var searchViewItem in Items)
         {
@@ -111,19 +104,16 @@ public partial class SearchWindowViewModel : ObservableRecipient
         //Items.RaiseListChangedEvents = false;
         if (ConfigManger.Config.alwayShows.Any())
         {
-            if (ConfigManger.Config.debugMode)
-            {
-                Log.Debug("加载常驻");
-            }
+            Log.Debug("加载常驻");
+
 
             foreach (var searchViewItem in ConfigManger.Config.alwayShows.SelectMany(name1 => _collection.Where(
                          searchViewItem => searchViewItem.OnlyKey.Equals(name1))))
             {
                 var item = (SearchViewItem)searchViewItem.Clone();
-                if (ConfigManger.Config.debugMode)
-                {
-                    Log.Debug("加载常驻:" + item.OnlyKey);
-                }
+
+                Log.Debug("加载常驻:" + item.OnlyKey);
+
 
                 item.IsPined = true;
                 Items.Add(item);
@@ -138,29 +128,24 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
         if (ConfigManger.Config.lastOpens.Any())
         {
-            if (ConfigManger.Config.debugMode)
-            {
-                Log.Debug("加载历史");
-            }
+            Log.Debug("加载历史");
+
 
             foreach (var searchViewItem in ConfigManger.Config.lastOpens.SelectMany(name1 => _collection.Where(
                          searchViewItem => searchViewItem.OnlyKey.Equals(name1))))
             {
                 if (limit >= ConfigManger.Config.maxHistory)
                 {
-                    if (ConfigManger.Config.debugMode)
-                    {
-                        Log.Debug("超过历史记录限制,当前" + limit);
-                    }
+                    Log.Debug("超过历史记录限制,当前" + limit);
+
 
                     break;
                 }
 
                 var item = (SearchViewItem)searchViewItem.Clone();
-                if (ConfigManger.Config.debugMode)
-                {
-                    Log.Debug("加载历史:" + item.OnlyKey);
-                }
+
+                Log.Debug("加载历史:" + item.OnlyKey);
+
 
                 if (!Items.Any((e) => e.OnlyKey.Equals(item.OnlyKey)))
                 {
@@ -240,10 +225,9 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 return;
             }
 
-            if (ConfigManger.Config.debugMode)
-            {
-                Log.Debug("搜索变更:" + Search);
-            }
+
+            Log.Debug("搜索变更:" + Search);
+
 
             foreach (var searchViewItem in Items)
             {
@@ -260,10 +244,8 @@ public partial class SearchWindowViewModel : ObservableRecipient
             value = Search.ToLowerInvariant();
             if (ConfigManger.Config.useEverything)
             {
-                if (ConfigManger.Config.debugMode)
-                {
-                    Log.Debug("everything检测");
-                }
+                Log.Debug("everything检测");
+
 
                 if (IntPtr.Size == 8)
                 {
@@ -284,17 +266,13 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
             if (value.Contains("\\") || value.Contains("/"))
             {
-                if (ConfigManger.Config.debugMode)
-                {
-                    Log.Debug("检测路径");
-                }
+                Log.Debug("检测路径");
+
 
                 if (Path.HasExtension(value) && File.Exists(value))
                 {
-                    if (ConfigManger.Config.debugMode)
-                    {
-                        Log.Debug("检测到文件路径");
-                    }
+                    Log.Debug("检测到文件路径");
+
 
                     var searchViewItem = new SearchViewItem()
                     {
@@ -309,10 +287,8 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 }
                 else if (Directory.Exists(value))
                 {
-                    if (ConfigManger.Config.debugMode)
-                    {
-                        Log.Debug("检测到文件夹路径");
-                    }
+                    Log.Debug("检测到文件夹路径");
+
 
                     var searchViewItem = new SearchViewItem()
                     {
@@ -392,10 +368,8 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 var searchViewItem = (SearchViewItem)x.Item.Clone();
                 if (ConfigManger.Config.lastOpens.Contains(x.Item.OnlyKey))
                 {
-                    if (ConfigManger.Config.debugMode)
-                    {
-                        Log.Debug("添加提高权重的搜索结果" + x.Item.OnlyKey);
-                    }
+                    Log.Debug("添加提高权重的搜索结果" + x.Item.OnlyKey);
+
 
                     if (ConfigManger.Config.alwayShows.Contains(searchViewItem.OnlyKey))
                     {
@@ -412,10 +386,8 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 }
                 else
                 {
-                    if (ConfigManger.Config.debugMode)
-                    {
-                        Log.Debug("添加搜索结果" + x.Item.OnlyKey);
-                    }
+                    Log.Debug("添加搜索结果" + x.Item.OnlyKey);
+
 
                     if (ConfigManger.Config.alwayShows.Contains(searchViewItem.OnlyKey))
                     {
@@ -435,10 +407,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
             if (Items.Count <= 0 && !(Path.HasExtension(value) && File.Exists(value)) && !Directory.Exists(value))
             {
-                if (ConfigManger.Config.debugMode)
-                {
-                    Log.Debug("无搜索项目,添加网页搜索");
-                }
+                Log.Debug("无搜索项目,添加网页搜索");
 
 
                 var searchViewItem = new SearchViewItem()

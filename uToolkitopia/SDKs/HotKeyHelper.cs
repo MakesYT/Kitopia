@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Input;
-using Core.SDKs.Config;
 using Core.SDKs.HotKey;
 using log4net;
 
@@ -51,10 +50,8 @@ public class HotKeyHelper
                     str += string.Format("+{0}", item.SelectKey);
                 str = string.Format("{0} ({1})\n\r", item.Name, str);
                 failList += str;
-                if (ConfigManger.Config.debugMode)
-                {
-                    log.Debug("注册热键失败:" + str);
-                }
+
+                log.Debug("注册热键失败:" + str);
             }
 
         hotKeySettingsDic = m_HotKeySettingsDic;
@@ -71,10 +68,9 @@ public class HotKeyHelper
     {
         var fsModifierKey = new ModifierKeys();
         var hotKeySetting = hotKeyModel.Name;
-        if (ConfigManger.Config.debugMode)
-        {
-            log.Debug("注册热键:" + hotKeySetting);
-        }
+
+        log.Debug("注册热键:" + hotKeySetting);
+
 
         if (!m_HotKeySettingsDic.ContainsKey(hotKeySetting))
         {

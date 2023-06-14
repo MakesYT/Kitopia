@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -39,6 +40,36 @@ public sealed partial class App : Application
     [DllImport("user32.dll", EntryPoint = "SetForegroundWindow", SetLastError = true)]
     public static extern void SetForegroundWindow(IntPtr hwnd);
 
+    public static void CheckAndDeleteLogFiles()
+    {
+        // 定义日志文件的目录
+        string logDirectory = "logs/";
+
+        // 定义要保留的日志文件的时间范围，这里是一周
+        TimeSpan timeSpan = TimeSpan.FromDays(2);
+
+        // 获取当前的日期
+        DateTime currentDate = DateTime.Now;
+
+        // 获取目录下的所有日志文件，按照最后修改时间排序
+        var logFiles = Directory.GetFiles(logDirectory)
+            .Select(f => new FileInfo(f))
+            .OrderByDescending(f => f.LastWriteTime);
+
+        // 遍历每个日志文件
+        foreach (var logFile in logFiles)
+        {
+            // 计算日志文件的最后修改时间和当前日期的差值
+            var diff = currentDate - logFile.LastWriteTime;
+
+            // 如果差值大于要保留的时间范围，就删除该日志文件
+            if (diff > timeSpan)
+            {
+                logFile.Delete();
+            }
+        }
+    }
+
     protected override void OnStartup(StartupEventArgs e)
     {
         /*创建具有唯一名称的互斥锁*/
@@ -62,12 +93,15 @@ public sealed partial class App : Application
         }
         else
         {
+            CheckAndDeleteLogFiles();
+
 #if !DEBUG
             log.Info("异常捕获");
             DispatcherUnhandledException += App_DispatcherUnhandledException;
             Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 #endif
+            AppDomain.CurrentDomain.ProcessExit += Application_ApplicationExit;
             ServiceManager.Services = ConfigureServices();
 
             log.Info("Ioc初始化完成");
@@ -75,12 +109,6 @@ public sealed partial class App : Application
             log.Info("配置文件初始化完成");
             ServiceManager.Services.GetService<PluginManager>().Init();
             log.Info("插件管理器初始化完成");
-            if (ConfigManger.Config.debugMode)
-            {
-                log.Debug("注意Debug模式已启用,如非必要请关闭该模式");
-                System.Windows.MessageBox.Show("注意Debug模式已启用,如非必要请关闭该模式", "Kitopia");
-            }
-
             var initWindow = ServiceManager.Services.GetService<InitWindow>();
             initWindow.Show();
             Current.MainWindow = ServiceManager.Services.GetService<MainWindow>();
@@ -96,10 +124,10 @@ public sealed partial class App : Application
         }
     }
 
-    protected override void OnExit(ExitEventArgs e)
+    static void Application_ApplicationExit(object? sender, EventArgs e)
     {
         ConfigManger.Save();
-        base.OnExit(e);
+        log.Info("程序退出");
     }
 
     private void SetAutoStartup()
@@ -202,10 +230,8 @@ public sealed partial class App : Application
                 }
             });
         }
-        else if (ConfigManger.Config.debugMode)
-        {
+        else
             log.Debug("程序自启已存在");
-        }
     }
 
     /// <summary>

@@ -26,7 +26,6 @@ public partial class SettingPageViewModel : ObservableRecipient
     [ObservableProperty] private int _maxHistory = 4;
     [ObservableProperty] private string _themeChoice = "跟随系统";
     [ObservableProperty] private bool _useEverything = true;
-    [ObservableProperty] private bool _debugMode;
     [ObservableProperty] private BindingList<HotKeyModel> _hotKeys;
 
     public SettingPageViewModel()
@@ -36,7 +35,6 @@ public partial class SettingPageViewModel : ObservableRecipient
         UseEverything = ConfigManger.Config.useEverything;
         MaxHistory = ConfigManger.Config.maxHistory;
         CanReadClipboard = ConfigManger.Config.canReadClipboard;
-        DebugMode = ConfigManger.Config.debugMode;
         HotKeys = ConfigManger.Config.hotKeys;
         WeakReferenceMessenger.Default.Register<string, string>(this, "hotkey", (_, _) =>
         {
@@ -76,12 +74,6 @@ public partial class SettingPageViewModel : ObservableRecipient
     partial void OnInputSmoothingMillisecondsChanged(int value)
     {
         ConfigManger.Config.inputSmoothingMilliseconds = value;
-        ConfigManger.Save();
-    }
-
-    partial void OnDebugModeChanged(bool value)
-    {
-        ConfigManger.Config.debugMode = value;
         ConfigManger.Save();
     }
 

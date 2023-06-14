@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows;
-using Core.SDKs.Config;
 using Core.SDKs.Services;
 using log4net;
 using Microsoft.Toolkit.Uwp.Notifications;
@@ -15,10 +14,8 @@ public class ToastService : IToastService
 
     public void show(string text)
     {
-        if (ConfigManger.Config.debugMode)
-        {
-            log.Debug(nameof(ToastService) + "的接口" + nameof(show) + "被调用");
-        }
+        log.Debug(nameof(ToastService) + "的接口" + nameof(show) + "被调用");
+
 
         new ToastContentBuilder()
             .AddText(text)

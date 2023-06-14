@@ -2,7 +2,6 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows;
-using Core.SDKs.Config;
 using Core.SDKs.Services;
 using log4net;
 
@@ -14,10 +13,8 @@ public class ClipboardService : IClipboardService
 
     public bool IsBitmap()
     {
-        if (ConfigManger.Config.debugMode)
-        {
-            log.Debug(nameof(ClipboardService) + "的接口" + nameof(IsBitmap) + "被调用");
-        }
+        log.Debug(nameof(ClipboardService) + "的接口" + nameof(IsBitmap) + "被调用");
+
 
         IDataObject data = Clipboard.GetDataObject();
         return data.GetDataPresent(DataFormats.Bitmap);
@@ -25,10 +22,8 @@ public class ClipboardService : IClipboardService
 
     public Bitmap? GetBitmap()
     {
-        if (ConfigManger.Config.debugMode)
-        {
-            log.Debug(nameof(ClipboardService) + "的接口" + nameof(GetBitmap) + "被调用");
-        }
+        log.Debug(nameof(ClipboardService) + "的接口" + nameof(GetBitmap) + "被调用");
+
 
         IDataObject data = Clipboard.GetDataObject();
         if (data.GetDataPresent(DataFormats.Bitmap))
@@ -42,10 +37,8 @@ public class ClipboardService : IClipboardService
     [STAThread]
     public string saveBitmap()
     {
-        if (ConfigManger.Config.debugMode)
-        {
-            log.Debug(nameof(ClipboardService) + "的接口" + nameof(saveBitmap) + "被调用");
-        }
+        log.Debug(nameof(ClipboardService) + "的接口" + nameof(saveBitmap) + "被调用");
+
 
         string r = Application.Current.Dispatcher.Invoke(() =>
         {

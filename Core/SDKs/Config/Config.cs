@@ -11,7 +11,6 @@ public record Config
     public bool useEverything = true;
     public bool autoStart = true;
     public bool canReadClipboard = true;
-    public bool debugMode = false;
     public string themeChoice = "跟随系统";
     public string themeColor = "#EC407A";
     public int maxHistory = 4;

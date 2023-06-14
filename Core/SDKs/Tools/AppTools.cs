@@ -13,10 +13,8 @@ public partial class AppTools
 
     public static void GetAllApps(List<SearchViewItem> collection, List<string> names)
     {
-        if (ConfigManger.Config.debugMode)
-        {
-            log.Debug("索引全部软件及收藏项目");
-        }
+        log.Debug("索引全部软件及收藏项目");
+
 
         // 创建一个空的文件路径集合
         List<string> filePaths = new List<string>();
@@ -95,24 +93,18 @@ public partial class AppTools
 
     public static void AppSolverA(List<SearchViewItem> collection, List<string> names, string file, bool star = false)
     {
-        if (ConfigManger.Config.debugMode)
-        {
-            log.Debug("索引:" + file);
-        }
+        //log.Debug("索引:" + file);
+
 
         if (star)
         {
-            if (ConfigManger.Config.debugMode)
-            {
-                log.Debug("索引为收藏项目:" + file);
-            }
+            log.Debug("索引为收藏项目:" + file);
+
 
             if (names.Contains(file))
             {
-                if (ConfigManger.Config.debugMode)
-                {
-                    log.Debug("重复跳过索引:" + file);
-                }
+                log.Debug("重复跳过索引:" + file);
+
 
                 return;
             }
@@ -151,10 +143,8 @@ public partial class AppTools
                 });
             }
 
-            if (ConfigManger.Config.debugMode)
-            {
-                log.Debug("完成索引:" + file);
-            }
+
+            log.Debug("完成索引:" + file);
 
             return;
         }
@@ -166,20 +156,16 @@ public partial class AppTools
         {
             if (names.Contains(refFileInfo.FullName))
             {
-                if (ConfigManger.Config.debugMode)
-                {
-                    log.Debug("重复索引:" + file);
-                }
+                //log.Debug("重复索引:" + file);
+
 
                 return;
             }
         }
         else
         {
-            if (ConfigManger.Config.debugMode)
-            {
-                log.Debug("无效索引:\n" + file + "\n目标位置:" + refFileInfo.FullName);
-            }
+            log.Debug("无效索引:\n" + file + "\n目标位置:" + refFileInfo.FullName);
+
 
             if (!ErrorLnkList.Contains(file) && !ConfigManger.Config.errorLnk.Contains(file))
             {
@@ -215,17 +201,12 @@ public partial class AppTools
                     });
                 }
             }
-            if (ConfigManger.Config.debugMode)
-            {
-                log.Debug("完成索引:" + file);
-            }
+
+            log.Debug("完成索引:" + file);
         }
         else
         {
-            if (ConfigManger.Config.debugMode)
-            {
-                log.Debug("不符合要求跳过索引:" + file);
-            }
+            log.Debug("不符合要求跳过索引:" + file);
         }
     }
 

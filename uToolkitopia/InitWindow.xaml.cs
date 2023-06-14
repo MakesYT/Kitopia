@@ -36,10 +36,8 @@ public partial class InitWindow
         var currentTheme = Wpf.Ui.Appearance.Theme.GetAppTheme();
         if (ConfigManger.Config.themeChoice == "跟随系统" && !Wpf.Ui.Appearance.Theme.IsAppMatchesSystem())
         {
-            if (ConfigManger.Config.debugMode)
-            {
-                log.Debug("主题跟随系统,当前不符合切换主题");
-            }
+            log.Debug("主题跟随系统,当前不符合切换主题");
+
 
             Wpf.Ui.Appearance.Theme.Apply(currentTheme == Wpf.Ui.Appearance.ThemeType.Light
                 ? Wpf.Ui.Appearance.ThemeType.Dark
@@ -47,10 +45,8 @@ public partial class InitWindow
         }
         else if (ConfigManger.Config.themeChoice == "深色")
         {
-            if (ConfigManger.Config.debugMode)
-            {
-                log.Debug("主题切换到深色");
-            }
+            log.Debug("主题切换到深色");
+
 
             Wpf.Ui.Appearance.Theme.Apply(Wpf.Ui.Appearance.ThemeType.Dark);
         }
@@ -79,10 +75,9 @@ public partial class InitWindow
     {
         base.OnContentRendered(e);
         // 注册热键
-        if (ConfigManger.Config.debugMode)
-        {
-            log.Debug("注册热键");
-        }
+
+        log.Debug("注册热键");
+
 
         InitHotKey();
     }
@@ -123,10 +118,8 @@ public partial class InitWindow
                 var sid = wideParam.ToInt32();
                 if (sid == m_HotKeySettings["显示搜索框"])
                 {
-                    if (ConfigManger.Config.debugMode)
-                    {
-                        log.Debug("显示搜索框热键被触发");
-                    }
+                    log.Debug("显示搜索框热键被触发");
+
 
                     //Console.WriteLine(App.Current.Services.GetService<SearchView>().Visibility);
                     if (ServiceManager.Services.GetService<SearchWindow>().Visibility == Visibility.Visible)
