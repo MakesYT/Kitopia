@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
+using System.Windows.Interop;
 using System.Windows.Threading;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
@@ -34,18 +34,11 @@ public sealed partial class App : Application
 {
     private static readonly ILog log = LogManager.GetLogger("App");
 
-    public App()
-    {
-    }
-
-    [DllImport("user32.dll", EntryPoint = "SetForegroundWindow", SetLastError = true)]
-    public static extern void SetForegroundWindow(IntPtr hwnd);
-
     public static void CheckAndDeleteLogFiles()
     {
         // 定义日志文件的目录
-        string logDirectory = "logs/";
-
+        string logDirectory = AppDomain.CurrentDomain.BaseDirectory + "logs";
+        log.Debug($"检查日志目录:{logDirectory}");
         // 定义要保留的日志文件的时间范围，这里是一周
         TimeSpan timeSpan = TimeSpan.FromDays(2);
 
@@ -66,35 +59,37 @@ public sealed partial class App : Application
             // 如果差值大于要保留的时间范围，就删除该日志文件
             if (diff > timeSpan)
             {
+                log.Debug($"删除日志文件:{logFile.FullName}");
                 logFile.Delete();
             }
         }
     }
 
+    [DllImport("user32.dll", EntryPoint = "SetForegroundWindow", SetLastError = true)]
+    public static extern void SetForegroundWindow(IntPtr hwnd);
+
     protected override void OnStartup(StartupEventArgs e)
     {
-        /*创建具有唯一名称的互斥锁*/
-        var appMutex = new Mutex(true, "Kitopia", out var createdNew);
-
-        if (!createdNew)
+        var eventWaitHandle = new EventWaitHandle(false, EventResetMode.AutoReset, "Kitopia", out var createNew);
+        if (!createNew)
         {
-            var current = Process.GetCurrentProcess();
-
-            foreach (var process in Process.GetProcessesByName(current.ProcessName))
-            {
-                if (process.Id != current.Id)
-                {
-                    SetForegroundWindow(process.MainWindowHandle);
-                    break;
-                }
-            }
-
             System.Windows.MessageBox.Show("不能同时开启两个应用", "Kitopia");
-            Shutdown();
+            eventWaitHandle.Set();
         }
         else
         {
             log.Info("程序启动");
+            ThreadPool.RegisterWaitForSingleObject(eventWaitHandle, (_, _) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    ServiceManager.Services.GetService<SearchWindow>().Show();
+                    SetForegroundWindow(new WindowInteropHelper(ServiceManager.Services.GetService<SearchWindow>())
+                        .Handle);
+
+                    ServiceManager.Services.GetService<SearchWindow>().tx.Focus();
+                });
+            }, null, -1, false);
 #if !DEBUG
             log.Info("异常捕获");
             DispatcherUnhandledException += App_DispatcherUnhandledException;

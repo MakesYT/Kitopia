@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
@@ -101,6 +102,9 @@ public partial class InitWindow
         return true;
     }
 
+    [DllImport("user32.dll", EntryPoint = "SetForegroundWindow", SetLastError = true)]
+    public static extern void SetForegroundWindow(IntPtr hwnd);
+
     /// <summary>
     ///     窗体回调函数，接收所有窗体消息的事件处理函数
     /// </summary>
@@ -129,10 +133,13 @@ public partial class InitWindow
                     else
                     {
                         ServiceManager.Services.GetService<SearchWindowViewModel>().CheckClipboard();
-                        ServiceManager.Services.GetService<SearchWindow>().Visibility = Visibility.Visible;
-                        ServiceManager.Services.GetService<SearchWindow>().Topmost = true;
+
+
+                        ServiceManager.Services.GetService<SearchWindow>().Show();
+                        SetForegroundWindow(new WindowInteropHelper(ServiceManager.Services.GetService<SearchWindow>())
+                            .Handle);
                         ServiceManager.Services.GetService<SearchWindow>().tx.Focus();
-                        ServiceManager.Services.GetService<SearchWindow>().Topmost = false;
+
                         if (ConfigManger.Config.canReadClipboard)
                         {
                             IDataObject data = Clipboard.GetDataObject();

@@ -1,12 +1,17 @@
-﻿namespace Core.SDKs.Services.Plugin;
+﻿using log4net;
+
+namespace Core.SDKs.Services.Plugin;
 
 public class PluginManager
 {
+    private static readonly ILog Log = LogManager.GetLogger(nameof(PluginManager));
+
     public void Init()
     {
-        DirectoryInfo pluginsDirectoryInfo = new DirectoryInfo("plugins");
+        DirectoryInfo pluginsDirectoryInfo = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "plugins");
         if (!pluginsDirectoryInfo.Exists)
         {
+            Log.Debug($"插件目录不存在创建{pluginsDirectoryInfo.FullName}");
             pluginsDirectoryInfo.Create();
         }
 

@@ -40,58 +40,62 @@ public partial class AppTools
         var options = new ParallelOptions();
         options.MaxDegreeOfParallelism = 256;
 // 使用Parallel.ForEach并行执行AppSolverA方法
+        List<Task> list = new();
+
         Parallel.ForEach(filePaths, options, file =>
         {
-            AppSolverA(collection, names, file);
+            list.Add(AppSolverA(collection, names, file));
         });
+        Task.WaitAll(list.ToArray());
 
         if (ErrorLnkList.Any())
-            //if (false)
+            if (false)
 
-        {
-            StringBuilder c = new StringBuilder("检测到多个无效的快捷方式\n需要Kitopia帮你清理吗?(该功能每个错误快捷方式只提示一次)\n以下为无效的快捷方式列表:\n");
-            foreach (var s in ErrorLnkList)
             {
-                c.AppendLine(s);
-            }
-
-            log.Debug(c.ToString());
-            ((IToastService)ServiceManager.Services!.GetService(typeof(IToastService))!).showMessageBox("Kitopia建议",
-                c.ToString(),
-                (() =>
+                StringBuilder c = new StringBuilder("检测到多个无效的快捷方式\n需要Kitopia帮你清理吗?(该功能每个错误快捷方式只提示一次)\n以下为无效的快捷方式列表:\n");
+                foreach (var s in ErrorLnkList)
                 {
-                    foreach (var s in ErrorLnkList)
+                    c.AppendLine(s);
+                }
+
+                log.Debug(c.ToString());
+                ((IToastService)ServiceManager.Services!.GetService(typeof(IToastService))!).showMessageBox("Kitopia建议",
+                    c.ToString(),
+                    (() =>
                     {
-                        log.Debug("删除无效快捷方式:" + s);
-                        try
+                        foreach (var s in ErrorLnkList)
                         {
-                            File.Delete(s);
+                            log.Debug("删除无效快捷方式:" + s);
+                            try
+                            {
+                                File.Delete(s);
+                            }
+                            catch (Exception)
+                            {
+                                log.Debug("添加无效快捷方式记录:" + s);
+                                ConfigManger.Config.errorLnk.Add(s);
+                                ConfigManger.Save();
+                            }
                         }
-                        catch (Exception)
+
+                        ErrorLnkList.Clear();
+                    }), (() =>
+                    {
+                        foreach (var s in ErrorLnkList)
                         {
                             log.Debug("添加无效快捷方式记录:" + s);
                             ConfigManger.Config.errorLnk.Add(s);
                             ConfigManger.Save();
                         }
-                    }
 
-                    ErrorLnkList.Clear();
-                }), (() =>
-                {
-                    foreach (var s in ErrorLnkList)
-                    {
-                        log.Debug("添加无效快捷方式记录:" + s);
-                        ConfigManger.Config.errorLnk.Add(s);
-                        ConfigManger.Save();
-                    }
-
-                    log.Debug("取消删除无效快捷方式");
-                    ErrorLnkList.Clear();
-                }));
-        }
+                        log.Debug("取消删除无效快捷方式");
+                        ErrorLnkList.Clear();
+                    }));
+            }
     }
 
-    public static void AppSolverA(List<SearchViewItem> collection, List<string> names, string file, bool star = false)
+    public static async Task AppSolverA(List<SearchViewItem> collection, List<string> names, string file,
+        bool star = false)
     {
         //log.Debug("索引:" + file);
 
@@ -114,33 +118,39 @@ public partial class AppTools
             if (Path.HasExtension(file) && File.Exists(file))
             {
                 var keys = new HashSet<string>();
-                NameSolver(keys, LnkTools.GetLocalizedName(file));
-                collection.Add(new SearchViewItem()
+                await NameSolver(keys, LnkTools.GetLocalizedName(file));
+                lock (collection)
                 {
-                    FileInfo = new FileInfo(file),
-                    FileName = "打开文件:" + LnkTools.GetLocalizedName(file) + "?",
-                    FileType = FileType.文件,
-                    OnlyKey = file,
-                    Keys = keys,
-                    IsStared = true,
-                    IsVisible = true
-                });
+                    collection.Add(new SearchViewItem()
+                    {
+                        FileInfo = new FileInfo(file),
+                        FileName = "打开文件:" + LnkTools.GetLocalizedName(file) + "?",
+                        FileType = FileType.文件,
+                        OnlyKey = file,
+                        Keys = keys,
+                        IsStared = true,
+                        IsVisible = true
+                    });
+                }
             }
             else if (Directory.Exists(file))
             {
                 var keys = new HashSet<string>();
-                NameSolver(keys, file.Split("\\").Last());
-                collection.Add(new SearchViewItem()
+                await NameSolver(keys, file.Split("\\").Last());
+                lock (collection)
                 {
-                    DirectoryInfo = new DirectoryInfo(file),
-                    FileName = "打开" + file.Split("\\").Last() + "?",
-                    FileType = FileType.文件夹,
-                    IsStared = true,
-                    OnlyKey = file,
-                    Keys = keys,
-                    Icon = null,
-                    IsVisible = true
-                });
+                    collection.Add(new SearchViewItem()
+                    {
+                        DirectoryInfo = new DirectoryInfo(file),
+                        FileName = "打开" + file.Split("\\").Last() + "?",
+                        FileType = FileType.文件夹,
+                        IsStared = true,
+                        OnlyKey = file,
+                        Keys = keys,
+                        Icon = null,
+                        IsVisible = true
+                    });
+                }
             }
 
 
@@ -185,9 +195,9 @@ public partial class AppTools
 
             //collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = fileInfo.Name.Replace(".lnk", ""), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
             var localName = LnkTools.GetLocalizedName(file);
-            NameSolver(keys, localName);
+            await NameSolver(keys, localName);
             //nameSolver(keys, fileInfo.Name.Replace(".lnk", ""));
-            NameSolver(keys, refFileInfo.Name.Replace(".exe", ""));
+            await NameSolver(keys, refFileInfo.Name.Replace(".exe", ""));
 
             {
                 lock (collection)
