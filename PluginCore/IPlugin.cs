@@ -2,7 +2,11 @@
 
 public interface IPlugin
 {
-    public PluginInfo PluginInfo();
+    public static PluginInfo PluginInfo()
+    {
+        return new PluginInfo();
+    }
+
     public void OnEnabled();
     public void OnDisabled();
 }

@@ -7,11 +7,31 @@ namespace Core.SDKs.Services.Plugin;
 
 public class Plugin
 {
-    public PluginInfo _pluginInfo;
-    private Assembly _plugin;
+    public PluginInfo PluginInfo
+    {
+        set;
+        get;
+    }
+
+    private readonly Assembly _plugin;
     private IPlugin _main;
-    private List<MethodInfo> _methodInfos = new();
-    private List<FieldInfo> _fieldInfos = new();
+    public readonly List<MethodInfo> MethodInfos = new();
+    private readonly List<FieldInfo> _fieldInfos = new();
+
+    public static PluginInfo GetPluginInfo(string path)
+    {
+        var _plugin = Assembly.LoadFrom(path);
+        Type[] t = _plugin.GetExportedTypes();
+        foreach (Type type in t)
+        {
+            if (type.GetInterface("IPlugin") != null)
+            {
+                return (PluginInfo)type.GetMethod("PluginInfo").Invoke(null, null);
+            }
+        }
+
+        return new PluginInfo();
+    }
 
     public Plugin(string path)
     {
@@ -21,16 +41,16 @@ public class Plugin
         {
             if (type.GetInterface("IPlugin") != null)
             {
-                IPlugin show = (IPlugin)Activator.CreateInstance(type);
+                IPlugin show = (IPlugin)(type);
                 _main = show;
-                _pluginInfo = show.PluginInfo();
+                PluginInfo = (PluginInfo)type.GetMethod("PluginInfo").Invoke(null, null);
             }
 
             foreach (MethodInfo methodInfo in type.GetMethods())
             {
                 if (methodInfo.GetCustomAttributes(typeof(PluginMethod)).Any())
                 {
-                    _methodInfos.Add(methodInfo);
+                    MethodInfos.Add(methodInfo);
                 }
             }
 

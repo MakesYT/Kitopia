@@ -5,6 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:pages="clr-namespace:Kitopia.View.Pages"
+        xmlns:plugin="clr-namespace:Kitopia.View.Pages.Plugin"
         mc:Ignorable="d" Closing="MainWindow_OnClosing"
         WindowStartupLocation="CenterScreen" 
         ExtendsContentIntoTitleBar="True"
@@ -21,15 +22,19 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         
-        <ui:NavigationView x:Name="NavigationView" Grid.Row="1"  PaneDisplayMode="LeftFluent" Grid.ColumnSpan="2" >
-
+        <ui:NavigationView x:Name="NavigationView" Grid.Row="1"  PaneDisplayMode="LeftFluent" Grid.ColumnSpan="2" BreadcrumbBar="{Binding ElementName=BreadcrumbBar}">
+            <ui:NavigationView.Header>
+                <StackPanel Margin="42,32,0,0">
+                    <ui:BreadcrumbBar x:Name="BreadcrumbBar" />
+                </StackPanel>
+            </ui:NavigationView.Header>
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem Content="主页" FontSize="14"  Cursor="Hand" TargetPageType="pages:HomePage">
                     <ui:NavigationViewItem.Icon>
                         <ui:SymbolIcon Symbol="Home24" FontSize="25" />
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
-                <ui:NavigationViewItem Content="插件" FontSize="14"  Cursor="Hand" TargetPageType="pages:HomePage">
+                <ui:NavigationViewItem Content="插件" FontSize="14"  Cursor="Hand" TargetPageType="plugin:PluginManagerPage">
                     <ui:NavigationViewItem.Icon>
                         <ui:SymbolIcon Symbol="Apps24" FontSize="25" />
                     </ui:NavigationViewItem.Icon>

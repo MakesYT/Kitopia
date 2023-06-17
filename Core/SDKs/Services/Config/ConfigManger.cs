@@ -45,7 +45,7 @@ public class ConfigManger
         foreach (var dConfig in PluginManager.EnablePlugin)
         {
             var config1 = new FileInfo(AppDomain.CurrentDomain.BaseDirectory +
-                                       $"configs\\{dConfig._pluginInfo.Author}_{dConfig._pluginInfo.PluginId}.json");
+                                       $"configs\\{dConfig.PluginInfo.Author}_{dConfig.PluginInfo.PluginId}.json");
 
             File.WriteAllText(config1.FullName,
                 JsonConvert.SerializeObject(dConfig.GetConfigJObject(), Formatting.Indented));

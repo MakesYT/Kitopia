@@ -13,9 +13,11 @@ using Core.SDKs.Services.Plugin;
 using Core.SDKs.Tools;
 using Core.ViewModel;
 using Core.ViewModel.Pages;
+using Core.ViewModel.Pages.plugin;
 using Kitopia.Services;
 using Kitopia.View;
 using Kitopia.View.Pages;
+using Kitopia.View.Pages.Plugin;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Toolkit.Uwp.Notifications;
@@ -103,7 +105,7 @@ public sealed partial class App : Application
             log.Info("Ioc初始化完成");
             ConfigManger.Init();
             log.Info("配置文件初始化完成");
-            ServiceManager.Services.GetService<PluginManager>().Init();
+            PluginManager.Init();
             log.Info("插件管理器初始化完成");
             var initWindow = ServiceManager.Services.GetService<InitWindow>();
             initWindow.Show();
@@ -237,7 +239,6 @@ public sealed partial class App : Application
     {
         var services = new ServiceCollection();
         services.AddSingleton<IconTools>();
-        services.AddSingleton<PluginManager>();
         services.AddTransient<IThemeChange, ThemeChange>();
         services.AddTransient<IToastService, ToastService>();
         services.AddSingleton<INavigationService, NavigationService>();
@@ -282,6 +283,14 @@ public sealed partial class App : Application
         services.AddTransient<HomePage>(e =>
         {
             return new HomePage() { DataContext = e.GetService<HomePageViewModel>() };
+        });
+        services.AddTransient<PluginManagerPageViewModel>(e =>
+        {
+            return new PluginManagerPageViewModel { IsActive = true };
+        });
+        services.AddTransient<PluginManagerPage>(e =>
+        {
+            return new PluginManagerPage() { DataContext = e.GetService<PluginManagerPageViewModel>() };
         });
         return services.BuildServiceProvider();
     }

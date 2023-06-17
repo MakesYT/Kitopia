@@ -1,6 +1,8 @@
-﻿namespace PluginCore;
+﻿using System.Drawing;
 
-public struct PluginInfo
+namespace Core.SDKs.Services.Plugin;
+
+public struct PluginInfoEx
 {
     public string PluginName
     {
@@ -27,6 +29,24 @@ public struct PluginInfo
     }
 
     public string Version
+    {
+        set;
+        get;
+    }
+
+    public bool IsEnabled
+    {
+        set;
+        get;
+    }
+
+    public string Error
+    {
+        set;
+        get;
+    }
+
+    public Icon Icon
     {
         set;
         get;

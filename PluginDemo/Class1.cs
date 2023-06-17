@@ -1,10 +1,16 @@
+using System.Windows;
 using PluginCore;
 
 namespace PluginDemo;
 
 public class Class1 : IPlugin
 {
-    public PluginInfo PluginInfo()
+    public Class1()
+    {
+        MessageBox.Show("dd");
+    }
+
+    public static PluginInfo PluginInfo()
     {
         return new PluginInfo()
         {

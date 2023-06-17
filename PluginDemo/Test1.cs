@@ -8,7 +8,7 @@ public class Test1
     [PluginMethod]
     public void t()
     {
-        MessageBox.Show("a");
+        MessageBox.Show("5a");
     }
 
     [ConfigField] public string name = "1";
