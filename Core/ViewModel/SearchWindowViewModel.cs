@@ -30,13 +30,13 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
     public SearchWindowViewModel()
     {
-        ReloadApps();
+        ReloadApps(true);
         LoadLast();
     }
 
-    public void ReloadApps()
+    public void ReloadApps(bool logging = false)
     {
-        AppTools.GetAllApps(_collection, _names);
+        AppTools.GetAllApps(_collection, _names, logging);
     }
 
     public void CheckClipboard()
@@ -182,6 +182,13 @@ public partial class SearchWindowViewModel : ObservableRecipient
                         break;
                     case FileType.命令:
                     case FileType.URL:
+                        if (t.FileInfo is not null)
+                        {
+                            t.Icon = (Icon)((IconTools)ServiceManager.Services!.GetService(typeof(IconTools))!)
+                                .GetIcon(t.FileInfo!.FullName).Clone();
+                        }
+
+                        break;
                     case FileType.数学运算:
                     case FileType.剪贴板图像:
                     case FileType.None:

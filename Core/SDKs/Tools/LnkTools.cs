@@ -18,7 +18,7 @@ public class LnkTools
         URL = 0x80068000
     }
 
-    private const uint STGM_READ = 0;
+    public const uint STGM_READ = 0;
     private const int MAX_PATH = 260;
 
     [DllImport("shfolder.dll", CharSet = CharSet.Auto)]
@@ -32,7 +32,7 @@ public class LnkTools
         ref Guid riid,
         [MarshalAs(UnmanagedType.Interface)] out IShellItem shellItem);
 
-    public  static string GetLocalizedName(string path)
+    public static string GetLocalizedName(string path)
     {
         var shellItemType = ShellItemTypeConstants.ShellItemGuid;
         var retCode = SHCreateItemFromParsingName(path, IntPtr.Zero, ref shellItemType, out var shellItem);
@@ -55,6 +55,7 @@ public class LnkTools
         return string.IsNullOrEmpty(sb.ToString()) ? filename : sb.ToString();
     }
 
+
     [ComImport]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     [Guid("43826d1e-e718-42ee-bc55-a1e261c37bfe")]
@@ -76,7 +77,7 @@ public class LnkTools
     }
 
     [Flags]
-    private enum SLGP_FLAGS
+    public enum SLGP_FLAGS
     {
         /// <summary>Retrieves the standard short (8.3 format) file name</summary>
         SLGP_SHORTPATH = 0x1,
@@ -92,7 +93,7 @@ public class LnkTools
     }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-    private struct WIN32_FIND_DATAW
+    public struct WIN32_FIND_DATAW
     {
         public readonly uint dwFileAttributes;
         public readonly long ftCreationTime;
@@ -111,7 +112,7 @@ public class LnkTools
     }
 
     [Flags]
-    private enum SLR_FLAGS
+    public enum SLR_FLAGS
     {
         /// <summary>
         ///     Do not display a dialog box if the link cannot be resolved. When SLR_NO_UI is set,
@@ -160,7 +161,7 @@ public class LnkTools
     [ComImport]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     [Guid("000214F9-0000-0000-C000-000000000046")]
-    private interface IShellLinkW
+    public interface IShellLinkW
     {
         /// <summary>Retrieves the path and file name of a Shell link object</summary>
         void GetPath([Out] [MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszFile, int cchMaxPath,
