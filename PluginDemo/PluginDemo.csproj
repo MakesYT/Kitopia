@@ -4,10 +4,15 @@
         <TargetFramework>net7.0-windows</TargetFramework>
         <Nullable>enable</Nullable>
         <UseWPF>true</UseWPF>
+        <EnableDynamicLoading>true</EnableDynamicLoading>
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\PluginCore\PluginCore.csproj"/>
+        <ProjectReference Include="..\PluginCore\PluginCore.csproj">
+            <Private>false</Private>
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </ProjectReference>
+
     </ItemGroup>
 
 </Project>

@@ -55,18 +55,20 @@
                                        Background="Transparent"
                                        Height="72" Margin="0"
                                        Padding="3">
-
-                                <Grid VerticalAlignment="Center">
+                                <StackPanel HorizontalAlignment="Stretch" 
+                                            VerticalAlignment="Center"
+                                            Width="{Binding RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type Button},AncestorLevel=1},Path=ActualWidth}">
+                                    <Grid VerticalAlignment="Center">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="36" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="60" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
                                     <Image Grid.Column="0" HorizontalAlignment="Left" Focusable="False" Width="48"
                                            Height="48"
                                            Source="{Binding Icon, Converter={StaticResource pathToImageConverter}}" />
-                                    <StackPanel Grid.Column="1" Margin="5" VerticalAlignment="Top"
+                                    <StackPanel Grid.Column="1" Margin="5" VerticalAlignment="Center" 
                                                 HorizontalAlignment="Stretch">
                                         <TextBlock VerticalAlignment="Center" Margin="0" Focusable="False"
                                                    Text="{Binding Path=PluginName}"
@@ -76,8 +78,20 @@
                                         <TextBlock VerticalAlignment="Top" Margin="0"
                                                    Text="{Binding Path=.,Converter={StaticResource PluginInfoToInfo }}" />
                                     </StackPanel>
-                                    <ui:ToggleSwitch  Grid.Column="3" />
+                                    <ui:DynamicScrollViewer Grid.Column="2" Height="60" VerticalAlignment="Center" HorizontalScrollBarVisibility="Hidden">
+                                        <ui:TextBlock VerticalAlignment="Center"
+                                            MaxWidth="{Binding RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type ui:DynamicScrollViewer},AncestorLevel=1},Path=ActualWidth}"
+                                                    TextWrapping="Wrap"
+                                                    Text="{Binding Description}"/>
+                                    </ui:DynamicScrollViewer>
+                                        
+                                    <ui:ToggleSwitch 
+                                        IsChecked="{Binding IsEnabled}"
+                                        Margin="10" Grid.Column="3" Command="{Binding Path=DataContext.SwitchCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Page}}}"
+                                                     CommandParameter="{Binding}"/>
                                 </Grid>
+                                </StackPanel>
+                                
                             </ui:Button>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>

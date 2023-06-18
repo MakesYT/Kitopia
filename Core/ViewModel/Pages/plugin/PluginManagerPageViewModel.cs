@@ -1,8 +1,6 @@
 ﻿using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Core.SDKs.Services;
-using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
 using log4net;
 
@@ -12,8 +10,14 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(PluginManagerPageViewModel));
     [ObservableProperty] private BindingList<PluginInfoEx> _items = new();
+    private readonly TaskScheduler _scheduler = TaskScheduler.FromCurrentSynchronizationContext();
 
     public PluginManagerPageViewModel()
+    {
+        Task.Factory.StartNew(LoadPluginsInfo, CancellationToken.None, TaskCreationOptions.None, _scheduler);
+    }
+
+    private void LoadPluginsInfo()
     {
         DirectoryInfo pluginsDirectoryInfo = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "plugins");
         if (!pluginsDirectoryInfo.Exists)
@@ -27,78 +31,37 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
             pluginsDirectoryInfo.FullName + "\\PluginDemo.dll", true);
 
 #endif
+
         foreach (FileInfo enumerateFile in pluginsDirectoryInfo.EnumerateFiles())
         {
             if (enumerateFile.Extension.Equals(".dll"))
             {
-                var pluginInfo = Plugin.GetPluginInfo(enumerateFile.FullName);
-                if (ConfigManger.Config.EnabledPluginInfos.Contains(pluginInfo))
+                Log.Debug($"加载插件:{enumerateFile.FullName}");
+                var pluginInfoEx = Plugin.GetPluginInfoEx(enumerateFile.FullName, out var alcWeakRef);
+                if (pluginInfoEx.Author != "error")
                 {
-                    var pluginInfoEx = new PluginInfoEx()
-                    {
-                        Author = pluginInfo.Author,
-                        Error = "",
-                        IsEnabled = true,
-                        PluginId = pluginInfo.PluginId,
-                        PluginName = pluginInfo.PluginName,
-                        Version = pluginInfo.Version,
-                        VersionInt = pluginInfo.VersionInt
-                    };
                     Items.Add(pluginInfoEx);
                 }
-                else if (ConfigManger.Config.EnabledPluginInfos.Exists(e =>
-                         {
-                             if (e.PluginName != pluginInfo.PluginName)
-                             {
-                                 return false;
-                             }
 
-                             if (e.Author != pluginInfo.Author)
-                             {
-                                 return false;
-                             }
-
-                             if (e.VersionInt != pluginInfo.VersionInt)
-                             {
-                                 return true;
-                             }
-
-                             return false;
-                         })) //有这个插件但是版本不对
+                for (int i = 0; alcWeakRef.IsAlive && (i < 10); i++)
                 {
-                    var pluginInfoEx = new PluginInfoEx()
-                    {
-                        Author = pluginInfo.Author,
-                        Error = "插件版本不一致",
-                        IsEnabled = false,
-                        PluginId = pluginInfo.PluginId,
-                        PluginName = pluginInfo.PluginName,
-                        Version = pluginInfo.Version,
-                        VersionInt = pluginInfo.VersionInt
-                    };
-                    Items.Add(pluginInfoEx);
-                }
-                else
-                {
-                    var pluginInfoEx = new PluginInfoEx()
-                    {
-                        Author = pluginInfo.Author,
-                        Error = "",
-                        IsEnabled = false,
-                        PluginId = pluginInfo.PluginId,
-                        PluginName = pluginInfo.PluginName,
-                        Version = pluginInfo.Version,
-                        VersionInt = pluginInfo.VersionInt
-                    };
-                    Items.Add(pluginInfoEx);
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
                 }
             }
         }
     }
 
     [RelayCommand]
-    public void Click()
+    public void Switch(PluginInfoEx pluginInfoEx)
     {
-        ((INavigationPageService)ServiceManager.Services!.GetService(typeof(INavigationPageService))).Navigate("设置");
+        if (pluginInfoEx.IsEnabled)
+        {
+            //卸载插件
+        }
+        else
+        {
+            //加载插件
+        }
     }
 }

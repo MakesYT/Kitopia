@@ -16,6 +16,12 @@ public struct PluginInfoEx
         get;
     }
 
+    public string Description
+    {
+        set;
+        get;
+    }
+
     public string Author
     {
         set;
