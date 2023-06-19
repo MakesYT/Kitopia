@@ -7,7 +7,7 @@ public class AssemblyLoadContextH : AssemblyLoadContext
 {
     private AssemblyDependencyResolver _resolver;
 
-    public AssemblyLoadContextH(string pluginPath) : base(isCollectible: true)
+    public AssemblyLoadContextH(string pluginPath, string name) : base(isCollectible: true, name: name)
     {
         _resolver = new AssemblyDependencyResolver(pluginPath);
     }

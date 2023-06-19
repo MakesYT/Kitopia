@@ -53,15 +53,33 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    public void Switch(PluginInfoEx pluginInfoEx)
+    public async Task Switch(PluginInfoEx pluginInfoEx)
     {
         if (pluginInfoEx.IsEnabled)
         {
             //卸载插件
+            if (PluginManager.EnablePlugin.TryGetValue($"{pluginInfoEx.Author}_{pluginInfoEx.PluginId}",
+                    out var weakReference))
+            {
+                PluginManager.EnablePlugin.Remove($"{pluginInfoEx.Author}_{pluginInfoEx.PluginId}");
+                pluginInfoEx.IsEnabled = false;
+                if (weakReference.TryGetTarget(out var plugin))
+                {
+                    plugin.Unload(out var weakReferenceP);
+                    for (int i = 0; weakReferenceP.IsAlive && (i < 10); i++)
+                    {
+                        GC.Collect(2, GCCollectionMode.Aggressive, true);
+                        GC.WaitForPendingFinalizers();
+                    }
+                }
+            }
         }
         else
         {
             //加载插件
+            Plugin.NewPlugin(pluginInfoEx.Path, out var weakReference);
+            PluginManager.EnablePlugin.Add($"{pluginInfoEx.Author}_{pluginInfoEx.PluginId}", weakReference);
+            pluginInfoEx.IsEnabled = true;
         }
     }
 }

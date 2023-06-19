@@ -2,7 +2,7 @@
 
 namespace Core.SDKs.Services.Plugin;
 
-public struct PluginInfoEx
+public class PluginInfoEx
 {
     public string PluginName
     {
@@ -47,6 +47,12 @@ public struct PluginInfoEx
     }
 
     public string Error
+    {
+        set;
+        get;
+    }
+
+    public string Path
     {
         set;
         get;

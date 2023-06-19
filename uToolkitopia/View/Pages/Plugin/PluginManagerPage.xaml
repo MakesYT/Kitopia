@@ -86,7 +86,7 @@
                                     </ui:DynamicScrollViewer>
                                         
                                     <ui:ToggleSwitch 
-                                        IsChecked="{Binding IsEnabled}"
+                                        IsChecked="{Binding IsEnabled,Mode=OneWay}"
                                         Margin="10" Grid.Column="3" Command="{Binding Path=DataContext.SwitchCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Page}}}"
                                                      CommandParameter="{Binding}"/>
                                 </Grid>

@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Core.SDKs.Services.Config;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PluginCore;
 using PluginCore.Attribute;
@@ -14,14 +15,17 @@ public class Plugin
         get;
     }
 
-    private readonly Assembly _plugin;
-    private IPlugin _main;
-    public readonly List<MethodInfo> MethodInfos = new();
-    private readonly List<FieldInfo> _fieldInfos = new();
+    private readonly WeakReference<AssemblyLoadContextH> _plugin;
 
+    private List<MethodInfo>? _methodInfos = new();
+    private List<FieldInfo>? _fieldInfos = new();
+
+    private IServiceProvider? ServiceProvider;
+
+    // private Dictionary<Type, object>? _instance = new();
     public static PluginInfoEx GetPluginInfoEx(string assemblyPath, out WeakReference alcWeakRef)
     {
-        var alc = new AssemblyLoadContextH(assemblyPath);
+        var alc = new AssemblyLoadContextH(assemblyPath, "pluginInfo");
 
         // Create a weak reference to the AssemblyLoadContext that will allow us to detect
         // when the unload completes.
@@ -39,6 +43,7 @@ public class Plugin
             if (type.GetInterface("IPlugin") != null)
             {
                 var pluginInfo = (PluginInfo)(type.GetMethod("PluginInfo").Invoke(null, null));
+
                 if (ConfigManger.Config.EnabledPluginInfos.Contains(pluginInfo))
                 {
                     pluginInfoEx = new PluginInfoEx()
@@ -46,6 +51,7 @@ public class Plugin
                         Author = pluginInfo.Author,
                         Error = "",
                         IsEnabled = true,
+                        Path = assemblyPath,
                         PluginId = pluginInfo.PluginId,
                         PluginName = pluginInfo.PluginName,
                         Description = pluginInfo.Description,
@@ -79,6 +85,7 @@ public class Plugin
                         Author = pluginInfo.Author,
                         Error = "插件版本不一致",
                         IsEnabled = false,
+                        Path = assemblyPath,
                         PluginId = pluginInfo.PluginId,
                         PluginName = pluginInfo.PluginName,
                         Description = pluginInfo.Description,
@@ -94,6 +101,7 @@ public class Plugin
                         Author = pluginInfo.Author,
                         Error = "",
                         IsEnabled = false,
+                        Path = assemblyPath,
                         PluginId = pluginInfo.PluginId,
                         PluginName = pluginInfo.PluginName,
                         Description = pluginInfo.Description,
@@ -114,24 +122,44 @@ public class Plugin
         return pluginInfoEx;
     }
 
-    public Plugin(string path)
+    public static void NewPlugin(string path, out WeakReference<Plugin> weakReference1)
     {
-        _plugin = Assembly.LoadFrom(path);
-        Type[] t = _plugin.GetExportedTypes();
+        new Plugin(path, out var weakReference);
+        weakReference1 = weakReference;
+    }
+
+    public Plugin(string path, out WeakReference<Plugin> weakReference)
+    {
+        weakReference = new WeakReference<Plugin>(this);
+        var alc = new AssemblyLoadContextH(path, path.Split("\\").Last());
+
+        // Create a weak reference to the AssemblyLoadContext that will allow us to detect
+        // when the unload completes.
+        _plugin = new WeakReference<AssemblyLoadContextH>(alc);
+
+        // Load the plugin assembly into the HostAssemblyLoadContext.
+        // NOTE: the assemblyPath must be an absolute path.
+        Assembly a = alc.LoadFromAssemblyPath(path);
+
+        // Get the plugin interface by calling the PluginClass.GetInterface method via reflection.
+        var t = a.GetExportedTypes();
         foreach (Type type in t)
         {
+            //TODO 插件分文件夹加载
             if (type.GetInterface("IPlugin") != null)
             {
-                IPlugin show = (IPlugin)(type);
-                _main = show;
                 PluginInfo = (PluginInfo)type.GetMethod("PluginInfo").Invoke(null, null);
+                //var instance = Activator.CreateInstance(type);
+                ServiceProvider = (IServiceProvider)type.GetMethod("GetServiceProvider").Invoke(null, null);
+
+                ((IPlugin)ServiceProvider.GetService(type)).OnEnabled();
             }
 
             foreach (MethodInfo methodInfo in type.GetMethods())
             {
                 if (methodInfo.GetCustomAttributes(typeof(PluginMethod)).Any())
                 {
-                    MethodInfos.Add(methodInfo);
+                    _methodInfos.Add(methodInfo);
                 }
             }
 
@@ -148,11 +176,33 @@ public class Plugin
     public JObject GetConfigJObject()
     {
         var jObject = new JObject();
+
         foreach (var fieldInfo in _fieldInfos)
         {
-            jObject.Add(fieldInfo.Name, new JValue(fieldInfo.GetValue(_plugin)));
+            jObject.Add(fieldInfo.Name,
+                new JValue(fieldInfo.GetValue(ServiceProvider.GetService(fieldInfo.DeclaringType))));
         }
 
         return jObject;
+    }
+
+    public void Unload(out WeakReference weakReference)
+    {
+        var config1 = new FileInfo(AppDomain.CurrentDomain.BaseDirectory +
+                                   $"configs\\{PluginInfo.Author}_{PluginInfo.PluginId}.json");
+        File.WriteAllText(config1.FullName,
+            JsonConvert.SerializeObject(GetConfigJObject(), Formatting.Indented));
+        _methodInfos = null;
+        _fieldInfos = null;
+
+        ServiceProvider = null;
+        if (_plugin.TryGetTarget(out var assemblyLoadContextH))
+        {
+            assemblyLoadContextH.Unload();
+            weakReference = new WeakReference(assemblyLoadContextH);
+            return;
+        }
+
+        weakReference = new WeakReference(_plugin);
     }
 }

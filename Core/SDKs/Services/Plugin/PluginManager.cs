@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using log4net;
+﻿using log4net;
 
 namespace Core.SDKs.Services.Plugin;
 
@@ -11,5 +10,5 @@ public class PluginManager
     {
     }
 
-    public static BindingList<Plugin> EnablePlugin = new();
+    public static Dictionary<string, WeakReference<Plugin>> EnablePlugin = new();
 }

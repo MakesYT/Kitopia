@@ -44,11 +44,14 @@ public class ConfigManger
         File.WriteAllText(configF.FullName, JsonConvert.SerializeObject(Config, Formatting.Indented));
         foreach (var dConfig in PluginManager.EnablePlugin)
         {
-            var config1 = new FileInfo(AppDomain.CurrentDomain.BaseDirectory +
-                                       $"configs\\{dConfig.PluginInfo.Author}_{dConfig.PluginInfo.PluginId}.json");
+            if (dConfig.Value.TryGetTarget(out var assemblyLoadContextH))
+            {
+                var config1 = new FileInfo(AppDomain.CurrentDomain.BaseDirectory +
+                                           $"configs\\{assemblyLoadContextH.PluginInfo.Author}_{assemblyLoadContextH.PluginInfo.PluginId}.json");
 
-            File.WriteAllText(config1.FullName,
-                JsonConvert.SerializeObject(dConfig.GetConfigJObject(), Formatting.Indented));
+                File.WriteAllText(config1.FullName,
+                    JsonConvert.SerializeObject(assemblyLoadContextH.GetConfigJObject(), Formatting.Indented));
+            }
         }
     }
 }
