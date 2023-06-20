@@ -10,5 +10,5 @@ public class PluginManager
     {
     }
 
-    public static Dictionary<string, WeakReference<Plugin>> EnablePlugin = new();
+    public static Dictionary<string, Plugin> EnablePlugin = new();
 }

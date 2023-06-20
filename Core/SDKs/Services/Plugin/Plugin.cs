@@ -15,7 +15,7 @@ public class Plugin
         get;
     }
 
-    private readonly WeakReference<AssemblyLoadContextH> _plugin;
+    private AssemblyLoadContextH _plugin;
 
     private List<MethodInfo>? _methodInfos = new();
     private List<FieldInfo>? _fieldInfos = new();
@@ -42,7 +42,7 @@ public class Plugin
         {
             if (type.GetInterface("IPlugin") != null)
             {
-                var pluginInfo = (PluginInfo)(type.GetMethod("PluginInfo").Invoke(null, null));
+                var pluginInfo = (PluginInfo)(type.GetField("PluginInfo").GetValue(null));
 
                 if (ConfigManger.Config.EnabledPluginInfos.Contains(pluginInfo))
                 {
@@ -122,37 +122,28 @@ public class Plugin
         return pluginInfoEx;
     }
 
-    public static void NewPlugin(string path, out WeakReference<Plugin> weakReference1)
+    public Plugin(string path)
     {
-        new Plugin(path, out var weakReference);
-        weakReference1 = weakReference;
-    }
-
-    public Plugin(string path, out WeakReference<Plugin> weakReference)
-    {
-        weakReference = new WeakReference<Plugin>(this);
-        var alc = new AssemblyLoadContextH(path, path.Split("\\").Last());
+        _plugin = new AssemblyLoadContextH(path, path.Split("\\").Last());
 
         // Create a weak reference to the AssemblyLoadContext that will allow us to detect
         // when the unload completes.
-        _plugin = new WeakReference<AssemblyLoadContextH>(alc);
 
         // Load the plugin assembly into the HostAssemblyLoadContext.
         // NOTE: the assemblyPath must be an absolute path.
-        Assembly a = alc.LoadFromAssemblyPath(path);
+        Assembly a = _plugin.LoadFromAssemblyPath(path);
 
         // Get the plugin interface by calling the PluginClass.GetInterface method via reflection.
         var t = a.GetExportedTypes();
         foreach (Type type in t)
         {
-            //TODO 插件分文件夹加载
             if (type.GetInterface("IPlugin") != null)
             {
-                PluginInfo = (PluginInfo)type.GetMethod("PluginInfo").Invoke(null, null);
+                PluginInfo = (PluginInfo)type.GetField("PluginInfo").GetValue(null);
                 //var instance = Activator.CreateInstance(type);
                 ServiceProvider = (IServiceProvider)type.GetMethod("GetServiceProvider").Invoke(null, null);
 
-                ((IPlugin)ServiceProvider.GetService(type)).OnEnabled();
+                ((PluginCore.IPlugin)ServiceProvider.GetService(type)).OnEnabled();
             }
 
             foreach (MethodInfo methodInfo in type.GetMethods())
@@ -186,6 +177,23 @@ public class Plugin
         return jObject;
     }
 
+    public static void UnloadByPluginInfo(PluginInfoEx pluginInfoEx, out WeakReference weakReference)
+    {
+        if (PluginManager.EnablePlugin.TryGetValue($"{pluginInfoEx.Author}_{pluginInfoEx.PluginId}",
+                out var plugin))
+        {
+            pluginInfoEx.IsEnabled = false;
+
+            {
+                PluginManager.EnablePlugin.Remove($"{pluginInfoEx.Author}_{pluginInfoEx.PluginId}");
+                plugin.Unload(out weakReference);
+                return;
+            }
+        }
+
+        weakReference = new WeakReference(null);
+    }
+
     public void Unload(out WeakReference weakReference)
     {
         var config1 = new FileInfo(AppDomain.CurrentDomain.BaseDirectory +
@@ -196,13 +204,8 @@ public class Plugin
         _fieldInfos = null;
 
         ServiceProvider = null;
-        if (_plugin.TryGetTarget(out var assemblyLoadContextH))
-        {
-            assemblyLoadContextH.Unload();
-            weakReference = new WeakReference(assemblyLoadContextH);
-            return;
-        }
 
+        _plugin.Unload();
         weakReference = new WeakReference(_plugin);
     }
 }

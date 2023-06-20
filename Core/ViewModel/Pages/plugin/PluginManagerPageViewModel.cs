@@ -27,23 +27,28 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
         }
 #if DEBUG
         Log.Debug("Debug加载测试插件");
+        if (!Directory.Exists(pluginsDirectoryInfo.FullName + "\\PluginDemo"))
+        {
+            Directory.CreateDirectory(pluginsDirectoryInfo.FullName + "\\PluginDemo");
+        }
+
         File.Copy(@"D:\WPF.net\uToolkitopia\PluginDemo\bin\Debug\net7.0-windows\PluginDemo.dll",
-            pluginsDirectoryInfo.FullName + "\\PluginDemo.dll", true);
+            pluginsDirectoryInfo.FullName + "\\PluginDemo\\PluginDemo.dll", true);
 
 #endif
-
-        foreach (FileInfo enumerateFile in pluginsDirectoryInfo.EnumerateFiles())
+        foreach (DirectoryInfo directoryInfo in pluginsDirectoryInfo.EnumerateDirectories())
         {
-            if (enumerateFile.Extension.Equals(".dll"))
+            if (File.Exists($"{directoryInfo.FullName}\\{directoryInfo.Name}.dll"))
             {
-                Log.Debug($"加载插件:{enumerateFile.FullName}");
-                var pluginInfoEx = Plugin.GetPluginInfoEx(enumerateFile.FullName, out var alcWeakRef);
+                Log.Debug($"加载插件:{directoryInfo.Name}.dll");
+                var pluginInfoEx = Plugin.GetPluginInfoEx($"{directoryInfo.FullName}\\{directoryInfo.Name}.dll",
+                    out var alcWeakRef);
                 if (pluginInfoEx.Author != "error")
                 {
                     Items.Add(pluginInfoEx);
                 }
 
-                for (int i = 0; alcWeakRef.IsAlive && (i < 10); i++)
+                while (alcWeakRef.IsAlive)
                 {
                     GC.Collect();
                     GC.WaitForPendingFinalizers();
@@ -53,32 +58,24 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    public async Task Switch(PluginInfoEx pluginInfoEx)
+    public void Switch(PluginInfoEx pluginInfoEx)
     {
         if (pluginInfoEx.IsEnabled)
         {
             //卸载插件
-            if (PluginManager.EnablePlugin.TryGetValue($"{pluginInfoEx.Author}_{pluginInfoEx.PluginId}",
-                    out var weakReference))
+            Plugin.UnloadByPluginInfo(pluginInfoEx, out var weakReference);
+            while (weakReference.IsAlive)
             {
-                PluginManager.EnablePlugin.Remove($"{pluginInfoEx.Author}_{pluginInfoEx.PluginId}");
-                pluginInfoEx.IsEnabled = false;
-                if (weakReference.TryGetTarget(out var plugin))
-                {
-                    plugin.Unload(out var weakReferenceP);
-                    for (int i = 0; weakReferenceP.IsAlive && (i < 10); i++)
-                    {
-                        GC.Collect(2, GCCollectionMode.Aggressive, true);
-                        GC.WaitForPendingFinalizers();
-                    }
-                }
+                GC.Collect(2, GCCollectionMode.Aggressive, true, true);
+                GC.WaitForPendingFinalizers();
             }
         }
         else
         {
             //加载插件
-            Plugin.NewPlugin(pluginInfoEx.Path, out var weakReference);
-            PluginManager.EnablePlugin.Add($"{pluginInfoEx.Author}_{pluginInfoEx.PluginId}", weakReference);
+            //Plugin.NewPlugin(pluginInfoEx.Path, out var weakReference);
+            PluginManager.EnablePlugin.Add($"{pluginInfoEx.Author}_{pluginInfoEx.PluginId}",
+                new Plugin(pluginInfoEx.Path));
             pluginInfoEx.IsEnabled = true;
         }
     }
