@@ -34,11 +34,18 @@
                         <ui:SymbolIcon Symbol="Home24" FontSize="25" />
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
-                <ui:NavigationViewItem Content="插件" FontSize="14"  Cursor="Hand" TargetPageType="plugin:PluginManagerPage">
+                <ui:NavigationViewItem  Content="插件" FontSize="14"  Cursor="Hand" TargetPageType="plugin:PluginManagerPage">
                     <ui:NavigationViewItem.Icon>
                         <ui:SymbolIcon Symbol="Apps24" FontSize="25" />
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
+                <ui:NavigationViewItem  Content="任务" FontSize="14"  Cursor="Hand" TargetPageType="plugin:PluginManagerPage">
+                    <ui:NavigationViewItem.Icon>
+                        <ui:SymbolIcon Symbol="TaskListLtr24" FontSize="25" />
+                    </ui:NavigationViewItem.Icon>
+                    
+                </ui:NavigationViewItem>
+                <ui:NavigationViewItem Visibility="Collapsed" Content="插件设置" FontSize="14"  Cursor="Hand" TargetPageType="plugin:PluginSetting" />
             </ui:NavigationView.MenuItems>
             <ui:NavigationView.FooterMenuItems>
                 <ui:NavigationViewItem Content="设置" FontSize="14" Cursor="Hand" TargetPageType="pages:SettingPage">

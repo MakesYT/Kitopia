@@ -292,6 +292,14 @@ public sealed partial class App : Application
         {
             return new PluginManagerPage() { DataContext = e.GetService<PluginManagerPageViewModel>() };
         });
+        services.AddSingleton<PluginSettingViewModel>(e =>
+        {
+            return new PluginSettingViewModel { IsActive = true };
+        });
+        services.AddSingleton<PluginSetting>(e =>
+        {
+            return new PluginSetting() { DataContext = e.GetService<PluginSettingViewModel>() };
+        });
         return services.BuildServiceProvider();
     }
 

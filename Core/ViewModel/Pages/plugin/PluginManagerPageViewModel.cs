@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Core.SDKs.Services;
 using Core.SDKs.Services.Plugin;
 using log4net;
 
@@ -14,7 +15,8 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
 
     public PluginManagerPageViewModel()
     {
-        Task.Factory.StartNew(LoadPluginsInfo, CancellationToken.None, TaskCreationOptions.None, _scheduler);
+        //Task.Factory.StartNew(LoadPluginsInfo, CancellationToken.None, TaskCreationOptions.None, _scheduler);
+        Task.Run(LoadPluginsInfo);
     }
 
     private void LoadPluginsInfo()
@@ -45,7 +47,10 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
                     out var alcWeakRef);
                 if (pluginInfoEx.Author != "error")
                 {
-                    Items.Add(pluginInfoEx);
+                    Task.Factory.StartNew(() =>
+                    {
+                        Items.Add(pluginInfoEx);
+                    }, CancellationToken.None, TaskCreationOptions.None, _scheduler);
                 }
 
                 while (alcWeakRef.IsAlive)
@@ -78,5 +83,13 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
                 new Plugin(pluginInfoEx.Path));
             pluginInfoEx.IsEnabled = true;
         }
+    }
+
+    [RelayCommand]
+    public void ToPluginSettingPage(PluginInfoEx pluginInfoEx)
+    {
+        ((INavigationPageService)ServiceManager.Services!.GetService(typeof(INavigationPageService))).Navigate("插件设置");
+        ((PluginSettingViewModel)ServiceManager.Services!.GetService(typeof(PluginSettingViewModel)))
+            .ChangePlugin(pluginInfoEx);
     }
 }

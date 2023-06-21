@@ -12,6 +12,7 @@
       mc:Ignorable="d"
       xmlns:plugin="clr-namespace:Core.ViewModel.Pages.plugin;assembly=Core"
       xmlns:plugin1="clr-namespace:Kitopia.View.Pages.Plugin"
+      xmlns:controls="clr-namespace:Kitopia.Controls"
       Title="插件管理页面">
     <Page.Resources>
         <Style TargetType="Border" />
@@ -50,7 +51,7 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ui:Button HorizontalAlignment="Stretch" x:Name="Button"
-                                       Command="{Binding Path=DataContext.OpenFileCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:FluentWindow}}}"
+                                       Command="{Binding Path=DataContext.ToPluginSettingPageCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Page}}}"
                                        CommandParameter="{Binding SelectedValue, ElementName=dataGrid}"
                                        Background="Transparent"
                                        Height="72" Margin="0"
@@ -60,13 +61,14 @@
                                             Width="{Binding RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type Button},AncestorLevel=1},Path=ActualWidth}">
                                     <Grid VerticalAlignment="Center">
                                     <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="60" />
+                                            <ColumnDefinition Width="80" />
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
                                     <Image Grid.Column="0" HorizontalAlignment="Left" Focusable="False" Width="48"
-                                           Height="48"
+                                           Height="48" Margin="0,0,12,0"
                                            Source="{Binding Icon, Converter={StaticResource pathToImageConverter}}" />
                                     <StackPanel Grid.Column="1" Margin="5" VerticalAlignment="Center" 
                                                 HorizontalAlignment="Stretch">
@@ -87,9 +89,10 @@
                                         
                                     <ui:ToggleSwitch 
                                         IsChecked="{Binding IsEnabled,Mode=OneWay}"
-                                        Margin="10" Grid.Column="3" Command="{Binding Path=DataContext.SwitchCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Page}}}"
+                                        Margin="0,0,10,0" Grid.Column="3" Command="{Binding Path=DataContext.SwitchCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Page}}}"
                                                      CommandParameter="{Binding}"/>
-                                </Grid>
+                                        <ui:SymbolIcon Grid.Column="4" Symbol="ChevronRight20" FontSize="20" Margin="0,0,10,0" />
+                                    </Grid>
                                 </StackPanel>
                                 
                             </ui:Button>
@@ -99,5 +102,6 @@
             </DataGrid.Columns>
 
         </ui:DataGrid>
+        <controls:HotKeyShow Command="{Binding ClickCommand}"/>
     </StackPanel>
 </Page>
