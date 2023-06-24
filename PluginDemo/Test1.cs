@@ -11,5 +11,5 @@ public class Test1
         MessageBox.Show("5a");
     }
 
-    [ConfigField] public string name = "1";
+    [ConfigField("名称", "设置名称")] public string name = "1";
 }

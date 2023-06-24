@@ -26,7 +26,7 @@ public class PluginSettingItem
         set;
     }
 
-    public string SettingName
+    public object Setting
     {
         get;
         set;

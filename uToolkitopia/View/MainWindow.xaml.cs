@@ -25,6 +25,7 @@ public partial class MainWindow
         // 获取窗体句柄
         IntPtr m_Hwnd = new WindowInteropHelper(this).Handle;
         var hWndSource = HwndSource.FromHwnd(m_Hwnd);
+
         ServiceManager.Services.GetService<InitWindow>().NotifyIcon.HookWindow = hWndSource;
         Wpf.Ui.Appearance.Theme.Changed += ((theme, accent) =>
         {

@@ -58,7 +58,7 @@ public partial class AppTools
             list.Add(AppSolverA(collection, names, file, logging: logging));
         });
         Task.WaitAll(list.ToArray());
-
+        UWPAPPsTools.GetAll(collection);
         if (ErrorLnkList.Any())
         {
             StringBuilder c = new StringBuilder("检测到多个无效的快捷方式\n需要Kitopia帮你清理吗?(该功能每个错误快捷方式只提示一次)\n以下为无效的快捷方式列表:\n");

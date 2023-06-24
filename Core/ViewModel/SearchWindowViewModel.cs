@@ -289,7 +289,11 @@ public partial class SearchWindowViewModel : ObservableRecipient
                         FileType = FileType.文件,
                         IsVisible = true
                     };
-                    GetIconInItems(searchViewItem);
+                    ThreadPool.QueueUserWorkItem(_ =>
+                    {
+                        GetIconInItems(searchViewItem);
+                    });
+
                     Items.Add(searchViewItem);
                 }
                 else if (Directory.Exists(value))
@@ -306,7 +310,10 @@ public partial class SearchWindowViewModel : ObservableRecipient
                         Icon = null,
                         IsVisible = true
                     };
-                    GetIconInItems(searchViewItem);
+                    ThreadPool.QueueUserWorkItem(_ =>
+                    {
+                        GetIconInItems(searchViewItem);
+                    });
                     Items.Add(searchViewItem);
                 }
 
@@ -383,11 +390,12 @@ public partial class SearchWindowViewModel : ObservableRecipient
                         searchViewItem.IsPined = true;
                     }
 
-                    Items.Insert(nowIndex, searchViewItem); // 添加元素
+
                     ThreadPool.QueueUserWorkItem(_ =>
                     {
                         GetIconInItems(searchViewItem);
                     });
+                    Items.Insert(nowIndex, searchViewItem); // 添加元素
                     nowIndex++;
                     count++; // 计数器加一
                 }
@@ -401,11 +409,12 @@ public partial class SearchWindowViewModel : ObservableRecipient
                         searchViewItem.IsPined = true;
                     }
 
-                    Items.Add(searchViewItem); // 添加元素
+
                     ThreadPool.QueueUserWorkItem(_ =>
                     {
                         GetIconInItems(searchViewItem);
                     });
+                    Items.Add(searchViewItem); // 添加元素
                     count++; // 计数器加一
                 }
             }

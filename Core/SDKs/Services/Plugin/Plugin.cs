@@ -158,6 +158,8 @@ public class Plugin
             {
                 if (fieldInfo.GetCustomAttributes(typeof(ConfigField)).Any())
                 {
+                    var customAttribute = (ConfigField)fieldInfo.GetCustomAttribute(typeof(ConfigField))!;
+                    // fieldInfo.SetValue(null,default());
                     _fieldInfos.Add(fieldInfo);
                 }
             }
@@ -207,5 +209,19 @@ public class Plugin
 
         _plugin.Unload();
         weakReference = new WeakReference(_plugin);
+    }
+
+    public List<PluginSettingItem> GetConfigSettingItems()
+    {
+        List<PluginSettingItem> settingItems = new();
+        foreach (var fieldInfo in _fieldInfos)
+        {
+            var pluginSettingItem = new PluginSettingItem()
+            {
+            };
+            settingItems.Add(pluginSettingItem);
+        }
+
+        return settingItems;
     }
 }

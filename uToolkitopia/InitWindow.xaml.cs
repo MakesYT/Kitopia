@@ -34,6 +34,7 @@ public partial class InitWindow
     {
         InitializeComponent();
         DataContext = ServiceManager.Services.GetService<InitWindowsViewModel>();
+
         var currentTheme = Wpf.Ui.Appearance.Theme.GetAppTheme();
         if (ConfigManger.Config.themeChoice == "跟随系统" && !Wpf.Ui.Appearance.Theme.IsAppMatchesSystem())
         {

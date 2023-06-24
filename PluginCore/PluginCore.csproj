@@ -10,4 +10,9 @@
         <DebugType>none</DebugType>
     </PropertyGroup>
 
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis" Version="4.6.0"/>
+    </ItemGroup>
+
 </Project>

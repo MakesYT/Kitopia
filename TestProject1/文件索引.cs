@@ -64,4 +64,10 @@ public class 文件索引
         Console.WriteLine("Time elapsed: {0} ms", elapsedMs);
         Console.WriteLine(collection.Count);
     }
+
+    [TestMethod]
+    public void GetAllUWPkeys()
+    {
+        Console.WriteLine(LnkTools.GetLocalizedName("ms-resource://Microsoft.People/Resources/AppStoreName"));
+    }
 }

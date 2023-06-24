@@ -32,7 +32,7 @@ public class SettingItemToControlConverter : IValueConverter
         if (control != null)
         {
             var binding = new Binding();
-            binding.Path = new PropertyPath(setting.SettingName);
+            binding.Path = new PropertyPath("Setting");
             binding.Source = this;
             switch (control)
             {

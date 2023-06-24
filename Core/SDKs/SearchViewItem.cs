@@ -126,5 +126,6 @@ public enum FileType
     文件,
     命令,
     数学运算,
+    UWP应用,
     None
 }

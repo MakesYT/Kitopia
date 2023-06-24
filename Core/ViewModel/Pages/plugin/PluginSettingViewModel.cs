@@ -12,5 +12,9 @@ public partial class PluginSettingViewModel : ObservableRecipient
 
     public void ChangePlugin(PluginInfoEx pluginInfoEx)
     {
+        var plugin = PluginManager.EnablePlugin[$"{pluginInfoEx.Author}_{pluginInfoEx.PluginId}"];
+        SettingItems.Add(new PluginSettingItem()
+        {
+        });
     }
 }
