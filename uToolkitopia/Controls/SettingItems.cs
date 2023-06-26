@@ -20,9 +20,10 @@ public class SettingItems : ContentControl
         set => SetValue(TitleProperty, value);
     }
 
-    public static readonly DependencyProperty TitleProperty = DependencyProperty.Register(nameof(Title),
-        typeof(string), typeof(TextBlock),
-        new PropertyMetadata(""));
+    [Bindable(true)] public static readonly DependencyProperty TitleProperty = DependencyProperty.Register(
+        nameof(Title),
+        typeof(string), typeof(SettingItems),
+        new FrameworkPropertyMetadata(""));
 
     [Bindable(true), Category("Description")]
     public string Description
@@ -32,7 +33,7 @@ public class SettingItems : ContentControl
     }
 
     public static readonly DependencyProperty DescriptionProperty = DependencyProperty.Register(nameof(Description),
-        typeof(string), typeof(TextBlock),
+        typeof(string), typeof(SettingItems),
         new PropertyMetadata(""));
 
 

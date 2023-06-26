@@ -52,6 +52,8 @@ public partial class InitWindow
 
             Wpf.Ui.Appearance.Theme.Apply(Wpf.Ui.Appearance.ThemeType.Dark);
         }
+
+        ServiceManager.Services.GetService<SearchWindow>().Visibility = Visibility.Hidden;
     }
 
     /// <summary>
