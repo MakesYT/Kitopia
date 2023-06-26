@@ -10,6 +10,7 @@ using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using Core.SDKs.Tools;
 using log4net;
+using Vanara.PInvoke;
 
 namespace Core.ViewModel;
 
@@ -117,10 +118,14 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
                 item.IsPined = true;
                 Items.Add(item);
-                ThreadPool.QueueUserWorkItem(_ =>
+                if (item.Icon is null)
                 {
-                    GetIconInItems(item);
-                });
+                    ThreadPool.QueueUserWorkItem(_ =>
+                    {
+                        GetIconInItems(item);
+                    });
+                }
+
 
                 limit++;
             }
@@ -150,10 +155,14 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 if (!Items.Any((e) => e.OnlyKey.Equals(item.OnlyKey)))
                 {
                     Items.Add(item);
-                    ThreadPool.QueueUserWorkItem(_ =>
+                    if (item.Icon is null)
                     {
-                        GetIconInItems(item);
-                    });
+                        ThreadPool.QueueUserWorkItem(_ =>
+                        {
+                            GetIconInItems(item);
+                        });
+                    }
+
                     limit++;
                 }
             }
@@ -284,7 +293,8 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     var searchViewItem = new SearchViewItem()
                     {
                         FileInfo = new FileInfo(value),
-                        FileName = "打开文件:" + LnkTools.GetLocalizedName(value) + "?",
+                        FileName = "打开文件:" + Shell32.SHCreateItemFromParsingName<Shell32.IShellItem>(value)
+                            .GetDisplayName(Shell32.SIGDN.SIGDN_NORMALDISPLAY) + "?",
                         OnlyKey = value,
                         FileType = FileType.文件,
                         IsVisible = true
@@ -391,10 +401,14 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     }
 
 
-                    ThreadPool.QueueUserWorkItem(_ =>
+                    if (searchViewItem.Icon is null)
                     {
-                        GetIconInItems(searchViewItem);
-                    });
+                        ThreadPool.QueueUserWorkItem(_ =>
+                        {
+                            GetIconInItems(searchViewItem);
+                        });
+                    }
+
                     Items.Insert(nowIndex, searchViewItem); // 添加元素
                     nowIndex++;
                     count++; // 计数器加一
@@ -410,10 +424,14 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     }
 
 
-                    ThreadPool.QueueUserWorkItem(_ =>
+                    if (searchViewItem.Icon is null)
                     {
-                        GetIconInItems(searchViewItem);
-                    });
+                        ThreadPool.QueueUserWorkItem(_ =>
+                        {
+                            GetIconInItems(searchViewItem);
+                        });
+                    }
+
                     Items.Add(searchViewItem); // 添加元素
                     count++; // 计数器加一
                 }
@@ -475,37 +493,49 @@ public partial class SearchWindowViewModel : ObservableRecipient
         {
             var item = (SearchViewItem)searchViewItem;
             Log.Debug("打开指定内容" + item.OnlyKey);
-
-            if (!item.OnlyKey.Equals("ClipboardImageData") && !item.OnlyKey.Equals("Math"))
+            switch (item.OnlyKey)
             {
-                ShellTools.ShellExecute(IntPtr.Zero, "open", item.OnlyKey, "", "",
-                    ShellTools.ShowCommands.SW_SHOWNORMAL);
-            }
-            else
-            {
-                var fileName = ((IClipboardService)ServiceManager.Services!.GetService(typeof(IClipboardService))!)
-                    .saveBitmap();
-                if (string.IsNullOrEmpty(fileName))
+                case "ClipboardImageData":
                 {
-                    Log.Error("剪贴板图片保存失败");
-                    ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).show("剪贴板图片保存失败");
+                    var fileName = ((IClipboardService)ServiceManager.Services!.GetService(typeof(IClipboardService))!)
+                        .saveBitmap();
+                    if (string.IsNullOrEmpty(fileName))
+                    {
+                        Log.Error("剪贴板图片保存失败");
+                        ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).show("剪贴板图片保存失败");
+                        return;
+                    }
+
+                    ShellTools.ShellExecute(IntPtr.Zero, "open", "explorer.exe", "/select," + fileName, "",
+                        ShellTools.ShowCommands.SW_SHOWNORMAL);
                     return;
                 }
+                case "Math": break;
+                default:
+                {
+                    if (item.FileType == FileType.UWP应用)
+                    {
+                        //explorer.exe shell:AppsFolder\Microsoft.WindowsMaps_8wekyb3d8bbwe!App
+                        ShellTools.ShellExecute(IntPtr.Zero, "open", "explorer.exe",
+                            $"shell:AppsFolder\\{item.OnlyKey}!App", "",
+                            ShellTools.ShowCommands.SW_SHOWNORMAL);
+                    }
+                    else
+                        ShellTools.ShellExecute(IntPtr.Zero, "open", item.OnlyKey, "", "",
+                            ShellTools.ShowCommands.SW_SHOWNORMAL);
 
-                ShellTools.ShellExecute(IntPtr.Zero, "open", "explorer.exe", "/select," + fileName, "",
-                    ShellTools.ShowCommands.SW_SHOWNORMAL);
-                return;
+                    if (ConfigManger.Config.lastOpens.Contains(item.OnlyKey))
+                    {
+                        ConfigManger.Config.lastOpens.Remove(item.OnlyKey);
+                    }
+
+                    ConfigManger.Config.lastOpens.Insert(0, item.OnlyKey);
+                    //if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
+                    Search = "";
+                    ConfigManger.Save();
+                    return;
+                }
             }
-
-            if (ConfigManger.Config.lastOpens.Contains(item.OnlyKey))
-            {
-                ConfigManger.Config.lastOpens.Remove(item.OnlyKey);
-            }
-
-            ConfigManger.Config.lastOpens.Insert(0, item.OnlyKey);
-            //if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
-            Search = "";
-            ConfigManger.Save();
         });
     }
 
@@ -538,8 +568,16 @@ public partial class SearchWindowViewModel : ObservableRecipient
         {
             var item = (SearchViewItem)searchViewItem;
             Log.Debug("以管理员身份打开指定内容" + item.OnlyKey);
-            ShellTools.ShellExecute(IntPtr.Zero, "runas", item.OnlyKey, "", "",
-                ShellTools.ShowCommands.SW_SHOWNORMAL);
+            if (item.FileType == FileType.UWP应用)
+            {
+                //explorer.exe shell:AppsFolder\Microsoft.WindowsMaps_8wekyb3d8bbwe!App
+                ShellTools.ShellExecute(IntPtr.Zero, "runas", "explorer.exe", $"shell:AppsFolder\\{item.OnlyKey}!App",
+                    "",
+                    ShellTools.ShowCommands.SW_SHOWNORMAL);
+            }
+            else
+                ShellTools.ShellExecute(IntPtr.Zero, "runas", item.OnlyKey, "", "",
+                    ShellTools.ShowCommands.SW_SHOWNORMAL);
 
             if (ConfigManger.Config.lastOpens.Contains(item.OnlyKey))
             {

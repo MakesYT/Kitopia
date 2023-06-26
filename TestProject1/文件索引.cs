@@ -1,6 +1,9 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Core.SDKs;
 using Core.SDKs.Tools;
+using Vanara.Extensions;
+using Vanara.PInvoke;
 
 namespace TestProject1;
 
@@ -66,8 +69,33 @@ public class 文件索引
     }
 
     [TestMethod]
-    public void GetAllUWPkeys()
+    public void GetPackagesByPackageFamily()
     {
-        Console.WriteLine(LnkTools.GetLocalizedName("ms-resource://Microsoft.People/Resources/AppStoreName"));
+        // The package family name of the app you want to query
+        string packageFamilyName = "Microsoft.WindowsCalculator_8wekyb3d8bbwe";
+        Kernel32.GetPackagesByPackageFamily(packageFamilyName, out var packageFullNames);
+        foreach (var packageFullName in packageFullNames)
+        {
+            Kernel32.PACKAGE_INFO_REFERENCE reference = new Kernel32.PACKAGE_INFO_REFERENCE();
+            Kernel32.OpenPackageInfoByFullName(packageFullName, 0, ref reference);
+            uint bufferLength = 4096;
+            using Vanara.InteropServices.SafeCoTaskMemHandle mem =
+                new(1 * IntPtr.Size + bufferLength * StringHelper.GetCharSize(CharSet.Unicode));
+            // = Kernel32.GetPackageInfo(reference, 0x00000010, ref bufferLength, reference.reserved, out var count);
+            var win32Error = Kernel32.GetPackageInfo(reference, 0x00000010, ref bufferLength, mem, out var count);
+            Console.WriteLine(win32Error.Succeeded);
+            var packageInfo = mem.ToStructure<Kernel32.PACKAGE_INFO>();
+            Console.WriteLine(packageInfo.path);
+            Kernel32.ClosePackageInfo(reference);
+        }
+
+        return;
+    }
+
+
+    [TestMethod]
+    public void NetworkIsolationEnumAppContainersTest()
+    {
+        // The package family name of the app you want to query
     }
 }

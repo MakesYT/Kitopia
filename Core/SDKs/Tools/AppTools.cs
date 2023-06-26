@@ -1,9 +1,11 @@
-﻿using System.Text;
+﻿using System.Runtime.InteropServices.ComTypes;
+using System.Text;
 using System.Text.RegularExpressions;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using log4net;
 using NPinyin;
+using Vanara.PInvoke;
 
 namespace Core.SDKs.Tools;
 
@@ -57,8 +59,16 @@ public partial class AppTools
 
             list.Add(AppSolverA(collection, names, file, logging: logging));
         });
-        Task.WaitAll(list.ToArray());
-        UWPAPPsTools.GetAll(collection);
+
+        try
+        {
+            Task.WaitAll(list.ToArray());
+        }
+        catch (Exception e)
+        {
+        }
+
+        UWPAPPsTools.GetAll(collection, names);
         if (ErrorLnkList.Any())
         {
             StringBuilder c = new StringBuilder("检测到多个无效的快捷方式\n需要Kitopia帮你清理吗?(该功能每个错误快捷方式只提示一次)\n以下为无效的快捷方式列表:\n");
@@ -106,6 +116,8 @@ public partial class AppTools
     public static async Task AppSolverA(List<SearchViewItem> collection, List<string> names, string file,
         bool star = false, bool logging = false)
     {
+        var localizedName = Shell32.SHCreateItemFromParsingName<Shell32.IShellItem>(file)
+            .GetDisplayName(Shell32.SIGDN.SIGDN_NORMALDISPLAY);
         if (star)
         {
             log.Debug("索引为收藏项目:" + file);
@@ -124,13 +136,13 @@ public partial class AppTools
             if (Path.HasExtension(file) && File.Exists(file))
             {
                 var keys = new HashSet<string>();
-                await NameSolver(keys, LnkTools.GetLocalizedName(file));
+                await NameSolver(keys, localizedName);
                 lock (collection)
                 {
                     collection.Add(new SearchViewItem()
                     {
                         FileInfo = new FileInfo(file),
-                        FileName = "打开文件:" + LnkTools.GetLocalizedName(file) + "?",
+                        FileName = "打开文件:" + localizedName + "?",
                         FileType = FileType.文件,
                         OnlyKey = file,
                         Keys = keys,
@@ -169,7 +181,23 @@ public partial class AppTools
         var fileInfo = new FileInfo(file);
         if (fileInfo.Extension != ".url")
         {
-            var refFileInfo = new FileInfo(LnkTools.ResolveShortcut(file));
+            //var sb = new StringBuilder(260);
+            // var shellLink = new ShellLink(file, LinkResolution.None);
+            var link = new Shell32.IShellLinkW();
+            ((IPersistFile)link).Load(file, (int)STGM.STGM_READ);
+            var sb = new StringBuilder(260);
+            var data = new WIN32_FIND_DATA();
+            //((IShellLinkW)link).GetShowCmd
+            ((Shell32.IShellLinkW)link).GetPath(sb, sb.Capacity, out data, 0);
+
+            var targetPath = sb.ToString() ?? file;
+
+            if (string.IsNullOrWhiteSpace(targetPath))
+            {
+                targetPath = file;
+            }
+
+            var refFileInfo = new FileInfo(targetPath);
             if (refFileInfo.Exists)
             {
                 if (names.Contains(refFileInfo.FullName))
@@ -205,7 +233,7 @@ public partial class AppTools
                 var keys = new HashSet<string>();
 
                 //collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = fileInfo.Name.Replace(".lnk", ""), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
-                var localName = LnkTools.GetLocalizedName(file);
+                var localName = localizedName;
                 await NameSolver(keys, localName);
                 //nameSolver(keys, fileInfo.Name.Replace(".lnk", ""));
                 await NameSolver(keys, refFileInfo.Name.Replace(".exe", ""));
@@ -272,7 +300,7 @@ public partial class AppTools
             var keys = new HashSet<string>();
 
             //collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = fileInfo.Name.Replace(".lnk", ""), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
-            var localName = LnkTools.GetLocalizedName(file);
+            var localName = localizedName;
             await NameSolver(keys, localName);
             //nameSolver(keys, fileInfo.Name.Replace(".lnk", ""));
             await NameSolver(keys, fileInfo.Name.Replace(".url", ""));

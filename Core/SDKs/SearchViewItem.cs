@@ -87,6 +87,7 @@ public class SearchViewItem : ICloneable, IDisposable
             IsStared = IsStared,
             OnlyKey = OnlyKey,
             FileInfo = FileInfo != null ? new FileInfo(FileInfo.FullName) : null,
+            Icon = (Icon?)Icon?.Clone(),
             DirectoryInfo = DirectoryInfo != null ? new DirectoryInfo(DirectoryInfo.FullName) : null,
         };
     }
