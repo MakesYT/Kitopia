@@ -12,7 +12,6 @@
       mc:Ignorable="d"
       xmlns:plugin="clr-namespace:Core.ViewModel.Pages.plugin;assembly=Core"
       xmlns:plugin1="clr-namespace:Kitopia.View.Pages.Plugin"
-      xmlns:controls="clr-namespace:Kitopia.Controls"
       Title="插件管理页面">
     <Page.Resources>
         <Style TargetType="Border" />
@@ -56,45 +55,48 @@
                                        Background="Transparent"
                                        Height="72" Margin="0"
                                        Padding="3">
-                                <StackPanel HorizontalAlignment="Stretch" 
+                                <StackPanel HorizontalAlignment="Stretch"
                                             VerticalAlignment="Center"
                                             Width="{Binding RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type Button},AncestorLevel=1},Path=ActualWidth}">
                                     <Grid VerticalAlignment="Center">
-                                    <Grid.ColumnDefinitions>
+                                        <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="80" />
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-                                    <Image Grid.Column="0" HorizontalAlignment="Left" Focusable="False" Width="48"
-                                           Height="48" Margin="0,0,12,0"
-                                           Source="{Binding Icon, Converter={StaticResource pathToImageConverter}}" />
-                                    <StackPanel Grid.Column="1" Margin="5" VerticalAlignment="Center" 
-                                                HorizontalAlignment="Stretch">
-                                        <TextBlock VerticalAlignment="Center" Margin="0" Focusable="False"
-                                                   Text="{Binding Path=PluginName}"
+                                        <Image Grid.Column="0" HorizontalAlignment="Left" Focusable="False" Width="48"
+                                               Height="48" Margin="0,0,12,0"
+                                               Source="{Binding Icon, Converter={StaticResource pathToImageConverter}}" />
+                                        <StackPanel Grid.Column="1" Margin="5" VerticalAlignment="Center"
+                                                    HorizontalAlignment="Stretch">
+                                            <TextBlock VerticalAlignment="Center" Margin="0" Focusable="False"
+                                                       Text="{Binding Path=PluginName}"
 
-                                                   Background="{x:Null}"
-                                                   FontWeight="Normal" FontSize="18" />
-                                        <TextBlock VerticalAlignment="Top" Margin="0"
-                                                   Text="{Binding Path=.,Converter={StaticResource PluginInfoToInfo }}" />
-                                    </StackPanel>
-                                    <ui:DynamicScrollViewer Grid.Column="2" Height="60" VerticalAlignment="Center" HorizontalScrollBarVisibility="Hidden">
-                                        <ui:TextBlock VerticalAlignment="Center"
-                                            MaxWidth="{Binding RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type ui:DynamicScrollViewer},AncestorLevel=1},Path=ActualWidth}"
-                                                    TextWrapping="Wrap"
-                                                    Text="{Binding Description}"/>
-                                    </ui:DynamicScrollViewer>
-                                        
-                                    <ui:ToggleSwitch 
-                                        IsChecked="{Binding IsEnabled,Mode=OneWay}"
-                                        Margin="0,0,10,0" Grid.Column="3" Command="{Binding Path=DataContext.SwitchCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Page}}}"
-                                                     CommandParameter="{Binding}"/>
-                                        <ui:SymbolIcon Grid.Column="4" Symbol="ChevronRight20" FontSize="20" Margin="0,0,10,0" />
+                                                       Background="{x:Null}"
+                                                       FontWeight="Normal" FontSize="18" />
+                                            <TextBlock VerticalAlignment="Top" Margin="0"
+                                                       Text="{Binding Path=.,Converter={StaticResource PluginInfoToInfo }}" />
+                                        </StackPanel>
+                                        <ui:DynamicScrollViewer Grid.Column="2" Height="60" VerticalAlignment="Center"
+                                                                HorizontalScrollBarVisibility="Hidden">
+                                            <ui:TextBlock VerticalAlignment="Center"
+                                                          MaxWidth="{Binding RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type ui:DynamicScrollViewer},AncestorLevel=1},Path=ActualWidth}"
+                                                          TextWrapping="Wrap"
+                                                          Text="{Binding Description}" />
+                                        </ui:DynamicScrollViewer>
+
+                                        <ui:ToggleSwitch
+                                            IsChecked="{Binding IsEnabled,Mode=OneWay}"
+                                            Margin="0,0,10,0" Grid.Column="3"
+                                            Command="{Binding Path=DataContext.SwitchCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Page}}}"
+                                            CommandParameter="{Binding}" />
+                                        <ui:SymbolIcon Grid.Column="4" Symbol="ChevronRight20" FontSize="20" Visibility="{Binding IsEnabled,Converter={StaticResource boolToVisibilityConverter},UpdateSourceTrigger=PropertyChanged}"
+                                                       Margin="0,0,10,0" />
                                     </Grid>
                                 </StackPanel>
-                                
+
                             </ui:Button>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -102,6 +104,5 @@
             </DataGrid.Columns>
 
         </ui:DataGrid>
-        <controls:HotKeyShow Command="{Binding ClickCommand}"/>
     </StackPanel>
 </Page>

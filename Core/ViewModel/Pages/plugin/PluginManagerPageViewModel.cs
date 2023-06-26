@@ -34,8 +34,15 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
             Directory.CreateDirectory(pluginsDirectoryInfo.FullName + "\\PluginDemo");
         }
 
-        File.Copy(@"D:\WPF.net\uToolkitopia\PluginDemo\bin\Debug\net7.0-windows\PluginDemo.dll",
-            pluginsDirectoryInfo.FullName + "\\PluginDemo\\PluginDemo.dll", true);
+        try
+        {
+            File.Copy(@"D:\WPF.net\uToolkitopia\PluginDemo\bin\Debug\net7.0-windows\PluginDemo.dll",
+                pluginsDirectoryInfo.FullName + "\\PluginDemo\\PluginDemo.dll", true);
+        }
+        catch (Exception e)
+        {
+        }
+
 
 #endif
         foreach (DirectoryInfo directoryInfo in pluginsDirectoryInfo.EnumerateDirectories())
@@ -74,6 +81,9 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
                 GC.Collect(2, GCCollectionMode.Aggressive, true, true);
                 GC.WaitForPendingFinalizers();
             }
+
+            pluginInfoEx.IsEnabled = false;
+            OnPropertyChanged(nameof(Items));
         }
         else
         {
@@ -81,13 +91,20 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
             //Plugin.NewPlugin(pluginInfoEx.Path, out var weakReference);
             PluginManager.EnablePlugin.Add($"{pluginInfoEx.Author}_{pluginInfoEx.PluginId}",
                 new Plugin(pluginInfoEx.Path));
+
             pluginInfoEx.IsEnabled = true;
+            OnPropertyChanged(nameof(Items));
         }
     }
 
     [RelayCommand]
     public void ToPluginSettingPage(PluginInfoEx pluginInfoEx)
     {
+        if (!pluginInfoEx.IsEnabled)
+        {
+            return;
+        }
+
         ((INavigationPageService)ServiceManager.Services!.GetService(typeof(INavigationPageService))).Navigate("插件设置");
         ((PluginSettingViewModel)ServiceManager.Services!.GetService(typeof(PluginSettingViewModel)))
             .ChangePlugin(pluginInfoEx);
