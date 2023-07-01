@@ -75,8 +75,21 @@ public sealed partial class App : Application
         var eventWaitHandle = new EventWaitHandle(false, EventResetMode.AutoReset, "Kitopia", out var createNew);
         if (!createNew)
         {
-            System.Windows.MessageBox.Show("不能同时开启两个应用", "Kitopia");
+            MessageBox msg = new MessageBox();
+            msg.Title = "Kitopia";
+            msg.Content = "不能同时开启两个应用        ";
+            msg.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            msg.CloseButtonText = "确定";
+            msg.FontSize = 15;
+            var task = msg.ShowDialogAsync();
+            // 使用ContinueWith来在任务完成后执行一个回调函数
+            task.ContinueWith(e =>
+            {
+                MessageBoxResult result = e.Result;
+            }).Wait();
+            // System.Windows.MessageBox.Show("不能同时开启两个应用", "Kitopia");
             eventWaitHandle.Set();
+            Environment.Exit(0);
         }
         else
         {
@@ -92,6 +105,33 @@ public sealed partial class App : Application
                     ServiceManager.Services.GetService<SearchWindow>().tx.Focus();
                 });
             }, null, -1, false);
+            log.Info("注册EventWaitHandle");
+            var appReloadEventWaitHandle =
+                new EventWaitHandle(false, EventResetMode.AutoReset, "Kitopia_appReload", out var appReload);
+            if (!createNew)
+            {
+                MessageBox msg = new MessageBox();
+                msg.Title = "Kitopia";
+                msg.Content = "右键菜单捕获出现异常,\n请关闭软件重试,将会导致部分功能异常        ";
+                msg.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                msg.CloseButtonText = "确定";
+                msg.FontSize = 15;
+                var task = msg.ShowDialogAsync();
+                // 使用ContinueWith来在任务完成后执行一个回调函数
+                task.ContinueWith(e =>
+                {
+                    MessageBoxResult result = e.Result;
+                }).Wait();
+                //System.Windows.MessageBox.Show("右键菜单捕获出现异常,请关闭软件重试,将会导致部分功能异常", "Kitopia");
+            }
+            else
+            {
+                ThreadPool.RegisterWaitForSingleObject(eventWaitHandle, (_, _) =>
+                {
+                    ServiceManager.Services.GetService<SearchWindowViewModel>().ReloadApps();
+                }, null, -1, false);
+            }
+
 #if !DEBUG
             log.Info("异常捕获");
             DispatcherUnhandledException += App_DispatcherUnhandledException;
@@ -337,11 +377,11 @@ public sealed partial class App : Application
                 if (e.Exception.InnerException == null)
                 {
                     log.Error(e.Exception.StackTrace);
-                    var error = new ErrorDialog("", "（1）发生了一个错误！" + Environment.NewLine
-                                                                  + "（2）错误源：" + e.Exception.Source +
-                                                                  Environment.NewLine
-                                                                  + "（3）详细信息：" + e.Exception.StackTrace +
-                                                                  Environment.NewLine);
+                    var error = new ErrorDialog("", "（1）发生了一个错误！" + e.Exception.Message + Environment.NewLine
+                                                    + "（2）错误源：" + e.Exception.Source +
+                                                    Environment.NewLine
+                                                    + "（3）详细信息：" + e.Exception.StackTrace +
+                                                    Environment.NewLine);
                     error.ShowDialog();
 
                     //MessageBox.Show("（1）发生了一个错误！请联系腐竹！" + Environment.NewLine
@@ -351,13 +391,13 @@ public sealed partial class App : Application
                 }
                 else
                 {
-                    log.Error("（1）发生了一个错误！" + Environment.NewLine
-                                            + "（2）错误源：" + e.Exception.InnerException.Source +
-                                            Environment.NewLine
-                                            + "（3）错误信息：" + e.Exception.Message + Environment.NewLine
-                                            + "（4）详细信息：" + e.Exception.InnerException.Message +
-                                            Environment.NewLine
-                                            + "（5）报错区域：" + e.Exception.InnerException.StackTrace);
+                    log.Error("（1）发生了一个错误！" + e.Exception.Message + Environment.NewLine
+                              + "（2）错误源：" + e.Exception.InnerException.Source +
+                              Environment.NewLine
+                              + "（3）错误信息：" + e.Exception.Message + Environment.NewLine
+                              + "（4）详细信息：" + e.Exception.InnerException.Message +
+                              Environment.NewLine
+                              + "（5）报错区域：" + e.Exception.InnerException.StackTrace);
                     var error = new ErrorDialog("", "（1）发生了一个错误！" + Environment.NewLine
                                                                   + "（2）错误源：" +
                                                                   e.Exception.InnerException.Source +

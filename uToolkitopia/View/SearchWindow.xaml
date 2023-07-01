@@ -82,7 +82,7 @@
                         <DataTemplate>
                             <ui:Button ToolTip="{Binding Path=. ,Converter={StaticResource SearchItemToInfo}}"
                                        Command="{Binding Path=DataContext.OpenFileCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:FluentWindow}}}"
-                                       CommandParameter="{Binding SelectedValue, ElementName=dataGrid}"
+                                       CommandParameter="{Binding .}"
                                        Background="Transparent"
                                        PreviewKeyDown="Button_PreviewKeyDown" Height="72" Margin="0"
                                        Width="762" Padding="3">

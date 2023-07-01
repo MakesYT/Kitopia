@@ -222,7 +222,11 @@ public partial class SearchWindowViewModel : ObservableRecipient
             }
             finally
             {
-                OnPropertyChanged(nameof(Items));
+                Task.Factory.StartNew(() =>
+                    {
+                        Items.ResetBindings();
+                    }, CancellationToken.None, TaskCreationOptions.None, _scheduler)
+                    .Wait();
             }
         }
     }
@@ -592,13 +596,14 @@ public partial class SearchWindowViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    private void Star(object searchViewItem)
+    private void Star(SearchViewItem item)
     {
-        var item = (SearchViewItem)searchViewItem;
         Log.Debug("添加/移除收藏" + item.OnlyKey);
-        var index = Items.IndexOf(item);
-        Items[index].IsStared = !Items[index].IsStared;
-        Items.ResetItem(index);
+        // var index = Items.IndexOf(item);
+        // Items[index].IsStared = !Items[index].IsStared;
+        // Items.ResetItem(index);
+        item.IsStared = !item.IsStared;
+        Items.ResetBindings();
         if (item.FileInfo is not null)
         {
             if (ConfigManger.Config.customCollections.Contains(item.FileInfo.FullName))

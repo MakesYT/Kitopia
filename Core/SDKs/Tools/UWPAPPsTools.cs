@@ -46,7 +46,16 @@ public class UWPAPPsTools
                 continue;
             }
 
-            string fileName = new IndirectString(appContainer.displayName).Value;
+            string? fileName = appContainer.displayName;
+            try
+            {
+                fileName = new IndirectString(appContainer.displayName).Value;
+            }
+            catch (Exception e)
+            {
+                log.Error($"{appContainer.displayName},{e.Message},{e.StackTrace}");
+            }
+
             if (string.IsNullOrWhiteSpace(fileName))
             {
                 continue;
