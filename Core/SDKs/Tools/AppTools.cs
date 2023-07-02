@@ -14,10 +14,44 @@ public partial class AppTools
     private static readonly ILog log = LogManager.GetLogger(nameof(AppTools));
     private static readonly List<string> ErrorLnkList = new();
 
+    public static void DelNullFile(List<SearchViewItem> collection, List<string> names)
+    {
+        foreach (var searchViewItem in collection)
+        {
+            switch (searchViewItem.FileType)
+            {
+                case FileType.文件:
+                case FileType.Excel文档:
+                case FileType.Word文档:
+                case FileType.PDF文档:
+                case FileType.PPT文档:
+                {
+                    if (!File.Exists(searchViewItem.OnlyKey))
+                    {
+                        collection.Remove(searchViewItem);
+                        names.Remove(searchViewItem.OnlyKey);
+                    }
+
+                    break;
+                }
+                case FileType.文件夹:
+                {
+                    if (!Directory.Exists(searchViewItem.OnlyKey))
+                    {
+                        collection.Remove(searchViewItem);
+                        names.Remove(searchViewItem.OnlyKey);
+                    }
+
+                    break;
+                }
+            }
+        }
+    }
+
     public static void GetAllApps(List<SearchViewItem> collection, List<string> names, bool logging = false)
     {
         log.Debug("索引全部软件及收藏项目");
-
+        UWPAPPsTools.GetAll(collection, names);
 
         // 创建一个空的文件路径集合
         List<string> filePaths = new List<string>();
@@ -68,7 +102,7 @@ public partial class AppTools
         {
         }
 
-        UWPAPPsTools.GetAll(collection, names);
+
         if (ErrorLnkList.Any())
         {
             StringBuilder c = new StringBuilder("检测到多个无效的快捷方式\n需要Kitopia帮你清理吗?(该功能每个错误快捷方式只提示一次)\n以下为无效的快捷方式列表:\n");

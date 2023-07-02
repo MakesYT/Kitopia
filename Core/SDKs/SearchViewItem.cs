@@ -82,7 +82,6 @@ public class SearchViewItem : ICloneable, IDisposable
         {
             FileName = FileName,
             IsVisible = IsVisible,
-            Keys = new HashSet<string>(Keys!),
             FileType = FileType,
             IsStared = IsStared,
             OnlyKey = OnlyKey,

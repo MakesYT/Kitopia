@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Concurrent;
+using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
@@ -17,12 +18,15 @@ namespace Core.ViewModel;
 public partial class SearchWindowViewModel : ObservableRecipient
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(SearchWindowViewModel));
-    private readonly List<SearchViewItem> _collection = new(250); //存储本机所有软件
+    private readonly List<SearchViewItem> _collection = new(400); //存储本机所有软件
 
     [ObservableProperty] private bool? _everythingIsOk = true;
+    static List<SearchViewItem> tempList = new List<SearchViewItem>(1000);
 
-    [ObservableProperty] private BindingList<SearchViewItem> _items = new(); //搜索界面显示的软件
-    private readonly List<string> _names = new(250); //软件去重
+    [ObservableProperty]
+    private BindingList<SearchViewItem> _items = new BindingList<SearchViewItem>(tempList); //搜索界面显示的软件
+
+    private readonly List<string> _names = new(500); //软件去重
 
     [ObservableProperty] private string? _search;
 
@@ -37,7 +41,31 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
     public void ReloadApps(bool logging = false)
     {
+        AppTools.DelNullFile(_collection, _names);
         AppTools.GetAllApps(_collection, _names, logging);
+        if (ConfigManger.Config.useEverything)
+        {
+            Log.Debug("everything检测");
+
+
+            if (IntPtr.Size == 8)
+            {
+                // 64-bit
+                Everything64.Everything_SetMax(1);
+                EverythingIsOk = Everything64.Everything_QueryW(true);
+            }
+            else
+            {
+                // 32-bit
+                Everything32.Everything_SetMax(1);
+                EverythingIsOk = Everything32.Everything_QueryW(true);
+            }
+
+            if (EverythingIsOk != null && EverythingIsOk.Value)
+            {
+                Tools.main(_collection, _names); //Everything文档检索
+            }
+        }
     }
 
     public void CheckClipboard()
@@ -262,26 +290,6 @@ public partial class SearchWindowViewModel : ObservableRecipient
             }
 
             value = Search.ToLowerInvariant();
-            if (ConfigManger.Config.useEverything)
-            {
-                Log.Debug("everything检测");
-
-
-                if (IntPtr.Size == 8)
-                {
-                    // 64-bit
-                    Everything64.Everything_SetMax(1);
-                    EverythingIsOk = Everything64.Everything_QueryW(true);
-                }
-                else
-                {
-                    // 32-bit
-                    Everything32.Everything_SetMax(1);
-                    EverythingIsOk = Everything32.Everything_QueryW(true);
-                }
-
-                Tools.main(Items, value, GetIconInItems); //Everything文档检索
-            }
 
 
             if (value.Contains("\\") || value.Contains("/"))
@@ -368,17 +376,32 @@ public partial class SearchWindowViewModel : ObservableRecipient
             }
 
 
-            // 使用LINQ语句来简化和优化筛选和排序逻辑，而不需要使用foreach循环和if判断
-            // 根据给定的值，从集合中筛选出符合条件的SearchViewItem对象，并计算它们的权重
-            var filtered = from item in _collection.AsParallel()
-                let keys = item.Keys.Where(key => !string.IsNullOrEmpty(key)).AsParallel() // 排除空的键
-                let weight = keys.Count(key => key.Contains(value)) * 2 // 统计包含给定值的键的数量
-                             + keys.Count(key => key.StartsWith(value)) * 3 // 统计以给定值开头的键的数量，并乘以500
-                             + keys.Count(key => key.Equals(value)) * 5 // 统计等于给定值的键的数量，并乘以1000
-                where weight > 0 // 只选择权重为正的对象
-                select new { Item = item, Weight = weight }; // 创建一个包含对象和权重属性的匿名类型
+            var filtered = new ConcurrentBag<(SearchViewItem Item, int Weight)>();
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            foreach (var item in _collection)
+            {
+                int weight = 0;
+                foreach (var key in item.Keys)
+                {
+                    if (string.IsNullOrEmpty(key)) continue;
 
-            // 按照权重降序排序筛选出的对象
+                    if (key.Contains(value)) weight += 2;
+
+                    if (key.StartsWith(value)) weight += 5;
+
+                    if (key.Equals(value, StringComparison.Ordinal)) weight += 10;
+                }
+
+                if (weight > 0)
+                {
+                    filtered.Add((item, weight));
+                }
+            }
+
+            stopwatch.Stop();
+            Log.Debug($"方法耗时:{stopwatch.Elapsed.TotalMilliseconds}");
+
             var sorted = filtered.OrderByDescending(x => x.Weight);
 
             // 将排序后的对象添加到Items集合中
