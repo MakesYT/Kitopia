@@ -37,7 +37,7 @@ public class Plugin
 
         // Get the plugin interface by calling the PluginClass.GetInterface method via reflection.
         var t = a.GetExportedTypes();
-        PluginInfoEx pluginInfoEx = new PluginInfoEx() { Author = "error" };
+        PluginInfoEx pluginInfoEx = new PluginInfoEx() { Version = "error" };
         foreach (Type type in t)
         {
             if (type.GetInterface("IPlugin") != null)
@@ -50,7 +50,7 @@ public class Plugin
                     {
                         Author = pluginInfo.Author,
                         Error = "",
-                        IsEnabled = true,
+                        IsEnabled = false,
                         Path = assemblyPath,
                         PluginId = pluginInfo.PluginId,
                         PluginName = pluginInfo.PluginName,
@@ -124,7 +124,7 @@ public class Plugin
 
     public Plugin(string path)
     {
-        _plugin = new AssemblyLoadContextH(path, path.Split("\\").Last());
+        _plugin = new AssemblyLoadContextH(path, path.Split("\\").Last() + "_plugin");
 
         // Create a weak reference to the AssemblyLoadContext that will allow us to detect
         // when the unload completes.

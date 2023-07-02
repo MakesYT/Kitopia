@@ -147,6 +147,7 @@ public sealed partial class App : Application
             log.Info("配置文件初始化完成");
             PluginManager.Init();
             log.Info("插件管理器初始化完成");
+
             var initWindow = ServiceManager.Services.GetService<InitWindow>();
             initWindow.Show();
             Current.MainWindow = ServiceManager.Services.GetService<MainWindow>();

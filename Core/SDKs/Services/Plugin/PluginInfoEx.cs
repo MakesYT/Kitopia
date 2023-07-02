@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using PluginCore;
 
 namespace Core.SDKs.Services.Plugin;
 
@@ -62,5 +63,23 @@ public class PluginInfoEx
     {
         set;
         get;
+    }
+
+    public string ToPlgString()
+    {
+        return $"{Author}_{PluginId}";
+    }
+
+    public PluginInfo ToPluginInfo()
+    {
+        return new PluginInfo()
+        {
+            Author = Author,
+            Description = Description,
+            PluginId = PluginId,
+            PluginName = PluginName,
+            Version = Version,
+            VersionInt = VersionInt
+        };
     }
 }
