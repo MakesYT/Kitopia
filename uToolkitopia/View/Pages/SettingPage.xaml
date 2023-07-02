@@ -43,6 +43,7 @@
                             </kitopia:SettingItems.Icon>
                         </kitopia:SettingItems>
                         
+                        
                     </StackPanel>
                 </Expander.Content>
             </Expander>
@@ -61,6 +62,12 @@
                             <ui:ToggleSwitch Content="" IsChecked="{Binding UseEverything}" />
                             <kitopia:SettingItems.Icon>
                                 <ui:SymbolIcon Symbol="DocumentSearch20" FontSize="25"/>
+                            </kitopia:SettingItems.Icon>
+                        </kitopia:SettingItems>
+                        <kitopia:SettingItems Title="自动启动Everything" Description="在Everything未启动时自动启动"> 
+                            <ui:ToggleSwitch IsChecked="{Binding AutoStartEverything}" />
+                            <kitopia:SettingItems.Icon>
+                                <ui:SymbolIcon Symbol="FlashAuto20" FontSize="25"/>
                             </kitopia:SettingItems.Icon>
                         </kitopia:SettingItems>
                         <kitopia:SettingItems Title="允许程序读取剪贴板内容" Description="自动读取剪贴板路径和剪贴板图像保存依赖于此权限"> 

@@ -533,8 +533,8 @@ public partial class SearchWindowViewModel : ObservableRecipient
                         return;
                     }
 
-                    ShellTools.ShellExecute(IntPtr.Zero, "open", "explorer.exe", "/select," + fileName, "",
-                        ShellTools.ShowCommands.SW_SHOWNORMAL);
+                    Shell32.ShellExecute(IntPtr.Zero, "open", "explorer.exe", "/select," + fileName, "",
+                        ShowWindowCommand.SW_NORMAL);
                     return;
                 }
                 case "Math": break;
@@ -543,13 +543,13 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     if (item.FileType == FileType.UWP应用)
                     {
                         //explorer.exe shell:AppsFolder\Microsoft.WindowsMaps_8wekyb3d8bbwe!App
-                        ShellTools.ShellExecute(IntPtr.Zero, "open", "explorer.exe",
+                        Shell32.ShellExecute(IntPtr.Zero, "open", "explorer.exe",
                             $"shell:AppsFolder\\{item.OnlyKey}!App", "",
-                            ShellTools.ShowCommands.SW_SHOWNORMAL);
+                            ShowWindowCommand.SW_NORMAL);
                     }
                     else
-                        ShellTools.ShellExecute(IntPtr.Zero, "open", item.OnlyKey, "", "",
-                            ShellTools.ShowCommands.SW_SHOWNORMAL);
+                        Shell32.ShellExecute(IntPtr.Zero, "open", item.OnlyKey, "", "",
+                            ShowWindowCommand.SW_NORMAL);
 
                     if (ConfigManger.Config.lastOpens.Contains(item.OnlyKey))
                     {
@@ -573,8 +573,8 @@ public partial class SearchWindowViewModel : ObservableRecipient
         {
             var item = (SearchViewItem)searchViewItem;
             Log.Debug("打开指定内容文件夹" + item.OnlyKey);
-            ShellTools.ShellExecute(IntPtr.Zero, "open", "explorer.exe", "/select," + item.OnlyKey, "",
-                ShellTools.ShowCommands.SW_SHOWNORMAL);
+            Shell32.ShellExecute(IntPtr.Zero, "open", "explorer.exe", "/select," + item.OnlyKey, "",
+                ShowWindowCommand.SW_SHOW);
 
             if (ConfigManger.Config.lastOpens.Contains(item.OnlyKey))
             {
@@ -598,13 +598,13 @@ public partial class SearchWindowViewModel : ObservableRecipient
             if (item.FileType == FileType.UWP应用)
             {
                 //explorer.exe shell:AppsFolder\Microsoft.WindowsMaps_8wekyb3d8bbwe!App
-                ShellTools.ShellExecute(IntPtr.Zero, "runas", "explorer.exe", $"shell:AppsFolder\\{item.OnlyKey}!App",
-                    "",
-                    ShellTools.ShowCommands.SW_SHOWNORMAL);
+
+                Shell32.ShellExecute(IntPtr.Zero, "runas", "explorer.exe", $"shell:AppsFolder\\{item.OnlyKey}!App",
+                    "", ShowWindowCommand.SW_NORMAL);
             }
             else
-                ShellTools.ShellExecute(IntPtr.Zero, "runas", item.OnlyKey, "", "",
-                    ShellTools.ShowCommands.SW_SHOWNORMAL);
+                Shell32.ShellExecute(IntPtr.Zero, "runas", item.OnlyKey, "", "",
+                    ShowWindowCommand.SW_NORMAL);
 
             if (ConfigManger.Config.lastOpens.Contains(item.OnlyKey))
             {

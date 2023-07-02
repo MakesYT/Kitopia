@@ -11,6 +11,7 @@ public record Config
     public string ver = "0.0.2";
     public bool useEverything = true;
     public bool autoStart = true;
+    public bool autoStartEverything = true;
     public bool canReadClipboard = true;
     public string themeChoice = "跟随系统";
     public string themeColor = "#EC407A";

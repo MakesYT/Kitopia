@@ -1,6 +1,7 @@
 ﻿using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Text.RegularExpressions;
+using Core.SDKs.Everything;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using log4net;
@@ -152,6 +153,7 @@ public partial class AppTools
     {
         var localizedName = Shell32.SHCreateItemFromParsingName<Shell32.IShellItem>(file)
             .GetDisplayName(Shell32.SIGDN.SIGDN_NORMALDISPLAY);
+
         if (star)
         {
             log.Debug("索引为收藏项目:" + file);
@@ -229,6 +231,30 @@ public partial class AppTools
             if (string.IsNullOrWhiteSpace(targetPath))
             {
                 targetPath = file;
+            }
+
+            if (targetPath.Contains("Everything.exe") && ConfigManger.Config.autoStartEverything)
+            {
+                var isRun = false;
+                if (IntPtr.Size == 8)
+                {
+                    // 64-bit
+                    Everything64.Everything_SetMax(1);
+                    isRun = Everything64.Everything_QueryW(true);
+                }
+                else
+                {
+                    // 32-bit
+                    Everything32.Everything_SetMax(1);
+                    isRun = Everything32.Everything_QueryW(true);
+                }
+
+                if (!isRun)
+                {
+                    log.Debug("自动启动Everything");
+                    Shell32.ShellExecute(IntPtr.Zero, "open", file, "-startup", "",
+                        ShowWindowCommand.SW_HIDE);
+                }
             }
 
             var refFileInfo = new FileInfo(targetPath);

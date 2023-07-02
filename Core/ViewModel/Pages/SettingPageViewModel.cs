@@ -21,6 +21,7 @@ public partial class SettingPageViewModel : ObservableRecipient
     private IList<string> _themeChoiceOptions = new ObservableCollection<string> { "跟随系统", "深色", "浅色" };
 
     [ObservableProperty] private bool _autoStart = true;
+    [ObservableProperty] private bool _autoStartEverything = true;
     [ObservableProperty] private bool _canReadClipboard = true;
     [ObservableProperty] private int _inputSmoothingMilliseconds = 50;
     [ObservableProperty] private int _maxHistory = 4;
@@ -32,6 +33,7 @@ public partial class SettingPageViewModel : ObservableRecipient
     {
         ThemeChoice = ConfigManger.Config.themeChoice;
         AutoStart = ConfigManger.Config.autoStart;
+        AutoStartEverything = ConfigManger.Config.autoStartEverything;
         UseEverything = ConfigManger.Config.useEverything;
         MaxHistory = ConfigManger.Config.maxHistory;
         CanReadClipboard = ConfigManger.Config.canReadClipboard;
@@ -89,6 +91,13 @@ public partial class SettingPageViewModel : ObservableRecipient
         ConfigManger.Config.canReadClipboard = value;
         ConfigManger.Save();
     }
+
+    partial void OnAutoStartEverythingChanged(bool value)
+    {
+        ConfigManger.Config.autoStartEverything = value;
+        ConfigManger.Save();
+    }
+
 
     partial void OnAutoStartChanged(bool value)
     {
