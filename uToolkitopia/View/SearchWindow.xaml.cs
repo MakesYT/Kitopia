@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Drawing;
-using System.Formats.Asn1;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
-using System.Windows.Threading;
+using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs;
 using Core.SDKs.Services;
 using Core.ViewModel;
 using Microsoft.Extensions.DependencyInjection;
 using Wpf.Ui.Appearance;
-using Wpf.Ui.Controls;
 using Wpf.Ui.Controls.Window;
 
 namespace Kitopia.View;
@@ -25,8 +22,15 @@ public partial class SearchWindow : FluentWindow
     public SearchWindow()
     {
         InitializeComponent();
-        
+        WeakReferenceMessenger.Default.Register<string, string>(this, "SearchWindowClose", (_, _) =>
+        {
+            App.Current.Dispatcher.BeginInvoke(() =>
+            {
+                this.Visibility = Visibility.Hidden;
+            });
+        });
     }
+
     protected override void OnSourceInitialized(EventArgs e)
     {
         base.OnSourceInitialized(e);
@@ -36,21 +40,18 @@ public partial class SearchWindow : FluentWindow
         {
             WindowBackdrop.ApplyBackdrop(m_Hwnd, WindowBackdropType.Acrylic);
         });
-
     }
 
     private void ChangeTheme(ThemeType currentTheme, Color systemAccent)
     {
-        
     }
-    
-    
+
+
     private void w_Deactivated(object sender, EventArgs e)
     {
         Visibility = Visibility.Hidden;
-        
     }
-    
+
     [DllImport("user32.dll", SetLastError = true)]
     private static extern IntPtr SetFocus(IntPtr hWnd);
 
@@ -59,11 +60,9 @@ public partial class SearchWindow : FluentWindow
 
     private void w_Activated(object sender, EventArgs e)
     {
-        
         var hwnd = new WindowInteropHelper(this).Handle;
         SetForegroundWindow(hwnd);
         SetFocus(hwnd);
-        
     }
 
     private void Button_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -105,13 +104,22 @@ public partial class SearchWindow : FluentWindow
             // 调用 InputManager.Current.ProcessInput 方法来处理该事件
             InputManager.Current.ProcessInput(shiftUpArgs);
         }
+        else if (e.Key != Key.System)
+        {
+            tx.Focus();
+        }
     }
 
     private void tx_KeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key == Key.Enter)
         {
-            ServiceManager.Services!.GetService<SearchWindowViewModel>()!.OpenFile((SearchViewItem)dataGrid.Items[0]);
+            if (!dataGrid.Items.IsEmpty)
+            {
+                ServiceManager.Services!.GetService<SearchWindowViewModel>()!.OpenFile(
+                    (SearchViewItem)dataGrid.Items[0]);
+            }
+
             e.Handled = true;
         }
         else if (e.Key == Key.Down)

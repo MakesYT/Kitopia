@@ -19,14 +19,7 @@ public class PluginManager
                     Log.Debug($"加载插件:{directoryInfo.Name}.dll");
                     var pluginInfoEx = Plugin.GetPluginInfoEx($"{directoryInfo.FullName}\\{directoryInfo.Name}.dll",
                         out var alcWeakRef);
-                    if (pluginInfoEx.Version != "error")
-                    {
-                        if (ConfigManger.Config.EnabledPluginInfos.Contains(pluginInfoEx.ToPluginInfo()))
-                        {
-                            // PluginManager.EnablePlugin.Add($"{pluginInfoEx.Author}_{pluginInfoEx.PluginId}",
-                            //     new Plugin(pluginInfoEx.Path));
-                        }
-                    }
+
 
                     while (alcWeakRef.IsAlive)
                     {
@@ -34,8 +27,14 @@ public class PluginManager
                         GC.WaitForPendingFinalizers();
                     }
 
-                    PluginManager.EnablePlugin.Add($"{pluginInfoEx.Author}_{pluginInfoEx.PluginId}",
-                        new Plugin(pluginInfoEx.Path));
+                    if (pluginInfoEx.Version != "error")
+                    {
+                        if (ConfigManger.Config.EnabledPluginInfos.Contains(pluginInfoEx.ToPluginInfo()))
+                        {
+                            PluginManager.EnablePlugin.Add($"{pluginInfoEx.Author}_{pluginInfoEx.PluginId}",
+                                new Plugin(pluginInfoEx.Path));
+                        }
+                    }
                 }
             }
         });

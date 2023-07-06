@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Drawing;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs;
 using Core.SDKs.Everything;
 using Core.SDKs.Services;
@@ -518,6 +519,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
     {
         await Task.Run(() =>
         {
+            WeakReferenceMessenger.Default.Send("a", "SearchWindowClose");
             var item = (SearchViewItem)searchViewItem;
             Log.Debug("打开指定内容" + item.OnlyKey);
             switch (item.OnlyKey)
@@ -571,6 +573,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
     {
         await Task.Run(() =>
         {
+            WeakReferenceMessenger.Default.Send("a", "SearchWindowClose");
             var item = (SearchViewItem)searchViewItem;
             Log.Debug("打开指定内容文件夹" + item.OnlyKey);
             Shell32.ShellExecute(IntPtr.Zero, "open", "explorer.exe", "/select," + item.OnlyKey, "",
@@ -593,6 +596,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
     {
         await Task.Run(() =>
         {
+            WeakReferenceMessenger.Default.Send("a", "SearchWindowClose");
             var item = (SearchViewItem)searchViewItem;
             Log.Debug("以管理员身份打开指定内容" + item.OnlyKey);
             if (item.FileType == FileType.UWP应用)
@@ -665,6 +669,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
         }
 
         //GetItemsIcon();
+
         ConfigManger.Save();
     }
 
@@ -694,6 +699,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
     {
         await Task.Run(() =>
         {
+            WeakReferenceMessenger.Default.Send("a", "SearchWindowClose");
             var item = (SearchViewItem)searchViewItem;
             Log.Debug("打开指定内容在终端中" + item.OnlyKey);
             var startInfo = new ProcessStartInfo
