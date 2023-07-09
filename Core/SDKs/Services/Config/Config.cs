@@ -34,7 +34,7 @@ public record Config
     };
 
 
-    public List<string> lastOpens = new();
+    public Dictionary<string, int> lastOpens = new();
 
 
     public List<string> errorLnk = new();

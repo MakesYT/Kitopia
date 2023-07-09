@@ -167,7 +167,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
 
             foreach (var searchViewItem in ConfigManger.Config.lastOpens.SelectMany(name1 => _collection.Where(
-                         searchViewItem => searchViewItem.OnlyKey.Equals(name1))))
+                         searchViewItem => searchViewItem.OnlyKey.Equals(name1.Key))))
             {
                 if (limit >= ConfigManger.Config.maxHistory)
                 {
@@ -401,13 +401,48 @@ public partial class SearchWindowViewModel : ObservableRecipient
             stopwatch.Stop();
             Log.Debug($"方法耗时:{stopwatch.Elapsed.TotalMilliseconds}");
 
-            var sorted = filtered.OrderByDescending(x => x.Weight);
+            var sorted = filtered.OrderByDescending(x => x.Weight).ToList();
 
             // 将排序后的对象添加到Items集合中
             //Items.RaiseListChangedEvents = false;
             var count = 0; // 计数器变量
             const int limit = 100; // 限制次数
             var nowIndex = 0;
+            Dictionary<SearchViewItem, int> nowHasLastOpens = new();
+            List<SearchViewItem> toRemove = new();
+            foreach (var valueTuple in sorted)
+            {
+                if (ConfigManger.Config.lastOpens.ContainsKey(valueTuple.Item.OnlyKey))
+                {
+                    nowHasLastOpens.Add((SearchViewItem)valueTuple.Item.Clone(),
+                        ConfigManger.Config.lastOpens[valueTuple.Item.OnlyKey]);
+                    toRemove.Add(valueTuple.Item);
+                }
+            }
+
+            sorted.RemoveAll(x => toRemove.Contains(x.Item1));
+
+            var sortedDict = nowHasLastOpens.OrderByDescending(p => p.Value).ToDictionary(p => p.Key, p => p.Value);
+            foreach (var (searchViewItem, i) in sortedDict)
+            {
+                if (ConfigManger.Config.alwayShows.Contains(searchViewItem.OnlyKey))
+                {
+                    searchViewItem.IsPined = true;
+                }
+
+
+                if (searchViewItem.Icon is null)
+                {
+                    ThreadPool.QueueUserWorkItem(_ =>
+                    {
+                        GetIconInItems(searchViewItem);
+                    });
+                }
+
+                Items.Add(searchViewItem); // 添加元素
+            }
+
+
             foreach (var x in sorted)
             {
                 if (count >= limit) // 如果达到了限制
@@ -416,28 +451,9 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 }
 
                 var searchViewItem = (SearchViewItem)x.Item.Clone();
-                if (ConfigManger.Config.lastOpens.Contains(x.Item.OnlyKey))
+                if (ConfigManger.Config.lastOpens.ContainsKey(x.Item.OnlyKey))
                 {
-                    Log.Debug("添加提高权重的搜索结果" + x.Item.OnlyKey);
-
-
-                    if (ConfigManger.Config.alwayShows.Contains(searchViewItem.OnlyKey))
-                    {
-                        searchViewItem.IsPined = true;
-                    }
-
-
-                    if (searchViewItem.Icon is null)
-                    {
-                        ThreadPool.QueueUserWorkItem(_ =>
-                        {
-                            GetIconInItems(searchViewItem);
-                        });
-                    }
-
-                    Items.Insert(nowIndex, searchViewItem); // 添加元素
-                    nowIndex++;
-                    count++; // 计数器加一
+                    count++;
                 }
                 else
                 {
@@ -552,12 +568,13 @@ public partial class SearchWindowViewModel : ObservableRecipient
                         Shell32.ShellExecute(IntPtr.Zero, "open", item.OnlyKey, "", "",
                             ShowWindowCommand.SW_NORMAL);
 
-                    if (ConfigManger.Config.lastOpens.Contains(item.OnlyKey))
+                    if (ConfigManger.Config.lastOpens.ContainsKey(item.OnlyKey))
                     {
-                        ConfigManger.Config.lastOpens.Remove(item.OnlyKey);
+                        ConfigManger.Config.lastOpens[item.OnlyKey]++;
                     }
+                    else
+                        ConfigManger.Config.lastOpens.Add(item.OnlyKey, 1);
 
-                    ConfigManger.Config.lastOpens.Insert(0, item.OnlyKey);
                     //if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
                     Search = "";
                     ConfigManger.Save();
@@ -578,12 +595,13 @@ public partial class SearchWindowViewModel : ObservableRecipient
             Shell32.ShellExecute(IntPtr.Zero, "open", "explorer.exe", "/select," + item.OnlyKey, "",
                 ShowWindowCommand.SW_SHOW);
 
-            if (ConfigManger.Config.lastOpens.Contains(item.OnlyKey))
+            if (ConfigManger.Config.lastOpens.ContainsKey(item.OnlyKey))
             {
-                ConfigManger.Config.lastOpens.Remove(item.OnlyKey);
+                ConfigManger.Config.lastOpens[item.OnlyKey]++;
             }
+            else
+                ConfigManger.Config.lastOpens.Add(item.OnlyKey, 1);
 
-            ConfigManger.Config.lastOpens.Insert(0, item.OnlyKey);
             //if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
             Search = "";
             ConfigManger.Save();
@@ -609,12 +627,13 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 Shell32.ShellExecute(IntPtr.Zero, "runas", item.OnlyKey, "", "",
                     ShowWindowCommand.SW_NORMAL);
 
-            if (ConfigManger.Config.lastOpens.Contains(item.OnlyKey))
+            if (ConfigManger.Config.lastOpens.ContainsKey(item.OnlyKey))
             {
-                ConfigManger.Config.lastOpens.Remove(item.OnlyKey);
+                ConfigManger.Config.lastOpens[item.OnlyKey]++;
             }
+            else
+                ConfigManger.Config.lastOpens.Add(item.OnlyKey, 1);
 
-            ConfigManger.Config.lastOpens.Insert(0, item.OnlyKey);
             //if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
             Search = "";
             ConfigManger.Save();
@@ -718,12 +737,13 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
             Process.Start(startInfo);
 
-            if (ConfigManger.Config.lastOpens.Contains(item.OnlyKey))
+            if (ConfigManger.Config.lastOpens.ContainsKey(item.OnlyKey))
             {
-                ConfigManger.Config.lastOpens.Remove(item.OnlyKey);
+                ConfigManger.Config.lastOpens[item.OnlyKey]++;
             }
+            else
+                ConfigManger.Config.lastOpens.Add(item.OnlyKey, 1);
 
-            ConfigManger.Config.lastOpens.Insert(0, item.OnlyKey);
             //if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
             Search = "";
             ConfigManger.Save();
