@@ -56,6 +56,7 @@ public partial class HotKeyEditorWindow : FluentWindow
     {
         if (e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Control) ||
             e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Alt) ||
+            e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Shift) ||
             e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Windows))
         {
             if (e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Control))
@@ -82,14 +83,22 @@ public partial class HotKeyEditorWindow : FluentWindow
             }
             else Win.Visibility = Visibility.Collapsed;
 
-            if (e.Key != Key.LeftShift && e.Key != Key.RightShift && e.Key != Key.LeftAlt && e.Key != Key.RightAlt &&
-                e.Key != Key.LWin && e.Key != Key.RWin && e.Key != Key.LeftCtrl && e.Key != Key.RightCtrl &&
-                (int)e.SystemKey != 120 && (int)e.SystemKey != 121)
+            Key key = (e.Key == Key.System ? e.SystemKey : e.Key);
+            if (key != Key.LeftShift && key != Key.RightShift && key != Key.LeftAlt && key != Key.RightAlt &&
+                key != Key.LWin && key != Key.RWin && key != Key.LeftCtrl && key != Key.RightCtrl)
             {
-                Key key = (e.Key == Key.System ? e.SystemKey : e.Key);
                 selectedKey = ((EKey)((VirtualKey)KeyInterop.VirtualKeyFromKey(key)));
+                KeyName.Visibility = Visibility.Visible;
                 KeyName.Content = selectedKey.ToString();
             }
+        }
+        else
+        {
+            Ctrl.Visibility = Visibility.Collapsed;
+            Alt.Visibility = Visibility.Collapsed;
+            Shift.Visibility = Visibility.Collapsed;
+            Win.Visibility = Visibility.Collapsed;
+            KeyName.Visibility = Visibility.Collapsed;
         }
     }
 

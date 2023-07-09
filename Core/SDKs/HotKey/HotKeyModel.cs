@@ -14,6 +14,12 @@ public class HotKeyModel
         set;
     }
 
+    public string? MainName
+    {
+        get;
+        set;
+    }
+
     /// <summary>
     ///     设置项快捷键是否可用
     /// </summary>
