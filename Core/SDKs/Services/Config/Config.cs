@@ -27,7 +27,8 @@ public record Config
     {
         new HotKeyModel
         {
-            Name = "显示搜索框", IsUsable = true, IsSelectCtrl = false, IsSelectAlt = true, IsSelectWin = false,
+            MainName = "Kitopia", Name = "显示搜索框", IsUsable = true, IsSelectCtrl = false, IsSelectAlt = true,
+            IsSelectWin = false,
             IsSelectShift = false, SelectKey = EKey.空格
         }
     };
