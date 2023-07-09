@@ -53,14 +53,10 @@ public partial class HotKeyEditorWindow : FluentWindow
         KeyName.Content = hotKeyModel.SelectKey.ToString();
     }
 
-    private EKey selectedKey;
+    private EKey? selectedKey;
 
     private void HotKeyEditorWindow_OnKeyDown(object sender, KeyEventArgs e)
     {
-        if (e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Control) ||
-            e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Alt) ||
-            e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Shift) ||
-            e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Windows))
         {
             if (e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Control))
             {
@@ -94,14 +90,11 @@ public partial class HotKeyEditorWindow : FluentWindow
                 KeyName.Visibility = Visibility.Visible;
                 KeyName.Content = selectedKey.ToString();
             }
-        }
-        else
-        {
-            Ctrl.Visibility = Visibility.Collapsed;
-            Alt.Visibility = Visibility.Collapsed;
-            Shift.Visibility = Visibility.Collapsed;
-            Win.Visibility = Visibility.Collapsed;
-            KeyName.Visibility = Visibility.Collapsed;
+            else
+            {
+                KeyName.Visibility = Visibility.Collapsed;
+                selectedKey = null;
+            }
         }
     }
 
@@ -155,6 +148,11 @@ public partial class HotKeyEditorWindow : FluentWindow
             hotKeyModel.IsSelectCtrl = true;
         }
         else hotKeyModel.IsSelectCtrl = false;
+
+        if (selectedKey is null)
+        {
+            return;
+        }
 
         hotKeyModel.SelectKey = selectedKey;
         ConfigManger.Save();

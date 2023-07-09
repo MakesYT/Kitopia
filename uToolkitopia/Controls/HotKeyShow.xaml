@@ -66,6 +66,12 @@
                     </ui:Button>
 
                     <ControlTemplate.Triggers>
+                        <Trigger Property="KeyType" Value="None">
+                            <Setter TargetName="Ctrl" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="Win" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="Alt" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="Shift" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
                         <Trigger Property="KeyType" Value="Ctrl">
                             <Setter TargetName="Ctrl" Property="Visibility" Value="Visible" />
                             <Setter TargetName="Win" Property="Visibility" Value="Collapsed" />

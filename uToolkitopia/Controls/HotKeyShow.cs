@@ -13,6 +13,7 @@ public class HotKeyShow : Wpf.Ui.Controls.Button
 {
     public enum KeyTypeE
     {
+        None = 0000,
         CtrlAlt = 1010,
         Ctrl = 1000,
         CtrlShift = 1100,

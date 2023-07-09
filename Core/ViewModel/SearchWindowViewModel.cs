@@ -1,6 +1,5 @@
 ﻿using System.Collections.Concurrent;
 using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Text.RegularExpressions;
@@ -348,11 +347,10 @@ public partial class SearchWindowViewModel : ObservableRecipient
             {
                 try
                 {
-                    var dt = new DataTable();
-                    var result = dt.Compute(value, null);
+                    var e = new NCalc.Expression(value);
                     Items.Add(new SearchViewItem()
                     {
-                        FileName = "=" + result,
+                        FileName = "=" + e.Evaluate(),
                         FileType = FileType.数学运算,
                         OnlyKey = value,
                         Icon = null,
