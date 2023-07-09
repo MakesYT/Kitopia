@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.Text.RegularExpressions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -339,17 +340,16 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     });
                     Items.Add(searchViewItem);
                 }
-
-                return;
             }
 
             var operators = new[] { '*', '+', '-', '/' };
-            if (value.IndexOfAny(operators) > 0)
+            string pattern = @"[\u4e00-\u9fa5a-zA-Z]+";
+            if (!Regex.Match(value, pattern).Success && value.IndexOfAny(operators) > 0)
             {
                 try
                 {
                     var dt = new DataTable();
-                    var result = (int)dt.Compute(value, null);
+                    var result = dt.Compute(value, null);
                     Items.Add(new SearchViewItem()
                     {
                         FileName = "=" + result,
@@ -372,8 +372,6 @@ public partial class SearchWindowViewModel : ObservableRecipient
                         IsVisible = true
                     });
                 }
-
-                return;
             }
 
 
@@ -471,18 +469,6 @@ public partial class SearchWindowViewModel : ObservableRecipient
             {
                 Log.Debug("无搜索项目,添加网页搜索");
 
-
-                var searchViewItem = new SearchViewItem()
-                {
-                    Url = "https://www.bing.com/search?q=" + value,
-                    FileName = "在网页中搜索" + value,
-                    FileType = FileType.URL,
-                    OnlyKey = "https://www.bing.com/search?q=" + value,
-                    Icon = null,
-                    IconSymbol = 62555,
-                    IsVisible = true
-                };
-                Items.Add(searchViewItem);
                 if (value.Contains("."))
                 {
                     var viewItem = new SearchViewItem()
@@ -497,6 +483,19 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     };
                     Items.Add(viewItem);
                 }
+
+                var searchViewItem = new SearchViewItem()
+                {
+                    Url = "https://www.bing.com/search?q=" + value,
+                    FileName = "在网页中搜索" + value,
+                    FileType = FileType.URL,
+                    OnlyKey = "https://www.bing.com/search?q=" + value,
+                    Icon = null,
+                    IconSymbol = 62555,
+                    IsVisible = true
+                };
+                Items.Add(searchViewItem);
+
 
                 var item = new SearchViewItem()
                 {
