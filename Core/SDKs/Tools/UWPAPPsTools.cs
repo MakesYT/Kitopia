@@ -129,6 +129,7 @@ public class UWPAPPsTools
                                 Icon = (Icon?)icon.Clone(),
                                 IsVisible = true
                             };
+
                             log.Debug(
                                 $"appContainerName:{appContainer.appContainerName},\n displayName:{searchViewItem.FileName},\nworkingDirectory:{appContainer.workingDirectory}\n");
                             //Console.WriteLine(searchViewItem);
