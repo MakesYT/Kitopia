@@ -13,7 +13,7 @@ public class HotKeysToHotKeyShow : IValueConverter
     {
         var hotKeyModel = ConfigManger.Config.hotKeys.FirstOrDefault(e =>
         {
-            if (e.Name.Equals(parameter))
+            if ($"{e.MainName}_{e.Name}".Equals(parameter))
             {
                 return true;
             }
