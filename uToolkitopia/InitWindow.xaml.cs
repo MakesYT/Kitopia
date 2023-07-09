@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
+using Core.SDKs.HotKey;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using Core.ViewModel;
@@ -13,6 +15,7 @@ using Kitopia.View;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
 using Wpf.Ui.Controls;
+using MessageBoxResult = Kitopia.Controls.MessageBoxControl.MessageBoxResult;
 
 namespace Kitopia;
 
@@ -86,6 +89,16 @@ public partial class InitWindow
         InitHotKey();
     }
 
+    public bool HotKeySet(HotKeyModel hotKeyModel)
+    {
+        if (HotKeyHelper.RegisterGlobalHotKey(new[] { hotKeyModel }, m_Hwnd, out m_HotKeySettings).Any())
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     /// <summary>
     ///     初始化注册快捷键
     /// </summary>
@@ -94,14 +107,58 @@ public partial class InitWindow
     public bool InitHotKey()
     {
         var list = ConfigManger.Config.hotKeys;
-        // 注册全局快捷键
         var failList = HotKeyHelper.RegisterGlobalHotKey(list, m_Hwnd, out m_HotKeySettings);
-        if (string.IsNullOrEmpty(failList))
+
+
+        if (!failList.Any())
             return true;
-        var mbResult = MessageBox.Show(string.Format("无法注册下列快捷键\n\r{0}程序退出？", failList), "提示",
-            MessageBoxButton.OK);
+        string fail = "";
+        foreach (var hotKeyModel in failList)
+        {
+            fail += $"{hotKeyModel.MainName}_{hotKeyModel.Name}\n";
+        }
+
+        Controls.MessageBoxControl.MessageBox msg = new Controls.MessageBoxControl.MessageBox();
+        msg.Title = "Kitopia";
+        msg.Content = $"无法注册下列快捷键\n{fail}\n现在你需要重新设置\n在设置界面按下取消以取消该快捷键注册";
+        msg.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+        msg.CloseButtonText = "确定";
+        msg.FontSize = 15;
+        var task = msg.ShowDialogAsync();
+        // 使用ContinueWith来在任务完成后执行一个回调函数
+        task.ContinueWith(e =>
+        {
+            MessageBoxResult result = e.Result;
+        }).Wait();
+        List<HotKeyModel> itemsToRemove = new List<HotKeyModel>();
+        foreach (var hotKeyModel in failList)
+        {
+            HotKeyEditorWindow hotKeyEditor = new HotKeyEditorWindow($"{hotKeyModel.MainName}_{hotKeyModel.Name}");
+            if (ServiceManager.Services.GetService<MainWindow>().Visibility != Visibility.Visible)
+            {
+                hotKeyEditor.Height = 371;
+                hotKeyEditor.Width = 600;
+                hotKeyEditor.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            }
+            else
+            {
+                hotKeyEditor.Height = ServiceManager.Services.GetService<MainWindow>().Height / 2;
+                hotKeyEditor.Width = ServiceManager.Services.GetService<MainWindow>().Width / 2;
+                hotKeyEditor.Owner = ServiceManager.Services.GetService<MainWindow>();
+                hotKeyEditor.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            }
+
+            hotKeyEditor.Topmost = true;
+
+            hotKeyEditor.Title = "修改快捷键";
+            hotKeyEditor.ShowDialog();
+        }
+
+
+        // 注册全局快捷键
+
         // 弹出热键设置窗体
-        Environment.Exit(0);
+
         return true;
     }
 
@@ -121,9 +178,9 @@ public partial class InitWindow
     {
         switch (msg)
         {
-            case HotKeyTools.WM_HOTKEY:
+            case 0x312:
                 var sid = wideParam.ToInt32();
-                if (sid == m_HotKeySettings["显示搜索框"])
+                if (sid == m_HotKeySettings["Kitopia_显示搜索框"])
                 {
                     log.Debug("显示搜索框热键被触发");
 

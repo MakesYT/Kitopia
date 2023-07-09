@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows.Input;
 using Core.SDKs.HotKey;
 using log4net;
+using Vanara.PInvoke;
 
 namespace Kitopia.SDKs;
 
@@ -21,37 +21,16 @@ public class HotKeyHelper
     /// <param name="hwnd">窗口句柄</param>
     /// <param name="hotKeySettingsDic">快捷键注册项的唯一标识符字典</param>
     /// <returns>返回注册失败项的拼接字符串</returns>
-    public static string RegisterGlobalHotKey(IEnumerable<HotKeyModel> hotKeyModelList, IntPtr hwnd,
+    public static List<HotKeyModel> RegisterGlobalHotKey(IEnumerable<HotKeyModel> hotKeyModelList, IntPtr hwnd,
         out Dictionary<string, int> hotKeySettingsDic)
     {
-        var failList = string.Empty;
+        List<HotKeyModel> failList = new List<HotKeyModel>();
         foreach (var item in hotKeyModelList)
             if (!RegisterHotKey(item, hwnd))
             {
-                var str = string.Empty;
-                if (item.IsSelectCtrl && !item.IsSelectShift && !item.IsSelectAlt)
-                    str = ModifierKeys.Control.ToString();
-                else if (!item.IsSelectCtrl && item.IsSelectShift && !item.IsSelectAlt)
-                    str = ModifierKeys.Shift.ToString();
-                else if (!item.IsSelectCtrl && !item.IsSelectShift && item.IsSelectAlt)
-                    str = ModifierKeys.Alt.ToString();
-                else if (item.IsSelectCtrl && item.IsSelectShift && !item.IsSelectAlt)
-                    str = string.Format("{0}+{1}", ModifierKeys.Control.ToString(), ModifierKeys.Shift);
-                else if (item.IsSelectCtrl && !item.IsSelectShift && item.IsSelectAlt)
-                    str = string.Format("{0}+{1}", ModifierKeys.Control.ToString(), ModifierKeys.Alt);
-                else if (!item.IsSelectCtrl && item.IsSelectShift && item.IsSelectAlt)
-                    str = string.Format("{0}+{1}", ModifierKeys.Shift.ToString(), ModifierKeys.Alt);
-                else if (item.IsSelectCtrl && item.IsSelectShift && item.IsSelectAlt)
-                    str = string.Format("{0}+{1}+{2}", ModifierKeys.Control.ToString(), ModifierKeys.Shift.ToString(),
-                        ModifierKeys.Alt);
-                if (string.IsNullOrEmpty(str))
-                    str += item.SelectKey;
-                else
-                    str += string.Format("+{0}", item.SelectKey);
-                str = string.Format("{0} ({1})\n\r", item.Name, str);
-                failList += str;
+                failList.Add(item);
 
-                log.Debug("注册热键失败:" + str);
+                log.Debug($"注册热键失败:{item.MainName}_{item.Name}");
             }
 
         hotKeySettingsDic = m_HotKeySettingsDic;
@@ -66,8 +45,8 @@ public class HotKeyHelper
     /// <returns>成功返回true，失败返回false</returns>
     private static bool RegisterHotKey(HotKeyModel hotKeyModel, IntPtr hWnd)
     {
-        var fsModifierKey = new ModifierKeys();
-        var hotKeySetting = hotKeyModel.Name;
+        var fsModifierKey = new User32.HotKeyModifiers();
+        var hotKeySetting = $"{hotKeyModel.MainName}_{hotKeyModel.Name}";
 
         log.Debug("注册热键:" + hotKeySetting);
 
@@ -75,15 +54,15 @@ public class HotKeyHelper
         if (!m_HotKeySettingsDic.ContainsKey(hotKeySetting))
         {
             // 全局原子不会在应用程序终止时自动删除。每次调用GlobalAddAtom函数，必须相应的调用GlobalDeleteAtom函数删除原子。
-            if (HotKeyTools.GlobalFindAtom(hotKeySetting.ToString()) != 0)
-                HotKeyTools.GlobalDeleteAtom(HotKeyTools.GlobalFindAtom(hotKeySetting.ToString()));
+            if (!Kernel32.GlobalFindAtom(hotKeySetting).IsInvalid)
+                Kernel32.GlobalDeleteAtom(Kernel32.GlobalFindAtom(hotKeySetting));
             // 获取唯一标识符
-            m_HotKeySettingsDic[hotKeySetting] = HotKeyTools.GlobalAddAtom(hotKeySetting.ToString());
+            m_HotKeySettingsDic[hotKeySetting] = Kernel32.GlobalAddAtom(hotKeySetting).GetHashCode();
         }
         else
         {
             // 注销旧的热键
-            HotKeyTools.UnregisterHotKey(hWnd, m_HotKeySettingsDic[hotKeySetting]);
+            User32.UnregisterHotKey(hWnd, m_HotKeySettingsDic[hotKeySetting]);
         }
 
         if (!hotKeyModel.IsUsable)
@@ -92,26 +71,27 @@ public class HotKeyHelper
         // 注册热键
         if (hotKeyModel.IsSelectShift)
         {
-            fsModifierKey |= ModifierKeys.Shift;
+            fsModifierKey |= User32.HotKeyModifiers.MOD_SHIFT;
         }
 
         if (hotKeyModel.IsSelectWin)
         {
-            fsModifierKey |= ModifierKeys.Windows;
+            fsModifierKey |= User32.HotKeyModifiers.MOD_WIN;
         }
 
         if (hotKeyModel.IsSelectAlt)
         {
-            fsModifierKey |= ModifierKeys.Alt;
+            fsModifierKey |= User32.HotKeyModifiers.MOD_ALT;
         }
 
         if (hotKeyModel.IsSelectCtrl)
         {
-            fsModifierKey |= ModifierKeys.Control;
+            fsModifierKey |= User32.HotKeyModifiers.MOD_CONTROL;
         }
 
+        fsModifierKey |= User32.HotKeyModifiers.MOD_NOREPEAT;
 
-        return HotKeyTools.RegisterHotKey(hWnd, m_HotKeySettingsDic[hotKeySetting], fsModifierKey,
-            (int)hotKeyModel.SelectKey);
+        return User32.RegisterHotKey(hWnd, m_HotKeySettingsDic[hotKeySetting], fsModifierKey,
+            (uint)hotKeyModel.SelectKey);
     }
 }

@@ -16,11 +16,13 @@ public partial class HotKeyEditorWindow : FluentWindow
 
     public HotKeyEditorWindow(string name)
     {
-        this.name = name;
         InitializeComponent();
+        this.name = name;
+        Name.Text = $"快捷键:{name}";
+
         var hotKeyModel = ConfigManger.Config.hotKeys.FirstOrDefault((e) =>
         {
-            if (e.Name.Equals(name))
+            if ($"{e.MainName}_{e.Name}".Equals(name))
             {
                 return true;
             }
@@ -47,6 +49,7 @@ public partial class HotKeyEditorWindow : FluentWindow
             Win.Visibility = Visibility.Visible;
         }
 
+        selectedKey = hotKeyModel.SelectKey;
         KeyName.Content = hotKeyModel.SelectKey.ToString();
     }
 
@@ -106,11 +109,23 @@ public partial class HotKeyEditorWindow : FluentWindow
     {
     }
 
+    private bool isFinnish = false;
+    private bool setSuccess = false;
+
+    public bool GetResult()
+    {
+        while (!isFinnish)
+        {
+        }
+
+        return setSuccess;
+    }
+
     private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
     {
         var hotKeyModel = ConfigManger.Config.hotKeys.FirstOrDefault((e) =>
         {
-            if (e.Name.Equals(name))
+            if ($"{e.MainName}_{e.Name}".Equals(name))
             {
                 return true;
             }
@@ -143,8 +158,29 @@ public partial class HotKeyEditorWindow : FluentWindow
 
         hotKeyModel.SelectKey = selectedKey;
         ConfigManger.Save();
-        ((InitWindow)(ServiceManager.Services.GetService(typeof(InitWindow)))).InitHotKey();
+        setSuccess = ((InitWindow)(ServiceManager.Services.GetService(typeof(InitWindow)))).HotKeySet(hotKeyModel);
+        if (!setSuccess)
+        {
+            Controls.MessageBoxControl.MessageBox msg = new Controls.MessageBoxControl.MessageBox();
+            msg.Title = "Kitopia";
+            msg.Content = $"无法注册快捷键\n{hotKeyModel.MainName}_{hotKeyModel.Name}\n现在你需要重新设置\n在设置界面按下取消以取消该快捷键注册";
+            msg.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            msg.CloseButtonText = "确定";
+            msg.FontSize = 15;
+            var task = msg.ShowDialogAsync();
+            // 使用ContinueWith来在任务完成后执行一个回调函数
+            task.Wait();
+            return;
+        }
+
+        isFinnish = true;
         WeakReferenceMessenger.Default.Send("hotKeyChanged", "hotkey");
         this.Close();
+    }
+
+    private void ButtonCancle_OnClick(object sender, RoutedEventArgs e)
+    {
+        isFinnish = true;
+        setSuccess = true;
     }
 }
