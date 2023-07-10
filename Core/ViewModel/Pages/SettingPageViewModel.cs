@@ -38,6 +38,7 @@ public partial class SettingPageViewModel : ObservableRecipient
         MaxHistory = ConfigManger.Config.maxHistory;
         CanReadClipboard = ConfigManger.Config.canReadClipboard;
         HotKeys = ConfigManger.Config.hotKeys;
+        InputSmoothingMilliseconds = ConfigManger.Config.inputSmoothingMilliseconds;
         WeakReferenceMessenger.Default.Register<string, string>(this, "hotkey", (_, _) =>
         {
             HotKeys = ConfigManger.Config.hotKeys;

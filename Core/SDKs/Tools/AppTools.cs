@@ -17,6 +17,7 @@ public partial class AppTools
 
     public static void DelNullFile(List<SearchViewItem> collection, List<string> names)
     {
+        var toRemove = new List<SearchViewItem>();
         foreach (var searchViewItem in collection)
         {
             switch (searchViewItem.FileType)
@@ -29,7 +30,8 @@ public partial class AppTools
                 {
                     if (!File.Exists(searchViewItem.OnlyKey))
                     {
-                        collection.Remove(searchViewItem);
+                        toRemove.Add(searchViewItem);
+                        //collection.Remove(searchViewItem);
                         names.Remove(searchViewItem.OnlyKey);
                     }
 
@@ -39,13 +41,19 @@ public partial class AppTools
                 {
                     if (!Directory.Exists(searchViewItem.OnlyKey))
                     {
-                        collection.Remove(searchViewItem);
+                        toRemove.Add(searchViewItem);
+                        //collection.Remove(searchViewItem);
                         names.Remove(searchViewItem.OnlyKey);
                     }
 
                     break;
                 }
             }
+        }
+
+        foreach (var searchViewItem in toRemove)
+        {
+            collection.Remove(searchViewItem);
         }
     }
 
