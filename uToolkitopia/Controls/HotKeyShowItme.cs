@@ -9,7 +9,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using Wpf.Ui.Common;
 using Wpf.Ui.Controls;
-using Wpf.Ui.Controls.IconElements;
 using Wpf.Ui.Converters;
 
 namespace Kitopia.Controls;

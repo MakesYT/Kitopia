@@ -11,8 +11,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using Wpf.Ui.Common;
 using Wpf.Ui.Controls;
-using Wpf.Ui.Controls.TitleBarControl;
-using Wpf.Ui.Controls.Window;
 using Wpf.Ui.Interop;
 using Size = System.Windows.Size;
 

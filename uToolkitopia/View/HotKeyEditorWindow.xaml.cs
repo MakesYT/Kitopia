@@ -6,7 +6,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.HotKey;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
-using Wpf.Ui.Controls.Window;
+using Wpf.Ui.Controls;
 
 namespace Kitopia.View;
 

@@ -5,7 +5,7 @@ using System.Windows.Interop;
 using Core.SDKs.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Wpf.Ui.Contracts;
-using Wpf.Ui.Controls.Window;
+using Wpf.Ui.Controls;
 
 namespace Kitopia.View;
 

@@ -6,7 +6,7 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
-using Wpf.Ui.Controls.IconElements;
+using Wpf.Ui.Controls;
 using Wpf.Ui.Converters;
 
 namespace Kitopia.Controls;

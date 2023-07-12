@@ -7,12 +7,13 @@ using System.Windows.Data;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 
-namespace Kitopia.Converter;
+namespace Kitopia.Converter.SearchWindow;
 
 public class PathToImageConverter : IValueConverter
 {
     [DllImport("gdi32.dll")]
     public static extern bool DeleteObject(IntPtr hObject);
+
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value == null)
@@ -33,13 +34,10 @@ public class PathToImageConverter : IValueConverter
             Console.WriteLine(e);
             return null;
         }
-       
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
         throw new NotImplementedException();
     }
-
-   
 }

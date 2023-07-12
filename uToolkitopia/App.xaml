@@ -18,18 +18,17 @@
                 <ResourceDictionary Source="Controls/MessageBoxControl/MessageBox.xaml" />
                 <ResourceDictionary Source="Controls/HotKeyShow.xaml" />
                 <ResourceDictionary Source="Controls/HotKeyShowItme.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Nodify;component/Themes/Light.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <crt:DoubleHalfConverter x:Key="doubleHalfConverter" />
             <crt:DoubleQuarterConverter x:Key="doubleQuarterConverter" />
-            <crt:EnumToVisibilityConverter x:Key="enumToVisibilityConverter" />
             <crt:ReverseBoolToVisibilityConverter x:Key="reverseBoolToVisibilityConverter" />
             <crt:BoolToVisibilityConverter x:Key="boolToVisibilityConverter" />
-            <crt:PathToImageConverter x:Key="pathToImageConverter" />
             <crt:ReverseBool x:Key="ReverseBool" />
             <crt:IntToIconSymbol x:Key="IntToIconSymbol"/>
             <crt:IfNullVisibilityHidden x:Key="IfNullVisibilityHidden"/>
-            <crt:StarBoolToText x:Key="StarBoolToText"/>
-            <crt:SearchItemToInfo x:Key="SearchItemToInfo"/>
+            
+            
             <crt:HotKeysToHotKeyShow x:Key="HotKeysToHotKeyShow"/>
             <crt:HotKeysToKeyName x:Key="HotKeysToKeyName"/>
         </ResourceDictionary>

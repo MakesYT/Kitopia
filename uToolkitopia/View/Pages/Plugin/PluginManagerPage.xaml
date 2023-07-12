@@ -12,10 +12,16 @@
       mc:Ignorable="d"
       xmlns:plugin="clr-namespace:Core.ViewModel.Pages.plugin;assembly=Core"
       xmlns:plugin1="clr-namespace:Kitopia.View.Pages.Plugin"
+      xmlns:searchWindow="clr-namespace:Kitopia.Converter.SearchWindow"
       Title="插件管理页面">
     <Page.Resources>
         <Style TargetType="Border" />
         <plugin1:PluginInfoToInfo x:Key="PluginInfoToInfo" />
+
+
+        <searchWindow:PathToImageConverter x:Key="PathToImageConverter" />
+
+
     </Page.Resources>
     <StackPanel Margin="42">
         <TextBlock Margin="0" FontSize="18" FontWeight="DemiBold" Text="插件列表" />
@@ -68,7 +74,7 @@
                                         </Grid.ColumnDefinitions>
                                         <Image Grid.Column="0" HorizontalAlignment="Left" Focusable="False" Width="48"
                                                Height="48" Margin="0,0,12,0"
-                                               Source="{Binding Icon, Converter={StaticResource pathToImageConverter}}" />
+                                               Source="{Binding Icon, Converter={StaticResource PathToImageConverter}}" />
                                         <StackPanel Grid.Column="1" Margin="5" VerticalAlignment="Center"
                                                     HorizontalAlignment="Stretch">
                                             <TextBlock VerticalAlignment="Center" Margin="0" Focusable="False"
@@ -92,7 +98,8 @@
                                             Margin="0,0,10,0" Grid.Column="3"
                                             Command="{Binding Path=DataContext.SwitchCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Page}}}"
                                             CommandParameter="{Binding}" />
-                                        <ui:SymbolIcon Grid.Column="4" Symbol="ChevronRight20" FontSize="20" Visibility="{Binding IsEnabled,Converter={StaticResource boolToVisibilityConverter},UpdateSourceTrigger=PropertyChanged}"
+                                        <ui:SymbolIcon Grid.Column="4" Symbol="ChevronRight20" FontSize="20"
+                                                       Visibility="{Binding IsEnabled,Converter={StaticResource boolToVisibilityConverter},UpdateSourceTrigger=PropertyChanged}"
                                                        Margin="0,0,10,0" />
                                     </Grid>
                                 </StackPanel>
@@ -104,5 +111,6 @@
             </DataGrid.Columns>
 
         </ui:DataGrid>
+        <Button Click="ButtonBase_OnClick" />
     </StackPanel>
 </Page>

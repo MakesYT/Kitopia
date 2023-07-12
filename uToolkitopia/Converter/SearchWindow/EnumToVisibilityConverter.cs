@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Data;
 using Core.SDKs;
 
-namespace Kitopia.Converter;
+namespace Kitopia.Converter.SearchWindow;
 
 public class EnumToVisibilityConverter : IValueConverter
 {

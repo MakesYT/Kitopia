@@ -13,8 +13,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:Kitopia.Controls"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    xmlns:converter="clr-namespace:Kitopia.Converter">
-    <converter:StarBoolToText x:Key="StarBoolToText" />
+    xmlns:searchWindow="clr-namespace:Kitopia.Converter.SearchWindow">
+    <searchWindow:StarBoolToText x:Key="StarBoolToText" />
     <DrawingImage x:Key="_WinImage">
         <DrawingImage.Drawing>
             <DrawingGroup ClipGeometry="M0,0 V129 H129 V0 H0 Z">
