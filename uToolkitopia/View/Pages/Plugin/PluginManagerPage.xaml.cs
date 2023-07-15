@@ -12,6 +12,5 @@ public partial class PluginManagerPage : Page
 
     private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
     {
-        new TaskEditor().Show();
     }
 }

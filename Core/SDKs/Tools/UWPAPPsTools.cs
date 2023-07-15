@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.IO;
 using System.Xml;
 using log4net;
 using Vanara.Extensions;

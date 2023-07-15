@@ -22,6 +22,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ContextMenu", "ContextMenu\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ContextMenuTest", "ContextMenuTest\ContextMenuTest.vcxproj", "{B86227AD-D071-4203-92F6-75EEB448BAA7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nodify", "..\nodify\Nodify\Nodify.csproj", "{F5E3DED3-7319-4F8D-8125-0C47E25C4E19}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -196,6 +198,26 @@ Global
 		{B86227AD-D071-4203-92F6-75EEB448BAA7}.Release|x64.Build.0 = Release|x64
 		{B86227AD-D071-4203-92F6-75EEB448BAA7}.Release|x86.ActiveCfg = Release|Win32
 		{B86227AD-D071-4203-92F6-75EEB448BAA7}.Release|x86.Build.0 = Release|Win32
+		{F5E3DED3-7319-4F8D-8125-0C47E25C4E19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5E3DED3-7319-4F8D-8125-0C47E25C4E19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5E3DED3-7319-4F8D-8125-0C47E25C4E19}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{F5E3DED3-7319-4F8D-8125-0C47E25C4E19}.Debug|ARM.Build.0 = Debug|Any CPU
+		{F5E3DED3-7319-4F8D-8125-0C47E25C4E19}.Debug|arm64.ActiveCfg = Debug|Any CPU
+		{F5E3DED3-7319-4F8D-8125-0C47E25C4E19}.Debug|arm64.Build.0 = Debug|Any CPU
+		{F5E3DED3-7319-4F8D-8125-0C47E25C4E19}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F5E3DED3-7319-4F8D-8125-0C47E25C4E19}.Debug|x64.Build.0 = Debug|Any CPU
+		{F5E3DED3-7319-4F8D-8125-0C47E25C4E19}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F5E3DED3-7319-4F8D-8125-0C47E25C4E19}.Debug|x86.Build.0 = Debug|Any CPU
+		{F5E3DED3-7319-4F8D-8125-0C47E25C4E19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5E3DED3-7319-4F8D-8125-0C47E25C4E19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5E3DED3-7319-4F8D-8125-0C47E25C4E19}.Release|ARM.ActiveCfg = Release|Any CPU
+		{F5E3DED3-7319-4F8D-8125-0C47E25C4E19}.Release|ARM.Build.0 = Release|Any CPU
+		{F5E3DED3-7319-4F8D-8125-0C47E25C4E19}.Release|arm64.ActiveCfg = Release|Any CPU
+		{F5E3DED3-7319-4F8D-8125-0C47E25C4E19}.Release|arm64.Build.0 = Release|Any CPU
+		{F5E3DED3-7319-4F8D-8125-0C47E25C4E19}.Release|x64.ActiveCfg = Release|Any CPU
+		{F5E3DED3-7319-4F8D-8125-0C47E25C4E19}.Release|x64.Build.0 = Release|Any CPU
+		{F5E3DED3-7319-4F8D-8125-0C47E25C4E19}.Release|x86.ActiveCfg = Release|Any CPU
+		{F5E3DED3-7319-4F8D-8125-0C47E25C4E19}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

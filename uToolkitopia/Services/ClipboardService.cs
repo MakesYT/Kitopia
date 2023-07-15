@@ -16,8 +16,15 @@ public class ClipboardService : IClipboardService
         log.Debug(nameof(ClipboardService) + "的接口" + nameof(IsBitmap) + "被调用");
 
 
-        IDataObject data = Clipboard.GetDataObject();
-        return data.GetDataPresent(DataFormats.Bitmap);
+        try
+        {
+            IDataObject data = Clipboard.GetDataObject();
+            return data.GetDataPresent(DataFormats.Bitmap);
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
     }
 
     public Bitmap? GetBitmap()
@@ -25,10 +32,17 @@ public class ClipboardService : IClipboardService
         log.Debug(nameof(ClipboardService) + "的接口" + nameof(GetBitmap) + "被调用");
 
 
-        IDataObject data = Clipboard.GetDataObject();
-        if (data.GetDataPresent(DataFormats.Bitmap))
+        try
         {
-            return (Bitmap)data.GetData(DataFormats.Bitmap);
+            IDataObject data = Clipboard.GetDataObject();
+            if (data.GetDataPresent(DataFormats.Bitmap))
+            {
+                return (Bitmap)data.GetData(DataFormats.Bitmap);
+            }
+        }
+        catch (Exception e)
+        {
+            return null;
         }
 
         return null;

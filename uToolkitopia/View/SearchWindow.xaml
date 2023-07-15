@@ -107,10 +107,19 @@
                                     <Image Grid.Column="1" HorizontalAlignment="Left" Focusable="False" Width="48"
                                            Height="48"
                                            Source="{Binding Icon, Converter={StaticResource PathToImageConverter}}" />
-
-                                    <ui:SymbolIcon Grid.Column="1" Height="48" Width="48" FontSize="48"
-                                                   Visibility="{Binding IconSymbol,Converter={StaticResource IfNullVisibilityHidden}}"
-                                                   Symbol="{Binding IconSymbol,Converter={StaticResource IntToIconSymbol},Mode=OneWay}" />
+                                    <ui:Button Grid.Column="1"
+                                               Visibility="{Binding IconSymbol,Converter={StaticResource IfNullVisibilityHidden}}"
+                                               Height="48" Width="48" FontSize="48" Margin="0" Padding="0"
+                                               Background="{x:Null}" IsEnabled="False" PressedForeground="{x:Null}"
+                                               MouseOverBackground="{x:Null}" MouseOverBorderBrush="{x:Null}"
+                                               PressedBackground="{x:Null}" PressedBorderBrush="{x:Null}"
+                                               BorderBrush="{x:Null}">
+                                        <ui:Button.Icon>
+                                            <ui:SymbolIcon Height="48" Width="48"
+                                                           Symbol="{Binding IconSymbol,Converter={StaticResource IntToIconSymbol},Mode=OneWay}" />
+                                        </ui:Button.Icon>
+                                    </ui:Button>
+                                    
 
 
                                     <StackPanel Grid.Column="2" Margin="5" VerticalAlignment="Top">

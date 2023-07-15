@@ -14,6 +14,7 @@ using Core.SDKs.Tools;
 using Core.ViewModel;
 using Core.ViewModel.Pages;
 using Core.ViewModel.Pages.plugin;
+using Core.ViewModel.TaskEditor;
 using Kitopia.Services;
 using Kitopia.View;
 using Kitopia.View.Pages;
@@ -340,6 +341,14 @@ public sealed partial class App : Application
         services.AddSingleton<PluginSetting>(e =>
         {
             return new PluginSetting() { DataContext = e.GetService<PluginSettingViewModel>() };
+        });
+        services.AddSingleton<TaskEditorViewModel>(e =>
+        {
+            return new TaskEditorViewModel { IsActive = true };
+        });
+        services.AddSingleton<TaskEditor>(e =>
+        {
+            return new TaskEditor() { DataContext = e.GetService<TaskEditorViewModel>() };
         });
         return services.BuildServiceProvider();
     }
