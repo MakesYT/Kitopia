@@ -43,7 +43,7 @@
                              Background="{StaticResource SmallGridLinesDrawingBrush}" 
                              Connections="{Binding Connections}"
                              ItemsSource="{Binding Nodes }">
-                             
+            
             <nodify:NodifyEditor.Resources>
                 <Style TargetType="{x:Type nodify:PendingConnection}"
                        BasedOn="{StaticResource {x:Type nodify:PendingConnection}}">
@@ -88,6 +88,7 @@
             <nodify:NodifyEditor.DataContext>
                 <taskEditor:TaskEditorViewModel />
             </nodify:NodifyEditor.DataContext>
+            
             <nodify:NodifyEditor.ConnectionTemplate>
                 <DataTemplate DataType="{x:Type taskEditor:ConnectionItem}">
                     <nodify:Connection Source="{Binding Source.Anchor}"

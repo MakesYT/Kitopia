@@ -1,4 +1,3 @@
-using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -12,27 +11,6 @@ public partial class PendingConnectionViewModel : ObservableRecipient
     public PendingConnectionViewModel(TaskEditorViewModel editor)
     {
         _editor = editor;
-
-        FinishCommand = new RelayCommand<ConnectorItem>(target =>
-        {
-            if (target == null)
-                return;
-
-            if (target != Source && target.Source != Source.Source)
-            {
-                if (Source.IsOut != target.IsOut)
-                {
-                    if (!Source.IsOut)
-                    {
-                        _editor.Connect(target, Source);
-                    }
-                    else
-                    {
-                        _editor.Connect(Source, target);
-                    }
-                }
-            }
-        });
     }
 
     [ObservableProperty] private object? _previewTarget;
@@ -71,8 +49,25 @@ public partial class PendingConnectionViewModel : ObservableRecipient
         Source = item;
     }
 
-    public ICommand FinishCommand
+    [RelayCommand]
+    public void Finish(ConnectorItem? target)
     {
-        get;
+        if (target == null)
+            return;
+
+        if (target != Source && target.Source != Source.Source)
+        {
+            if (Source.IsOut != target.IsOut)
+            {
+                if (!Source.IsOut)
+                {
+                    _editor.Connect(target, Source);
+                }
+                else
+                {
+                    _editor.Connect(Source, target);
+                }
+            }
+        }
     }
 }

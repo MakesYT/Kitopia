@@ -164,11 +164,11 @@ public partial class SearchWindowViewModel : ObservableRecipient
         if (ConfigManger.Config.lastOpens.Any())
         {
             Log.Debug("加载历史");
-
-
-            foreach (var searchViewItem in ConfigManger.Config.lastOpens.SelectMany(name1 => _collection.Where(
-                         searchViewItem => searchViewItem.OnlyKey.Equals(name1.Key))))
+            var sortedDict = ConfigManger.Config.lastOpens.OrderByDescending(p => p.Value)
+                .ToDictionary(p => p.Key, p => p.Value);
+            foreach (var (key, value) in sortedDict)
             {
+                var item2 = _collection.FirstOrDefault((e) => e.OnlyKey == key);
                 if (limit >= ConfigManger.Config.maxHistory)
                 {
                     Log.Debug("超过历史记录限制,当前" + limit);
@@ -177,7 +177,12 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     break;
                 }
 
-                var item = (SearchViewItem)searchViewItem.Clone();
+                if (item2 is null)
+                {
+                    break;
+                }
+
+                var item = (SearchViewItem)item2.Clone();
 
                 Log.Debug("加载历史:" + item.OnlyKey);
 
@@ -612,12 +617,29 @@ public partial class SearchWindowViewModel : ObservableRecipient
                         Shell32.ShellExecute(IntPtr.Zero, "open", item.OnlyKey, "", "",
                             ShowWindowCommand.SW_NORMAL);
 
-                    if (ConfigManger.Config.lastOpens.ContainsKey(item.OnlyKey))
+                    switch (item.FileType)
                     {
-                        ConfigManger.Config.lastOpens[item.OnlyKey]++;
+                        case FileType.文件夹:
+                        case FileType.应用程序:
+                        case FileType.Word文档:
+                        case FileType.PPT文档:
+                        case FileType.Excel文档:
+                        case FileType.PDF文档:
+                        case FileType.图像:
+                        case FileType.文件:
+                        {
+                            if (ConfigManger.Config.lastOpens.ContainsKey(item.OnlyKey))
+                            {
+                                ConfigManger.Config.lastOpens[item.OnlyKey]++;
+                            }
+                            else
+                                ConfigManger.Config.lastOpens.Add(item.OnlyKey, 1);
+
+                            break;
+                        }
+                            ;
                     }
-                    else
-                        ConfigManger.Config.lastOpens.Add(item.OnlyKey, 1);
+
 
                     //if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
                     Search = "";
@@ -639,12 +661,28 @@ public partial class SearchWindowViewModel : ObservableRecipient
             Shell32.ShellExecute(IntPtr.Zero, "open", "explorer.exe", "/select," + item.OnlyKey, "",
                 ShowWindowCommand.SW_SHOW);
 
-            if (ConfigManger.Config.lastOpens.ContainsKey(item.OnlyKey))
+            switch (item.FileType)
             {
-                ConfigManger.Config.lastOpens[item.OnlyKey]++;
+                case FileType.文件夹:
+                case FileType.应用程序:
+                case FileType.Word文档:
+                case FileType.PPT文档:
+                case FileType.Excel文档:
+                case FileType.PDF文档:
+                case FileType.图像:
+                case FileType.文件:
+                {
+                    if (ConfigManger.Config.lastOpens.ContainsKey(item.OnlyKey))
+                    {
+                        ConfigManger.Config.lastOpens[item.OnlyKey]++;
+                    }
+                    else
+                        ConfigManger.Config.lastOpens.Add(item.OnlyKey, 1);
+
+                    break;
+                }
+                    ;
             }
-            else
-                ConfigManger.Config.lastOpens.Add(item.OnlyKey, 1);
 
             //if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
             Search = "";
@@ -671,12 +709,28 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 Shell32.ShellExecute(IntPtr.Zero, "runas", item.OnlyKey, "", "",
                     ShowWindowCommand.SW_NORMAL);
 
-            if (ConfigManger.Config.lastOpens.ContainsKey(item.OnlyKey))
+            switch (item.FileType)
             {
-                ConfigManger.Config.lastOpens[item.OnlyKey]++;
+                case FileType.文件夹:
+                case FileType.应用程序:
+                case FileType.Word文档:
+                case FileType.PPT文档:
+                case FileType.Excel文档:
+                case FileType.PDF文档:
+                case FileType.图像:
+                case FileType.文件:
+                {
+                    if (ConfigManger.Config.lastOpens.ContainsKey(item.OnlyKey))
+                    {
+                        ConfigManger.Config.lastOpens[item.OnlyKey]++;
+                    }
+                    else
+                        ConfigManger.Config.lastOpens.Add(item.OnlyKey, 1);
+
+                    break;
+                }
+                    ;
             }
-            else
-                ConfigManger.Config.lastOpens.Add(item.OnlyKey, 1);
 
             //if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
             Search = "";
@@ -781,12 +835,28 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
             Process.Start(startInfo);
 
-            if (ConfigManger.Config.lastOpens.ContainsKey(item.OnlyKey))
+            switch (item.FileType)
             {
-                ConfigManger.Config.lastOpens[item.OnlyKey]++;
+                case FileType.文件夹:
+                case FileType.应用程序:
+                case FileType.Word文档:
+                case FileType.PPT文档:
+                case FileType.Excel文档:
+                case FileType.PDF文档:
+                case FileType.图像:
+                case FileType.文件:
+                {
+                    if (ConfigManger.Config.lastOpens.ContainsKey(item.OnlyKey))
+                    {
+                        ConfigManger.Config.lastOpens[item.OnlyKey]++;
+                    }
+                    else
+                        ConfigManger.Config.lastOpens.Add(item.OnlyKey, 1);
+
+                    break;
+                }
+                    ;
             }
-            else
-                ConfigManger.Config.lastOpens.Add(item.OnlyKey, 1);
 
             //if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
             Search = "";

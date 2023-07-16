@@ -18,7 +18,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
         get;
     }
 
-    [ObservableProperty] private ObservableCollection<PointItem> nodes = new();
+    [ObservableProperty] private ObservableCollection<object> nodes = new();
 
     [ObservableProperty] public ObservableCollection<ConnectionItem> connections = new();
 
@@ -36,15 +36,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
         });
         var welcome = new PointItem
         {
-            Title = "Welcome",
-        };
-        welcome.Input = new ObservableCollection<ConnectorItem>
-        {
-            new ConnectorItem
-            {
-                Source = welcome,
-                Title = "In"
-            }
+            Title = "任务1",
         };
         welcome.Output = new ObservableCollection<ConnectorItem>
         {
@@ -52,10 +44,30 @@ public partial class TaskEditorViewModel : ObservableRecipient
             {
                 IsOut = true,
                 Source = welcome,
+                Title = "开始"
+            }
+        };
+        var welcome2 = new PointItem
+        {
+            Title = "Welcome",
+        };
+        welcome2.Input = new ObservableCollection<ConnectorItem>
+        {
+            new ConnectorItem
+            {
+                Source = welcome2,
+                Title = "In"
+            }
+        };
+        welcome2.Output = new ObservableCollection<ConnectorItem>
+        {
+            new ConnectorItem
+            {
+                IsOut = true,
+                Source = welcome2,
                 Title = "Out"
             }
         };
-
         var nodify = new PointItem
         {
             Title = "To Nodify",
@@ -68,12 +80,51 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 Title = "In"
             }
         };
+        nodify.Output = new ObservableCollection<ConnectorItem>
+        {
+            new ConnectorItem
+            {
+                IsOut = true,
+                Source = nodify,
+                Title = "Out"
+            }
+        };
         Nodes.Add(welcome);
+        Nodes.Add(welcome2);
         Nodes.Add(nodify);
     }
 
     public void Connect(ConnectorItem source, ConnectorItem target)
     {
+        if (source.IsConnected)
+        {
+            var connectionsToRemove = Connections
+                .Where(e => e.Source == source)
+                .ToList();
+
+            foreach (var connection in connectionsToRemove)
+            {
+                connection.Source.IsConnected = false;
+                connection.Target.IsConnected = false;
+                Connections.Remove(connection);
+            }
+        }
+
+        if (target.IsConnected)
+        {
+            var connectionsToRemove = Connections
+                .Where(e => e.Target == target)
+                .ToList();
+
+            foreach (var connection in connectionsToRemove)
+            {
+                connection.Source.IsConnected = false;
+                connection.Target.IsConnected = false;
+                Connections.Remove(connection);
+            }
+        }
+
+        OnPropertyChanged(nameof(Connections));
         Connections.Add(new ConnectionItem(source, target));
     }
 }
