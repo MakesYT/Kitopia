@@ -18,7 +18,9 @@ public partial class MainWindow
 
         ServiceManager.Services!.GetService<INavigationService>()!.SetNavigationControl(NavigationView);
         //TOD
-        //new TaskEditor().Show();
+#if DEBUG
+        new TaskEditor().Show();
+#endif
     }
 
     protected override void OnSourceInitialized(EventArgs e)

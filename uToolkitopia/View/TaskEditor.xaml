@@ -1,14 +1,14 @@
 ﻿<ui:FluentWindow x:Class="Kitopia.View.TaskEditor"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:nodify="https://miroiu.github.io/nodify"
-        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-        xmlns:taskEditor="clr-namespace:Core.ViewModel.TaskEditor;assembly=Core"
-        mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance taskEditor:TaskEditorViewModel}"
-        Title="TaskEditor" Height="450" Width="800">
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:nodify="https://miroiu.github.io/nodify"
+                 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                 xmlns:taskEditor="clr-namespace:Core.ViewModel.TaskEditor;assembly=Core"
+                 mc:Ignorable="d"
+                 d:DataContext="{d:DesignInstance taskEditor:TaskEditorViewModel}"
+                 Title="TaskEditor" Height="450" Width="800">
     <Window.Resources>
         <GeometryDrawing x:Key="SmallGridGeometry"
                          Geometry="M0,0 L0,1 0.03,1 0.03,0.03 1,0.03 1,0 Z"
@@ -33,108 +33,139 @@
                       Transform="{Binding ViewportTransform, ElementName=Editor}"
                       Drawing="{StaticResource LargeGridGeometry}" />
     </Window.Resources>
-    <Grid Background="{StaticResource NodifyEditor.BackgroundBrush}">
-        <ui:TitleBar Title="任务编排" Height="42" Grid.ColumnSpan="2" VerticalAlignment="Top"/>
-        <nodify:NodifyEditor x:Name="Editor" 
-                             EnableRealtimeSelection="True"
-                             
-                             PendingConnection="{Binding PendingConnection}"
-                             DisconnectConnectorCommand="{Binding DisconnectConnectorCommand}"
-                             Background="{StaticResource SmallGridLinesDrawingBrush}" 
-                             Connections="{Binding Connections}"
-                             ItemsSource="{Binding Nodes }">
-            
-            <nodify:NodifyEditor.Resources>
-                <Style TargetType="{x:Type nodify:PendingConnection}"
-                       BasedOn="{StaticResource {x:Type nodify:PendingConnection}}">
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="{x:Type nodify:PendingConnection}">
-                                <Canvas>
-                                    <nodify:Connection Source="{TemplateBinding SourceAnchor}"
-                                                       Target="{TemplateBinding TargetAnchor}"
-                                                       Direction="{TemplateBinding Direction}"
-                                                       StrokeThickness="{TemplateBinding StrokeThickness}"
-                                                      
-                                                       TargetOffsetMode="None">
-                                                       
-                                        <nodify:Connection.Style>
-                                            <Style TargetType="nodify:Connection" BasedOn="{StaticResource {x:Type nodify:Connection}}">
-                                                <Setter Property="Stroke" Value="{DynamicResource Connection.StrokeBrush}"/>
-                                                <Setter Property="Fill" Value="{DynamicResource Connection.StrokeBrush}"/>
-                                                
-                                            </Style>
-                                        </nodify:Connection.Style>
-                                    </nodify:Connection>
-                                    <Border Background="{TemplateBinding Background}"
-                                            Canvas.Left="{Binding TargetAnchor.X, RelativeSource={RelativeSource TemplatedParent}}"
-                                            Canvas.Top="{Binding TargetAnchor.Y, RelativeSource={RelativeSource TemplatedParent}}"
-                                            Visibility="Visible"
-                                            Padding="{TemplateBinding Padding}"
-                                            BorderThickness="{TemplateBinding BorderThickness}"
-                                            BorderBrush="{TemplateBinding BorderBrush}"
-                                            CornerRadius="3"
-                                            Margin="15">
-                                        <ContentPresenter />
-                                    </Border>
-                                </Canvas>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </nodify:NodifyEditor.Resources>
-            
-            
-            <nodify:NodifyEditor.DataContext>
-                <taskEditor:TaskEditorViewModel />
-            </nodify:NodifyEditor.DataContext>
-            
-            <nodify:NodifyEditor.ConnectionTemplate>
-                <DataTemplate DataType="{x:Type taskEditor:ConnectionItem}">
-                    <nodify:Connection Source="{Binding Source.Anchor}"
-                                           Target="{Binding Target.Anchor}" />
-                </DataTemplate>
-            </nodify:NodifyEditor.ConnectionTemplate>
-            
-            <nodify:NodifyEditor.PendingConnectionTemplate>
-                <DataTemplate DataType="{x:Type taskEditor:PendingConnectionViewModel}">
-                    <nodify:PendingConnection StartedCommand="{Binding StartCommand}"
-                                              CompletedCommand="{Binding FinishCommand}"
-                                              EnablePreview="True"
-                                              EnableSnapping="True"
-                                              Target="{Binding PreviewTarget,Mode=OneWayToSource}"
-                                              PreviewTarget="{Binding PreviewTarget,Mode=OneWayToSource}"
-                                              Content="{Binding PreviewText}"
-                                               />
-                </DataTemplate>
-            </nodify:NodifyEditor.PendingConnectionTemplate>
-            <nodify:NodifyEditor.ItemTemplate>
-                <DataTemplate DataType="{x:Type taskEditor:PointItem}">
-                    <nodify:Node Header="{Binding Title}"
-                                 Input="{Binding Input}"
-                                 Output="{Binding Output}">
-                        <nodify:Node.InputConnectorTemplate>
-                            <DataTemplate DataType="{x:Type taskEditor:ConnectorItem}">
-                                <nodify:NodeInput Header="{Binding Title}"
-                                                  IsConnected="{Binding IsConnected}"
-                                                  Anchor="{Binding Anchor, Mode=OneWayToSource}" />
-                            </DataTemplate>
-                        </nodify:Node.InputConnectorTemplate>
-  
-                        <nodify:Node.OutputConnectorTemplate>
-                            <DataTemplate DataType="{x:Type taskEditor:ConnectorItem}">
-                                <nodify:NodeOutput Header="{Binding Title}"
-                                                   IsConnected="{Binding IsConnected}"
-                                                   Anchor="{Binding Anchor, Mode=OneWayToSource}"  />
-                            </DataTemplate>
-                        </nodify:Node.OutputConnectorTemplate>
-                       
-                    </nodify:Node>
-                </DataTemplate>
-            </nodify:NodifyEditor.ItemTemplate>
-            
-        </nodify:NodifyEditor>
-        
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="4*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="42" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <ui:TitleBar Title="任务编排"  Grid.ColumnSpan="2"  />
+        <!-- 左边部分 -->
+        <Border Grid.Row="1" Grid.Column="0" Background="LightBlue">
+            <StackPanel>
+                
+                <ListBox>
+                    <TextBox Text="TextBox1" />
+                    <Button Content="Button1" />
+                    <RadioButton Content="RadioButton1" />
+                    <CheckBox Content="CheckBox1" />
+                </ListBox>
+            </StackPanel>
+
+        </Border>
+
+        <!-- 右边部分 -->
+        <Border Grid.Row="1" Grid.Column="1" >
+            <Grid Background="{StaticResource NodifyEditor.BackgroundBrush}">
+
+                <nodify:NodifyEditor x:Name="Editor"
+                                     EnableRealtimeSelection="True"
+
+                                     PendingConnection="{Binding PendingConnection}"
+                                     DisconnectConnectorCommand="{Binding DisconnectConnectorCommand}"
+                                     Background="{StaticResource SmallGridLinesDrawingBrush}"
+                                     Connections="{Binding Connections}"
+                                     ItemsSource="{Binding Nodes }">
+
+                    <nodify:NodifyEditor.Resources>
+                        <Style TargetType="{x:Type nodify:PendingConnection}"
+                               BasedOn="{StaticResource {x:Type nodify:PendingConnection}}">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type nodify:PendingConnection}">
+                                        <Canvas>
+                                            <nodify:Connection Source="{TemplateBinding SourceAnchor}"
+                                                               Target="{TemplateBinding TargetAnchor}"
+                                                               Direction="{TemplateBinding Direction}"
+                                                               StrokeThickness="{TemplateBinding StrokeThickness}"
+
+                                                               TargetOffsetMode="None">
+
+                                                <nodify:Connection.Style>
+                                                    <Style TargetType="nodify:Connection"
+                                                           BasedOn="{StaticResource {x:Type nodify:Connection}}">
+                                                        <Setter Property="Stroke"
+                                                                Value="{DynamicResource Connection.StrokeBrush}" />
+                                                        <Setter Property="Fill"
+                                                                Value="{DynamicResource Connection.StrokeBrush}" />
+
+                                                    </Style>
+                                                </nodify:Connection.Style>
+                                            </nodify:Connection>
+                                            <Border Background="{TemplateBinding Background}"
+                                                    Canvas.Left="{Binding TargetAnchor.X, RelativeSource={RelativeSource TemplatedParent}}"
+                                                    Canvas.Top="{Binding TargetAnchor.Y, RelativeSource={RelativeSource TemplatedParent}}"
+                                                    Visibility="Visible"
+                                                    Padding="{TemplateBinding Padding}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    CornerRadius="3"
+                                                    Margin="15">
+                                                <ContentPresenter />
+                                            </Border>
+                                        </Canvas>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </nodify:NodifyEditor.Resources>
+
+
+                    <nodify:NodifyEditor.DataContext>
+                        <taskEditor:TaskEditorViewModel />
+                    </nodify:NodifyEditor.DataContext>
+
+                    <nodify:NodifyEditor.ConnectionTemplate>
+                        <DataTemplate DataType="{x:Type taskEditor:ConnectionItem}">
+                            <nodify:Connection Source="{Binding Source.Anchor}"
+                                               Target="{Binding Target.Anchor}" />
+                        </DataTemplate>
+                    </nodify:NodifyEditor.ConnectionTemplate>
+
+                    <nodify:NodifyEditor.PendingConnectionTemplate>
+                        <DataTemplate DataType="{x:Type taskEditor:PendingConnectionViewModel}">
+                            <nodify:PendingConnection StartedCommand="{Binding StartCommand}"
+                                                      CompletedCommand="{Binding FinishCommand}"
+                                                      EnablePreview="True"
+                                                      EnableSnapping="True"
+                                                      Target="{Binding PreviewTarget,Mode=OneWayToSource}"
+                                                      PreviewTarget="{Binding PreviewTarget,Mode=OneWayToSource}"
+                                                      Content="{Binding PreviewText}" />
+                        </DataTemplate>
+                    </nodify:NodifyEditor.PendingConnectionTemplate>
+                    <nodify:NodifyEditor.ItemTemplate>
+                        <DataTemplate DataType="{x:Type taskEditor:PointItem}">
+                            <nodify:Node Header="{Binding Title}"
+                                         Input="{Binding Input}"
+                                         Output="{Binding Output}">
+                                <nodify:Node.InputConnectorTemplate>
+                                    <DataTemplate DataType="{x:Type taskEditor:ConnectorItem}">
+                                        <nodify:NodeInput Header="{Binding Title}"
+                                                          IsConnected="{Binding IsConnected}"
+                                                          Anchor="{Binding Anchor, Mode=OneWayToSource}" />
+                                    </DataTemplate>
+                                </nodify:Node.InputConnectorTemplate>
+
+                                <nodify:Node.OutputConnectorTemplate>
+                                    <DataTemplate DataType="{x:Type taskEditor:ConnectorItem}">
+                                        <nodify:NodeOutput Header="{Binding Title}"
+                                                           IsConnected="{Binding IsConnected}"
+                                                           Anchor="{Binding Anchor, Mode=OneWayToSource}" />
+                                    </DataTemplate>
+                                </nodify:Node.OutputConnectorTemplate>
+
+                            </nodify:Node>
+                        </DataTemplate>
+                    </nodify:NodifyEditor.ItemTemplate>
+
+                </nodify:NodifyEditor>
+
+            </Grid>
+        </Border>
     </Grid>
-    
+
+
 </ui:FluentWindow>

@@ -13,6 +13,7 @@ using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using Core.SDKs.Tools;
 using log4net;
+using NCalc;
 using Vanara.PInvoke;
 
 namespace Core.ViewModel;
@@ -284,6 +285,8 @@ public partial class SearchWindowViewModel : ObservableRecipient
             Log.Debug("搜索变更:" + Search);
 
 
+            #region 清除上次搜索结果
+
             foreach (var searchViewItem in Items)
             {
                 searchViewItem.Dispose();
@@ -296,9 +299,11 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 return;
             }
 
+            #endregion
+
             value = Search.ToLowerInvariant();
 
-
+            //检测路径
             if (value.Contains("\\") || value.Contains("/"))
             {
                 Log.Debug("检测路径");
@@ -347,13 +352,15 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 }
             }
 
+            #region 数学运算
+
             var operators = new[] { '*', '+', '-', '/' };
             string pattern = @"[\u4e00-\u9fa5a-zA-Z]+";
             if (!Regex.Match(value, pattern).Success && value.IndexOfAny(operators) > 0)
             {
                 try
                 {
-                    var e = new NCalc.Expression(value);
+                    var e = new Expression(value);
                     Items.Add(new SearchViewItem()
                     {
                         FileName = "=" + e.Evaluate(),
@@ -378,10 +385,12 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 }
             }
 
+            #endregion
+
+
+            #region 从文件索引检索并排序
 
             var filtered = new ConcurrentBag<(SearchViewItem Item, int Weight)>();
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
             foreach (var item in _collection)
             {
                 int weight = 0;
@@ -396,39 +405,39 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     if (key.Equals(value, StringComparison.Ordinal)) weight += 10;
                 }
 
+                if (item.OnlyKey.Contains("QQNT"))
+                {
+                }
+
                 if (weight > 0)
                 {
                     filtered.Add((item, weight));
                 }
             }
 
-            stopwatch.Stop();
-            Log.Debug($"方法耗时:{stopwatch.Elapsed.TotalMilliseconds}");
 
             var sorted = filtered.OrderByDescending(x => x.Weight).ToList();
 
-            // 将排序后的对象添加到Items集合中
-            //Items.RaiseListChangedEvents = false;
+            #endregion
+
+
             var count = 0; // 计数器变量
             const int limit = 100; // 限制次数
-            var nowIndex = 0;
             Dictionary<SearchViewItem, int> nowHasLastOpens = new();
-            List<SearchViewItem> toRemove = new();
-            foreach (var valueTuple in sorted)
+
+            for (int i = sorted.Count - 1; i >= 0; i--)
             {
-                if (ConfigManger.Config.lastOpens.ContainsKey(valueTuple.Item.OnlyKey))
+                if (ConfigManger.Config.lastOpens.TryGetValue(sorted[i].Item.OnlyKey, out var open))
                 {
-                    nowHasLastOpens.Add((SearchViewItem)valueTuple.Item.Clone(),
-                        ConfigManger.Config.lastOpens[valueTuple.Item.OnlyKey]);
-                    toRemove.Add(valueTuple.Item);
+                    nowHasLastOpens.Add((SearchViewItem)sorted[i].Item.Clone(), open);
+                    sorted.RemoveAt(i);
                 }
             }
-
-            sorted.RemoveAll(x => toRemove.Contains(x.Item1));
 
             var sortedDict = nowHasLastOpens.OrderByDescending(p => p.Value).ToDictionary(p => p.Key, p => p.Value);
             foreach (var (searchViewItem, i) in sortedDict)
             {
+                Log.Debug("添加搜索结果" + searchViewItem.OnlyKey);
                 if (ConfigManger.Config.alwayShows.Contains(searchViewItem.OnlyKey))
                 {
                     searchViewItem.IsPined = true;
@@ -443,6 +452,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     });
                 }
 
+                count++;
                 Items.Add(searchViewItem); // 添加元素
             }
 
@@ -455,11 +465,6 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 }
 
                 var searchViewItem = (SearchViewItem)x.Item.Clone();
-                if (ConfigManger.Config.lastOpens.ContainsKey(x.Item.OnlyKey))
-                {
-                    count++;
-                }
-                else
                 {
                     Log.Debug("添加搜索结果" + x.Item.OnlyKey);
 
