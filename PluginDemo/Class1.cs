@@ -18,7 +18,7 @@ public class Class1 : IPlugin
         PluginId = "Demo",
         Description = "这仅仅是一个演示插件",
         Author = "Kitopia",
-        VersionInt = 0,
+        VersionInt = 1,
         Version = "1.0.0"
     };
 

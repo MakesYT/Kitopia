@@ -29,24 +29,7 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
             Log.Debug($"插件目录不存在创建{pluginsDirectoryInfo.FullName}");
             pluginsDirectoryInfo.Create();
         }
-#if DEBUG
-        Log.Debug("Debug加载测试插件");
-        if (!Directory.Exists(pluginsDirectoryInfo.FullName + "\\PluginDemo"))
-        {
-            Directory.CreateDirectory(pluginsDirectoryInfo.FullName + "\\PluginDemo");
-        }
 
-        try
-        {
-            File.Copy(@"D:\WPF.net\uToolkitopia\PluginDemo\bin\Debug\net7.0-windows\PluginDemo.dll",
-                pluginsDirectoryInfo.FullName + "\\PluginDemo\\PluginDemo.dll", true);
-        }
-        catch (Exception e)
-        {
-        }
-
-
-#endif
         foreach (DirectoryInfo directoryInfo in pluginsDirectoryInfo.EnumerateDirectories())
         {
             if (File.Exists($"{directoryInfo.FullName}\\{directoryInfo.Name}.dll"))
@@ -85,7 +68,7 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
             Plugin.UnloadByPluginInfo(pluginInfoEx, out var weakReference);
             while (weakReference.IsAlive)
             {
-                GC.Collect(2, GCCollectionMode.Aggressive, true, true);
+                GC.Collect();
                 GC.WaitForPendingFinalizers();
             }
 

@@ -6,7 +6,13 @@ namespace PluginDemo;
 public class Test1
 {
     [PluginMethod]
-    public void t()
+    public void t(string id)
+    {
+        MessageBox.Show("5a");
+    }
+
+    [PluginMethod]
+    public void t2()
     {
         MessageBox.Show("5a");
     }

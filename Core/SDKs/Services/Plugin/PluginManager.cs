@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Windows;
 using Core.SDKs.Services.Config;
 using log4net;
 
@@ -12,6 +13,26 @@ public class PluginManager
     {
         ThreadPool.QueueUserWorkItem((e) =>
         {
+#if DEBUG
+            Log.Debug("Debug加载测试插件");
+            Application.Current.Dispatcher.BeginInvoke(() =>
+            {
+                var pluginInfoEx = Plugin.GetPluginInfoEx(
+                    @"D:\WPF.net\uToolkitopia\PluginDemo\bin\Debug\net7.0-windows\PluginDemo.dll",
+                    out var alcWeakRef);
+
+
+                while (alcWeakRef.IsAlive)
+                {
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                }
+
+                Plugin.LoadBypath($"{pluginInfoEx.Author}_{pluginInfoEx.PluginId}", pluginInfoEx.Path);
+            });
+
+
+#endif
             DirectoryInfo pluginsDirectoryInfo = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "plugins");
             if (!pluginsDirectoryInfo.Exists)
             {
@@ -38,8 +59,10 @@ public class PluginManager
                     {
                         if (ConfigManger.Config.EnabledPluginInfos.Contains(pluginInfoEx.ToPluginInfo()))
                         {
-                            PluginManager.EnablePlugin.Add($"{pluginInfoEx.Author}_{pluginInfoEx.PluginId}",
-                                new Plugin(pluginInfoEx.Path));
+                            Application.Current.Dispatcher.BeginInvoke(() =>
+                            {
+                                Plugin.LoadBypath($"{pluginInfoEx.Author}_{pluginInfoEx.PluginId}", pluginInfoEx.Path);
+                            });
                         }
                     }
                 }

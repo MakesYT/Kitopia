@@ -56,14 +56,10 @@
       <Folder Include="SDKs\Msgs\" />
     </ItemGroup>
 
-    <ItemGroup>
-        <Reference Include="PluginCore">
-            <HintPath>..\PluginCore\bin\Release\net7.0-windows\PluginCore.dll</HintPath>
-        </Reference>
-    </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\..\nodify\Nodify\Nodify.csproj"/>
+        <ProjectReference Include="..\PluginCore\PluginCore.csproj"/>
     </ItemGroup>
 
 </Project>

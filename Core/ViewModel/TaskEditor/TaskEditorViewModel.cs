@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -18,9 +19,10 @@ public partial class TaskEditorViewModel : ObservableRecipient
         get;
     }
 
+    [ObservableProperty] private ObservableCollection<object> _nodeMethods = new();
     [ObservableProperty] private ObservableCollection<object> nodes = new();
 
-    [ObservableProperty] public ObservableCollection<ConnectionItem> connections = new();
+    [ObservableProperty] private ObservableCollection<ConnectionItem> connections = new();
 
     public TaskEditorViewModel()
     {
@@ -34,64 +36,8 @@ public partial class TaskEditorViewModel : ObservableRecipient
             connection.Target.IsConnected = false;
             Connections.Remove(connection);
         });
-        var welcome = new PointItem
-        {
-            Title = "任务1",
-        };
-        welcome.Output = new ObservableCollection<ConnectorItem>
-        {
-            new ConnectorItem
-            {
-                IsOut = true,
-                Source = welcome,
-                Title = "开始"
-            }
-        };
-        var welcome2 = new PointItem
-        {
-            Title = "Welcome",
-        };
-        welcome2.Input = new ObservableCollection<ConnectorItem>
-        {
-            new ConnectorItem
-            {
-                Source = welcome2,
-                Title = "In"
-            }
-        };
-        welcome2.Output = new ObservableCollection<ConnectorItem>
-        {
-            new ConnectorItem
-            {
-                IsOut = true,
-                Source = welcome2,
-                Title = "Out"
-            }
-        };
-        var nodify = new PointItem
-        {
-            Title = "To Nodify",
-        };
-        nodify.Input = new ObservableCollection<ConnectorItem>
-        {
-            new ConnectorItem
-            {
-                Source = nodify,
-                Title = "In"
-            }
-        };
-        nodify.Output = new ObservableCollection<ConnectorItem>
-        {
-            new ConnectorItem
-            {
-                IsOut = true,
-                Source = nodify,
-                Title = "Out"
-            }
-        };
-        Nodes.Add(welcome);
-        Nodes.Add(welcome2);
-        Nodes.Add(nodify);
+        //nodeMethods.Add("new PointItem(){Title = \"Test\"}");
+        NodeMethods.Add(new CheckBox() { Content = "2" });
     }
 
     public void Connect(ConnectorItem source, ConnectorItem target)

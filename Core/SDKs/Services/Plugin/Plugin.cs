@@ -1,6 +1,8 @@
 ﻿using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Core.SDKs.Services.Config;
+using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PluginCore;
@@ -10,16 +12,16 @@ namespace Core.SDKs.Services.Plugin;
 
 public class Plugin
 {
+    private static readonly ILog Log = LogManager.GetLogger(nameof(Plugin));
+
     public PluginInfo PluginInfo
     {
         set;
         get;
     }
 
-    private AssemblyLoadContextH _plugin;
-
-    private List<MethodInfo>? _methodInfos = new();
-    private List<FieldInfo>? _fieldInfos = new();
+    private AssemblyLoadContextH? _plugin;
+    private Assembly? _dll;
 
     private IServiceProvider? ServiceProvider;
 
@@ -126,16 +128,13 @@ public class Plugin
     public Plugin(string path)
     {
         _plugin = new AssemblyLoadContextH(path, path.Split("\\").Last() + "_plugin");
+        _dll = _plugin.LoadFromAssemblyPath(path);
+    }
 
-        // Create a weak reference to the AssemblyLoadContext that will allow us to detect
-        // when the unload completes.
-
-        // Load the plugin assembly into the HostAssemblyLoadContext.
-        // NOTE: the assemblyPath must be an absolute path.
-        Assembly a = _plugin.LoadFromAssemblyPath(path);
-
-        // Get the plugin interface by calling the PluginClass.GetInterface method via reflection.
-        var t = a.GetExportedTypes();
+    public List<MethodInfo> GetMethodInfos()
+    {
+        var methodInfos = new List<MethodInfo>();
+        var t = _dll.GetExportedTypes();
         foreach (Type type in t)
         {
             if (type.GetInterface("IPlugin") != null)
@@ -149,37 +148,74 @@ public class Plugin
 
             foreach (MethodInfo methodInfo in type.GetMethods())
             {
-                if (methodInfo.GetCustomAttributes(typeof(PluginMethod)).Any())
+                if (!methodInfo.GetCustomAttributes(typeof(PluginMethod)).Any())
                 {
-                    _methodInfos.Add(methodInfo);
+                    continue;
                 }
+
+                Log.Debug($"找到方法{methodInfo.Name}");
+                for (var index = 0; index < methodInfo.GetParameters().Length; index++)
+                {
+                    var parameterInfo = methodInfo.GetParameters()[index];
+                    Log.Debug($"参数{index}:类型为{parameterInfo.ParameterType}");
+                }
+
+                Log.Debug($"输出:类型为{methodInfo.ReturnParameter.ParameterType}");
+
+
+                methodInfos.Add(methodInfo);
+            }
+        }
+
+        return methodInfos;
+    }
+
+    public List<FieldInfo> GetFieldInfos()
+    {
+        var _fieldInfos = new List<FieldInfo>();
+        var t = _dll.GetExportedTypes();
+        foreach (Type type in t)
+        {
+            if (type.GetInterface("IPlugin") != null)
+            {
+                PluginInfo = (PluginInfo)type.GetField("PluginInfo").GetValue(null);
+                //var instance = Activator.CreateInstance(type);
+                ServiceProvider = (IServiceProvider)type.GetMethod("GetServiceProvider").Invoke(null, null);
+
+                ((PluginCore.IPlugin)ServiceProvider.GetService(type)).OnEnabled();
             }
 
             foreach (FieldInfo fieldInfo in type.GetFields())
             {
-                if (fieldInfo.GetCustomAttributes(typeof(ConfigField)).Any())
+                if (!fieldInfo.GetCustomAttributes(typeof(ConfigField)).Any())
                 {
-                    var customAttribute = (ConfigField)fieldInfo.GetCustomAttribute(typeof(ConfigField))!;
-                    // fieldInfo.SetValue(null,default());
-                    _fieldInfos.Add(fieldInfo);
+                    continue;
                 }
+
+                Log.Debug($"找到属性{fieldInfo.Name}");
+                _fieldInfos.Add(fieldInfo);
             }
         }
+
+        return _fieldInfos;
     }
 
     public JObject GetConfigJObject()
     {
         var jObject = new JObject();
 
-        foreach (var fieldInfo in _fieldInfos)
-        {
-            jObject.Add(fieldInfo.Name,
-                new JValue(fieldInfo.GetValue(ServiceProvider.GetService(fieldInfo.DeclaringType))));
-        }
 
         return jObject;
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static void LoadBypath(string name, string path)
+    {
+        PluginManager.EnablePlugin.Add(name,
+            new Plugin(path));
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public static void UnloadByPluginInfo(PluginInfoEx pluginInfoEx, out WeakReference weakReference)
     {
         if (PluginManager.EnablePlugin.TryGetValue($"{pluginInfoEx.Author}_{pluginInfoEx.PluginId}",
@@ -203,26 +239,12 @@ public class Plugin
                                    $"configs\\{PluginInfo.Author}_{PluginInfo.PluginId}.json");
         File.WriteAllText(config1.FullName,
             JsonConvert.SerializeObject(GetConfigJObject(), Formatting.Indented));
-        _methodInfos = null;
-        _fieldInfos = null;
+        _dll = null;
 
         ServiceProvider = null;
 
         _plugin.Unload();
+        _plugin = null;
         weakReference = new WeakReference(_plugin);
-    }
-
-    public List<PluginSettingItem> GetConfigSettingItems()
-    {
-        List<PluginSettingItem> settingItems = new();
-        foreach (var fieldInfo in _fieldInfos)
-        {
-            var pluginSettingItem = new PluginSettingItem()
-            {
-            };
-            settingItems.Add(pluginSettingItem);
-        }
-
-        return settingItems;
     }
 }

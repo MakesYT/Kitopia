@@ -6,6 +6,9 @@
                  xmlns:nodify="https://miroiu.github.io/nodify"
                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                  xmlns:taskEditor="clr-namespace:Core.ViewModel.TaskEditor;assembly=Core"
+                 WindowBackdropType="Acrylic"
+                 WindowCornerPreference="Round"
+                 ExtendsContentIntoTitleBar="True"
                  mc:Ignorable="d"
                  d:DataContext="{d:DesignInstance taskEditor:TaskEditorViewModel}"
                  Title="TaskEditor" Height="450" Width="800">
@@ -44,15 +47,10 @@
         </Grid.RowDefinitions>
         <ui:TitleBar Title="任务编排"  Grid.ColumnSpan="2"  />
         <!-- 左边部分 -->
-        <Border Grid.Row="1" Grid.Column="0" Background="LightBlue">
+        <Border Grid.Row="1" Grid.Column="0">
             <StackPanel>
                 
-                <ListBox>
-                    <TextBox Text="TextBox1" />
-                    <Button Content="Button1" />
-                    <RadioButton Content="RadioButton1" />
-                    <CheckBox Content="CheckBox1" />
-                </ListBox>
+                <ListBox  ItemsSource="{Binding NodeMethods,NotifyOnSourceUpdated=True,UpdateSourceTrigger=PropertyChanged,Mode=OneWay}" />
             </StackPanel>
 
         </Border>

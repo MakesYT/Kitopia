@@ -315,11 +315,11 @@ public sealed partial class App : Application
         {
             return new PluginSetting() { DataContext = e.GetService<PluginSettingViewModel>() };
         });
-        services.AddSingleton<TaskEditorViewModel>(e =>
+        services.AddTransient<TaskEditorViewModel>(e =>
         {
             return new TaskEditorViewModel { IsActive = true };
         });
-        services.AddSingleton<TaskEditor>(e =>
+        services.AddTransient<TaskEditor>(e =>
         {
             return new TaskEditor() { DataContext = e.GetService<TaskEditorViewModel>() };
         });
