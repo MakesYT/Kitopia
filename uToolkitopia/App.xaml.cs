@@ -259,6 +259,9 @@ public sealed partial class App : Application
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddTransient<INavigationPageService, NavigationPageService>();
         services.AddTransient<IClipboardService, ClipboardService>();
+#if DEBUG
+        services.AddTransient<ITaskEditorOpenService, TaskEditorOpenService>();
+#endif
         services.AddSingleton<SearchWindowViewModel>(e =>
         {
             return new SearchWindowViewModel { IsActive = true };

@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using Core.SDKs.Services;
 
 namespace Kitopia.View.Pages.Plugin;
 
@@ -12,6 +13,6 @@ public partial class PluginManagerPage : Page
 
     private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
     {
-        new TaskEditor().Show();
+        ((TaskEditor)ServiceManager.Services!.GetService(typeof(TaskEditor))!).Show();
     }
 }

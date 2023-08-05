@@ -1,9 +1,12 @@
 ﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Reflection;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Core.SDKs.Services.Plugin;
+using PluginCore.Attribute;
 
 namespace Core.ViewModel.TaskEditor;
 
@@ -19,10 +22,138 @@ public partial class TaskEditorViewModel : ObservableRecipient
         get;
     }
 
-    [ObservableProperty] private ObservableCollection<object> _nodeMethods = new();
-    [ObservableProperty] private ObservableCollection<object> nodes = new();
+    [ObservableProperty] private BindingList<object> _nodeMethods = new();
+
+
+    [RelayCommand]
+    private void AddNodes(PointItem pointItem)
+    {
+        var item = new PointItem()
+        {
+            Title = pointItem.Title,
+            Plugin = pointItem.Plugin,
+            Location = new Point(pointItem.Location.X, pointItem.Location.Y)
+        };
+        ObservableCollection<ConnectorItem> input = new();
+        foreach (var connectorItem in pointItem.Input)
+        {
+            input.Add(new ConnectorItem()
+            {
+                Anchor = new Point(connectorItem.Anchor.X, connectorItem.Anchor.Y),
+                Source = item,
+                Title = connectorItem.Title,
+                Type = connectorItem.Type,
+                IsConnected = connectorItem.IsConnected,
+                IsSelf = connectorItem.IsSelf,
+                IsOut = connectorItem.IsOut
+            });
+        }
+
+        ObservableCollection<ConnectorItem> output = new();
+        foreach (var connectorItem in pointItem.Output)
+        {
+            output.Add(new ConnectorItem()
+            {
+                Anchor = new Point(connectorItem.Anchor.X, connectorItem.Anchor.Y),
+                Source = item,
+                Title = connectorItem.Title,
+                Type = connectorItem.Type,
+                IsConnected = connectorItem.IsConnected,
+                IsOut = connectorItem.IsOut
+            });
+        }
+
+        item.Input = input;
+        item.Output = output;
+        Nodes.Add(item);
+        //OnPropertyChanged(nameof(Nodes));
+    }
+
+    [ObservableProperty] private ObservableCollection<PointItem> nodes = new();
 
     [ObservableProperty] private ObservableCollection<ConnectionItem> connections = new();
+
+    private void GetAllMethods()
+    {
+        PointItem String = new PointItem()
+        {
+            Plugin = "Kitopia",
+            Title = "字符串"
+        };
+        ObservableCollection<ConnectorItem> StringoutItems = new()
+        {
+            new ConnectorItem()
+            {
+                Source = String,
+                Type = typeof(string),
+                Title = "字符串",
+                IsOut = true
+            }
+        };
+        String.Output = StringoutItems;
+        ObservableCollection<ConnectorItem> StringinItems = new()
+        {
+            new ConnectorItem()
+            {
+                Source = String,
+                Type = typeof(string),
+                Title = "字符串",
+                IsSelf = true
+            }
+        };
+        String.Input = StringinItems;
+        NodeMethods.Add(String);
+
+
+        foreach (var (key, value) in PluginManager.EnablePlugin)
+        {
+            foreach (var methodInfo in value.GetMethodInfos())
+            {
+                if (methodInfo.GetCustomAttribute(typeof(PluginMethod)) is not null)
+                {
+                    var customAttribute = (PluginMethod)(methodInfo.GetCustomAttribute(typeof(PluginMethod)));
+                    PointItem pointItem = new PointItem()
+                    {
+                        Plugin = key,
+                        Title = $"{key}_{customAttribute.Name}"
+                    };
+                    ObservableCollection<ConnectorItem> inpItems = new();
+                    for (var index = 0; index < methodInfo.GetParameters().Length; index++)
+                    {
+                        var parameterInfo = methodInfo.GetParameters()[index];
+                        inpItems.Add(new ConnectorItem()
+                        {
+                            Source = pointItem,
+                            Type = parameterInfo.ParameterType,
+                            Title = parameterInfo.ParameterType.Name,
+                        });
+                        //Log.Debug($"参数{index}:类型为{parameterInfo.ParameterType}");
+                    }
+
+                    if (methodInfo.ReturnParameter.ParameterType != typeof(void))
+                    {
+                        ObservableCollection<ConnectorItem> outItems = new()
+                        {
+                            new ConnectorItem()
+                            {
+                                Source = pointItem,
+                                Type = methodInfo.ReturnParameter.ParameterType,
+                                Title = methodInfo.ReturnParameter.ParameterType.Name,
+                                IsOut = true
+                            }
+                        };
+                        pointItem.Output = outItems;
+                    }
+
+
+                    pointItem.Input = inpItems;
+                    NodeMethods.Add(pointItem);
+                }
+
+                //Log.Debug($"输出:类型为{methodInfo.ReturnParameter.ParameterType}");
+            }
+        }
+    }
 
     public TaskEditorViewModel()
     {
@@ -36,8 +167,22 @@ public partial class TaskEditorViewModel : ObservableRecipient
             connection.Target.IsConnected = false;
             Connections.Remove(connection);
         });
+        GetAllMethods();
+        var nodify2 = new PointItem()
+        {
+            Title = "任务1",
+        };
+        nodify2.Output = new ObservableCollection<ConnectorItem>
+        {
+            new ConnectorItem
+            {
+                IsOut = true,
+                Source = nodify2,
+                Title = "开始"
+            }
+        };
+        Nodes.Add(nodify2);
         //nodeMethods.Add("new PointItem(){Title = \"Test\"}");
-        NodeMethods.Add(new CheckBox() { Content = "2" });
     }
 
     public void Connect(ConnectorItem source, ConnectorItem target)
@@ -75,25 +220,20 @@ public partial class TaskEditorViewModel : ObservableRecipient
     }
 }
 
-public class PointItem
+public partial class PointItem : ObservableRecipient
 {
-    public string Title
+    public string Plugin
     {
         get;
         set;
     }
 
-    public ObservableCollection<ConnectorItem> Input
-    {
-        get;
-        set;
-    } = new ObservableCollection<ConnectorItem>();
+    [ObservableProperty] private Point _location;
 
-    public ObservableCollection<ConnectorItem> Output
-    {
-        get;
-        set;
-    } = new ObservableCollection<ConnectorItem>();
+    [ObservableProperty] private string _title;
+
+    [ObservableProperty] private ObservableCollection<ConnectorItem> input = new();
+    [ObservableProperty] private ObservableCollection<ConnectorItem> output = new();
 }
 
 public partial class ConnectorItem : ObservableRecipient
@@ -103,8 +243,16 @@ public partial class ConnectorItem : ObservableRecipient
     [ObservableProperty] private bool _isConnected;
 
     [ObservableProperty] private bool _isOut;
+    [ObservableProperty] private bool _isSelf = false;
+    [ObservableProperty] private object? _inputObject;
 
     public string Title
+    {
+        get;
+        set;
+    }
+
+    public Type Type
     {
         get;
         set;

@@ -129,11 +129,6 @@ public class Plugin
     {
         _plugin = new AssemblyLoadContextH(path, path.Split("\\").Last() + "_plugin");
         _dll = _plugin.LoadFromAssemblyPath(path);
-    }
-
-    public List<MethodInfo> GetMethodInfos()
-    {
-        var methodInfos = new List<MethodInfo>();
         var t = _dll.GetExportedTypes();
         foreach (Type type in t)
         {
@@ -145,23 +140,21 @@ public class Plugin
 
                 ((PluginCore.IPlugin)ServiceProvider.GetService(type)).OnEnabled();
             }
+        }
+    }
 
+    public List<MethodInfo> GetMethodInfos()
+    {
+        var methodInfos = new List<MethodInfo>();
+        var t = _dll.GetExportedTypes();
+        foreach (Type type in t)
+        {
             foreach (MethodInfo methodInfo in type.GetMethods())
             {
                 if (!methodInfo.GetCustomAttributes(typeof(PluginMethod)).Any())
                 {
                     continue;
                 }
-
-                Log.Debug($"找到方法{methodInfo.Name}");
-                for (var index = 0; index < methodInfo.GetParameters().Length; index++)
-                {
-                    var parameterInfo = methodInfo.GetParameters()[index];
-                    Log.Debug($"参数{index}:类型为{parameterInfo.ParameterType}");
-                }
-
-                Log.Debug($"输出:类型为{methodInfo.ReturnParameter.ParameterType}");
-
 
                 methodInfos.Add(methodInfo);
             }
@@ -176,15 +169,6 @@ public class Plugin
         var t = _dll.GetExportedTypes();
         foreach (Type type in t)
         {
-            if (type.GetInterface("IPlugin") != null)
-            {
-                PluginInfo = (PluginInfo)type.GetField("PluginInfo").GetValue(null);
-                //var instance = Activator.CreateInstance(type);
-                ServiceProvider = (IServiceProvider)type.GetMethod("GetServiceProvider").Invoke(null, null);
-
-                ((PluginCore.IPlugin)ServiceProvider.GetService(type)).OnEnabled();
-            }
-
             foreach (FieldInfo fieldInfo in type.GetFields())
             {
                 if (!fieldInfo.GetCustomAttributes(typeof(ConfigField)).Any())
