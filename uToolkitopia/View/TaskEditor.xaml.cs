@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Core.ViewModel.TaskEditor;
@@ -20,7 +21,14 @@ public partial class TaskEditor
     {
         if (sender is ListBox listBox && e.LeftButton == MouseButtonState.Pressed && listBox.SelectedItem != null)
         {
-            DragDrop.DoDragDrop(listBox, listBox.SelectedItem, DragDropEffects.Copy);
+            try
+            {
+                DragDrop.DoDragDrop(listBox, listBox.SelectedItem, DragDropEffects.Copy);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+            }
         }
     }
 

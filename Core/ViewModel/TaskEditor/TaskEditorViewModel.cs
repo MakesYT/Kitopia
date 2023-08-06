@@ -43,6 +43,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 Source = item,
                 Title = connectorItem.Title,
                 Type = connectorItem.Type,
+                InputObject = connectorItem.InputObject,
                 IsConnected = connectorItem.IsConnected,
                 IsSelf = connectorItem.IsSelf,
                 IsOut = connectorItem.IsOut
