@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using PluginCore.Attribute;
 
 namespace PluginDemo;
@@ -6,10 +7,10 @@ namespace PluginDemo;
 public class Test1
 {
     [PluginMethod("测试代码1")]
-    public string t(string id, string id2)
+    public (string, bool) t(string id, string id2)
     {
         MessageBox.Show("5a");
-        return id;
+        return new ValueTuple<string, bool>();
     }
 
     [PluginMethod("测试代码2")]

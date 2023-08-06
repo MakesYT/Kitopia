@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
@@ -9,7 +8,6 @@ using Core.SDKs;
 using Core.SDKs.Services;
 using Core.ViewModel;
 using Microsoft.Extensions.DependencyInjection;
-using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 
 namespace Kitopia.View;
@@ -36,14 +34,10 @@ public partial class SearchWindow : FluentWindow
         base.OnSourceInitialized(e);
         // 获取窗体句柄
         IntPtr m_Hwnd = new WindowInteropHelper(this).Handle;
-        Wpf.Ui.Appearance.Theme.Changed += ((theme, accent) =>
+        Wpf.Ui.Appearance.ApplicationThemeManager.Changed += ((theme, accent) =>
         {
             WindowBackdrop.ApplyBackdrop(m_Hwnd, WindowBackdropType.Acrylic);
         });
-    }
-
-    private void ChangeTheme(ThemeType currentTheme, Color systemAccent)
-    {
     }
 
 

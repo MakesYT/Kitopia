@@ -20,6 +20,21 @@ public class MyDataTemplateSelector : DataTemplateSelector
                 {
                     return element.FindResource("StringTemplate") as DataTemplate;
                 }
+
+                if (pointItem.Type.FullName == "System.Int32")
+                {
+                    return element.FindResource("IntTemplate") as DataTemplate;
+                }
+
+                if (pointItem.Type.FullName == "System.Double")
+                {
+                    return element.FindResource("DoubleTemplate") as DataTemplate;
+                }
+
+                if (pointItem.Type.FullName == "System.Boolean")
+                {
+                    return element.FindResource("BoolTemplate") as DataTemplate;
+                }
             }
 
             return element.FindResource("InputTemplate") as DataTemplate;

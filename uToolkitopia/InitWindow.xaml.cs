@@ -14,7 +14,7 @@ using Kitopia.SDKs;
 using Kitopia.View;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
-using Wpf.Ui.Controls;
+using Wpf.Ui.Tray.Controls;
 using MessageBoxResult = Kitopia.Controls.MessageBoxControl.MessageBoxResult;
 
 namespace Kitopia;
@@ -38,22 +38,23 @@ public partial class InitWindow
         InitializeComponent();
         DataContext = ServiceManager.Services.GetService<InitWindowsViewModel>();
 
-        var currentTheme = Wpf.Ui.Appearance.Theme.GetAppTheme();
-        if (ConfigManger.Config.themeChoice == "跟随系统" && !Wpf.Ui.Appearance.Theme.IsAppMatchesSystem())
+        var currentTheme = Wpf.Ui.Appearance.ApplicationThemeManager.GetAppTheme();
+        if (ConfigManger.Config.themeChoice == "跟随系统" &&
+            !Wpf.Ui.Appearance.ApplicationThemeManager.IsAppMatchesSystem())
         {
             log.Debug("主题跟随系统,当前不符合切换主题");
 
 
-            Wpf.Ui.Appearance.Theme.Apply(currentTheme == Wpf.Ui.Appearance.ThemeType.Light
-                ? Wpf.Ui.Appearance.ThemeType.Dark
-                : Wpf.Ui.Appearance.ThemeType.Light);
+            Wpf.Ui.Appearance.ApplicationThemeManager.Apply(currentTheme == Wpf.Ui.Appearance.ApplicationTheme.Light
+                ? Wpf.Ui.Appearance.ApplicationTheme.Dark
+                : Wpf.Ui.Appearance.ApplicationTheme.Light);
         }
         else if (ConfigManger.Config.themeChoice == "深色")
         {
             log.Debug("主题切换到深色");
 
 
-            Wpf.Ui.Appearance.Theme.Apply(Wpf.Ui.Appearance.ThemeType.Dark);
+            Wpf.Ui.Appearance.ApplicationThemeManager.Apply(Wpf.Ui.Appearance.ApplicationTheme.Dark);
         }
 
         ServiceManager.Services.GetService<SearchWindow>().Visibility = Visibility.Hidden;

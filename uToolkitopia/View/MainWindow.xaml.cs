@@ -28,7 +28,7 @@ public partial class MainWindow
         var hWndSource = HwndSource.FromHwnd(m_Hwnd);
 
         ServiceManager.Services.GetService<InitWindow>().NotifyIcon.HookWindow = hWndSource;
-        Wpf.Ui.Appearance.Theme.Changed += ((theme, accent) =>
+        Wpf.Ui.Appearance.ApplicationThemeManager.Changed += ((theme, accent) =>
         {
             WindowBackdrop.ApplyBackdrop(m_Hwnd, WindowBackdropType.Acrylic);
         });

@@ -15,13 +15,16 @@
                  Title="TaskEditor" Height="450" Width="800">
     <Window.Resources>
         <DataTemplate x:Key="StringTemplate" DataType="{x:Type taskEditor:ConnectorItem}"> 
-            <TextBox Margin="10,5,10,5" MinWidth="40" Text="{Binding InputObject}" FontSize="18" />
+            <ui:TextBox Margin="10,5,10,5" MinWidth="40" Text="{Binding InputObject}" PlaceholderText="字符串"  />
         </DataTemplate>
-        <DataTemplate x:Key="IntTemplate">
-            <TextBlock Text="{Binding}" Foreground="Red" FontSize="18" />
+        <DataTemplate x:Key="IntTemplate" DataType="{x:Type taskEditor:ConnectorItem}">
+            <ui:NumberBox MaxDecimalPlaces="0" Margin="10,5,10,5" MinWidth="40"  Value="{Binding InputObject,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" PlaceholderText="整型"  />
         </DataTemplate>
-        <DataTemplate x:Key="BoolTemplate">
-            <CheckBox IsChecked="{Binding}" IsEnabled="False" />
+        <DataTemplate x:Key="DoubleTemplate" DataType="{x:Type taskEditor:ConnectorItem}">
+            <ui:NumberBox  Margin="10,5,10,5" MinWidth="40"  Value="{Binding InputObject,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" PlaceholderText="双精度浮点数"  />
+        </DataTemplate>
+        <DataTemplate x:Key="BoolTemplate" DataType="{x:Type taskEditor:ConnectorItem}">
+            <ui:ToggleSwitch  Margin="10,5,10,5" MinWidth="40" IsChecked="{Binding InputObject}"  />
         </DataTemplate>
         <GeometryDrawing x:Key="SmallGridGeometry"
                          Geometry="M0,0 L0,1 0.03,1 0.03,0.03 1,0.03 1,0 Z"

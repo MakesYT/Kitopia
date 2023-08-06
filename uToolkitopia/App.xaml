@@ -9,7 +9,7 @@
 
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ui:ThemesDictionary Theme="Light" />
+                <ui:ThemesDictionary ApplicationTheme="Light" />
                 <ui:ControlsDictionary />
                 <ResourceDictionary Source="Assets/ColorDr.xaml" />
                 <c:ColorD />

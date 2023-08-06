@@ -6,6 +6,7 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Core.SDKs.Services.Plugin;
+using Core.SDKs.Tools;
 using PluginCore.Attribute;
 
 namespace Core.ViewModel.TaskEditor;
@@ -76,34 +77,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
 
     private void GetAllMethods()
     {
-        PointItem String = new PointItem()
-        {
-            Plugin = "Kitopia",
-            Title = "字符串"
-        };
-        ObservableCollection<ConnectorItem> StringoutItems = new()
-        {
-            new ConnectorItem()
-            {
-                Source = String,
-                Type = typeof(string),
-                Title = "字符串",
-                IsOut = true
-            }
-        };
-        String.Output = StringoutItems;
-        ObservableCollection<ConnectorItem> StringinItems = new()
-        {
-            new ConnectorItem()
-            {
-                Source = String,
-                Type = typeof(string),
-                Title = "字符串",
-                IsSelf = true
-            }
-        };
-        String.Input = StringinItems;
-        NodeMethods.Add(String);
+        BaseNodeMethodsGen.GenBaseNodeMethods(NodeMethods);
 
 
         foreach (var (key, value) in PluginManager.EnablePlugin)
