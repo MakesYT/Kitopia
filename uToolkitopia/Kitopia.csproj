@@ -114,6 +114,7 @@
             <XamlRuntime>Wpf</XamlRuntime>
             <SubType>Designer</SubType>
         </Page>
+        <Page Remove="Controls\TaskEditor\NodeMethod.xaml"/>
     </ItemGroup>
 
     <ItemGroup>

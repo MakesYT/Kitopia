@@ -100,23 +100,40 @@ public partial class TaskEditorViewModel : ObservableRecipient
                         {
                             Source = pointItem,
                             Type = parameterInfo.ParameterType,
-                            Title = parameterInfo.ParameterType.Name,
+                            Title = BaseNodeMethodsGen.GetI18N(parameterInfo.ParameterType.FullName),
                         });
                         //Log.Debug($"参数{index}:类型为{parameterInfo.ParameterType}");
                     }
 
                     if (methodInfo.ReturnParameter.ParameterType != typeof(void))
                     {
-                        ObservableCollection<ConnectorItem> outItems = new()
+                        ObservableCollection<ConnectorItem> outItems = new();
+                        if (methodInfo.ReturnParameter.ParameterType.GetCustomAttribute(typeof(AutoUnbox)) is not null)
                         {
-                            new ConnectorItem()
+                            var type = methodInfo.ReturnParameter.ParameterType;
+                            foreach (var memberInfo in type.GetProperties())
+                            {
+                                outItems.Add(new ConnectorItem()
+                                {
+                                    Source = pointItem,
+                                    Type = memberInfo.PropertyType,
+                                    Title = BaseNodeMethodsGen.GetI18N(memberInfo.PropertyType.FullName),
+                                    IsOut = true
+                                });
+                            }
+                        }
+                        else
+                        {
+                            outItems.Add(new ConnectorItem()
                             {
                                 Source = pointItem,
                                 Type = methodInfo.ReturnParameter.ParameterType,
-                                Title = methodInfo.ReturnParameter.ParameterType.Name,
+                                Title = BaseNodeMethodsGen.GetI18N(methodInfo.ReturnParameter.ParameterType.FullName),
                                 IsOut = true
-                            }
-                        };
+                            });
+                        }
+
+                        ;
                         pointItem.Output = outItems;
                     }
 
@@ -153,6 +170,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
             {
                 IsOut = true,
                 Source = nodify2,
+                Type = typeof(object),
                 Title = "开始"
             }
         };

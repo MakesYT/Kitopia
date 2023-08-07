@@ -14,6 +14,24 @@ public class BaseNodeMethodsGen
         { "双精度浮点数", typeof(double) },
     };
 
+    public static Dictionary<string, string> _i18n = new()
+    {
+        { "System.String", "字符串" },
+        { "System.Boolean", "布尔" },
+        { "System.Int32", "整型" },
+        { "System.Double", "双精度浮点数" },
+    };
+
+    public static string GetI18N(string key)
+    {
+        if (_i18n.TryGetValue(key, out var n))
+        {
+            return n;
+        }
+
+        return key;
+    }
+
     public static void GenBaseNodeMethods(BindingList<object> nodeMethods)
     {
         foreach (var (key, value) in _baseType)
@@ -29,7 +47,7 @@ public class BaseNodeMethodsGen
                 {
                     Source = String,
                     Type = value,
-                    Title = value.Name,
+                    Title = GetI18N(value.FullName),
                     IsOut = true
                 }
             };
@@ -40,7 +58,7 @@ public class BaseNodeMethodsGen
                 {
                     Source = String,
                     Type = value,
-                    Title = value.Name,
+                    Title = GetI18N(value.FullName),
                     IsSelf = true
                 }
             };

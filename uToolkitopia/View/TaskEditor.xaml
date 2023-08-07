@@ -167,17 +167,17 @@
                                         </ItemsControl>
 
 
-                                        <ItemsControl DockPanel.Dock="Right" ItemsSource="{Binding Output}">
+                                        <ItemsControl DockPanel.Dock="Right" VerticalAlignment="Center" ItemsSource="{Binding Output}">
                                             <!-- Set the ItemsPanel to a StackPanel with horizontal orientation -->
                                             <ItemsControl.ItemsPanel>
                                                 <ItemsPanelTemplate>
-                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" />
+                                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Right" />
                                                 </ItemsPanelTemplate>
                                             </ItemsControl.ItemsPanel>
                                             <!-- Set the ItemTemplate to a Button with the content bound to the item -->
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
-                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
                                                         <TextBlock VerticalAlignment="Center" x:Name="textBlock"
                                                                    Text="{Binding  Title}" />
                                                         <Border>
@@ -335,7 +335,8 @@
                         <DataTemplate DataType="{x:Type taskEditor:PointItem}">
                             <nodify:Node Header="{Binding Title}"
                                          Input="{Binding Input}"
-                                            Background="WhiteSmoke"
+                                         VerticalAlignment="Center"
+                                         Background="WhiteSmoke"
                                          ContentBrush="WhiteSmoke"
                                          Output="{Binding Output}">
                                 <nodify:Node.HeaderBrush>
@@ -359,7 +360,7 @@
                                 <nodify:Node.InputConnectorTemplate>
                                     <DataTemplate>
                                         <!-- Use a ContentControl to display the single element -->
-                                        <ContentControl Content="{Binding}">
+                                        <ContentControl Content="{Binding}" VerticalAlignment="Center">
                                             <!-- Set the ContentTemplateSelector to the data template selector resource -->
                                             <ContentControl.ContentTemplateSelector>
                                                 <StaticResource ResourceKey="MyDataTemplateSelector" />
@@ -371,6 +372,7 @@
                                 <nodify:Node.OutputConnectorTemplate>
                                     <DataTemplate DataType="{x:Type taskEditor:ConnectorItem}">
                                         <nodify:NodeOutput Header="{Binding Title}"
+                                                           VerticalAlignment="Center"
                                                            IsConnected="{Binding IsConnected}"
                                                            Anchor="{Binding Anchor, Mode=OneWayToSource}">
                                             <nodify:NodeOutput.BorderBrush>

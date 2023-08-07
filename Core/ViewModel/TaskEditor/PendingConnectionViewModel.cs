@@ -24,16 +24,48 @@ public partial class PendingConnectionViewModel : ObservableRecipient
             case ConnectorItem con:
             {
                 if (con == Source || con.Source == Source.Source)
-                    PreviewText = $"不能自己连接自己";
-                else
                 {
-                    if (Source.IsOut == con.IsOut)
-                    {
-                        PreviewText = $"错误的连接";
-                    }
-                    else
-                        PreviewText = "连接";
+                    PreviewText = $"不能自己连接自己";
+                    break;
                 }
+
+                if (Source.IsOut == con.IsOut)
+                {
+                    PreviewText = $"错误的连接";
+                    break;
+                }
+
+                if (Source.Type.FullName != con.Type.FullName)
+                {
+                    if (con.Type.FullName == "System.Object")
+                    {
+                        PreviewText = "连接";
+                        break;
+                    }
+
+                    if (Source.Type.FullName == "System.Object")
+                    {
+                        PreviewText = "连接";
+                        break;
+                    }
+
+                    if (con.Type.IsSubclassOf(Source.Type))
+                    {
+                        PreviewText = "连接";
+                        break;
+                    }
+
+                    if (Source.Type.IsSubclassOf(con.Type))
+                    {
+                        PreviewText = "连接";
+                        break;
+                    }
+
+                    PreviewText = $"类型错误";
+                    break;
+                }
+
+                PreviewText = "连接";
 
                 break;
             }
@@ -55,18 +87,28 @@ public partial class PendingConnectionViewModel : ObservableRecipient
         if (target == null)
             return;
 
-        if (target != Source && target.Source != Source.Source)
+        if (target == Source || target.Source == Source.Source)
         {
-            if (Source.IsOut != target.IsOut)
+            return;
+        }
+
+        if (Source.Type.FullName != target.Type.FullName && !(Source.Type.IsSubclassOf(target.Type) ||
+                                                              target.Type.IsSubclassOf(Source.Type) ||
+                                                              Source.Type.FullName == "System.Object" ||
+                                                              target.Type.FullName == "System.Object"))
+        {
+            return;
+        }
+
+        if (Source.IsOut != target.IsOut)
+        {
+            if (!Source.IsOut)
             {
-                if (!Source.IsOut)
-                {
-                    _editor.Connect(target, Source);
-                }
-                else
-                {
-                    _editor.Connect(Source, target);
-                }
+                _editor.Connect(target, Source);
+            }
+            else
+            {
+                _editor.Connect(Source, target);
             }
         }
     }

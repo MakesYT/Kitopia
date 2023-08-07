@@ -1,5 +1,4 @@
 using System;
-using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using PluginCore;
 
@@ -9,7 +8,7 @@ public class Class1 : IPlugin
 {
     public Class1()
     {
-        MessageBox.Show("dd");
+        //MessageBox.Show("dd");
     }
 
     public static PluginInfo PluginInfo = new PluginInfo()
@@ -24,7 +23,7 @@ public class Class1 : IPlugin
 
     public void OnEnabled()
     {
-        MessageBox.Show("OnEnabled");
+        //MessageBox.Show("OnEnabled");
     }
 
     public void OnDisabled()
