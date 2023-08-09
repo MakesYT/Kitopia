@@ -18,8 +18,8 @@ public class BaseNodeMethodsGen
     {
         { "System.String", "字符串" },
         { "System.Boolean", "布尔" },
-        { "System.Int32", "整型" },
-        { "System.Double", "双精度浮点数" },
+        { "System.Int32", "整数" },
+        { "System.Double", "浮点" },
     };
 
     public static string GetI18N(string key)
@@ -48,6 +48,7 @@ public class BaseNodeMethodsGen
                     Source = String,
                     Type = value,
                     Title = GetI18N(value.FullName),
+                    TypeName = GetI18N(value.FullName),
                     IsOut = true
                 }
             };
@@ -59,6 +60,7 @@ public class BaseNodeMethodsGen
                     Source = String,
                     Type = value,
                     Title = GetI18N(value.FullName),
+                    TypeName = GetI18N(value.FullName),
                     IsSelf = true
                 }
             };

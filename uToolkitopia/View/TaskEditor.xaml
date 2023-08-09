@@ -7,24 +7,32 @@
                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                  xmlns:taskEditor="clr-namespace:Core.ViewModel.TaskEditor;assembly=Core"
                  xmlns:plugin="clr-namespace:Kitopia.View.Pages.Plugin"
+                 xmlns:taskEditor1="clr-namespace:Kitopia.Converter.TaskEditor"
                  WindowBackdropType="Acrylic"
                  WindowCornerPreference="Round"
                  ExtendsContentIntoTitleBar="True"
                  mc:Ignorable="d"
                  d:DataContext="{d:DesignInstance taskEditor:TaskEditorViewModel}"
-                 Title="TaskEditor" Height="450" Width="800">
+                 Title="TaskEditor" Height="450" Width="1800">
     <Window.Resources>
-        <DataTemplate x:Key="StringTemplate" DataType="{x:Type taskEditor:ConnectorItem}"> 
-            <ui:TextBox Margin="10,5,10,5" MinWidth="40" Text="{Binding InputObject}" PlaceholderText="字符串"  />
+        <DataTemplate x:Key="StringTemplate" DataType="{x:Type taskEditor:ConnectorItem}">
+            <ui:TextBox Margin="10,5,10,5" MinWidth="40" Text="{Binding InputObject}" PlaceholderText="字符串" />
         </DataTemplate>
         <DataTemplate x:Key="IntTemplate" DataType="{x:Type taskEditor:ConnectorItem}">
-            <ui:NumberBox MaxDecimalPlaces="0" Margin="10,5,10,5" MinWidth="40"  Value="{Binding InputObject,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" PlaceholderText="整型"  />
+            <ui:NumberBox MaxDecimalPlaces="0" Margin="10,5,10,5" MinWidth="40"
+                          ValidationMode="InvalidInputOverwritten"
+                          Maximum="2147483647" Minimum="-2147483648"
+                          Value="{Binding InputObject,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                          PlaceholderText="整型" />
         </DataTemplate>
         <DataTemplate x:Key="DoubleTemplate" DataType="{x:Type taskEditor:ConnectorItem}">
-            <ui:NumberBox  Margin="10,5,10,5" MinWidth="40"  Value="{Binding InputObject,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" PlaceholderText="双精度浮点数"  />
+            <ui:NumberBox Margin="10,5,10,5" MinWidth="40"
+                          ValidationMode="InvalidInputOverwritten"
+                          Value="{Binding InputObject,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                          PlaceholderText="浮点" />
         </DataTemplate>
         <DataTemplate x:Key="BoolTemplate" DataType="{x:Type taskEditor:ConnectorItem}">
-            <ui:ToggleSwitch  Margin="10,5,10,5" MinWidth="40" IsChecked="{Binding InputObject}"  />
+            <ui:ToggleSwitch Margin="10,5,10,5" MinWidth="40" IsChecked="{Binding InputObject}" />
         </DataTemplate>
         <GeometryDrawing x:Key="SmallGridGeometry"
                          Geometry="M0,0 L0,1 0.03,1 0.03,0.03 1,0.03 1,0 Z"
@@ -87,14 +95,15 @@
                     <ListBox.Resources>
 
                         <!-- Declare some data templates for different types of data -->
-                        
+
                         <DataTemplate x:Key="InputTemplate" DataType="{x:Type taskEditor:ConnectorItem}">
 
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                 <Border>
                                     <!-- Set the border color to red -->
                                     <Border.BorderBrush>
-                                        <SolidColorBrush Color="{DynamicResource  SystemAccentColorSecondary}" Opacity="0.5"/>
+                                        <SolidColorBrush Color="{DynamicResource  SystemAccentColorSecondary}"
+                                                         Opacity="0.5" />
                                     </Border.BorderBrush>
                                     <!-- Set the border thickness to 2 -->
                                     <Border.BorderThickness>2</Border.BorderThickness>
@@ -110,7 +119,17 @@
                                     <Border.Margin>5</Border.Margin>
                                 </Border>
                                 <!-- Declare a TextBlock element and give it a name -->
-                                <TextBlock VerticalAlignment="Center" x:Name="textBlock"
+
+                                <TextBlock VerticalAlignment="Center" x:Name="textBlock" FontSize="12"
+                                           Foreground="White"
+                                           Text="{Binding  TypeName}">
+                                    <TextBlock.Background>
+                                        <SolidColorBrush Color="Gray" Opacity="0.7" />
+                                    </TextBlock.Background>
+                                </TextBlock>
+
+
+                                <TextBlock VerticalAlignment="Center"
                                            Text="{Binding  Title}" />
                             </StackPanel>
 
@@ -124,11 +143,12 @@
                         <DataTemplate DataType="{x:Type taskEditor:PointItem}">
                             <DockPanel ZIndex="1">
                                 <Grid DockPanel.Dock="Top">
-                                    <Rectangle 
-                                               Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type DockPanel}}}"
-                                               Height="20">
+                                    <Rectangle
+                                        Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type DockPanel}}}"
+                                        Height="20">
                                         <Rectangle.Fill>
-                                            <SolidColorBrush Color="{DynamicResource  SystemAccentColorSecondary}" Opacity="0.5" />
+                                            <SolidColorBrush Color="{DynamicResource  SystemAccentColorSecondary}"
+                                                             Opacity="0.5" />
                                         </Rectangle.Fill>
                                     </Rectangle>
                                     <TextBlock HorizontalAlignment="Center" Text="{Binding Title}">
@@ -138,7 +158,7 @@
                                     </TextBlock>
                                 </Grid>
                                 <Grid>
-                                    <Rectangle Fill="WhiteSmoke" 
+                                    <Rectangle Fill="WhiteSmoke"
                                                Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type DockPanel}}}" />
                                     <DockPanel
                                         Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type Rectangle}}}">
@@ -167,7 +187,8 @@
                                         </ItemsControl>
 
 
-                                        <ItemsControl DockPanel.Dock="Right" VerticalAlignment="Center" ItemsSource="{Binding Output}">
+                                        <ItemsControl DockPanel.Dock="Right" VerticalAlignment="Center"
+                                                      ItemsSource="{Binding Output}">
                                             <!-- Set the ItemsPanel to a StackPanel with horizontal orientation -->
                                             <ItemsControl.ItemsPanel>
                                                 <ItemsPanelTemplate>
@@ -177,13 +198,24 @@
                                             <!-- Set the ItemTemplate to a Button with the content bound to the item -->
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
-                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
+                                                                HorizontalAlignment="Right">
+
                                                         <TextBlock VerticalAlignment="Center" x:Name="textBlock"
                                                                    Text="{Binding  Title}" />
+                                                        <TextBlock VerticalAlignment="Center" FontSize="12"
+                                                                   Foreground="White"
+                                                                   Text="{Binding  TypeName}">
+                                                            <TextBlock.Background>
+                                                                <SolidColorBrush Color="Gray" Opacity="0.7" />
+                                                            </TextBlock.Background>
+                                                        </TextBlock>
                                                         <Border>
                                                             <!-- Set the border color to red -->
                                                             <Border.BorderBrush>
-                                                                <SolidColorBrush Color="{DynamicResource  SystemAccentColorSecondary}" Opacity="0.5"/>
+                                                                <SolidColorBrush
+                                                                    Color="{DynamicResource  SystemAccentColorSecondary}"
+                                                                    Opacity="0.5" />
                                                             </Border.BorderBrush>
                                                             <!-- Set the border thickness to 2 -->
                                                             <Border.BorderThickness>2</Border.BorderThickness>
@@ -240,7 +272,7 @@
                                      ItemsSource="{Binding Nodes}">
                     <nodify:NodifyEditor.ItemContainerStyle>
                         <Style TargetType="{x:Type nodify:ItemContainer}">
-                            
+
                             <Setter Property="Location"
                                     Value="{Binding Location,Mode=TwoWay}" />
                             <Setter Property="BorderBrush">
@@ -275,7 +307,9 @@
                                                     </Style>
                                                 </nodify:Connection.Style>
                                                 <nodify:Connection.Stroke>
-                                                    <SolidColorBrush Color="{DynamicResource  SystemAccentColorSecondary}" Opacity="0.5"/>
+                                                    <SolidColorBrush
+                                                        Color="{DynamicResource  SystemAccentColorSecondary}"
+                                                        Opacity="0.5" />
                                                 </nodify:Connection.Stroke>
                                             </nodify:Connection>
                                             <Border Background="{TemplateBinding Background}"
@@ -287,7 +321,7 @@
                                                     BorderBrush="{TemplateBinding BorderBrush}"
                                                     CornerRadius="3"
                                                     Margin="15">
-                                                
+
                                                 <ContentPresenter />
                                             </Border>
                                         </Canvas>
@@ -303,7 +337,8 @@
                             <nodify:Connection Source="{Binding Source.Anchor}"
                                                Target="{Binding Target.Anchor}">
                                 <nodify:Connection.Stroke>
-                                    <SolidColorBrush Color="{DynamicResource  SystemAccentColorSecondary}" Opacity="0.5"/>
+                                    <SolidColorBrush Color="{DynamicResource  SystemAccentColorSecondary}"
+                                                     Opacity="0.5" />
                                 </nodify:Connection.Stroke>
                             </nodify:Connection>
                         </DataTemplate>
@@ -316,16 +351,17 @@
                                                       EnablePreview="True"
                                                       EnableSnapping="True"
                                                       Target="{Binding PreviewTarget,Mode=OneWayToSource}"
-                                                      PreviewTarget="{Binding PreviewTarget,Mode=OneWayToSource}"
-                                                      >
+                                                      PreviewTarget="{Binding PreviewTarget,Mode=OneWayToSource}">
                                 <nodify:PendingConnection.Content>
                                     <TextBlock Text="{Binding PreviewText}" />
                                 </nodify:PendingConnection.Content>
                                 <nodify:PendingConnection.Stroke>
-                                    <SolidColorBrush Color="{DynamicResource  SystemAccentColorSecondary}" Opacity="0.5"/>
+                                    <SolidColorBrush Color="{DynamicResource  SystemAccentColorSecondary}"
+                                                     Opacity="0.5" />
                                 </nodify:PendingConnection.Stroke>
                                 <nodify:PendingConnection.Background>
-                                    <SolidColorBrush Color="{DynamicResource  SystemAccentColorSecondary}" Opacity="0.8"/>
+                                    <SolidColorBrush Color="{DynamicResource  SystemAccentColorSecondary}"
+                                                     Opacity="0.8" />
                                 </nodify:PendingConnection.Background>
                             </nodify:PendingConnection>
 
@@ -340,20 +376,38 @@
                                          ContentBrush="WhiteSmoke"
                                          Output="{Binding Output}">
                                 <nodify:Node.HeaderBrush>
-                                    <SolidColorBrush Color="{DynamicResource  SystemAccentColorSecondary}" Opacity="0.5"/>
+                                    <SolidColorBrush Color="{DynamicResource  SystemAccentColorSecondary}"
+                                                     Opacity="0.5" />
                                 </nodify:Node.HeaderBrush>
                                 <nodify:Node.Resources>
+                                    <taskEditor1:InterfacesToString x:Key="InterfacesToString"/>
                                     <DataTemplate x:Key="InputTemplate" DataType="{x:Type taskEditor:ConnectorItem}">
-                                        <nodify:NodeInput Header="{Binding Title}"
-                                                          
-                                                          IsConnected="{Binding IsConnected}"
-                                                          Anchor="{Binding Anchor, Mode=OneWayToSource}" 
-                                                          >
+                                        <nodify:NodeInput
+
+                                            IsConnected="{Binding IsConnected}"
+                                            Anchor="{Binding Anchor, Mode=OneWayToSource}">
+                                            <nodify:NodeInput.Header>
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
+                                                            HorizontalAlignment="Right">
+
+
+                                                    <TextBlock VerticalAlignment="Center" FontSize="12"
+                                                               Foreground="White"
+                                                               Text="{Binding  TypeName}">
+                                                        <TextBlock.Background>
+                                                            <SolidColorBrush Color="Gray" Opacity="0.7" />
+                                                        </TextBlock.Background>
+                                                    </TextBlock>
+                                                    <TextBlock VerticalAlignment="Center" x:Name="textBlock"
+                                                               Text="{Binding  Title}" />
+                                                </StackPanel>
+                                            </nodify:NodeInput.Header>
                                             <nodify:NodeInput.BorderBrush>
-                                                <SolidColorBrush Color="{DynamicResource  SystemAccentColorSecondary}" Opacity="0.5"/>
+                                                <SolidColorBrush Color="{DynamicResource  SystemAccentColorSecondary}"
+                                                                 Opacity="0.5" />
                                             </nodify:NodeInput.BorderBrush>
                                         </nodify:NodeInput>
-                                        
+
                                     </DataTemplate>
                                     <plugin:MyDataTemplateSelector x:Key="MyDataTemplateSelector" />
                                 </nodify:Node.Resources>
@@ -371,12 +425,28 @@
 
                                 <nodify:Node.OutputConnectorTemplate>
                                     <DataTemplate DataType="{x:Type taskEditor:ConnectorItem}">
-                                        <nodify:NodeOutput Header="{Binding Title}"
-                                                           VerticalAlignment="Center"
-                                                           IsConnected="{Binding IsConnected}"
-                                                           Anchor="{Binding Anchor, Mode=OneWayToSource}">
+                                        <nodify:NodeOutput
+                                            VerticalAlignment="Center"
+                                            IsConnected="{Binding IsConnected}"
+                                            Anchor="{Binding Anchor, Mode=OneWayToSource}">
+                                            <nodify:NodeOutput.Header>
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
+                                                            HorizontalAlignment="Right">
+
+                                                    <TextBlock VerticalAlignment="Center" x:Name="textBlock"
+                                                               Text="{Binding  Title}" />
+                                                    <TextBlock VerticalAlignment="Center" FontSize="12"
+                                                               Foreground="White" ToolTip="{Binding Interfaces,Converter={StaticResource InterfacesToString}}"
+                                                               Text="{Binding  TypeName}">
+                                                        <TextBlock.Background>
+                                                            <SolidColorBrush Color="Gray" Opacity="0.7" />
+                                                        </TextBlock.Background>
+                                                    </TextBlock>
+                                                </StackPanel>
+                                            </nodify:NodeOutput.Header>
                                             <nodify:NodeOutput.BorderBrush>
-                                                <SolidColorBrush Color="{DynamicResource  SystemAccentColorSecondary}" Opacity="0.5"/>
+                                                <SolidColorBrush Color="{DynamicResource  SystemAccentColorSecondary}"
+                                                                 Opacity="0.5" />
                                             </nodify:NodeOutput.BorderBrush>
                                         </nodify:NodeOutput>
                                     </DataTemplate>

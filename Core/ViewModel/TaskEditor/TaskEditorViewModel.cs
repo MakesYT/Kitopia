@@ -42,6 +42,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
             {
                 Anchor = new Point(connectorItem.Anchor.X, connectorItem.Anchor.Y),
                 Source = item,
+                TypeName = connectorItem.TypeName,
                 Title = connectorItem.Title,
                 Type = connectorItem.Type,
                 InputObject = connectorItem.InputObject,
@@ -54,15 +55,28 @@ public partial class TaskEditorViewModel : ObservableRecipient
         ObservableCollection<ConnectorItem> output = new();
         foreach (var connectorItem in pointItem.Output)
         {
-            output.Add(new ConnectorItem()
+            var connectorItem1 = new ConnectorItem()
             {
                 Anchor = new Point(connectorItem.Anchor.X, connectorItem.Anchor.Y),
                 Source = item,
                 Title = connectorItem.Title,
+                TypeName = connectorItem.TypeName,
                 Type = connectorItem.Type,
                 IsConnected = connectorItem.IsConnected,
                 IsOut = connectorItem.IsOut
-            });
+            };
+            if (connectorItem.Interfaces is { Count: > 0 })
+            {
+                List<string> interfaces = new List<string>();
+                foreach (var connectorItemInterface in connectorItem.Interfaces)
+                {
+                    interfaces.Add(connectorItemInterface);
+                }
+
+                connectorItem1.Interfaces = interfaces;
+            }
+
+            output.Add(connectorItem1);
         }
 
         item.Input = input;
@@ -100,7 +114,8 @@ public partial class TaskEditorViewModel : ObservableRecipient
                         {
                             Source = pointItem,
                             Type = parameterInfo.ParameterType,
-                            Title = BaseNodeMethodsGen.GetI18N(parameterInfo.ParameterType.FullName),
+                            Title = customAttribute.GetParameterName(parameterInfo.Name),
+                            TypeName = BaseNodeMethodsGen.GetI18N(parameterInfo.ParameterType.FullName),
                         });
                         //Log.Debug($"参数{index}:类型为{parameterInfo.ParameterType}");
                     }
@@ -113,22 +128,40 @@ public partial class TaskEditorViewModel : ObservableRecipient
                             var type = methodInfo.ReturnParameter.ParameterType;
                             foreach (var memberInfo in type.GetProperties())
                             {
+                                List<string> interfaces = new List<string>();
+                                foreach (var @interface in memberInfo.PropertyType.GetInterfaces())
+                                {
+                                    interfaces.Add(@interface.FullName);
+                                }
+
                                 outItems.Add(new ConnectorItem()
                                 {
                                     Source = pointItem,
                                     Type = memberInfo.PropertyType,
-                                    Title = BaseNodeMethodsGen.GetI18N(memberInfo.PropertyType.FullName),
+                                    Interfaces = interfaces,
+                                    Title = customAttribute.GetParameterName(memberInfo.Name),
+                                    TypeName = BaseNodeMethodsGen.GetI18N(memberInfo.PropertyType.FullName),
                                     IsOut = true
                                 });
                             }
                         }
                         else
                         {
+                            List<string> interfaces = new List<string>();
+                            foreach (var @interface in methodInfo.ReturnParameter.ParameterType.GetInterfaces())
+                            {
+                                interfaces.Add(@interface.FullName);
+                            }
+
+
                             outItems.Add(new ConnectorItem()
                             {
                                 Source = pointItem,
                                 Type = methodInfo.ReturnParameter.ParameterType,
-                                Title = BaseNodeMethodsGen.GetI18N(methodInfo.ReturnParameter.ParameterType.FullName),
+                                Title = customAttribute.GetParameterName("return"),
+                                Interfaces = interfaces,
+                                TypeName =
+                                    BaseNodeMethodsGen.GetI18N(methodInfo.ReturnParameter.ParameterType.FullName),
                                 IsOut = true
                             });
                         }
@@ -239,6 +272,13 @@ public partial class ConnectorItem : ObservableRecipient
     [ObservableProperty] private bool _isSelf = false;
     [ObservableProperty] private object? _inputObject;
 
+
+    public string TypeName
+    {
+        get;
+        set;
+    }
+
     public string Title
     {
         get;
@@ -246,6 +286,12 @@ public partial class ConnectorItem : ObservableRecipient
     }
 
     public Type Type
+    {
+        get;
+        set;
+    }
+
+    public List<string>? Interfaces
     {
         get;
         set;

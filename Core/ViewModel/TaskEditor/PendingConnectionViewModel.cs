@@ -49,13 +49,7 @@ public partial class PendingConnectionViewModel : ObservableRecipient
                         break;
                     }
 
-                    if (con.Type.IsSubclassOf(Source.Type))
-                    {
-                        PreviewText = "连接";
-                        break;
-                    }
-
-                    if (Source.Type.IsSubclassOf(con.Type))
+                    if (con.Type.IsAssignableFrom(Source.Type))
                     {
                         PreviewText = "连接";
                         break;
@@ -92,8 +86,7 @@ public partial class PendingConnectionViewModel : ObservableRecipient
             return;
         }
 
-        if (Source.Type.FullName != target.Type.FullName && !(Source.Type.IsSubclassOf(target.Type) ||
-                                                              target.Type.IsSubclassOf(Source.Type) ||
+        if (Source.Type.FullName != target.Type.FullName && !(target.Type.IsAssignableFrom(Source.Type) ||
                                                               Source.Type.FullName == "System.Object" ||
                                                               target.Type.FullName == "System.Object"))
         {
