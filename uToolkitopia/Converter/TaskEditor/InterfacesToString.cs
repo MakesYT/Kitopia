@@ -18,9 +18,13 @@ public class InterfacesToString : IValueConverter
         if (value is List<string> list)
         {
             StringBuilder stringBuilder = new StringBuilder();
-            foreach (var s in list)
+            for (int i = 0; i < list.Count; i++)
             {
-                stringBuilder.AppendLine(s);
+                stringBuilder.Append(list[i]); // 追加对象
+                if (i < list.Count - 1) // 如果不是最后一个对象
+                {
+                    stringBuilder.AppendLine(); // 添加换行符
+                }
             }
 
             return stringBuilder.ToString();
