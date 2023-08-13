@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Core.ViewModel.TaskEditor;
+using PluginCore;
 
 namespace Core.SDKs.Tools;
 
@@ -20,6 +21,8 @@ public class BaseNodeMethodsGen
         { "System.Boolean", "布尔" },
         { "System.Int32", "整数" },
         { "System.Double", "浮点" },
+        { "System.Object", "任意" },
+        { "PluginCore.NodeConnectorClass", "节点" },
     };
 
     public static string GetI18N(string key)
@@ -39,6 +42,7 @@ public class BaseNodeMethodsGen
             PointItem String = new PointItem()
             {
                 Plugin = "Kitopia",
+                MerthodName = value.FullName,
                 Title = key
             };
             ObservableCollection<ConnectorItem> StringoutItems = new()
@@ -62,6 +66,88 @@ public class BaseNodeMethodsGen
                     Title = GetI18N(value.FullName),
                     TypeName = GetI18N(value.FullName),
                     IsSelf = true
+                }
+            };
+            String.Input = StringinItems;
+            nodeMethods.Add(String);
+        } //基本数值类型
+
+        //if
+        {
+            PointItem String = new PointItem()
+            {
+                Plugin = "Kitopia",
+                MerthodName = "判断",
+                Title = "判断"
+            };
+            ObservableCollection<ConnectorItem> StringoutItems = new()
+            {
+                new ConnectorItem()
+                {
+                    Source = String,
+                    Type = typeof(NodeConnectorClass),
+                    Title = "真",
+                    TypeName = GetI18N(typeof(NodeConnectorClass).FullName),
+                    IsOut = true
+                },
+                new ConnectorItem()
+                {
+                    Source = String,
+                    Type = typeof(NodeConnectorClass),
+                    Title = "假",
+                    TypeName = GetI18N(typeof(NodeConnectorClass).FullName),
+                    IsOut = true
+                }
+            };
+            String.Output = StringoutItems;
+            ObservableCollection<ConnectorItem> StringinItems = new()
+            {
+                new ConnectorItem()
+                {
+                    Source = String,
+                    Type = typeof(bool),
+                    Title = GetI18N(typeof(bool).FullName),
+                    TypeName = GetI18N(typeof(bool).FullName),
+                }
+            };
+            String.Input = StringinItems;
+            nodeMethods.Add(String);
+        }
+        //==
+        {
+            PointItem String = new PointItem()
+            {
+                Plugin = "Kitopia",
+                MerthodName = "相等",
+                Title = "相等"
+            };
+            ObservableCollection<ConnectorItem> StringoutItems = new()
+            {
+                new ConnectorItem()
+                {
+                    Source = String,
+                    Type = typeof(bool),
+                    Title = GetI18N(typeof(bool).FullName),
+                    TypeName = GetI18N(typeof(bool).FullName),
+                    IsOut = true
+                }
+            };
+            String.Output = StringoutItems;
+            ObservableCollection<ConnectorItem> StringinItems = new()
+            {
+                new ConnectorItem()
+                {
+                    Source = String,
+                    Type = typeof(object),
+                    Title = GetI18N(typeof(object).FullName),
+                    TypeName = GetI18N(typeof(object).FullName),
+                },
+                new ConnectorItem()
+                {
+                    Source = String,
+                    Type = typeof(object),
+                    Title = GetI18N(typeof(object).FullName),
+                    TypeName = GetI18N(typeof(object).FullName),
                 }
             };
             String.Input = StringinItems;

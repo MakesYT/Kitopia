@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Core.SDKs.Services.Plugin;
 using Core.SDKs.Tools;
+using PluginCore;
 using PluginCore.Attribute;
 
 namespace Core.ViewModel.TaskEditor;
@@ -33,6 +34,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
         {
             Title = pointItem.Title,
             Plugin = pointItem.Plugin,
+            MerthodName = pointItem.MerthodName,
             Location = new Point(pointItem.Location.X, pointItem.Location.Y)
         };
         ObservableCollection<ConnectorItem> input = new();
@@ -104,9 +106,17 @@ public partial class TaskEditorViewModel : ObservableRecipient
                     PointItem pointItem = new PointItem()
                     {
                         Plugin = key,
+                        MerthodName = methodInfo.Name,
                         Title = $"{key}_{customAttribute.Name}"
                     };
                     ObservableCollection<ConnectorItem> inpItems = new();
+                    inpItems.Add(new ConnectorItem()
+                    {
+                        Source = pointItem,
+                        Type = typeof(NodeConnectorClass),
+                        Title = "流输入",
+                        TypeName = "节点",
+                    });
                     for (var index = 0; index < methodInfo.GetParameters().Length; index++)
                     {
                         var parameterInfo = methodInfo.GetParameters()[index];
@@ -203,7 +213,8 @@ public partial class TaskEditorViewModel : ObservableRecipient
             {
                 IsOut = true,
                 Source = nodify2,
-                Type = typeof(object),
+                Type = typeof(NodeConnectorClass),
+                TypeName = BaseNodeMethodsGen.GetI18N(typeof(NodeConnectorClass).FullName),
                 Title = "开始"
             }
         };
@@ -249,6 +260,12 @@ public partial class TaskEditorViewModel : ObservableRecipient
 public partial class PointItem : ObservableRecipient
 {
     public string Plugin
+    {
+        get;
+        set;
+    }
+
+    public string MerthodName
     {
         get;
         set;

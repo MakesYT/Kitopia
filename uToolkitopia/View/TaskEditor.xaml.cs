@@ -2,7 +2,9 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using Core.ViewModel.TaskEditor;
+using Wpf.Ui.Controls;
 
 namespace Kitopia.View;
 
@@ -15,6 +17,17 @@ public partial class TaskEditor
         this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         this.Width = SystemParameters.PrimaryScreenWidth * 2 / 3;
         this.Height = SystemParameters.PrimaryScreenHeight * 2 / 3;
+    }
+
+    protected override void OnSourceInitialized(EventArgs e)
+    {
+        base.OnSourceInitialized(e);
+        // 获取窗体句柄
+        IntPtr m_Hwnd = new WindowInteropHelper(this).Handle;
+        Wpf.Ui.Appearance.ApplicationThemeManager.Changed += ((theme, accent) =>
+        {
+            WindowBackdrop.ApplyBackdrop(m_Hwnd, WindowBackdropType.Acrylic);
+        });
     }
 
     private void ListBox_OnMouseMove(object sender, MouseEventArgs e)

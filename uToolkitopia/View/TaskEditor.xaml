@@ -15,7 +15,7 @@
                  d:DataContext="{d:DesignInstance taskEditor:TaskEditorViewModel}"
                  Title="TaskEditor" Height="450" Width="1800">
     <Window.Resources>
-        <taskEditor1:IfNullVisibilityHidden x:Key="IfNullVisibilityHidden"/>
+        <taskEditor1:IfNullVisibilityHidden x:Key="IfNullVisibilityHidden" />
         <DataTemplate x:Key="StringTemplate" DataType="{x:Type taskEditor:ConnectorItem}">
             <ui:TextBox Margin="10,5,10,5" MinWidth="40" Text="{Binding InputObject}" PlaceholderText="字符串" />
         </DataTemplate>
@@ -68,11 +68,12 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <ui:TitleBar Title="任务编排" Grid.ColumnSpan="2" />
+        <ui:Button Visibility="Collapsed" x:Name="add" Content="添加" Command="{Binding AddNodesCommand}" />
         <!-- 左边部分 -->
         <Border Grid.Row="1" Grid.Column="0">
-            <StackPanel>
-
-                <ListBox MouseMove="ListBox_OnMouseMove"
+            
+                <ListBox MouseMove="ListBox_OnMouseMove" ScrollViewer.VerticalScrollBarVisibility="Auto" 
+                         ScrollViewer.CanContentScroll="False"
                          ItemsSource="{Binding NodeMethods,NotifyOnSourceUpdated=True,UpdateSourceTrigger=PropertyChanged,Mode=OneWay}">
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
@@ -96,7 +97,7 @@
                     <ListBox.Resources>
 
                         <!-- Declare some data templates for different types of data -->
-
+                        <taskEditor1:InterfacesToString x:Key="InterfacesToString" />
                         <DataTemplate x:Key="InputTemplate" DataType="{x:Type taskEditor:ConnectorItem}">
 
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
@@ -122,16 +123,24 @@
                                 <!-- Declare a TextBlock element and give it a name -->
 
                                 <TextBlock VerticalAlignment="Center" x:Name="textBlock" FontSize="12"
-                                           Foreground="White"
+
                                            Text="{Binding  TypeName}">
                                     <TextBlock.Background>
-                                        <SolidColorBrush Color="Gray" Opacity="0.7" />
+                                        <SolidColorBrush Color="{DynamicResource TextFillColorPrimary}"
+                                                         Opacity="0.6" />
                                     </TextBlock.Background>
+                                    <TextBlock.Foreground>
+                                        <SolidColorBrush Color="{DynamicResource ApplicationBackgroundColor}" />
+                                    </TextBlock.Foreground>
                                 </TextBlock>
 
 
                                 <TextBlock VerticalAlignment="Center"
-                                           Text="{Binding  Title}" />
+                                           Text="{Binding  Title}">
+                                    <TextBlock.Foreground>
+                                        <SolidColorBrush Color="{DynamicResource TextFillColorPrimary}" />
+                                    </TextBlock.Foreground>
+                                </TextBlock>
                             </StackPanel>
 
 
@@ -145,7 +154,7 @@
                             <DockPanel ZIndex="1">
                                 <Grid DockPanel.Dock="Top">
                                     <Rectangle
-                                        Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type DockPanel}}}"
+                                        
                                         Height="20">
                                         <Rectangle.Fill>
                                             <SolidColorBrush Color="{DynamicResource  SystemAccentColorSecondary}"
@@ -154,20 +163,27 @@
                                     </Rectangle>
                                     <TextBlock HorizontalAlignment="Center" Text="{Binding Title}">
                                         <TextBlock.Foreground>
-                                            <SolidColorBrush Color="{DynamicResource TextOnAccentFillColorPrimary}" />
+                                            <SolidColorBrush Color="White" />
                                         </TextBlock.Foreground>
                                     </TextBlock>
                                 </Grid>
                                 <Grid>
-                                    <Rectangle Fill="WhiteSmoke"
-                                               Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type DockPanel}}}" />
+                                    <Rectangle
+                                        
+                                        >
+                                        <Rectangle.Fill>
+                                            <SolidColorBrush Color="{DynamicResource ApplicationBackgroundColor}"
+                                                             Opacity="0.2" />
+                                        </Rectangle.Fill>
+                                    </Rectangle>
                                     <DockPanel
-                                        Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type Rectangle}}}">
+                                       
+                                        >
                                         <ItemsControl DockPanel.Dock="Left" ItemsSource="{Binding Input}">
                                             <!-- Set the ItemsPanel to a StackPanel with horizontal orientation -->
                                             <ItemsControl.ItemsPanel>
                                                 <ItemsPanelTemplate>
-                                                    <StackPanel Orientation="Vertical" />
+                                                    <StackPanel Orientation="Vertical" VerticalAlignment="Center" />
                                                 </ItemsPanelTemplate>
                                             </ItemsControl.ItemsPanel>
                                             <!-- Set the ItemTemplate to a Button with the content bound to the item -->
@@ -203,14 +219,30 @@
                                                                 HorizontalAlignment="Right">
 
                                                         <TextBlock VerticalAlignment="Center" x:Name="textBlock"
-                                                                   Text="{Binding  Title}" />
+                                                                   Text="{Binding  Title}">
+                                                            <TextBlock.Foreground>
+                                                                <SolidColorBrush
+                                                                    Color="{DynamicResource TextFillColorPrimary}" />
+                                                            </TextBlock.Foreground>
+                                                        </TextBlock>
                                                         <TextBlock VerticalAlignment="Center" FontSize="12"
-                                                                   Foreground="White"
+
                                                                    Text="{Binding  TypeName}">
                                                             <TextBlock.Background>
-                                                                <SolidColorBrush Color="Gray" Opacity="0.7" />
+                                                                <SolidColorBrush
+                                                                    Color="{DynamicResource TextFillColorPrimary}"
+                                                                    Opacity="0.6" />
+
                                                             </TextBlock.Background>
+                                                            <TextBlock.Foreground>
+                                                                <SolidColorBrush
+                                                                    Color="{DynamicResource ApplicationBackgroundColor}" />
+                                                            </TextBlock.Foreground>
                                                         </TextBlock>
+                                                        <ui:SymbolIcon Symbol="AddCircle20"
+                                                                       ToolTip="{Binding Interfaces,Converter={StaticResource InterfacesToString}}"
+                                                                       ToolTipService.InitialShowDelay="0"
+                                                                       Visibility="{Binding Interfaces,Converter={StaticResource IfNullVisibilityHidden}}" />
                                                         <Border>
                                                             <!-- Set the border color to red -->
                                                             <Border.BorderBrush>
@@ -247,8 +279,9 @@
                     </ListBox.ItemTemplate>
 
                 </ListBox>
-                <ui:Button Visibility="Collapsed" x:Name="add" Content="添加" Command="{Binding AddNodesCommand}" />
-            </StackPanel>
+
+                
+            
 
         </Border>
 
@@ -271,6 +304,9 @@
                                      Background="{StaticResource SmallGridLinesDrawingBrush}"
                                      Connections="{Binding Connections}"
                                      ItemsSource="{Binding Nodes}">
+                    <nodify:NodifyEditor.Foreground>
+                        <SolidColorBrush Color="{DynamicResource ApplicationBackgroundColor}" Opacity="0.7" />
+                    </nodify:NodifyEditor.Foreground>
                     <nodify:NodifyEditor.ItemContainerStyle>
                         <Style TargetType="{x:Type nodify:ItemContainer}">
 
@@ -278,7 +314,7 @@
                                     Value="{Binding Location,Mode=TwoWay}" />
                             <Setter Property="BorderBrush">
                                 <Setter.Value>
-                                    <SolidColorBrush Color="{DynamicResource TextOnAccentFillColorPrimary}" />
+                                    <SolidColorBrush Color="{DynamicResource TextFillColorPrimary}" />
                                 </Setter.Value>
                             </Setter>
                         </Style>
@@ -370,18 +406,23 @@
                     </nodify:NodifyEditor.PendingConnectionTemplate>
                     <nodify:NodifyEditor.ItemTemplate>
                         <DataTemplate DataType="{x:Type taskEditor:PointItem}">
-                            <nodify:Node Header="{Binding Title}"
-                                         Input="{Binding Input}"
-                                         VerticalAlignment="Center"
-                                         Background="WhiteSmoke"
-                                         ContentBrush="WhiteSmoke"
-                                         Output="{Binding Output}">
+                            <nodify:Node
+                                Input="{Binding Input}"
+                                VerticalAlignment="Center"
+
+                                Output="{Binding Output}">
+                                <nodify:Node.Foreground>
+                                    <SolidColorBrush Color="{DynamicResource ApplicationBackgroundColor}" />
+                                </nodify:Node.Foreground>
                                 <nodify:Node.HeaderBrush>
                                     <SolidColorBrush Color="{DynamicResource  SystemAccentColorSecondary}"
                                                      Opacity="0.5" />
                                 </nodify:Node.HeaderBrush>
+                                <nodify:Node.Header>
+                                    <TextBlock Text="{Binding Title}" Foreground="White" HorizontalAlignment="Center" />
+                                </nodify:Node.Header>
                                 <nodify:Node.Resources>
-                                    <taskEditor1:InterfacesToString x:Key="InterfacesToString"/>
+                                    <taskEditor1:InterfacesToString x:Key="InterfacesToString" />
                                     <DataTemplate x:Key="InputTemplate" DataType="{x:Type taskEditor:ConnectorItem}">
                                         <nodify:NodeInput
 
@@ -393,11 +434,16 @@
 
 
                                                     <TextBlock VerticalAlignment="Center" FontSize="12"
-                                                               Foreground="White"
                                                                Text="{Binding  TypeName}">
                                                         <TextBlock.Background>
-                                                            <SolidColorBrush Color="Gray" Opacity="0.7" />
+                                                            <SolidColorBrush
+                                                                Color="{DynamicResource TextFillColorPrimary}"
+                                                                Opacity="0.6" />
                                                         </TextBlock.Background>
+                                                        <TextBlock.Foreground>
+                                                            <SolidColorBrush
+                                                                Color="{DynamicResource ApplicationBackgroundColor}" />
+                                                        </TextBlock.Foreground>
                                                     </TextBlock>
                                                     <TextBlock VerticalAlignment="Center" x:Name="textBlock"
                                                                Text="{Binding  Title}" />
@@ -437,14 +483,18 @@
                                                     <TextBlock VerticalAlignment="Center" x:Name="textBlock"
                                                                Text="{Binding  Title}" />
                                                     <TextBlock VerticalAlignment="Center" FontSize="12"
-                                                               
-                                                               Foreground="White" 
                                                                Text="{Binding  TypeName}">
                                                         <TextBlock.Background>
-                                                            <SolidColorBrush Color="Gray" Opacity="0.7" />
+                                                            <SolidColorBrush
+                                                                Color="{DynamicResource TextFillColorPrimary}"
+                                                                Opacity="0.6" />
                                                         </TextBlock.Background>
+                                                        <TextBlock.Foreground>
+                                                            <SolidColorBrush
+                                                                Color="{DynamicResource ApplicationBackgroundColor}" />
+                                                        </TextBlock.Foreground>
                                                     </TextBlock>
-                                                    <ui:SymbolIcon Symbol="AddCircle20" 
+                                                    <ui:SymbolIcon Symbol="AddCircle20"
                                                                    ToolTip="{Binding Interfaces,Converter={StaticResource InterfacesToString}}"
                                                                    ToolTipService.InitialShowDelay="0"
                                                                    Visibility="{Binding Interfaces,Converter={StaticResource IfNullVisibilityHidden}}" />
@@ -466,6 +516,34 @@
 
             </Grid>
         </Border>
+        <Grid Grid.Row="1" Grid.Column="1"
+              ZIndex="10">
+            <Border
+
+                Padding="12"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Center"
+                BorderThickness="1"
+                CornerRadius="4">
+
+                <Border.Effect>
+                    <DropShadowEffect
+                        BlurRadius="30"
+                        Direction="0"
+                        Opacity="0.4"
+                        ShadowDepth="0"
+                        Color="#202020" />
+                </Border.Effect>
+                <StackPanel Orientation="Horizontal">
+                    <ui:Button FontSize="25" ToolTip="运行测试" Command="{Binding VerifyNodeCommand}">
+                        <ui:Button.Icon>
+                            <ui:SymbolIcon Symbol="Play20" />
+                        </ui:Button.Icon>
+
+                    </ui:Button>
+                </StackPanel>
+            </Border>
+        </Grid>
     </Grid>
 
 

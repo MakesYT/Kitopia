@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -14,6 +15,7 @@ using Kitopia.SDKs;
 using Kitopia.View;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
+using Wpf.Ui.Appearance;
 using Wpf.Ui.Tray.Controls;
 using MessageBoxResult = Kitopia.Controls.MessageBoxControl.MessageBoxResult;
 
@@ -39,6 +41,56 @@ public partial class InitWindow
         DataContext = ServiceManager.Services.GetService<InitWindowsViewModel>();
 
         var currentTheme = Wpf.Ui.Appearance.ApplicationThemeManager.GetAppTheme();
+        Wpf.Ui.Appearance.ApplicationThemeManager.Changed += ((theme, accent) =>
+        {
+            #region 同步Nodify主题
+
+            Collection<ResourceDictionary> applicationDictionaries = Application
+                .Current
+                .Resources
+                .MergedDictionaries;
+
+            if (applicationDictionaries.Count == 0)
+            {
+                return;
+            }
+
+            for (var i = 0; i < applicationDictionaries.Count; i++)
+            {
+                string sourceUri;
+
+                if (applicationDictionaries[i]?.Source != null)
+                {
+                    sourceUri = applicationDictionaries[i].Source.ToString().ToLower().Trim();
+
+                    if (sourceUri.Contains("pack://application:,,,/nodify;component"))
+                    {
+                        switch (theme)
+                        {
+                            case ApplicationTheme.Dark:
+                                applicationDictionaries[i] = new()
+                                {
+                                    Source = new Uri("pack://application:,,,/Nodify;component/Themes/Dark.xaml",
+                                        UriKind.Absolute)
+                                };
+                                break;
+                            case ApplicationTheme.Light:
+                                applicationDictionaries[i] = new()
+                                {
+                                    Source = new Uri("pack://application:,,,/Nodify;component/Themes/light.xaml",
+                                        UriKind.Absolute)
+                                };
+                                break;
+                        }
+
+
+                        break;
+                    }
+                }
+            }
+
+            #endregion
+        });
         if (ConfigManger.Config.themeChoice == "跟随系统" &&
             !Wpf.Ui.Appearance.ApplicationThemeManager.IsAppMatchesSystem())
         {
