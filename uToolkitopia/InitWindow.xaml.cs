@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
@@ -15,8 +14,8 @@ using Kitopia.SDKs;
 using Kitopia.View;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
+using Vanara.PInvoke;
 using Wpf.Ui.Appearance;
-using Wpf.Ui.Tray.Controls;
 using MessageBoxResult = Kitopia.Controls.MessageBoxControl.MessageBoxResult;
 
 namespace Kitopia;
@@ -38,8 +37,6 @@ public partial class InitWindow
     public InitWindow()
     {
         InitializeComponent();
-        DataContext = ServiceManager.Services.GetService<InitWindowsViewModel>();
-
         var currentTheme = Wpf.Ui.Appearance.ApplicationThemeManager.GetAppTheme();
         Wpf.Ui.Appearance.ApplicationThemeManager.Changed += ((theme, accent) =>
         {
@@ -215,8 +212,6 @@ public partial class InitWindow
         return true;
     }
 
-    [DllImport("user32.dll", EntryPoint = "SetForegroundWindow", SetLastError = true)]
-    public static extern void SetForegroundWindow(IntPtr hwnd);
 
     /// <summary>
     ///     窗体回调函数，接收所有窗体消息的事件处理函数
@@ -239,42 +234,49 @@ public partial class InitWindow
 
 
                     //Console.WriteLine(App.Current.Services.GetService<SearchView>().Visibility);
-                    if (ServiceManager.Services.GetService<SearchWindow>().Visibility == Visibility.Visible)
+                    if (ServiceManager.Services.GetService<SearchWindow>()!.Visibility == Visibility.Visible)
                     {
-                        ServiceManager.Services.GetService<SearchWindow>().Visibility = Visibility.Hidden;
+                        ServiceManager.Services.GetService<SearchWindow>()!.Visibility = Visibility.Hidden;
                     }
                     else
                     {
-                        ServiceManager.Services.GetService<SearchWindowViewModel>().CheckClipboard();
+                        ServiceManager.Services.GetService<SearchWindowViewModel>()!.CheckClipboard();
 
 
-                        ServiceManager.Services.GetService<SearchWindow>().Show();
-                        SetForegroundWindow(new WindowInteropHelper(ServiceManager.Services.GetService<SearchWindow>())
-                            .Handle);
-                        ServiceManager.Services.GetService<SearchWindow>().tx.Focus();
+                        ServiceManager.Services.GetService<SearchWindow>()!.Show();
+                        User32.SetForegroundWindow(
+                            new WindowInteropHelper(ServiceManager.Services.GetService<SearchWindow>()!)
+                                .Handle);
+                        ServiceManager.Services.GetService<SearchWindow>()!.tx.Focus();
 
                         if (ConfigManger.Config.canReadClipboard)
                         {
-                            IDataObject data = Clipboard.GetDataObject();
-                            if (data.GetDataPresent(DataFormats.Text))
+                            try
                             {
-                                string text = (string)data.GetData(DataFormats.Text);
-                                if (text.StartsWith("\""))
+                                IDataObject data = Clipboard.GetDataObject()!;
+                                if (data.GetDataPresent(DataFormats.Text))
                                 {
-                                    text = text.Replace("\"", "");
-                                }
+                                    var text = (string)data.GetData(DataFormats.Text)!;
+                                    if (text.StartsWith("\""))
+                                    {
+                                        text = text.Replace("\"", "");
+                                    }
 
-                                if (File.Exists(text) || Directory.Exists(text))
-                                {
-                                    ServiceManager.Services.GetService<SearchWindowViewModel>().Search = text;
+                                    if (File.Exists(text) || Directory.Exists(text))
+                                    {
+                                        ServiceManager.Services.GetService<SearchWindowViewModel>()!.Search = text;
+                                    }
                                 }
+                            }
+                            catch
+                            {
                             }
                         }
 
-                        ServiceManager.Services.GetService<SearchWindow>().tx.SelectAll();
+                        ServiceManager.Services.GetService<SearchWindow>()!.tx.SelectAll();
                         ThreadPool.QueueUserWorkItem((e) =>
                         {
-                            ServiceManager.Services.GetService<SearchWindowViewModel>().ReloadApps();
+                            ServiceManager.Services.GetService<SearchWindowViewModel>()!.ReloadApps();
                         });
                     }
                 }
@@ -284,20 +286,5 @@ public partial class InitWindow
         }
 
         return IntPtr.Zero;
-    }
-
-    private void Button_Click(object sender, RoutedEventArgs e)
-    {
-    }
-
-    private void MenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        ConfigManger.Save();
-        Environment.Exit(0);
-    }
-
-    private void NotifyIcon_OnLeftDoubleClick(NotifyIcon sender, RoutedEventArgs e)
-    {
-        ServiceManager.Services.GetService<MainWindow>().Show();
     }
 }

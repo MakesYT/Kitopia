@@ -151,6 +151,8 @@ public sealed partial class App : Application
 
             var initWindow = ServiceManager.Services.GetService<InitWindow>();
             initWindow.Show();
+            // initWindow.Close();
+
             Current.MainWindow = ServiceManager.Services.GetService<MainWindow>();
             ServicePointManager.DefaultConnectionLimit = 10240;
 

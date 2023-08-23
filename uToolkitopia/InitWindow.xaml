@@ -8,15 +8,18 @@
              d:DataContext="{d:DesignInstance localM:InitWindowsViewModel}"
              xmlns:localM="clr-namespace:Core.ViewModel;assembly=Core"
              xmlns:tray="http://schemas.lepo.co/wpfui/2022/xaml/tray"
-             Visibility="Hidden" 
+             xmlns:services="clr-namespace:Kitopia.Services"
+             Visibility="Hidden"
              Title="MainWindows" Height="10" Width="10">
-    
+    <Window.Resources>
+        <services:BindingProxy x:Key="runRecordList" Data="{Binding}" />
+    </Window.Resources>
     <Grid>
         <tray:NotifyIcon x:Name="NotifyIcon" TooltipText="Kitopia" >
             <tray:NotifyIcon.Menu>
                
-                <ContextMenu>
-                    <MenuItem Header="退出" Click="MenuItem_Click" />
+                <ContextMenu DataContext="{StaticResource runRecordList}">
+                    <MenuItem Header="退出" Command="{Binding Data.ExitCommand}" />
                 </ContextMenu>
             </tray:NotifyIcon.Menu>
         </tray:NotifyIcon>
