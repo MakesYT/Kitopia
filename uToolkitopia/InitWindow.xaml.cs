@@ -74,7 +74,7 @@ public partial class InitWindow
                             case ApplicationTheme.Light:
                                 applicationDictionaries[i] = new()
                                 {
-                                    Source = new Uri("pack://application:,,,/Nodify;component/Themes/light.xaml",
+                                    Source = new Uri("pack://application:,,,/Nodify;component/Themes/Light.xaml",
                                         UriKind.Absolute)
                                 };
                                 break;
@@ -85,6 +85,8 @@ public partial class InitWindow
                     }
                 }
             }
+
+            log.Debug("Nodify主题切换完成");
 
             #endregion
         });
