@@ -21,7 +21,7 @@ namespace Core.ViewModel;
 public partial class SearchWindowViewModel : ObservableRecipient
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(SearchWindowViewModel));
-    private readonly List<SearchViewItem> _collection = new(400); //存储本机所有软件
+    private readonly Dictionary<string, SearchViewItem> _collection = new(400); //存储本机所有软件
 
     [ObservableProperty] private bool? _everythingIsOk = true;
     static List<SearchViewItem> tempList = new List<SearchViewItem>(1000);
@@ -62,6 +62,31 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 // 32-bit
                 Everything32.Everything_SetMax(1);
                 EverythingIsOk = Everything32.Everything_QueryW(true);
+            }
+
+            if (!EverythingIsOk.Value)
+            {
+                AppTools.AutoStartEverything(_collection, () =>
+                {
+                    Thread.Sleep(1500);
+                    if (IntPtr.Size == 8)
+                    {
+                        // 64-bit
+                        Everything64.Everything_SetMax(1);
+                        EverythingIsOk = Everything64.Everything_QueryW(true);
+                    }
+                    else
+                    {
+                        // 32-bit
+                        Everything32.Everything_SetMax(1);
+                        EverythingIsOk = Everything32.Everything_QueryW(true);
+                    }
+
+                    if (EverythingIsOk != null && EverythingIsOk.Value)
+                    {
+                        Tools.main(_collection, _names); //Everything文档检索
+                    }
+                });
             }
 
             if (EverythingIsOk != null && EverythingIsOk.Value)
@@ -137,28 +162,28 @@ public partial class SearchWindowViewModel : ObservableRecipient
         if (ConfigManger.Config.alwayShows.Any())
         {
             Log.Debug("加载常驻");
-
-
-            foreach (var searchViewItem in ConfigManger.Config.alwayShows.SelectMany(name1 => _collection.Where(
-                         searchViewItem => searchViewItem.OnlyKey.Equals(name1))))
+            foreach (var configAlwayShow in ConfigManger.Config.alwayShows)
             {
-                var item = (SearchViewItem)searchViewItem.Clone();
-
-                Log.Debug("加载常驻:" + item.OnlyKey);
-
-
-                item.IsPined = true;
-                Items.Add(item);
-                if (item.Icon is null)
+                if (_collection.TryGetValue(configAlwayShow, out var searchViewItem))
                 {
-                    ThreadPool.QueueUserWorkItem(_ =>
+                    var item = (SearchViewItem)searchViewItem.Clone();
+
+                    Log.Debug("加载常驻:" + item.OnlyKey);
+
+
+                    item.IsPined = true;
+                    Items.Add(item);
+                    if (item.Icon is null)
                     {
-                        GetIconInItems(item);
-                    });
+                        ThreadPool.QueueUserWorkItem(_ =>
+                        {
+                            GetIconInItems(item);
+                        });
+                    }
+
+
+                    limit++;
                 }
-
-
-                limit++;
             }
         }
 
@@ -169,7 +194,6 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 .ToDictionary(p => p.Key, p => p.Value);
             foreach (var (key, value) in sortedDict)
             {
-                var item2 = _collection.FirstOrDefault((e) => e.OnlyKey == key);
                 if (limit >= ConfigManger.Config.maxHistory)
                 {
                     Log.Debug("超过历史记录限制,当前" + limit);
@@ -178,34 +202,38 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     break;
                 }
 
-                if (item2 is null)
+                if (_collection.TryGetValue(key, out var item2))
                 {
-                    break;
-                }
-
-                var item = (SearchViewItem)item2.Clone();
-
-                Log.Debug("加载历史:" + item.OnlyKey);
-
-
-                if (!Items.Any((e) => e.OnlyKey.Equals(item.OnlyKey)))
-                {
-                    Items.Add(item);
-                    if (item.Icon is null)
+                    if (item2 is null)
                     {
-                        ThreadPool.QueueUserWorkItem(_ =>
-                        {
-                            GetIconInItems(item);
-                        });
+                        break;
                     }
 
-                    limit++;
+                    var item = (SearchViewItem)item2.Clone();
+
+                    Log.Debug("加载历史:" + item.OnlyKey);
+
+
+                    if (!Items.Any((e) => e.OnlyKey.Equals(item.OnlyKey)))
+                    {
+                        Items.Add(item);
+                        if (item.Icon is null)
+                        {
+                            ThreadPool.QueueUserWorkItem(_ =>
+                            {
+                                GetIconInItems(item);
+                            });
+                        }
+
+                        limit++;
+                    }
                 }
             }
         }
 
         //Items.RaiseListChangedEvents = true;
         CheckClipboard();
+
         // GetItemsIcon();
     }
 
@@ -394,7 +422,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
             foreach (var item in _collection)
             {
                 int weight = 0;
-                foreach (var key in item.Keys)
+                foreach (var key in item.Value.Keys)
                 {
                     if (string.IsNullOrEmpty(key)) continue;
 
@@ -405,13 +433,13 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     if (key.Equals(value, StringComparison.Ordinal)) weight += 10;
                 }
 
-                if (item.OnlyKey.Contains("QQNT"))
+                if (item.Value.OnlyKey.Contains("QQNT"))
                 {
                 }
 
                 if (weight > 0)
                 {
-                    filtered.Add((item, weight));
+                    filtered.Add((item.Value, weight));
                 }
             }
 
@@ -766,8 +794,12 @@ public partial class SearchWindowViewModel : ObservableRecipient
             }
             else
             {
-                _collection.Remove(_collection.Find(e =>
-                    e.FileInfo != null && e.FileInfo.FullName.Equals(item.FileInfo.FullName))!);
+                var keyValuePairs = _collection.Where(e =>
+                    e.Value.FileInfo != null && e.Value.FileInfo.FullName.Equals(item.FileInfo.FullName));
+                foreach (var keyValuePair in keyValuePairs)
+                {
+                    _collection.Remove(keyValuePair.Key);
+                }
             }
         }
         else if (item.DirectoryInfo is not null)
@@ -784,8 +816,13 @@ public partial class SearchWindowViewModel : ObservableRecipient
             }
             else
             {
-                _collection.Remove(_collection.Find(e =>
-                    e.FileInfo != null && e.FileInfo.FullName.Equals(item.DirectoryInfo.FullName))!);
+                var keyValuePairs = _collection.Where(e =>
+                    e.Value.DirectoryInfo != null &&
+                    e.Value.DirectoryInfo.FullName.Equals(item.DirectoryInfo.FullName));
+                foreach (var keyValuePair in keyValuePairs)
+                {
+                    _collection.Remove(keyValuePair.Key);
+                }
             }
         }
 

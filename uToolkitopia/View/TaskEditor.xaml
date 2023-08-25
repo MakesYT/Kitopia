@@ -297,16 +297,16 @@
                                      DragDrop.DragOver="NodifyEditor_DragOver"
                                      DragDrop.DragEnter="NodifyEditor_DragEnter"
                                      DragDrop.DragLeave="NodifyEditor_DragLeave"
-                                     
+
                                      EnableRealtimeSelection="True"
-                                     
+
                                      PendingConnection="{Binding PendingConnection}"
                                      DisconnectConnectorCommand="{Binding DisconnectConnectorCommand}"
                                      Connections="{Binding Connections}"
                                      ItemsSource="{Binding Nodes}" BorderBrush="{DynamicResource Node.BorderBrush}">
-<nodify:NodifyEditor.Background>
-    <DynamicResource ResourceKey="SmallGridLinesDrawingBrush"/>
-</nodify:NodifyEditor.Background>
+                    <nodify:NodifyEditor.Background>
+                        <DynamicResource ResourceKey="SmallGridLinesDrawingBrush" />
+                    </nodify:NodifyEditor.Background>
                     <nodify:NodifyEditor.Resources>
                         <Style TargetType="{x:Type nodify:PendingConnection}"
                                BasedOn="{StaticResource {x:Type nodify:PendingConnection}}">

@@ -5,9 +5,11 @@ using System.Text.RegularExpressions;
 using Core.SDKs.Everything;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
+using IWshRuntimeLibrary;
 using log4net;
 using NPinyin;
 using Vanara.PInvoke;
+using File = System.IO.File;
 
 namespace Core.SDKs.Tools;
 
@@ -16,10 +18,105 @@ public partial class AppTools
     private static readonly ILog log = LogManager.GetLogger(nameof(AppTools));
     private static readonly List<string> ErrorLnkList = new();
 
-    public static void DelNullFile(List<SearchViewItem> collection, List<string> names)
+    public static void AutoStartEverything(Dictionary<string, SearchViewItem> collection, Action action)
     {
-        var toRemove = new List<SearchViewItem>();
-        foreach (var searchViewItem in collection)
+        if (ConfigManger.Config.autoStartEverything)
+        {
+            if (string.IsNullOrWhiteSpace(ConfigManger.Config.everythingOnlyKey))
+            {
+                foreach (var (key, value) in collection)
+                {
+                    if (key.Contains("Everything.exe"))
+                    {
+                        ConfigManger.Config.everythingOnlyKey = key;
+                        ConfigManger.Save();
+                        break;
+                    }
+                }
+            }
+
+            if (collection.TryGetValue(ConfigManger.Config.everythingOnlyKey, out var searchViewItem))
+            {
+                var isRun = false;
+                if (IntPtr.Size == 8)
+                {
+                    // 64-bit
+                    Everything64.Everything_SetMax(1);
+                    isRun = Everything64.Everything_QueryW(true);
+                }
+                else
+                {
+                    // 32-bit
+                    Everything32.Everything_SetMax(1);
+                    isRun = Everything32.Everything_QueryW(true);
+                }
+
+                if (!isRun)
+                {
+                    var 程序名称 = "noUAC.Everything";
+                    if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + "noUAC\\" + 程序名称 + ".lnk"))
+                    {
+                        ((IToastService)ServiceManager.Services!.GetService(typeof(IToastService))!).showMessageBox(
+                            "Kitopia提示",
+                            "Kitopia即将使用任务计划来创建绕过UAC启动Everything的快捷方式\n需要确认UAC权限\n按下取消则关闭自动启动功能\n路径:" +
+                            AppDomain.CurrentDomain.BaseDirectory + "noUAC\\" + 程序名称 + ".lnk",
+                            (() =>
+                            {
+                                Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + "noUAC");
+                                string TempFileName = AppDomain.CurrentDomain.BaseDirectory + "noUAC\\" + 程序名称 + ".xml";
+                                string XML_Text =
+                                    "<?xml version=\"1.0\" encoding=\"UTF-16\"?>\n<Task version=\"1.2\" xmlns=\"http://schemas.microsoft.com/windows/2004/02/mit/task\">\n  <Triggers />\n  <Principals>\n    <Principal id=\"Author\">\n      <LogonType>InteractiveToken</LogonType>\n      <RunLevel>HighestAvailable</RunLevel>\n    </Principal>\n  </Principals>\n  <Settings>\n    <MultipleInstancesPolicy>Parallel</MultipleInstancesPolicy>\n    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>\n    <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>\n    <AllowHardTerminate>false</AllowHardTerminate>\n    <StartWhenAvailable>false</StartWhenAvailable>\n    <RunOnlyIfNetworkAvailable>false</RunOnlyIfNetworkAvailable>\n    <IdleSettings>\n      <StopOnIdleEnd>false</StopOnIdleEnd>\n      <RestartOnIdle>false</RestartOnIdle>\n    </IdleSettings>\n    <AllowStartOnDemand>true</AllowStartOnDemand>\n    <Enabled>true</Enabled>\n    <Hidden>false</Hidden>\n    <RunOnlyIfIdle>false</RunOnlyIfIdle>\n    <WakeToRun>false</WakeToRun>\n    <ExecutionTimeLimit>PT0S</ExecutionTimeLimit>\n    <Priority>7</Priority>\n  </Settings>\n  <Actions Context=\"Author\">\n    <Exec>"
+                                    + Environment.NewLine +
+                                    "      <Command>\"" +
+                                    searchViewItem.OnlyKey +
+                                    "\"</Command>" + Environment.NewLine +
+                                    "      <Arguments>-startup</Arguments>" + Environment.NewLine +
+                                    "    </Exec>\n  </Actions>\n</Task>";
+                                System.IO.File.WriteAllText(TempFileName, XML_Text, Encoding.Unicode);
+
+                                Shell32.ShellExecute(IntPtr.Zero, "runas", "schtasks.exe",
+                                    "/create " + "/tn " + '"' + 程序名称 + '"' + " /xml " + '"' + @TempFileName + '"', "",
+                                    ShowWindowCommand.SW_HIDE);
+                                WshShell shell = new WshShell();
+                                IWshShortcut shortcut =
+                                    (IWshShortcut)shell.CreateShortcut(AppDomain.CurrentDomain.BaseDirectory +
+                                                                       "noUAC\\" + 程序名称 + ".lnk");
+                                //Debug.Print(Path.GetDirectoryName(Application.ExecutablePath) + @"\" + TextBox_程序名称.Text + ".lnk");
+                                shortcut.TargetPath = "schtasks.exe";
+                                shortcut.Arguments = "/run " + "/tn " + '"' + 程序名称 + '"';
+                                shortcut.IconLocation = searchViewItem.OnlyKey + ", 0";
+                                shortcut.WindowStyle = 7;
+                                shortcut.Save();
+                                System.Threading.Thread.Sleep(200);
+                                System.IO.File.Delete(TempFileName);
+                                log.Debug("创建Everything的noUAC任务计划完成");
+                                Shell32.ShellExecute(IntPtr.Zero, "open",
+                                    AppDomain.CurrentDomain.BaseDirectory + "noUAC\\" + 程序名称 + ".lnk", "", "",
+                                    ShowWindowCommand.SW_HIDE);
+                                action.Invoke();
+                            }), () =>
+                            {
+                                log.Debug("关闭自动启动Everything功能");
+                                ConfigManger.Config.autoStartEverything = false;
+                                ConfigManger.Save();
+                            });
+                    }
+                    else
+
+                    {
+                        Shell32.ShellExecute(IntPtr.Zero, "open",
+                            AppDomain.CurrentDomain.BaseDirectory + "noUAC\\" + 程序名称 + ".lnk", "", "",
+                            ShowWindowCommand.SW_HIDE);
+                    }
+                }
+            }
+        }
+    }
+
+    public static void DelNullFile(Dictionary<string, SearchViewItem> collection, List<string> names)
+    {
+        var toRemove = new List<string>();
+        foreach (var (key, searchViewItem) in collection)
         {
             switch (searchViewItem.FileType)
             {
@@ -31,7 +128,7 @@ public partial class AppTools
                 {
                     if (!File.Exists(searchViewItem.OnlyKey))
                     {
-                        toRemove.Add(searchViewItem);
+                        toRemove.Add(key);
                         //collection.Remove(searchViewItem);
                         names.Remove(searchViewItem.OnlyKey);
                     }
@@ -42,7 +139,7 @@ public partial class AppTools
                 {
                     if (!Directory.Exists(searchViewItem.OnlyKey))
                     {
-                        toRemove.Add(searchViewItem);
+                        toRemove.Add(key);
                         //collection.Remove(searchViewItem);
                         names.Remove(searchViewItem.OnlyKey);
                     }
@@ -58,7 +155,8 @@ public partial class AppTools
         }
     }
 
-    public static void GetAllApps(List<SearchViewItem> collection, List<string> names, bool logging = false)
+    public static void GetAllApps(Dictionary<string, SearchViewItem> collection, List<string> names,
+        bool logging = false)
     {
         log.Debug("索引全部软件及收藏项目");
         UWPAPPsTools.GetAll(collection, names);
@@ -112,7 +210,7 @@ public partial class AppTools
         {
         }
 
-
+        //AutoStartEverything(collection);
         if (ErrorLnkList.Any())
         {
             StringBuilder c = new StringBuilder("检测到多个无效的快捷方式\n需要Kitopia帮你清理吗?(该功能每个错误快捷方式只提示一次)\n以下为无效的快捷方式列表:\n");
@@ -157,7 +255,7 @@ public partial class AppTools
         }
     }
 
-    public static async Task AppSolverA(List<SearchViewItem> collection, List<string> names, string file,
+    public static async Task AppSolverA(Dictionary<string, SearchViewItem> collection, List<string> names, string file,
         bool star = false, bool logging = false)
     {
         var localizedName = Shell32.SHCreateItemFromParsingName<Shell32.IShellItem>(file)
@@ -184,7 +282,7 @@ public partial class AppTools
                 await NameSolver(keys, localizedName);
                 lock (collection)
                 {
-                    collection.Add(new SearchViewItem()
+                    collection.Add(file, new SearchViewItem()
                     {
                         FileInfo = new FileInfo(file),
                         FileName = "打开文件:" + localizedName + "?",
@@ -202,7 +300,7 @@ public partial class AppTools
                 await NameSolver(keys, file.Split("\\").Last());
                 lock (collection)
                 {
-                    collection.Add(new SearchViewItem()
+                    collection.Add(file, new SearchViewItem()
                     {
                         DirectoryInfo = new DirectoryInfo(file),
                         FileName = "打开" + file.Split("\\").Last() + "?",
@@ -240,30 +338,6 @@ public partial class AppTools
             if (string.IsNullOrWhiteSpace(targetPath))
             {
                 targetPath = file;
-            }
-
-            if (targetPath.Contains("Everything.exe") && ConfigManger.Config.autoStartEverything)
-            {
-                var isRun = false;
-                if (IntPtr.Size == 8)
-                {
-                    // 64-bit
-                    Everything64.Everything_SetMax(1);
-                    isRun = Everything64.Everything_QueryW(true);
-                }
-                else
-                {
-                    // 32-bit
-                    Everything32.Everything_SetMax(1);
-                    isRun = Everything32.Everything_QueryW(true);
-                }
-
-                if (!isRun)
-                {
-                    log.Debug("自动启动Everything");
-                    Shell32.ShellExecute(IntPtr.Zero, "open", file, "-startup", "",
-                        ShowWindowCommand.SW_HIDE);
-                }
             }
 
             var refFileInfo = new FileInfo(targetPath);
@@ -310,7 +384,7 @@ public partial class AppTools
                 {
                     lock (collection)
                     {
-                        collection.Add(new SearchViewItem
+                        collection.Add(refFileInfo.FullName, new SearchViewItem
                         {
                             Keys = keys, IsVisible = true, FileInfo = refFileInfo, FileName = localName,
                             OnlyKey = refFileInfo.FullName,
@@ -377,7 +451,7 @@ public partial class AppTools
             {
                 lock (collection)
                 {
-                    collection.Add(new SearchViewItem
+                    collection.Add(url, new SearchViewItem
                     {
                         Keys = keys, IsVisible = true, FileName = localName,
                         OnlyKey = url, Url = url, FileInfo = new FileInfo(relFile),
@@ -437,11 +511,6 @@ public partial class AppTools
         keys.Add(name);
     }
 
-    [System.Text.RegularExpressions.GeneratedRegex("[^A-Z]")]
-    private static partial System.Text.RegularExpressions.Regex MyRegex();
-
-    public static List<string> GetErrorLnks()
-    {
-        return ErrorLnkList;
-    }
+    [GeneratedRegex("[^A-Z]")]
+    private static partial Regex MyRegex();
 }

@@ -55,7 +55,7 @@ public class 文件索引
     [TestMethod]
     public void GetAllAppskeys()
     {
-        var collection = new List<SearchViewItem>(); //存储本机所有软件
+        var collection = new Dictionary<string, SearchViewItem>(); //存储本机所有软件
         var names = new List<string>(); //软件去重
         var watch = Stopwatch.StartNew();
 

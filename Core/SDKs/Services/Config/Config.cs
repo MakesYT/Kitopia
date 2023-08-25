@@ -12,6 +12,7 @@ public record Config
     public bool useEverything = true;
     public bool autoStart = true;
     public bool autoStartEverything = true;
+    public string everythingOnlyKey = "";
     public bool canReadClipboard = true;
     public string themeChoice = "跟随系统";
     public string themeColor = "#EC407A";
