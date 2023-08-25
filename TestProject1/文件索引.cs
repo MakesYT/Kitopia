@@ -59,7 +59,7 @@ public class 文件索引
         var names = new List<string>(); //软件去重
         var watch = Stopwatch.StartNew();
 
-        AppTools.GetAllApps(collection, names);
+        AppTools.GetAllApps(collection);
         watch.Stop();
         // 获取执行时间，单位为毫秒
         var elapsedMs = watch.ElapsedMilliseconds;

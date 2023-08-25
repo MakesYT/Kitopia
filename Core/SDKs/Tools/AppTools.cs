@@ -113,7 +113,7 @@ public partial class AppTools
         }
     }
 
-    public static void DelNullFile(Dictionary<string, SearchViewItem> collection, List<string> names)
+    public static void DelNullFile(Dictionary<string, SearchViewItem> collection)
     {
         var toRemove = new List<string>();
         foreach (var (key, searchViewItem) in collection)
@@ -130,7 +130,6 @@ public partial class AppTools
                     {
                         toRemove.Add(key);
                         //collection.Remove(searchViewItem);
-                        names.Remove(searchViewItem.OnlyKey);
                     }
 
                     break;
@@ -141,7 +140,6 @@ public partial class AppTools
                     {
                         toRemove.Add(key);
                         //collection.Remove(searchViewItem);
-                        names.Remove(searchViewItem.OnlyKey);
                     }
 
                     break;
@@ -155,11 +153,11 @@ public partial class AppTools
         }
     }
 
-    public static void GetAllApps(Dictionary<string, SearchViewItem> collection, List<string> names,
+    public static void GetAllApps(Dictionary<string, SearchViewItem> collection,
         bool logging = false)
     {
         log.Debug("索引全部软件及收藏项目");
-        UWPAPPsTools.GetAll(collection, names);
+        UWPAPPsTools.GetAll(collection);
 
         // 创建一个空的文件路径集合
         List<string> filePaths = new List<string>();
@@ -199,7 +197,7 @@ public partial class AppTools
                 log.Debug("索引:" + file);
             }
 
-            list.Add(AppSolverA(collection, names, file, logging: logging));
+            list.Add(AppSolverA(collection, file, logging: logging));
         });
 
         try
@@ -255,7 +253,7 @@ public partial class AppTools
         }
     }
 
-    public static async Task AppSolverA(Dictionary<string, SearchViewItem> collection, List<string> names, string file,
+    public static async Task AppSolverA(Dictionary<string, SearchViewItem> collection, string file,
         bool star = false, bool logging = false)
     {
         var localizedName = Shell32.SHCreateItemFromParsingName<Shell32.IShellItem>(file)
@@ -266,7 +264,7 @@ public partial class AppTools
             log.Debug("索引为收藏项目:" + file);
 
 
-            if (names.Contains(file))
+            if (collection.ContainsKey(file))
             {
                 log.Debug("重复跳过索引:" + file);
 
@@ -274,44 +272,37 @@ public partial class AppTools
                 return;
             }
 
-            names.Add(file);
-
             if (Path.HasExtension(file) && File.Exists(file))
             {
                 var keys = new HashSet<string>();
                 await NameSolver(keys, localizedName);
-                lock (collection)
+                collection.TryAdd(file, new SearchViewItem()
                 {
-                    collection.Add(file, new SearchViewItem()
-                    {
-                        FileInfo = new FileInfo(file),
-                        FileName = "打开文件:" + localizedName + "?",
-                        FileType = FileType.文件,
-                        OnlyKey = file,
-                        Keys = keys,
-                        IsStared = true,
-                        IsVisible = true
-                    });
-                }
+                    FileInfo = new FileInfo(file),
+                    FileName = "打开文件:" + localizedName + "?",
+                    FileType = FileType.文件,
+                    OnlyKey = file,
+                    Keys = keys,
+                    IsStared = true,
+                    IsVisible = true
+                });
             }
             else if (Directory.Exists(file))
             {
                 var keys = new HashSet<string>();
                 await NameSolver(keys, file.Split("\\").Last());
-                lock (collection)
+
+                collection.TryAdd(file, new SearchViewItem()
                 {
-                    collection.Add(file, new SearchViewItem()
-                    {
-                        DirectoryInfo = new DirectoryInfo(file),
-                        FileName = "打开" + file.Split("\\").Last() + "?",
-                        FileType = FileType.文件夹,
-                        IsStared = true,
-                        OnlyKey = file,
-                        Keys = keys,
-                        Icon = null,
-                        IsVisible = true
-                    });
-                }
+                    DirectoryInfo = new DirectoryInfo(file),
+                    FileName = "打开" + file.Split("\\").Last() + "?",
+                    FileType = FileType.文件夹,
+                    IsStared = true,
+                    OnlyKey = file,
+                    Keys = keys,
+                    Icon = null,
+                    IsVisible = true
+                });
             }
 
 
@@ -340,10 +331,32 @@ public partial class AppTools
                 targetPath = file;
             }
 
+            if (!File.Exists(targetPath))
+            {
+                if (File.Exists(targetPath.Replace("Program Files (x86)", "Program Files")))
+                {
+                    targetPath = targetPath.Replace("Program Files (x86)", "Program Files");
+                    goto next;
+                }
+
+                if (File.Exists(targetPath.Replace("Program Files", "Program Files (x86)")))
+                {
+                    targetPath = targetPath.Replace("Program Files", "Program Files (x86)");
+                    goto next;
+                }
+
+                if (File.Exists(targetPath.Replace("system32", "sysnative")))
+                {
+                    targetPath = targetPath.Replace("system32", "sysnative");
+                    goto next;
+                }
+            }
+
+            next:
             var refFileInfo = new FileInfo(targetPath);
             if (refFileInfo.Exists)
             {
-                if (names.Contains(refFileInfo.FullName))
+                if (collection.ContainsKey(refFileInfo.FullName))
                 {
                     if (logging)
                     {
@@ -365,8 +378,6 @@ public partial class AppTools
                 return;
             }
 
-
-            names.Add(refFileInfo.FullName);
             if (refFileInfo.Extension != ".url" && refFileInfo.Extension != ".txt" && refFileInfo.Extension != ".chm" &&
                 !refFileInfo.Name.Contains("powershell.exe") && !refFileInfo.Name.Contains("cmd.exe") &&
                 refFileInfo.Extension != ".pdf" && refFileInfo.Extension != ".bat" &&
@@ -382,15 +393,12 @@ public partial class AppTools
                 await NameSolver(keys, refFileInfo.Name.Replace(".exe", ""));
 
                 {
-                    lock (collection)
+                    collection.TryAdd(refFileInfo.FullName, new SearchViewItem
                     {
-                        collection.Add(refFileInfo.FullName, new SearchViewItem
-                        {
-                            Keys = keys, IsVisible = true, FileInfo = refFileInfo, FileName = localName,
-                            OnlyKey = refFileInfo.FullName,
-                            FileType = FileType.应用程序, Icon = null
-                        });
-                    }
+                        Keys = keys, IsVisible = true, FileInfo = refFileInfo, FileName = localName,
+                        OnlyKey = refFileInfo.FullName,
+                        FileType = FileType.应用程序, Icon = null
+                    });
                 }
 
                 log.Debug("完成索引:" + file);
@@ -406,17 +414,6 @@ public partial class AppTools
         }
         else
         {
-            if (names.Contains(file))
-            {
-                if (logging)
-                {
-                    log.Debug("重复索引:" + file);
-                }
-
-                return;
-            }
-
-            names.Add(file);
             string url = "";
             string relFile = "";
             string fileContent = File.ReadAllText(file); // read the file content
@@ -427,6 +424,15 @@ public partial class AppTools
                 url = match.Groups[1].Value.Replace("\r", ""); // get the url from the first group
             }
 
+            if (collection.ContainsKey(url))
+            {
+                if (logging)
+                {
+                    log.Debug("重复索引:" + file);
+                }
+
+                return;
+            }
 
             string pattern2 = @"IconFile=(.*)"; // the regex pattern to match the url
             Match match2 = Regex.Match(fileContent, pattern2); // match the pattern
@@ -449,15 +455,12 @@ public partial class AppTools
             await NameSolver(keys, fileInfo.Name.Replace(".url", ""));
 
             {
-                lock (collection)
+                collection.TryAdd(url, new SearchViewItem
                 {
-                    collection.Add(url, new SearchViewItem
-                    {
-                        Keys = keys, IsVisible = true, FileName = localName,
-                        OnlyKey = url, Url = url, FileInfo = new FileInfo(relFile),
-                        FileType = FileType.URL, Icon = null
-                    });
-                }
+                    Keys = keys, IsVisible = true, FileName = localName,
+                    OnlyKey = url, Url = url, FileInfo = new FileInfo(relFile),
+                    FileType = FileType.URL, Icon = null
+                });
             }
 
             log.Debug("完成索引:" + file);

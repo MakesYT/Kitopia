@@ -29,7 +29,6 @@ public partial class SearchWindowViewModel : ObservableRecipient
     [ObservableProperty]
     private BindingList<SearchViewItem> _items = new BindingList<SearchViewItem>(tempList); //搜索界面显示的软件
 
-    private readonly List<string> _names = new(500); //软件去重
 
     [ObservableProperty] private string? _search;
 
@@ -44,8 +43,8 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
     public void ReloadApps(bool logging = false)
     {
-        AppTools.DelNullFile(_collection, _names);
-        AppTools.GetAllApps(_collection, _names, logging);
+        AppTools.DelNullFile(_collection);
+        AppTools.GetAllApps(_collection, logging);
         if (ConfigManger.Config.useEverything)
         {
             Log.Debug("everything检测");
@@ -84,14 +83,14 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
                     if (EverythingIsOk != null && EverythingIsOk.Value)
                     {
-                        Tools.main(_collection, _names); //Everything文档检索
+                        Tools.main(_collection); //Everything文档检索
                     }
                 });
             }
 
             if (EverythingIsOk != null && EverythingIsOk.Value)
             {
-                Tools.main(_collection, _names); //Everything文档检索
+                Tools.main(_collection); //Everything文档检索
             }
         }
     }
@@ -789,7 +788,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
             if (item.IsStared) //收藏操作
             {
-                AppTools.AppSolverA(_collection, _names, item.FileInfo.FullName, true);
+                AppTools.AppSolverA(_collection, item.FileInfo.FullName, true);
                 ConfigManger.Config.customCollections.Insert(0, item.FileInfo.FullName);
             }
             else
@@ -811,7 +810,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
             if (item.IsStared) //收藏操作
             {
-                AppTools.AppSolverA(_collection, _names, item.DirectoryInfo.FullName, true);
+                AppTools.AppSolverA(_collection, item.DirectoryInfo.FullName, true);
                 ConfigManger.Config.customCollections.Insert(0, item.DirectoryInfo.FullName);
             }
             else

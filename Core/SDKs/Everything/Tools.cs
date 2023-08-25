@@ -6,17 +6,17 @@ namespace Core.SDKs.Everything;
 
 public class Tools
 {
-    public static void main(Dictionary<string, SearchViewItem> Items, List<string> _name)
+    public static void main(Dictionary<string, SearchViewItem> Items)
     {
         if (IntPtr.Size == 8)
             // 64-bit
-            amd64(Items, _name);
+            amd64(Items);
         else
             // 32-bit
-            amd32(Items, _name);
+            amd32(Items);
     }
 
-    public static void amd32(Dictionary<string, SearchViewItem> Items, List<string> _name)
+    public static void amd32(Dictionary<string, SearchViewItem> Items)
     {
         Everything32.Everything_Reset();
         Everything32.Everything_SetSearchW("*.docx|*.doc|*.xls|*.xlsx|*.pdf|*.ppt|*.pptx");
@@ -29,12 +29,11 @@ public class Tools
             // get the result's full path and file name.
             Everything32.Everything_GetResultFullPathNameW(i, buf, bufsize);
             var filePath = buf.ToString();
-            if (_name.Contains(filePath))
+            if (Items.ContainsKey(filePath))
             {
                 continue;
             }
 
-            _name.Add(filePath);
             var fileInfo = new FileInfo(filePath);
             var fileType = FileType.None;
             if (fileInfo.Name.StartsWith("~") || fileInfo.Name.StartsWith("_"))
@@ -55,11 +54,11 @@ public class Tools
                 OnlyKey = filePath,
                 Icon = null
             };
-            Items.Add(filePath, searchViewItem);
+            Items.TryAdd(filePath, searchViewItem);
         }
     }
 
-    public static void amd64(Dictionary<string, SearchViewItem> Items, List<string> _name)
+    public static void amd64(Dictionary<string, SearchViewItem> Items)
     {
         Everything64.Everything_Reset();
         Everything64.Everything_SetSearchW("*.docx|*.doc|*.xls|*.xlsx|*.pdf|*.ppt|*.pptx");
@@ -72,12 +71,11 @@ public class Tools
             // get the result's full path and file name.
             Everything64.Everything_GetResultFullPathNameW(i, buf, bufsize);
             var filePath = buf.ToString();
-            if (_name.Contains(filePath))
+            if (Items.ContainsKey(filePath))
             {
                 continue;
             }
 
-            _name.Add(filePath);
             var fileInfo = new FileInfo(filePath);
             var fileType = FileType.None;
             if (fileInfo.Name.StartsWith("~") || fileInfo.Name.StartsWith("_"))
@@ -98,7 +96,7 @@ public class Tools
                 OnlyKey = filePath,
                 Icon = null
             };
-            Items.Add(filePath, searchViewItem);
+            Items.TryAdd(filePath, searchViewItem);
         }
     }
 }

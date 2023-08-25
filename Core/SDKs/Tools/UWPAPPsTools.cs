@@ -33,7 +33,7 @@ public class UWPAPPsTools
         return null;
     }
 
-    public static async void GetAll(Dictionary<string, SearchViewItem> items, List<string> names)
+    public static async void GetAll(Dictionary<string, SearchViewItem> items)
     {
         FirewallApi.NetworkIsolationEnumAppContainers(FirewallApi.NETISO_FLAG.NETISO_FLAG_FORCE_COMPUTE_BINARIES,
             out var pdwNumPublicAppCs, out var ppPublicAppCs);
@@ -62,12 +62,6 @@ public class UWPAPPsTools
                 continue;
             }
 
-            if (names.Contains(fileName))
-            {
-                continue;
-            }
-
-            names.Add(fileName);
             HashSet<string> keys = new HashSet<string>();
             AppTools.NameSolver(keys, fileName).Wait();
             XmlDocument xmlDocument = new XmlDocument();
@@ -134,7 +128,7 @@ public class UWPAPPsTools
                             log.Debug(
                                 $"appContainerName:{appContainer.appContainerName},\n displayName:{searchViewItem.FileName},\nworkingDirectory:{appContainer.workingDirectory}\n");
                             //Console.WriteLine(searchViewItem);
-                            items.Add(appContainer.appContainerName, searchViewItem);
+                            items.TryAdd(appContainer.appContainerName, searchViewItem);
                             continue;
                         }
                     }
@@ -166,7 +160,7 @@ public class UWPAPPsTools
                                     Console.WriteLine(
                                         $"appContainerName:{appContainer.appContainerName},\n displayName:{searchViewItem.FileName},\nworkingDirectory:{appContainer.workingDirectory}\n");
                                     //Console.WriteLine(searchViewItem);
-                                    items.Add(appContainer.appContainerName, searchViewItem);
+                                    items.TryAdd(appContainer.appContainerName, searchViewItem);
                                     break;
                                 }
                             }
