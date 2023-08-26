@@ -1,6 +1,10 @@
-﻿using System.Windows;
+﻿#region
+
+using System.Windows;
 using System.Windows.Controls;
 using Core.SDKs.Services;
+
+#endregion
 
 namespace Kitopia.View.Pages.Plugin;
 
@@ -11,8 +15,6 @@ public partial class PluginManagerPage : Page
         InitializeComponent();
     }
 
-    private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
-    {
+    private void ButtonBase_OnClick(object sender, RoutedEventArgs e) =>
         ((TaskEditor)ServiceManager.Services!.GetService(typeof(TaskEditor))!).Show();
-    }
 }

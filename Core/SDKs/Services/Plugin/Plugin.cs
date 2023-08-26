@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿#region
+
+using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Core.SDKs.Services.Config;
@@ -7,6 +9,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PluginCore;
 using PluginCore.Attribute;
+
+#endregion
 
 namespace Core.SDKs.Services.Plugin;
 
@@ -36,16 +40,16 @@ public class Plugin
 
         // Load the plugin assembly into the HostAssemblyLoadContext.
         // NOTE: the assemblyPath must be an absolute path.
-        Assembly a = alc.LoadFromAssemblyPath(assemblyPath);
+        var a = alc.LoadFromAssemblyPath(assemblyPath);
 
         // Get the plugin interface by calling the PluginClass.GetInterface method via reflection.
         var t = a.GetExportedTypes();
-        PluginInfoEx pluginInfoEx = new PluginInfoEx() { Version = "error" };
-        foreach (Type type in t)
+        var pluginInfoEx = new PluginInfoEx() { Version = "error" };
+        foreach (var type in t)
         {
             if (type.GetInterface("IPlugin") != null)
             {
-                var pluginInfo = (PluginInfo)(type.GetField("PluginInfo").GetValue(null));
+                var pluginInfo = (PluginInfo)type.GetField("PluginInfo").GetValue(null);
 
                 if (ConfigManger.Config.EnabledPluginInfos.Contains(pluginInfo))
                 {
@@ -130,7 +134,7 @@ public class Plugin
         _plugin = new AssemblyLoadContextH(path, path.Split("\\").Last() + "_plugin");
         _dll = _plugin.LoadFromAssemblyPath(path);
         var t = _dll.GetExportedTypes();
-        foreach (Type type in t)
+        foreach (var type in t)
         {
             if (type.GetInterface("IPlugin") != null)
             {
@@ -138,7 +142,7 @@ public class Plugin
                 //var instance = Activator.CreateInstance(type);
                 ServiceProvider = (IServiceProvider)type.GetMethod("GetServiceProvider").Invoke(null, null);
 
-                ((PluginCore.IPlugin)ServiceProvider.GetService(type)).OnEnabled();
+                ((IPlugin)ServiceProvider.GetService(type)).OnEnabled();
             }
         }
     }
@@ -147,9 +151,9 @@ public class Plugin
     {
         var methodInfos = new List<MethodInfo>();
         var t = _dll.GetExportedTypes();
-        foreach (Type type in t)
+        foreach (var type in t)
         {
-            foreach (MethodInfo methodInfo in type.GetMethods())
+            foreach (var methodInfo in type.GetMethods())
             {
                 if (!methodInfo.GetCustomAttributes(typeof(PluginMethod)).Any())
                 {
@@ -167,9 +171,9 @@ public class Plugin
     {
         var _fieldInfos = new List<FieldInfo>();
         var t = _dll.GetExportedTypes();
-        foreach (Type type in t)
+        foreach (var type in t)
         {
-            foreach (FieldInfo fieldInfo in type.GetFields())
+            foreach (var fieldInfo in type.GetFields())
             {
                 if (!fieldInfo.GetCustomAttributes(typeof(ConfigField)).Any())
                 {
@@ -193,11 +197,9 @@ public class Plugin
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    public static void LoadBypath(string name, string path)
-    {
+    public static void LoadBypath(string name, string path) =>
         PluginManager.EnablePlugin.Add(name,
             new Plugin(path));
-    }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void UnloadByPluginInfo(PluginInfoEx pluginInfoEx, out WeakReference weakReference)

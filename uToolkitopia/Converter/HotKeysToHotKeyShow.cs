@@ -1,9 +1,13 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Data;
 using Core.SDKs.Services.Config;
 using Kitopia.Controls;
+
+#endregion
 
 namespace Kitopia.Converter;
 
@@ -20,7 +24,7 @@ public class HotKeysToHotKeyShow : IValueConverter
 
             return false;
         });
-        int type = 0000;
+        var type = 0000;
         if (hotKeyModel.IsSelectAlt)
         {
             type += 10;
@@ -44,8 +48,5 @@ public class HotKeysToHotKeyShow : IValueConverter
         return (HotKeyShow.KeyTypeE)type;
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        return null;
-    }
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => null;
 }

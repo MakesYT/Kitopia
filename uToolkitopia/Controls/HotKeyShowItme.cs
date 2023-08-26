@@ -1,7 +1,4 @@
-﻿// This Source Code Form is subject to the terms of the MIT License.
-// If a copy of the MIT was not distributed with this file, You can obtain one at https://opensource.org/licenses/MIT.
-// Copyright (C) Leszek Pomianowski and WPF UI Contributors.
-// All Rights Reserved.
+﻿#region
 
 using System.ComponentModel;
 using System.Windows;
@@ -10,30 +7,33 @@ using System.Windows.Media;
 using Wpf.Ui.Common;
 using Wpf.Ui.Controls;
 using Wpf.Ui.Converters;
+using Button = System.Windows.Controls.Button;
+
+#endregion
 
 namespace Kitopia.Controls;
 
 /// <summary>
-/// Inherited from the <see cref="System.Windows.Controls.Button"/>, adding <see cref="SymbolRegular"/>.
+///     Inherited from the <see cref="System.Windows.Controls.Button" />, adding <see cref="SymbolRegular" />.
 /// </summary>
-public class HotKeyShowItme : System.Windows.Controls.Button, IAppearanceControl
+public class HotKeyShowItme : Button, IAppearanceControl
 {
     /// <summary>
-    /// Property for <see cref="Icon"/>.
+    ///     Property for <see cref="Icon" />.
     /// </summary>
     public static readonly DependencyProperty IconProperty = DependencyProperty.Register(nameof(Icon),
         typeof(IconElement), typeof(HotKeyShowItme),
         new PropertyMetadata(null, null, IconSourceElementConverter.ConvertToIconElement));
 
     /// <summary>
-    /// Property for <see cref="Appearance"/>.
+    ///     Property for <see cref="Appearance" />.
     /// </summary>
     public static readonly DependencyProperty AppearanceProperty = DependencyProperty.Register(nameof(Appearance),
         typeof(ControlAppearance), typeof(HotKeyShowItme),
         new PropertyMetadata(ControlAppearance.Primary));
 
     /// <summary>
-    /// Property for <see cref="MouseOverBackground"/>.
+    ///     Property for <see cref="MouseOverBackground" />.
     /// </summary>
     public static readonly DependencyProperty MouseOverBackgroundProperty = DependencyProperty.Register(
         nameof(MouseOverBackground),
@@ -41,7 +41,7 @@ public class HotKeyShowItme : System.Windows.Controls.Button, IAppearanceControl
         new PropertyMetadata(Border.BackgroundProperty.DefaultMetadata.DefaultValue));
 
     /// <summary>
-    /// Property for <see cref="MouseOverBorderBrush"/>.
+    ///     Property for <see cref="MouseOverBorderBrush" />.
     /// </summary>
     public static readonly DependencyProperty MouseOverBorderBrushProperty = DependencyProperty.Register(
         nameof(MouseOverBorderBrush),
@@ -49,7 +49,7 @@ public class HotKeyShowItme : System.Windows.Controls.Button, IAppearanceControl
         new PropertyMetadata(Border.BorderBrushProperty.DefaultMetadata.DefaultValue));
 
     /// <summary>
-    /// Property for <see cref="PressedForeground"/>.
+    ///     Property for <see cref="PressedForeground" />.
     /// </summary>
     public static readonly DependencyProperty PressedForegroundProperty = DependencyProperty.Register(
         nameof(PressedForeground),
@@ -57,7 +57,7 @@ public class HotKeyShowItme : System.Windows.Controls.Button, IAppearanceControl
             FrameworkPropertyMetadataOptions.Inherits));
 
     /// <summary>
-    /// Property for <see cref="PressedBackground"/>.
+    ///     Property for <see cref="PressedBackground" />.
     /// </summary>
     public static readonly DependencyProperty PressedBackgroundProperty = DependencyProperty.Register(
         nameof(PressedBackground),
@@ -65,7 +65,7 @@ public class HotKeyShowItme : System.Windows.Controls.Button, IAppearanceControl
         new PropertyMetadata(Border.BackgroundProperty.DefaultMetadata.DefaultValue));
 
     /// <summary>
-    /// Property for <see cref="PressedBorderBrush"/>.
+    ///     Property for <see cref="PressedBorderBrush" />.
     /// </summary>
     public static readonly DependencyProperty PressedBorderBrushProperty = DependencyProperty.Register(
         nameof(PressedBorderBrush),
@@ -73,9 +73,10 @@ public class HotKeyShowItme : System.Windows.Controls.Button, IAppearanceControl
         new PropertyMetadata(Border.BorderBrushProperty.DefaultMetadata.DefaultValue));
 
     /// <summary>
-    /// Gets or sets displayed <see cref="IconElement"/>.
+    ///     Gets or sets displayed <see cref="IconElement" />.
     /// </summary>
-    [Bindable(true), Category("Appearance")]
+    [Bindable(true)]
+    [Category("Appearance")]
     public IconElement? Icon
     {
         get => (IconElement)GetValue(IconProperty);
@@ -83,7 +84,8 @@ public class HotKeyShowItme : System.Windows.Controls.Button, IAppearanceControl
     }
 
     /// <inheritdoc />
-    [Bindable(true), Category("Appearance")]
+    [Bindable(true)]
+    [Category("Appearance")]
     public ControlAppearance Appearance
     {
         get => (ControlAppearance)GetValue(AppearanceProperty);
@@ -91,9 +93,10 @@ public class HotKeyShowItme : System.Windows.Controls.Button, IAppearanceControl
     }
 
     /// <summary>
-    /// Background <see cref="Brush"/> when the user interacts with an element with a pointing device.
+    ///     Background <see cref="Brush" /> when the user interacts with an element with a pointing device.
     /// </summary>
-    [Bindable(true), Category("Appearance")]
+    [Bindable(true)]
+    [Category("Appearance")]
     public Brush MouseOverBackground
     {
         get => (Brush)GetValue(MouseOverBackgroundProperty);
@@ -101,9 +104,10 @@ public class HotKeyShowItme : System.Windows.Controls.Button, IAppearanceControl
     }
 
     /// <summary>
-    /// Border <see cref="Brush"/> when the user interacts with an element with a pointing device.
+    ///     Border <see cref="Brush" /> when the user interacts with an element with a pointing device.
     /// </summary>
-    [Bindable(true), Category("Appearance")]
+    [Bindable(true)]
+    [Category("Appearance")]
     public Brush MouseOverBorderBrush
     {
         get => (Brush)GetValue(MouseOverBorderBrushProperty);
@@ -111,9 +115,10 @@ public class HotKeyShowItme : System.Windows.Controls.Button, IAppearanceControl
     }
 
     /// <summary>
-    /// Foreground when pressed.
+    ///     Foreground when pressed.
     /// </summary>
-    [Bindable(true), Category("Appearance")]
+    [Bindable(true)]
+    [Category("Appearance")]
     public Brush PressedForeground
     {
         get => (Brush)GetValue(PressedForegroundProperty);
@@ -121,9 +126,10 @@ public class HotKeyShowItme : System.Windows.Controls.Button, IAppearanceControl
     }
 
     /// <summary>
-    /// Background <see cref="Brush"/> when the user clicks the button.
+    ///     Background <see cref="Brush" /> when the user clicks the button.
     /// </summary>
-    [Bindable(true), Category("Appearance")]
+    [Bindable(true)]
+    [Category("Appearance")]
     public Brush PressedBackground
     {
         get => (Brush)GetValue(PressedBackgroundProperty);
@@ -131,9 +137,10 @@ public class HotKeyShowItme : System.Windows.Controls.Button, IAppearanceControl
     }
 
     /// <summary>
-    /// Border <see cref="Brush"/> when the user clicks the button.
+    ///     Border <see cref="Brush" /> when the user clicks the button.
     /// </summary>
-    [Bindable(true), Category("Appearance")]
+    [Bindable(true)]
+    [Category("Appearance")]
     public Brush PressedBorderBrush
     {
         get => (Brush)GetValue(PressedBorderBrushProperty);

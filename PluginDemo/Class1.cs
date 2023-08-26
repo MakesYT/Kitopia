@@ -1,6 +1,10 @@
+#region
+
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using PluginCore;
+
+#endregion
 
 namespace PluginDemo;
 
@@ -11,7 +15,7 @@ public class Class1 : IPlugin
         //MessageBox.Show("dd");
     }
 
-    public static PluginInfo PluginInfo = new PluginInfo()
+    public static PluginInfo PluginInfo = new()
     {
         PluginName = "Demo",
         PluginId = "Demo",

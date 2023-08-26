@@ -1,6 +1,10 @@
-﻿using System.IO;
+﻿#region
+
+using System.IO;
 using System.Text;
 using Core.SDKs.Tools;
+
+#endregion
 
 namespace Core.SDKs.Everything;
 
@@ -10,10 +14,14 @@ public class Tools
     {
         if (IntPtr.Size == 8)
             // 64-bit
+        {
             amd64(Items);
+        }
         else
             // 32-bit
+        {
             amd32(Items);
+        }
     }
 
     public static void amd32(Dictionary<string, SearchViewItem> Items)
@@ -37,14 +45,27 @@ public class Tools
             var fileInfo = new FileInfo(filePath);
             var fileType = FileType.None;
             if (fileInfo.Name.StartsWith("~") || fileInfo.Name.StartsWith("_"))
+            {
                 continue;
+            }
+
             if (fileInfo.Extension == ".pdf")
+            {
                 fileType = FileType.PDF文档;
+            }
             else if (fileInfo.Extension == ".docx" || fileInfo.Extension == ".doc")
+            {
                 fileType = FileType.Word文档;
+            }
             else if (fileInfo.Extension == ".xlsx" || fileInfo.Extension == ".xls")
+            {
                 fileType = FileType.Excel文档;
-            else if (fileInfo.Extension == ".ppt" || fileInfo.Extension == ".pptx") fileType = FileType.PPT文档;
+            }
+            else if (fileInfo.Extension == ".ppt" || fileInfo.Extension == ".pptx")
+            {
+                fileType = FileType.PPT文档;
+            }
+
             var keys = new HashSet<string>();
             AppTools.NameSolver(keys, fileInfo.Name).Wait();
             var searchViewItem = new SearchViewItem
@@ -79,14 +100,27 @@ public class Tools
             var fileInfo = new FileInfo(filePath);
             var fileType = FileType.None;
             if (fileInfo.Name.StartsWith("~") || fileInfo.Name.StartsWith("_"))
+            {
                 continue;
+            }
+
             if (fileInfo.Extension == ".pdf")
+            {
                 fileType = FileType.PDF文档;
+            }
             else if (fileInfo.Extension == ".docx" || fileInfo.Extension == ".doc")
+            {
                 fileType = FileType.Word文档;
+            }
             else if (fileInfo.Extension == ".xlsx" || fileInfo.Extension == ".xls")
+            {
                 fileType = FileType.Excel文档;
-            else if (fileInfo.Extension == ".ppt" || fileInfo.Extension == ".pptx") fileType = FileType.PPT文档;
+            }
+            else if (fileInfo.Extension == ".ppt" || fileInfo.Extension == ".pptx")
+            {
+                fileType = FileType.PPT文档;
+            }
+
             var keys = new HashSet<string>();
             AppTools.NameSolver(keys, fileInfo.Name).Wait();
             var searchViewItem = new SearchViewItem

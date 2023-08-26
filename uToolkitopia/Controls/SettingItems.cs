@@ -1,7 +1,4 @@
-﻿// This Source Code Form is subject to the terms of the MIT License.
-// If a copy of the MIT was not distributed with this file, You can obtain one at https://opensource.org/licenses/MIT.
-// Copyright (C) Leszek Pomianowski and WPF UI Contributors.
-// All Rights Reserved.
+﻿#region
 
 using System.ComponentModel;
 using System.Windows;
@@ -9,11 +6,14 @@ using System.Windows.Controls;
 using Wpf.Ui.Controls;
 using Wpf.Ui.Converters;
 
+#endregion
+
 namespace Kitopia.Controls;
 
 public class SettingItems : ContentControl
 {
-    [Bindable(true), Category("Title")]
+    [Bindable(true)]
+    [Category("Title")]
     public string Title
     {
         get => (string)GetValue(TitleProperty);
@@ -25,7 +25,8 @@ public class SettingItems : ContentControl
         typeof(string), typeof(SettingItems),
         new FrameworkPropertyMetadata(""));
 
-    [Bindable(true), Category("Description")]
+    [Bindable(true)]
+    [Category("Description")]
     public string Description
     {
         get => (string)GetValue(DescriptionProperty);
@@ -37,7 +38,8 @@ public class SettingItems : ContentControl
         new PropertyMetadata(""));
 
 
-    [Bindable(true), Category("Appearance")]
+    [Bindable(true)]
+    [Category("Appearance")]
     public IconElement? Icon
     {
         get => (IconElement)GetValue(IconProperty);

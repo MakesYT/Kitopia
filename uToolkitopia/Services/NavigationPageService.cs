@@ -1,19 +1,19 @@
-﻿using System;
+﻿#region
+
+using System;
 using Core.SDKs.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Wpf.Ui.Contracts;
+
+#endregion
 
 namespace Kitopia.Services;
 
 public class NavigationPageService : INavigationPageService
 {
-    public bool Navigate(Type pageType)
-    {
-        return ServiceManager.Services!.GetService<INavigationService>()!.Navigate(pageType);
-    }
+    public bool Navigate(Type pageType) =>
+        ServiceManager.Services!.GetService<INavigationService>()!.Navigate(pageType);
 
-    public bool Navigate(string pageIdOrTargetTag)
-    {
-        return ServiceManager.Services!.GetService<INavigationService>()!.Navigate(pageIdOrTargetTag);
-    }
+    public bool Navigate(string pageIdOrTargetTag) =>
+        ServiceManager.Services!.GetService<INavigationService>()!.Navigate(pageIdOrTargetTag);
 }

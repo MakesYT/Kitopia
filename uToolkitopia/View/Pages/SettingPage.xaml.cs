@@ -1,8 +1,12 @@
-﻿using System.Windows;
+﻿#region
+
+using System.Windows;
 using System.Windows.Controls;
 using Core.SDKs.Services;
 using Kitopia.Controls;
 using Microsoft.Extensions.DependencyInjection;
+
+#endregion
 
 namespace Kitopia.View.Pages;
 
@@ -15,7 +19,7 @@ public partial class SettingPage : Page
 
     private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
     {
-        HotKeyEditorWindow hotKeyEditor = new HotKeyEditorWindow(((HotKeyShow)sender).Tag.ToString());
+        var hotKeyEditor = new HotKeyEditorWindow(((HotKeyShow)sender).Tag.ToString());
         hotKeyEditor.Height = ServiceManager.Services.GetService<MainWindow>().Height / 2;
         hotKeyEditor.Width = ServiceManager.Services.GetService<MainWindow>().Width / 2;
         hotKeyEditor.Owner = ServiceManager.Services.GetService<MainWindow>();

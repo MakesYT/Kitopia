@@ -1,8 +1,12 @@
-﻿using System.Diagnostics;
+﻿#region
+
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Media.Animation;
 using log4net;
+
+#endregion
 
 namespace Kitopia.View;
 
@@ -22,17 +26,12 @@ public partial class ErrorDialog : Window
         storyboard.Begin();
     }
 
-    private void Button_Click(object sender, RoutedEventArgs e)
-    {
-        Close();
-    }
+    private void Button_Click(object sender, RoutedEventArgs e) => Close();
 
-    private void logs_Click(object sender, RoutedEventArgs e)
-    {
+    private void logs_Click(object sender, RoutedEventArgs e) =>
         ExecuteInCmd("start \"\" \"" + Directory.GetCurrentDirectory() + "\\logs\"", "");
-        // System.Diagnostics.Process.Start(Directory.GetCurrentDirectory() );
-    }
 
+    // System.Diagnostics.Process.Start(Directory.GetCurrentDirectory() );
     public string ExecuteInCmd(string cmdline, string dir)
     {
         using (var process = new Process())
@@ -51,7 +50,10 @@ public partial class ErrorDialog : Window
             process.StandardInput.WriteLine(cmdline + "&exit");
             process.StandardInput.Close();
             string line;
-            while ((line = process.StandardOutput.ReadLine()) != null) log.Debug(line);
+            while ((line = process.StandardOutput.ReadLine()) != null)
+            {
+                log.Debug(line);
+            }
 
             //获取cmd窗口的输出信息  
             // string output = process.StandardOutput.ReadToEnd();

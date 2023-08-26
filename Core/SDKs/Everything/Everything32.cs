@@ -1,5 +1,9 @@
-﻿using System.Runtime.InteropServices;
+﻿#region
+
+using System.Runtime.InteropServices;
 using System.Text;
+
+#endregion
 
 namespace Core.SDKs.Everything;
 

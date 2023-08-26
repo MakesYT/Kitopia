@@ -1,10 +1,14 @@
-﻿using System.Drawing;
+﻿#region
+
+using System.Drawing;
 using System.IO;
 using System.Xml;
 using log4net;
 using Vanara.Extensions;
 using Vanara.PInvoke;
 using Vanara.Windows.Shell;
+
+#endregion
 
 namespace Core.SDKs.Tools;
 
@@ -47,7 +51,7 @@ public class UWPAPPsTools
                 continue;
             }
 
-            string? fileName = appContainer.displayName;
+            var fileName = appContainer.displayName;
             try
             {
                 fileName = new IndirectString(appContainer.displayName).Value;
@@ -62,9 +66,9 @@ public class UWPAPPsTools
                 continue;
             }
 
-            HashSet<string> keys = new HashSet<string>();
+            HashSet<string> keys = new();
             AppTools.NameSolver(keys, fileName).Wait();
-            XmlDocument xmlDocument = new XmlDocument();
+            var xmlDocument = new XmlDocument();
             if (File.Exists($"{appContainer.workingDirectory}\\AppxManifest.xml"))
             {
                 xmlDocument.Load($"{appContainer.workingDirectory}\\AppxManifest.xml");
@@ -78,7 +82,7 @@ public class UWPAPPsTools
                 continue;
             }
 
-            XmlNode? Application = GetApplicationNode(xmlDocument);
+            var Application = GetApplicationNode(xmlDocument);
             if (Application is null)
             {
                 continue;
@@ -102,18 +106,18 @@ public class UWPAPPsTools
                 continue;
             }
 
-            DirectoryInfo logos =
+            var logos =
                 new DirectoryInfo(path);
             var pa = $"{path}\\{logoName}.scale-200.png";
             if (File.Exists(pa))
             {
-                using (Bitmap bm = new Bitmap(pa))
+                using (var bm = new Bitmap(pa))
                 {
-                    using (Bitmap iconBm = new Bitmap(bm, new Size(64, 64)))
+                    using (var iconBm = new Bitmap(bm, new Size(64, 64)))
                     {
                         //如果是windows调用，直接下面一行代码就可以了
                         //此代码不能在web程序中调用，会有安全异常抛出
-                        using (Icon icon = Icon.FromHandle(iconBm.GetHicon()))
+                        using (var icon = Icon.FromHandle(iconBm.GetHicon()))
                         {
                             var searchViewItem = new SearchViewItem()
                             {
@@ -140,13 +144,13 @@ public class UWPAPPsTools
                 {
                     if (enumerateFile.Name.StartsWith(logoName))
                     {
-                        using (Bitmap bm = new Bitmap(enumerateFile.FullName))
+                        using (var bm = new Bitmap(enumerateFile.FullName))
                         {
-                            using (Bitmap iconBm = new Bitmap(bm, new Size(64, 64)))
+                            using (var iconBm = new Bitmap(bm, new Size(64, 64)))
                             {
                                 //如果是windows调用，直接下面一行代码就可以了
                                 //此代码不能在web程序中调用，会有安全异常抛出
-                                using (Icon icon = Icon.FromHandle(iconBm.GetHicon()))
+                                using (var icon = Icon.FromHandle(iconBm.GetHicon()))
                                 {
                                     var searchViewItem = new SearchViewItem()
                                     {

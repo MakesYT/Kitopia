@@ -1,9 +1,13 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows;
 using Core.SDKs.Services;
 using log4net;
+
+#endregion
 
 namespace Kitopia.Services;
 
@@ -18,7 +22,7 @@ public class ClipboardService : IClipboardService
 
         try
         {
-            IDataObject data = Clipboard.GetDataObject();
+            var data = Clipboard.GetDataObject();
             return data.GetDataPresent(DataFormats.Bitmap);
         }
         catch (Exception e)
@@ -34,7 +38,7 @@ public class ClipboardService : IClipboardService
 
         try
         {
-            IDataObject data = Clipboard.GetDataObject();
+            var data = Clipboard.GetDataObject();
             if (data.GetDataPresent(DataFormats.Bitmap))
             {
                 return (Bitmap)data.GetData(DataFormats.Bitmap);
@@ -54,15 +58,15 @@ public class ClipboardService : IClipboardService
         log.Debug(nameof(ClipboardService) + "的接口" + nameof(saveBitmap) + "被调用");
 
 
-        string r = Application.Current.Dispatcher.Invoke(() =>
+        var r = Application.Current.Dispatcher.Invoke(() =>
         {
-            IDataObject data = Clipboard.GetDataObject();
+            var data = Clipboard.GetDataObject();
             if (data.GetDataPresent(DataFormats.Bitmap))
             {
                 var ts = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0);
                 var timeStamp = Convert.ToInt64(ts.TotalMilliseconds);
-                string f = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads\\Kitopia" +
-                           timeStamp + ".png";
+                var f = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads\\Kitopia" +
+                        timeStamp + ".png";
                 var img = (Bitmap)data.GetData(typeof(Bitmap));
                 img.Save(f, ImageFormat.Png); // 将 bitmap 以 png 格式保存到文件
                 return f;

@@ -16,7 +16,6 @@
       Title="插件管理页面">
     <Page.Resources>
         <Style TargetType="Border" />
-        <plugin1:PluginInfoToInfo x:Key="PluginInfoToInfo" />
         <plugin1:SettingItemToControlConverter x:Key="SettingItemToControlConverter" />
     </Page.Resources>
     <StackPanel Margin="42">
@@ -24,7 +23,8 @@
         <ui:DataGrid VerticalScrollBarVisibility="Visible" IsReadOnly="True" x:Name="dataGrid" RowHeight="75"
                      GridLinesVisibility="None" ColumnWidth="*"
                      HeadersVisibility="None" HorizontalContentAlignment="Stretch"
-                     ItemsSource="{Binding SettingItems,UpdateSourceTrigger=PropertyChanged}" AutoGenerateColumns="False"
+                     ItemsSource="{Binding SettingItems,UpdateSourceTrigger=PropertyChanged}"
+                     AutoGenerateColumns="False"
                      Margin="0,10,0,0">
 
             <DataGrid.CellStyle>
@@ -51,12 +51,14 @@
                 <DataGridTemplateColumn x:Name="dataGridTemplateColumn" Header="Button" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <controls:SettingItems Title="{Binding Title}" Description="{Binding Description}"> 
+                            <controls:SettingItems Title="{Binding Title}" Description="{Binding Description}">
                                 <controls:SettingItems.Icon>
-                                    <ui:SymbolIcon Symbol="{Binding Symbol,Converter={StaticResource IntToIconSymbol},Mode=OneWay}" FontSize="25"/>
+                                    <ui:SymbolIcon
+                                        Symbol="{Binding Symbol,Converter={StaticResource IntToIconSymbol},Mode=OneWay}"
+                                        FontSize="25" />
                                 </controls:SettingItems.Icon>
                                 <controls:SettingItems.Content>
-                                    <Binding Converter="{StaticResource SettingItemToControlConverter}"/>
+                                    <Binding Converter="{StaticResource SettingItemToControlConverter}" />
                                 </controls:SettingItems.Content>
                             </controls:SettingItems>
                         </DataTemplate>

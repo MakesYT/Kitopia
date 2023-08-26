@@ -1,8 +1,12 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using System.Windows.Data;
+
+#endregion
 
 namespace Kitopia.Converter.TaskEditor;
 
@@ -17,8 +21,8 @@ public class InterfacesToString : IValueConverter
 
         if (value is List<string> list)
         {
-            StringBuilder stringBuilder = new StringBuilder();
-            for (int i = 0; i < list.Count; i++)
+            var stringBuilder = new StringBuilder();
+            for (var i = 0; i < list.Count; i++)
             {
                 stringBuilder.Append(list[i]); // 追加对象
                 if (i < list.Count - 1) // 如果不是最后一个对象
@@ -33,8 +37,6 @@ public class InterfacesToString : IValueConverter
         return "";
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        return (bool)!(bool)value;
-    }
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+        (bool)!(bool)value;
 }

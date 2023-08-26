@@ -4,17 +4,17 @@
 #include <wrl/implements.h>
 #include <wrl/client.h>
 #include <shobjidl_core.h>
-#include <wil\resource.h>
+#include <wil/resource.h>
 #include <string>
 #include <vector>
 #include <sstream>
 
 using namespace Microsoft::WRL;
 
-BOOL APIENTRY DllMain( HMODULE hModule,
-                       DWORD  ul_reason_for_call,
-                       LPVOID lpReserved
-                     )
+BOOL APIENTRY DllMain(HMODULE hModule,
+                      const DWORD ul_reason_for_call,
+                      LPVOID lpReserved
+)
 {
     switch (ul_reason_for_call)
     {
@@ -35,7 +35,7 @@ public:
     virtual const EXPCMDSTATE State(_In_opt_ IShellItemArray* selection) { return ECS_ENABLED; }
 
     // IExplorerCommand
-    IFACEMETHODIMP GetTitle(_In_opt_ IShellItemArray* items, _Outptr_result_nullonfailure_ PWSTR* name)
+    IFACEMETHODIMP GetTitle(_In_opt_ IShellItemArray* items, _Outptr_result_nullonfailure_ PWSTR* name) override
     {
         *name = nullptr;
         auto title = wil::make_cotaskmem_string_nothrow(Title());
@@ -43,15 +43,33 @@ public:
         *name = title.release();
         return S_OK;
     }
-    IFACEMETHODIMP GetIcon(_In_opt_ IShellItemArray*, _Outptr_result_nullonfailure_ PWSTR* icon) { *icon = nullptr; return E_NOTIMPL; }
-    IFACEMETHODIMP GetToolTip(_In_opt_ IShellItemArray*, _Outptr_result_nullonfailure_ PWSTR* infoTip) { *infoTip = nullptr; return E_NOTIMPL; }
-    IFACEMETHODIMP GetCanonicalName(_Out_ GUID* guidCommandName) { *guidCommandName = GUID_NULL;  return S_OK; }
-    IFACEMETHODIMP GetState(_In_opt_ IShellItemArray* selection, _In_ BOOL okToBeSlow, _Out_ EXPCMDSTATE* cmdState)
+
+    IFACEMETHODIMP GetIcon(_In_opt_ IShellItemArray*, _Outptr_result_nullonfailure_ PWSTR* icon) override
+    {
+        *icon = nullptr;
+        return E_NOTIMPL;
+    }
+
+    IFACEMETHODIMP GetToolTip(_In_opt_ IShellItemArray*, _Outptr_result_nullonfailure_ PWSTR* infoTip) override
+    {
+        *infoTip = nullptr;
+        return E_NOTIMPL;
+    }
+
+    IFACEMETHODIMP GetCanonicalName(_Out_ GUID* guidCommandName) override
+    {
+        *guidCommandName = GUID_NULL;
+        return S_OK;
+    }
+
+    IFACEMETHODIMP GetState(_In_opt_ IShellItemArray* selection, _In_ BOOL okToBeSlow,
+                            _Out_ EXPCMDSTATE* cmdState) override
     {
         *cmdState = State(selection);
         return S_OK;
     }
-    IFACEMETHODIMP Invoke(_In_opt_ IShellItemArray* selection, _In_opt_ IBindCtx*) noexcept try
+
+    IFACEMETHODIMP Invoke(_In_opt_ IShellItemArray* selection, _In_opt_ IBindCtx*) noexcept override try
     {
         HWND parent = nullptr;
         if (m_site)
@@ -80,25 +98,44 @@ public:
     }
     CATCH_RETURN();
 
-    IFACEMETHODIMP GetFlags(_Out_ EXPCMDFLAGS* flags) { *flags = Flags(); return S_OK; }
-    IFACEMETHODIMP EnumSubCommands(_COM_Outptr_ IEnumExplorerCommand** enumCommands) { *enumCommands = nullptr; return E_NOTIMPL; }
+    IFACEMETHODIMP GetFlags(_Out_ EXPCMDFLAGS* flags) override
+    {
+        *flags = Flags();
+        return S_OK;
+    }
+
+    IFACEMETHODIMP EnumSubCommands(_COM_Outptr_ IEnumExplorerCommand** enumCommands) override
+    {
+        *enumCommands = nullptr;
+        return E_NOTIMPL;
+    }
 
     // IObjectWithSite
-    IFACEMETHODIMP SetSite(_In_ IUnknown* site) noexcept { m_site = site; return S_OK; }
-    IFACEMETHODIMP GetSite(_In_ REFIID riid, _COM_Outptr_ void** site) noexcept { return m_site.CopyTo(riid, site); }
+    IFACEMETHODIMP SetSite(_In_ IUnknown* site) noexcept override
+    {
+        m_site = site;
+        return S_OK;
+    }
+
+    IFACEMETHODIMP GetSite(_In_ REFIID riid, _COM_Outptr_ void** site) noexcept override
+    {
+        return m_site.CopyTo(riid, site);
+    }
 
 protected:
     ComPtr<IUnknown> m_site;
 };
 
-class __declspec(uuid("3282E233-C5D3-4533-9B25-44B8AAAFACFA")) TestExplorerCommandHandler final : public TestExplorerCommandBase
+class __declspec(uuid("3282E233-C5D3-4533-9B25-44B8AAAFACFA"))
+    TestExplorerCommandHandler final : public TestExplorerCommandBase
 {
 public:
     const wchar_t* Title() override { return L"PhotoStore Command1"; }
     const EXPCMDSTATE State(_In_opt_ IShellItemArray* selection) override { return ECS_DISABLED; }
 };
 
-class __declspec(uuid("817CF159-A4B5-41C8-8E8D-0E23A6605395")) TestExplorerCommand2Handler final : public TestExplorerCommandBase
+class __declspec(uuid("817CF159-A4B5-41C8-8E8D-0E23A6605395"))
+    TestExplorerCommand2Handler final : public TestExplorerCommandBase
 {
 public:
     const wchar_t* Title() override { return L"PhotoStore ExplorerCommand2"; }
@@ -144,56 +181,65 @@ public:
     }
 
     // IEnumExplorerCommand
-    IFACEMETHODIMP Next(ULONG celt, __out_ecount_part(celt, *pceltFetched) IExplorerCommand** apUICommand, __out_opt ULONG* pceltFetched)
+    IFACEMETHODIMP Next(const ULONG celt, __out_ecount_part(celt, *pceltFetched) IExplorerCommand** apUICommand,
+                        __out_opt ULONG* pceltFetched) override
     {
-        ULONG fetched{ 0 };
+        ULONG fetched{0};
         wil::assign_to_opt_param(pceltFetched, 0ul);
 
-        for (ULONG i = 0; (i < celt) && (m_current != m_commands.cend()); i++)
+        for (ULONG i = 0; i < celt && m_current != m_commands.cend(); i++)
         {
             m_current->CopyTo(&apUICommand[0]);
-            m_current++;
+            ++m_current;
             fetched++;
         }
 
         wil::assign_to_opt_param(pceltFetched, fetched);
-        return (fetched == celt) ? S_OK : S_FALSE;
+        return fetched == celt ? S_OK : S_FALSE;
     }
 
-    IFACEMETHODIMP Skip(ULONG /*celt*/) { return E_NOTIMPL; }
-    IFACEMETHODIMP Reset()
+    IFACEMETHODIMP Skip(ULONG /*celt*/) override { return E_NOTIMPL; }
+    IFACEMETHODIMP Reset() override
     {
         m_current = m_commands.cbegin();
         return S_OK;
     }
-    IFACEMETHODIMP Clone(__deref_out IEnumExplorerCommand** ppenum) { *ppenum = nullptr; return E_NOTIMPL; }
+
+    IFACEMETHODIMP Clone(__deref_out IEnumExplorerCommand** ppenum) override
+    {
+        *ppenum = nullptr;
+        return E_NOTIMPL;
+    }
 
 private:
     std::vector<ComPtr<IExplorerCommand>> m_commands;
     std::vector<ComPtr<IExplorerCommand>>::const_iterator m_current;
 };
 
-class __declspec(uuid("1476525B-BBC2-4D04-B175-7E7D72F3DFF8")) TestExplorerCommand3Handler final : public TestExplorerCommandBase
+class __declspec(uuid("1476525B-BBC2-4D04-B175-7E7D72F3DFF8"))
+    TestExplorerCommand3Handler final : public TestExplorerCommandBase
 {
 public:
     const wchar_t* Title() override { return L"PhotoStore CommandWithSubCommands"; }
     const EXPCMDFLAGS Flags() override { return ECF_HASSUBCOMMANDS; }
 
-    IFACEMETHODIMP EnumSubCommands(_COM_Outptr_ IEnumExplorerCommand** enumCommands)
+    IFACEMETHODIMP EnumSubCommands(_COM_Outptr_ IEnumExplorerCommand** enumCommands) override
     {
         *enumCommands = nullptr;
-        auto e = Make<EnumCommands>();
+        const auto e = Make<EnumCommands>();
         return e->QueryInterface(IID_PPV_ARGS(enumCommands));
     }
 };
 
-class __declspec(uuid("30DEEDF6-63EA-4042-A7D8-0A9E1B17BB99")) TestExplorerCommand4Handler final : public TestExplorerCommandBase
+class __declspec(uuid("30DEEDF6-63EA-4042-A7D8-0A9E1B17BB99"))
+    TestExplorerCommand4Handler final : public TestExplorerCommandBase
 {
 public:
     const wchar_t* Title() override { return L"PhotoStore Command4"; }
 };
 
-class __declspec(uuid("50419A05-F966-47BA-B22B-299A95492348")) TestExplorerHiddenCommandHandler final : public TestExplorerCommandBase
+class __declspec(uuid("50419A05-F966-47BA-B22B-299A95492348"))
+    TestExplorerHiddenCommandHandler final : public TestExplorerCommandBase
 {
 public:
     const wchar_t* Title() override { return L"PhotoStore HiddenCommand"; }
@@ -213,9 +259,9 @@ CoCreatableClassWrlCreatorMapInclude(TestExplorerCommand4Handler)
 CoCreatableClassWrlCreatorMapInclude(TestExplorerHiddenCommandHandler)
 
 
-STDAPI DllGetActivationFactory(_In_ HSTRING activatableClassId, _COM_Outptr_ IActivationFactory** factory)
+STDAPI DllGetActivationFactory(_In_ const HSTRING activatableClassId, _COM_Outptr_ IActivationFactory** factory)
 {
-    return Module<ModuleType::InProc>::GetModule().GetActivationFactory(activatableClassId, factory);
+    return Module<InProc>::GetModule().GetActivationFactory(activatableClassId, factory);
 }
 
 STDAPI DllCanUnloadNow()

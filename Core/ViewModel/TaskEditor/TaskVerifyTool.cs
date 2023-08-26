@@ -1,5 +1,9 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿#region
+
+using CommunityToolkit.Mvvm.Input;
 using Core.SDKs.Services.Plugin;
+
+#endregion
 
 namespace Core.ViewModel.TaskEditor;
 
@@ -14,17 +18,17 @@ public record DoMethod
 
 public partial class TaskEditorViewModel
 {
-    Dictionary<string, object> datas = new();
+    private Dictionary<string, object> datas = new();
     private List<DoMethod> methods = new();
-    List<PointItem> pointItems = new();
-    bool finnish = false;
-    bool pass = false;
+    private List<PointItem> pointItems = new();
+    private bool finnish = false;
+    private bool pass = false;
 
     [RelayCommand]
     private void VerifyNode()
     {
-        datas = new();
-        pointItems = new();
+        datas = new Dictionary<string, object>();
+        pointItems = new List<PointItem>();
         finnish = false;
         pass = false;
         pointItems.Add(Nodes[0]);

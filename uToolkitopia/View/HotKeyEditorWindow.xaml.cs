@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿#region
+
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using Windows.System;
@@ -7,6 +9,9 @@ using Core.SDKs.HotKey;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using Wpf.Ui.Controls;
+using MessageBox = Kitopia.Controls.MessageBoxControl.MessageBox;
+
+#endregion
 
 namespace Kitopia.View;
 
@@ -62,31 +67,43 @@ public partial class HotKeyEditorWindow : FluentWindow
             {
                 Ctrl.Visibility = Visibility.Visible;
             }
-            else Ctrl.Visibility = Visibility.Collapsed;
+            else
+            {
+                Ctrl.Visibility = Visibility.Collapsed;
+            }
 
             if (e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Alt))
             {
                 Alt.Visibility = Visibility.Visible;
             }
-            else Alt.Visibility = Visibility.Collapsed;
+            else
+            {
+                Alt.Visibility = Visibility.Collapsed;
+            }
 
             if (e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Shift))
             {
                 Shift.Visibility = Visibility.Visible;
             }
-            else Shift.Visibility = Visibility.Collapsed;
+            else
+            {
+                Shift.Visibility = Visibility.Collapsed;
+            }
 
             if (e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Windows))
             {
                 Win.Visibility = Visibility.Visible;
             }
-            else Win.Visibility = Visibility.Collapsed;
+            else
+            {
+                Win.Visibility = Visibility.Collapsed;
+            }
 
-            Key key = (e.Key == Key.System ? e.SystemKey : e.Key);
+            var key = e.Key == Key.System ? e.SystemKey : e.Key;
             if (key != Key.LeftShift && key != Key.RightShift && key != Key.LeftAlt && key != Key.RightAlt &&
                 key != Key.LWin && key != Key.RWin && key != Key.LeftCtrl && key != Key.RightCtrl)
             {
-                selectedKey = ((EKey)((VirtualKey)KeyInterop.VirtualKeyFromKey(key)));
+                selectedKey = (EKey)(VirtualKey)KeyInterop.VirtualKeyFromKey(key);
                 KeyName.Visibility = Visibility.Visible;
                 KeyName.Content = selectedKey.ToString();
             }
@@ -129,25 +146,37 @@ public partial class HotKeyEditorWindow : FluentWindow
         {
             hotKeyModel.IsSelectAlt = true;
         }
-        else hotKeyModel.IsSelectAlt = false;
+        else
+        {
+            hotKeyModel.IsSelectAlt = false;
+        }
 
         if (Win.Visibility == Visibility.Visible)
         {
             hotKeyModel.IsSelectWin = true;
         }
-        else hotKeyModel.IsSelectWin = false;
+        else
+        {
+            hotKeyModel.IsSelectWin = false;
+        }
 
         if (Shift.Visibility == Visibility.Visible)
         {
             hotKeyModel.IsSelectShift = true;
         }
-        else hotKeyModel.IsSelectShift = false;
+        else
+        {
+            hotKeyModel.IsSelectShift = false;
+        }
 
         if (Ctrl.Visibility == Visibility.Visible)
         {
             hotKeyModel.IsSelectCtrl = true;
         }
-        else hotKeyModel.IsSelectCtrl = false;
+        else
+        {
+            hotKeyModel.IsSelectCtrl = false;
+        }
 
         if (selectedKey is null)
         {
@@ -156,10 +185,10 @@ public partial class HotKeyEditorWindow : FluentWindow
 
         hotKeyModel.SelectKey = selectedKey;
         ConfigManger.Save();
-        setSuccess = ((MainWindow)(ServiceManager.Services.GetService(typeof(MainWindow)))).HotKeySet(hotKeyModel);
+        setSuccess = ((MainWindow)ServiceManager.Services.GetService(typeof(MainWindow))).HotKeySet(hotKeyModel);
         if (!setSuccess)
         {
-            Controls.MessageBoxControl.MessageBox msg = new Controls.MessageBoxControl.MessageBox();
+            var msg = new MessageBox();
             msg.Title = "Kitopia";
             msg.Content = $"无法注册快捷键\n{hotKeyModel.MainName}_{hotKeyModel.Name}\n现在你需要重新设置\n在设置界面按下取消以取消该快捷键注册";
             msg.WindowStartupLocation = WindowStartupLocation.CenterScreen;
@@ -173,7 +202,7 @@ public partial class HotKeyEditorWindow : FluentWindow
 
         isFinnish = true;
         WeakReferenceMessenger.Default.Send("hotKeyChanged", "hotkey");
-        this.Close();
+        Close();
     }
 
     private void ButtonCancle_OnClick(object sender, RoutedEventArgs e)

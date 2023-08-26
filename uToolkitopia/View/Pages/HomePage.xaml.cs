@@ -1,4 +1,8 @@
-﻿using System.Windows.Controls;
+﻿#region
+
+using System.Windows.Controls;
+
+#endregion
 
 namespace Kitopia.View.Pages;
 

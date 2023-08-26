@@ -13,14 +13,14 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:Kitopia.Controls"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
-    
+
     <Style TargetType="{x:Type controls:SettingItems}">
         <Setter Property="Padding" Value="14,16,14,16" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type controls:SettingItems}">
                     <ui:Card Padding="{TemplateBinding Padding}">
-                        <Grid VerticalAlignment="Center" >
+                        <Grid VerticalAlignment="Center">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="36" />
                                 <ColumnDefinition Width="*" />
@@ -37,11 +37,13 @@
                                 TextElement.FontSize="{Binding Path=FontSize,RelativeSource={RelativeSource TemplatedParent}}"
                                 TextElement.Foreground="{TemplateBinding Foreground}" />
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <TextBlock Margin="0" Focusable="False" Text="{Binding Title, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                <TextBlock Margin="0" Focusable="False"
+                                           Text="{Binding Title, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
                                            FontSize="15"
                                            Background="{x:Null}"
                                            FontWeight="Normal" />
-                                <TextBlock Margin="0" Focusable="False" Text="{Binding Description, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                <TextBlock Margin="0" Focusable="False"
+                                           Text="{Binding Description, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
                                            FontSize="13"
                                            Foreground="{DynamicResource TextPlaceholderColorBrush}"
                                            Background="{x:Null}"

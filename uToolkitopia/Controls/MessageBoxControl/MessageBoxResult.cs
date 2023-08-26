@@ -1,23 +1,23 @@
-﻿namespace Kitopia.Controls.MessageBoxControl
+﻿namespace Kitopia.Controls.MessageBoxControl;
+
+/// <summary>
+///     Specifies identifiers to indicate the return value of a
+///     <see cref="Kitopia.Controls.MessageBoxControl.MessageBox" />.
+/// </summary>
+public enum MessageBoxResult
 {
     /// <summary>
-    /// Specifies identifiers to indicate the return value of a <see cref="Kitopia.Controls.MessageBoxControl.MessageBox"/>.
+    ///     No button was tapped.
     /// </summary>
-    public enum MessageBoxResult
-    {
-        /// <summary>
-        /// No button was tapped.
-        /// </summary>
-        None,
+    None,
 
-        /// <summary>
-        /// The primary button was tapped by the user.
-        /// </summary>
-        Primary,
+    /// <summary>
+    ///     The primary button was tapped by the user.
+    /// </summary>
+    Primary,
 
-        /// <summary>
-        /// The secondary button was tapped by the user.
-        /// </summary>
-        Secondary
-    }
+    /// <summary>
+    ///     The secondary button was tapped by the user.
+    /// </summary>
+    Secondary
 }

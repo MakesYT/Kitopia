@@ -6,7 +6,7 @@ public class a
     [TestMethod]
     public void aa()
     {
-        DirectoryInfo directoryInfo = new DirectoryInfo(@"H:\Ai\总数据\v2\wangzai\新建文件夹");
+        var directoryInfo = new DirectoryInfo(@"H:\Ai\总数据\v2\wangzai\新建文件夹");
         foreach (var enumerateFile in directoryInfo.EnumerateFiles())
         {
             //20_旺仔小乔 - 雾里 (官方女版)_(Vocals)_5.wav

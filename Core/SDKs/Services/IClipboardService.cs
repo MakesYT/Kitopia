@@ -1,4 +1,8 @@
-﻿using System.Drawing;
+﻿#region
+
+using System.Drawing;
+
+#endregion
 
 namespace Core.SDKs.Services;
 
@@ -11,5 +15,4 @@ public interface IClipboardService
 
 public enum ClipboardType
 {
-    
 }

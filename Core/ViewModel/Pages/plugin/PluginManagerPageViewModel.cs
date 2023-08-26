@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿#region
+
+using System.ComponentModel;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -6,6 +8,8 @@ using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
 using log4net;
+
+#endregion
 
 namespace Core.ViewModel.Pages.plugin;
 
@@ -23,14 +27,14 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
 
     private void LoadPluginsInfo()
     {
-        DirectoryInfo pluginsDirectoryInfo = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "plugins");
+        var pluginsDirectoryInfo = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "plugins");
         if (!pluginsDirectoryInfo.Exists)
         {
             Log.Debug($"插件目录不存在创建{pluginsDirectoryInfo.FullName}");
             pluginsDirectoryInfo.Create();
         }
 
-        foreach (DirectoryInfo directoryInfo in pluginsDirectoryInfo.EnumerateDirectories())
+        foreach (var directoryInfo in pluginsDirectoryInfo.EnumerateDirectories())
         {
             if (File.Exists($"{directoryInfo.FullName}\\{directoryInfo.Name}.dll"))
             {

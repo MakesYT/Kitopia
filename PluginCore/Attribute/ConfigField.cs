@@ -1,4 +1,8 @@
-﻿using System;
+﻿#region
+
+using System;
+
+#endregion
 
 namespace PluginCore.Attribute;
 
@@ -31,7 +35,7 @@ public class ConfigField : System.Attribute
 
     public ConfigField(string title, string description, int symbol = 0)
     {
-        this.Tittle = title;
+        Tittle = title;
         Description = description;
         Symbol = symbol;
     }

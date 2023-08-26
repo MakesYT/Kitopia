@@ -1,6 +1,10 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Globalization;
 using System.Windows.Data;
+
+#endregion
 
 namespace Kitopia.Converter.SearchWindow;
 
@@ -36,8 +40,6 @@ public class StarBoolToText : IValueConverter
         return "";
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        return (bool)!(bool)value;
-    }
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+        (bool)!(bool)value;
 }

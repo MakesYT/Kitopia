@@ -1,4 +1,6 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
@@ -8,7 +10,10 @@ using Core.SDKs;
 using Core.SDKs.Services;
 using Core.ViewModel;
 using Microsoft.Extensions.DependencyInjection;
+using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
+
+#endregion
 
 namespace Kitopia.View;
 
@@ -22,9 +27,9 @@ public partial class SearchWindow : FluentWindow
         InitializeComponent();
         WeakReferenceMessenger.Default.Register<string, string>(this, "SearchWindowClose", (_, _) =>
         {
-            App.Current.Dispatcher.BeginInvoke(() =>
+            Application.Current.Dispatcher.BeginInvoke(() =>
             {
-                this.Visibility = Visibility.Hidden;
+                Visibility = Visibility.Hidden;
             });
         });
     }
@@ -33,18 +38,15 @@ public partial class SearchWindow : FluentWindow
     {
         base.OnSourceInitialized(e);
         // 获取窗体句柄
-        IntPtr m_Hwnd = new WindowInteropHelper(this).Handle;
-        Wpf.Ui.Appearance.ApplicationThemeManager.Changed += ((theme, accent) =>
+        var m_Hwnd = new WindowInteropHelper(this).Handle;
+        ApplicationThemeManager.Changed += (theme, accent) =>
         {
             WindowBackdrop.ApplyBackdrop(m_Hwnd, WindowBackdropType.Acrylic);
-        });
+        };
     }
 
 
-    private void w_Deactivated(object sender, EventArgs e)
-    {
-        Visibility = Visibility.Hidden;
-    }
+    private void w_Deactivated(object sender, EventArgs e) => Visibility = Visibility.Hidden;
 
     [DllImport("user32.dll", SetLastError = true)]
     private static extern IntPtr SetFocus(IntPtr hWnd);

@@ -1,5 +1,9 @@
+#region
+
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+
+#endregion
 
 namespace Core.ViewModel.TaskEditor;
 
@@ -18,7 +22,7 @@ public partial class PendingConnectionViewModel : ObservableRecipient
 
     partial void OnPreviewTargetChanged(object? value)
     {
-        bool canConnect = value != null;
+        var canConnect = value != null;
         switch (value)
         {
             case ConnectorItem con:
@@ -70,16 +74,15 @@ public partial class PendingConnectionViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    public void Start(ConnectorItem item)
-    {
-        Source = item;
-    }
+    public void Start(ConnectorItem item) => Source = item;
 
     [RelayCommand]
     public void Finish(ConnectorItem? target)
     {
         if (target == null)
+        {
             return;
+        }
 
         if (target == Source || target.Source == Source.Source)
         {

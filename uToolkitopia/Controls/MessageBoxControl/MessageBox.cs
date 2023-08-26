@@ -1,7 +1,4 @@
-﻿// This Source Code Form is subject to the terms of the MIT License.
-// If a copy of the MIT was not distributed with this file, You can obtain one at https://opensource.org/licenses/MIT.
-// Copyright (C) Leszek Pomianowski and WPF UI Contributors.
-// All Rights Reserved.
+﻿#region
 
 using System;
 using System.ComponentModel;
@@ -12,69 +9,70 @@ using System.Windows;
 using Wpf.Ui.Common;
 using Wpf.Ui.Controls;
 using Wpf.Ui.Interop;
-using Size = System.Windows.Size;
+
+#endregion
 
 namespace Kitopia.Controls.MessageBoxControl;
 
 /// <summary>
-/// Customized window for notifications.
+///     Customized window for notifications.
 /// </summary>
 [ToolboxItem(true)]
 [ToolboxBitmap(typeof(MessageBox), "MessageBox.bmp")]
-public class MessageBox : System.Windows.Window
+public class MessageBox : Window
 {
     #region Static properties
 
     /// <summary>
-    /// Property for <see cref="ShowTitle"/>.
+    ///     Property for <see cref="ShowTitle" />.
     /// </summary>
     public static readonly DependencyProperty ShowTitleProperty = DependencyProperty.Register(nameof(ShowTitle),
         typeof(bool), typeof(MessageBox), new PropertyMetadata(true));
 
     /// <summary>
-    /// Property for <see cref="PrimaryButtonText"/>.
+    ///     Property for <see cref="PrimaryButtonText" />.
     /// </summary>
     public static readonly DependencyProperty PrimaryButtonTextProperty = DependencyProperty.Register(
         nameof(PrimaryButtonText),
         typeof(string), typeof(MessageBox), new PropertyMetadata(string.Empty));
 
     /// <summary>
-    /// Property for <see cref="SecondaryButtonText"/>.
+    ///     Property for <see cref="SecondaryButtonText" />.
     /// </summary>
     public static readonly DependencyProperty SecondaryButtonTextProperty = DependencyProperty.Register(
         nameof(SecondaryButtonText),
         typeof(string), typeof(MessageBox), new PropertyMetadata(string.Empty));
 
     /// <summary>
-    /// Property for <see cref="CloseButtonText"/>.
+    ///     Property for <see cref="CloseButtonText" />.
     /// </summary>
     public static readonly DependencyProperty CloseButtonTextProperty = DependencyProperty.Register(
         nameof(CloseButtonText),
         typeof(string), typeof(MessageBox), new PropertyMetadata("Close"));
 
     /// <summary>
-    /// Property for <see cref="PrimaryButtonIcon"/>.
+    ///     Property for <see cref="PrimaryButtonIcon" />.
     /// </summary>
     public static readonly DependencyProperty PrimaryButtonIconProperty =
         DependencyProperty.Register(nameof(PrimaryButtonIcon),
             typeof(SymbolRegular), typeof(MessageBox), new PropertyMetadata(SymbolRegular.Empty));
 
     /// <summary>
-    /// Property for <see cref="SecondaryButtonIcon"/>.
+    ///     Property for <see cref="SecondaryButtonIcon" />.
     /// </summary>
     public static readonly DependencyProperty SecondaryButtonIconProperty =
         DependencyProperty.Register(nameof(SecondaryButtonIcon),
             typeof(SymbolRegular), typeof(MessageBox), new PropertyMetadata(SymbolRegular.Empty));
 
     /// <summary>
-    /// Property for <see cref="CloseButtonIcon"/>.
+    ///     Property for <see cref="CloseButtonIcon" />.
     /// </summary>
     public static readonly DependencyProperty CloseButtonIconProperty =
         DependencyProperty.Register(nameof(CloseButtonIcon),
             typeof(SymbolRegular), typeof(MessageBox), new PropertyMetadata(SymbolRegular.Empty));
 
     /// <summary>
-    /// Property for <see cref="PrimaryButtonAppearance"/>.
+    ///     Property for <see cref="PrimaryButtonAppearance" />.
     /// </summary>
     public static readonly DependencyProperty PrimaryButtonAppearanceProperty = DependencyProperty.Register(
         nameof(PrimaryButtonAppearance),
@@ -82,7 +80,7 @@ public class MessageBox : System.Windows.Window
         new PropertyMetadata(ControlAppearance.Primary));
 
     /// <summary>
-    /// Property for <see cref="SecondaryButtonAppearance"/>.
+    ///     Property for <see cref="SecondaryButtonAppearance" />.
     /// </summary>
     public static readonly DependencyProperty SecondaryButtonAppearanceProperty = DependencyProperty.Register(
         nameof(SecondaryButtonAppearance),
@@ -90,7 +88,7 @@ public class MessageBox : System.Windows.Window
         new PropertyMetadata(ControlAppearance.Secondary));
 
     /// <summary>
-    /// Property for <see cref="CloseButtonAppearance"/>.
+    ///     Property for <see cref="CloseButtonAppearance" />.
     /// </summary>
     public static readonly DependencyProperty CloseButtonAppearanceProperty = DependencyProperty.Register(
         nameof(CloseButtonAppearance),
@@ -98,7 +96,7 @@ public class MessageBox : System.Windows.Window
         new PropertyMetadata(ControlAppearance.Secondary));
 
     /// <summary>
-    /// Property for <see cref="IsPrimaryButtonEnabled"/>.
+    ///     Property for <see cref="IsPrimaryButtonEnabled" />.
     /// </summary>
     public static readonly DependencyProperty IsPrimaryButtonEnabledProperty = DependencyProperty.Register(
         nameof(IsPrimaryButtonEnabled),
@@ -106,7 +104,7 @@ public class MessageBox : System.Windows.Window
         new PropertyMetadata(true));
 
     /// <summary>
-    /// Property for <see cref="IsSecondaryButtonEnabled"/>.
+    ///     Property for <see cref="IsSecondaryButtonEnabled" />.
     /// </summary>
     public static readonly DependencyProperty IsSecondaryButtonEnabledProperty = DependencyProperty.Register(
         nameof(IsSecondaryButtonEnabled),
@@ -114,7 +112,7 @@ public class MessageBox : System.Windows.Window
         new PropertyMetadata(true));
 
     /// <summary>
-    /// Property for <see cref="TemplateButtonCommand"/>.
+    ///     Property for <see cref="TemplateButtonCommand" />.
     /// </summary>
     public static readonly DependencyProperty TemplateButtonCommandProperty =
         DependencyProperty.Register(nameof(TemplateButtonCommand),
@@ -125,7 +123,8 @@ public class MessageBox : System.Windows.Window
     #region Properties
 
     /// <summary>
-    /// Gets or sets a value that determines whether to show the <see cref="System.Windows.Window.Title"/> in <see cref="TitleBar"/>.
+    ///     Gets or sets a value that determines whether to show the <see cref="System.Windows.Window.Title" /> in
+    ///     <see cref="TitleBar" />.
     /// </summary>
     public bool ShowTitle
     {
@@ -134,7 +133,7 @@ public class MessageBox : System.Windows.Window
     }
 
     /// <summary>
-    /// Gets or sets the text to display on the primary button.
+    ///     Gets or sets the text to display on the primary button.
     /// </summary>
     public string PrimaryButtonText
     {
@@ -143,7 +142,7 @@ public class MessageBox : System.Windows.Window
     }
 
     /// <summary>
-    /// Gets or sets the text to be displayed on the secondary button.
+    ///     Gets or sets the text to be displayed on the secondary button.
     /// </summary>
     public string SecondaryButtonText
     {
@@ -152,7 +151,7 @@ public class MessageBox : System.Windows.Window
     }
 
     /// <summary>
-    /// Gets or sets the text to display on the close button.
+    ///     Gets or sets the text to display on the close button.
     /// </summary>
     public string CloseButtonText
     {
@@ -161,7 +160,7 @@ public class MessageBox : System.Windows.Window
     }
 
     /// <summary>
-    /// Gets or sets the <see cref="SymbolRegular"/> on the primary button
+    ///     Gets or sets the <see cref="SymbolRegular" /> on the primary button
     /// </summary>
     public SymbolRegular PrimaryButtonIcon
     {
@@ -170,7 +169,7 @@ public class MessageBox : System.Windows.Window
     }
 
     /// <summary>
-    /// Gets or sets the <see cref="SymbolRegular"/> on the secondary button
+    ///     Gets or sets the <see cref="SymbolRegular" /> on the secondary button
     /// </summary>
     public SymbolRegular SecondaryButtonIcon
     {
@@ -179,7 +178,7 @@ public class MessageBox : System.Windows.Window
     }
 
     /// <summary>
-    /// Gets or sets the <see cref="SymbolRegular"/> on the close button
+    ///     Gets or sets the <see cref="SymbolRegular" /> on the close button
     /// </summary>
     public SymbolRegular CloseButtonIcon
     {
@@ -188,7 +187,7 @@ public class MessageBox : System.Windows.Window
     }
 
     /// <summary>
-    /// Gets or sets the <see cref="ControlAppearance"/> on the primary button
+    ///     Gets or sets the <see cref="ControlAppearance" /> on the primary button
     /// </summary>
     public ControlAppearance PrimaryButtonAppearance
     {
@@ -197,7 +196,7 @@ public class MessageBox : System.Windows.Window
     }
 
     /// <summary>
-    /// Gets or sets the <see cref="ControlAppearance"/> on the secondary button
+    ///     Gets or sets the <see cref="ControlAppearance" /> on the secondary button
     /// </summary>
     public ControlAppearance SecondaryButtonAppearance
     {
@@ -206,7 +205,7 @@ public class MessageBox : System.Windows.Window
     }
 
     /// <summary>
-    /// Gets or sets the <see cref="ControlAppearance"/> on the close button
+    ///     Gets or sets the <see cref="ControlAppearance" /> on the close button
     /// </summary>
     public ControlAppearance CloseButtonAppearance
     {
@@ -215,7 +214,7 @@ public class MessageBox : System.Windows.Window
     }
 
     /// <summary>
-    /// Gets or sets whether the <see cref="MessageBox"/> primary button is enabled.
+    ///     Gets or sets whether the <see cref="MessageBox" /> primary button is enabled.
     /// </summary>
     public bool IsSecondaryButtonEnabled
     {
@@ -224,7 +223,7 @@ public class MessageBox : System.Windows.Window
     }
 
     /// <summary>
-    /// Gets or sets whether the <see cref="MessageBox"/> secondary button is enabled.
+    ///     Gets or sets whether the <see cref="MessageBox" /> secondary button is enabled.
     /// </summary>
     public bool IsPrimaryButtonEnabled
     {
@@ -233,14 +232,14 @@ public class MessageBox : System.Windows.Window
     }
 
     /// <summary>
-    /// Command triggered after clicking the button on the Footer.
+    ///     Command triggered after clicking the button on the Footer.
     /// </summary>
     public IRelayCommand TemplateButtonCommand => (IRelayCommand)GetValue(TemplateButtonCommandProperty);
 
     #endregion
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="MessageBox"/> class.
+    ///     Initializes a new instance of the <see cref="MessageBox" /> class.
     /// </summary>
     public MessageBox()
     {
@@ -259,33 +258,27 @@ public class MessageBox : System.Windows.Window
     protected TaskCompletionSource<MessageBoxResult>? Tcs;
 
     [Obsolete($"Use {nameof(ShowDialogAsync)} instead")]
-    public new void Show()
-    {
-        throw new InvalidOperationException($"Use {nameof(ShowDialogAsync)} instead");
-    }
+    public new void Show() => throw new InvalidOperationException($"Use {nameof(ShowDialogAsync)} instead");
 
     [Obsolete($"Use {nameof(ShowDialogAsync)} instead")]
-    public new bool? ShowDialog()
-    {
-        throw new InvalidOperationException($"Use {nameof(ShowDialogAsync)} instead");
-    }
+    public new bool? ShowDialog() => throw new InvalidOperationException($"Use {nameof(ShowDialogAsync)} instead");
 
     [Obsolete($"Use {nameof(Close)} with MessageBoxResult instead")]
-    public new void Close()
-    {
+    public new void Close() =>
         throw new InvalidOperationException($"Use {nameof(Close)} with MessageBoxResult instead");
-    }
 
     /// <summary>
-    /// Displays a message box
+    ///     Displays a message box
     /// </summary>
-    /// <returns><see cref="MessageBoxResult"/></returns>
+    /// <returns>
+    ///     <see cref="MessageBoxResult" />
+    /// </returns>
     /// <exception cref="TaskCanceledException"></exception>
     public async Task<MessageBoxResult> ShowDialogAsync(bool showAsDialog = true,
         CancellationToken cancellationToken = default)
     {
         Tcs = new TaskCompletionSource<MessageBoxResult>();
-        CancellationTokenRegistration tokenRegistration =
+        var tokenRegistration =
             cancellationToken.Register(o => Tcs.TrySetCanceled((CancellationToken)o!), cancellationToken);
 
         try
@@ -293,9 +286,13 @@ public class MessageBox : System.Windows.Window
             RemoveTitleBarAndApplyMica();
 
             if (showAsDialog)
+            {
                 base.ShowDialog();
+            }
             else
+            {
                 base.Show();
+            }
 
             return await Tcs.Task;
         }
@@ -310,7 +307,7 @@ public class MessageBox : System.Windows.Window
     }
 
     /// <summary>
-    /// Occurs after Loading event
+    ///     Occurs after Loading event
     /// </summary>
     protected virtual void OnLoaded()
     {
@@ -321,12 +318,12 @@ public class MessageBox : System.Windows.Window
     }
 
     /// <summary>
-    /// Sets Width and Height
+    ///     Sets Width and Height
     /// </summary>
     /// <param name="rootElement"></param>
     protected virtual void ResizeToContentSize(UIElement rootElement)
     {
-        Size desiredSize = rootElement.DesiredSize;
+        var desiredSize = rootElement.DesiredSize;
 
         //left and right margin
         const double margin = 12.0 * 2;
@@ -343,7 +340,9 @@ public class MessageBox : System.Windows.Window
         base.OnClosing(e);
 
         if (e.Cancel)
+        {
             return;
+        }
 
         Tcs?.TrySetResult(MessageBoxResult.None);
     }
@@ -352,20 +351,20 @@ public class MessageBox : System.Windows.Window
     {
         //TODO MessageBox should be displayed on the window on which the application
 
-        double screenWidth = SystemParameters.PrimaryScreenWidth;
-        double screenHeight = SystemParameters.PrimaryScreenHeight;
+        var screenWidth = SystemParameters.PrimaryScreenWidth;
+        var screenHeight = SystemParameters.PrimaryScreenHeight;
 
-        Left = (screenWidth / 2) - (Width / 2);
-        Top = (screenHeight / 2) - (Height / 2);
+        Left = screenWidth / 2 - Width / 2;
+        Top = screenHeight / 2 - Height / 2;
     }
 
     /// <summary>
-    /// Occurs after the <see cref="MessageBoxButton"/> is clicked 
+    ///     Occurs after the <see cref="MessageBoxButton" /> is clicked
     /// </summary>
     /// <param name="button"></param>
     protected virtual void OnButtonClick(MessageBoxButton button)
     {
-        MessageBoxResult result = button switch
+        var result = button switch
         {
             MessageBoxButton.Primary => MessageBoxResult.Primary,
             MessageBoxButton.Secondary => MessageBoxResult.Secondary,
@@ -387,7 +386,9 @@ public class MessageBox : System.Windows.Window
     private void ResizeWidth(UIElement element)
     {
         if (Width <= MaxWidth)
+        {
             return;
+        }
 
         Width = MaxWidth;
         element.UpdateLayout();
@@ -403,7 +404,9 @@ public class MessageBox : System.Windows.Window
     private void ResizeHeight(UIElement element)
     {
         if (Height <= MaxHeight)
+        {
             return;
+        }
 
         Height = MaxHeight;
         element.UpdateLayout();

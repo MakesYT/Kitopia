@@ -1,21 +1,25 @@
-﻿using Core.SDKs;
+﻿#region
+
+using Core.SDKs;
 using Core.SDKs.Tools;
 using Vanara.PInvoke;
 using Vanara.Windows.Shell;
+
+#endregion
 
 namespace TestProject1;
 
 [TestClass]
 public class 文件索引性能
 {
-    List<SearchViewItem> collection = new List<SearchViewItem>(); //存储本机所有软件
-    List<string> names = new List<string>(); //软件去重
+    private readonly List<SearchViewItem> collection = new(); //存储本机所有软件
+    private readonly List<string> names = new(); //软件去重
 
     [TestMethod]
     public void GetAllAppskeys()
     {
         // 创建一个空的文件路径集合
-        List<string> filePaths = new List<string>();
+        List<string> filePaths = new();
 
 // 把桌面上的.lnk文件路径添加到集合中
         filePaths.AddRange(Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop),

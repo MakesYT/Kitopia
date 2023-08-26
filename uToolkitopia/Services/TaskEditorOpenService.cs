@@ -1,6 +1,10 @@
-﻿using System.Windows;
+﻿#region
+
+using System.Windows;
 using Core.SDKs.Services;
 using Kitopia.View;
+
+#endregion
 
 namespace Kitopia.Services;
 

@@ -1,8 +1,12 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 using Core.SDKs;
+
+#endregion
 
 namespace Kitopia.Converter.SearchWindow;
 
@@ -11,7 +15,9 @@ public class EnumToVisibilityConverter : IValueConverter
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value == null || parameter == null)
+        {
             return Visibility.Collapsed;
+        }
 
         switch (parameter)
         {
@@ -76,8 +82,6 @@ public class EnumToVisibilityConverter : IValueConverter
         }
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    {
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
         throw new NotImplementedException();
-    }
 }

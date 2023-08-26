@@ -1,8 +1,12 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Data;
 using Core.SDKs.Services.Config;
+
+#endregion
 
 namespace Kitopia.Converter;
 
@@ -22,8 +26,5 @@ public class HotKeysToKeyName : IValueConverter
         return hotKeyModel.SelectKey.ToString();
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        return null;
-    }
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => null;
 }

@@ -1,5 +1,9 @@
-﻿using System.Drawing;
+﻿#region
+
+using System.Drawing;
 using System.IO;
+
+#endregion
 
 namespace Core.SDKs;
 
@@ -77,9 +81,8 @@ public class SearchViewItem : ICloneable, IDisposable
         get;
     }
 
-    public object Clone()
-    {
-        return new SearchViewItem()
+    public object Clone() =>
+        new SearchViewItem()
         {
             FileName = FileName,
             IsVisible = IsVisible,
@@ -88,9 +91,8 @@ public class SearchViewItem : ICloneable, IDisposable
             OnlyKey = OnlyKey,
             FileInfo = FileInfo != null ? new FileInfo(FileInfo.FullName) : null,
             Icon = (Icon?)Icon?.Clone(),
-            DirectoryInfo = DirectoryInfo != null ? new DirectoryInfo(DirectoryInfo.FullName) : null,
+            DirectoryInfo = DirectoryInfo != null ? new DirectoryInfo(DirectoryInfo.FullName) : null
         };
-    }
 
     public void Dispose()
     {

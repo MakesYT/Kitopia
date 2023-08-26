@@ -1,4 +1,8 @@
-﻿using PluginCore.Attribute;
+﻿#region
+
+using PluginCore.Attribute;
+
+#endregion
 
 namespace PluginDemo;
 

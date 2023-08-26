@@ -1,10 +1,15 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using Core.ViewModel.TaskEditor;
+using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
+
+#endregion
 
 namespace Kitopia.View;
 
@@ -14,20 +19,20 @@ public partial class TaskEditor
     {
         InitializeComponent();
 
-        this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-        this.Width = SystemParameters.PrimaryScreenWidth * 2 / 3;
-        this.Height = SystemParameters.PrimaryScreenHeight * 2 / 3;
+        WindowStartupLocation = WindowStartupLocation.CenterScreen;
+        Width = SystemParameters.PrimaryScreenWidth * 2 / 3;
+        Height = SystemParameters.PrimaryScreenHeight * 2 / 3;
     }
 
     protected override void OnSourceInitialized(EventArgs e)
     {
         base.OnSourceInitialized(e);
         // 获取窗体句柄
-        IntPtr m_Hwnd = new WindowInteropHelper(this).Handle;
-        Wpf.Ui.Appearance.ApplicationThemeManager.Changed += ((theme, accent) =>
+        var m_Hwnd = new WindowInteropHelper(this).Handle;
+        ApplicationThemeManager.Changed += (theme, accent) =>
         {
             WindowBackdrop.ApplyBackdrop(m_Hwnd, WindowBackdropType.Acrylic);
-        });
+        };
     }
 
     private void ListBox_OnMouseMove(object sender, MouseEventArgs e)
@@ -56,7 +61,7 @@ public partial class TaskEditor
                 if (command != null &&
                     command.CanExecute(fromListNode)) // Check if the command is not null and can be executed
                 {
-                    Point point = (e.GetPosition((IInputElement)Editor));
+                    var point = e.GetPosition((IInputElement)Editor);
                     point.X += Editor.ViewportLocation.X;
                     point.Y += Editor.ViewportLocation.Y;
                     fromListNode.Location = point;

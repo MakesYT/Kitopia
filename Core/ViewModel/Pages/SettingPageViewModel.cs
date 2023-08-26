@@ -1,5 +1,8 @@
-﻿using System.Collections.ObjectModel;
+﻿#region
+
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.HotKey;
@@ -7,6 +10,8 @@ using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using log4net;
 using Microsoft.Win32;
+
+#endregion
 
 namespace Core.ViewModel.Pages;
 
@@ -106,14 +111,20 @@ public partial class SettingPageViewModel : ObservableRecipient
         ConfigManger.Save();
         if (value)
         {
-            string strName = AppDomain.CurrentDomain.BaseDirectory + "Kitopia.exe"; //获取要自动运行的应用程序名
-            if (!System.IO.File.Exists(strName)) //判断要自动运行的应用程序文件是否存在
+            var strName = AppDomain.CurrentDomain.BaseDirectory + "Kitopia.exe"; //获取要自动运行的应用程序名
+            if (!File.Exists(strName)) //判断要自动运行的应用程序文件是否存在
+            {
                 return;
-            RegistryKey registry =
+            }
+
+            var registry =
                 Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run", true); //检索指定的子项
             if (registry == null) //若指定的子项不存在
+            {
                 registry = Registry.CurrentUser.CreateSubKey(
                     "Software\\Microsoft\\Windows\\CurrentVersion\\Run"); //则创建指定的子项
+            }
+
             log.Info("用户确认启用开机自启");
             try
             {
@@ -131,7 +142,7 @@ public partial class SettingPageViewModel : ObservableRecipient
         {
             try
             {
-                RegistryKey registry =
+                var registry =
                     Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run",
                         true); //检索指定的子项
                 registry?.DeleteValue("Kitopia");

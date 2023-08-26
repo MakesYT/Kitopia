@@ -14,8 +14,8 @@
     xmlns:controls="clr-namespace:Kitopia.Controls"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:searchWindow="clr-namespace:Kitopia.Converter.SearchWindow">
-    <searchWindow:StarBoolToText x:Key="StarBoolToText"/>
-    
+    <searchWindow:StarBoolToText x:Key="StarBoolToText" />
+
     <Style x:Key="DefaultPinButtonStyle" TargetType="{x:Type controls:PinButton}">
         <Setter Property="Background">
             <Setter.Value>
@@ -85,13 +85,13 @@
                                 </BeginStoryboard>
                             </Trigger.ExitActions>
                         </Trigger>
-                        
+
                     </ControlTemplate.Triggers>
-                    
+
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
-    
+
     <Style BasedOn="{StaticResource DefaultPinButtonStyle}" TargetType="{x:Type controls:PinButton}" />
 </ResourceDictionary>

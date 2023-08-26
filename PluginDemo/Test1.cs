@@ -1,5 +1,9 @@
-﻿using System.Windows;
+﻿#region
+
+using System.Windows;
 using PluginCore.Attribute;
+
+#endregion
 
 namespace PluginDemo;
 
@@ -13,10 +17,7 @@ public class Test1
     }
 
     [PluginMethod("测试代码2", $"{nameof(id)}=参数1", "return=返回参数")]
-    public void t2(Abase id)
-    {
-        MessageBox.Show("5a");
-    }
+    public void t2(Abase id) => MessageBox.Show("5a");
 
     [ConfigField("名称", "设置名称")] public string name = "1";
 }

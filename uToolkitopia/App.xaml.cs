@@ -1,4 +1,6 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -28,6 +30,8 @@ using Wpf.Ui.Services;
 using MessageBox = Kitopia.Controls.MessageBoxControl.MessageBox;
 using MessageBoxResult = Kitopia.Controls.MessageBoxControl.MessageBoxResult;
 
+#endregion
+
 namespace Kitopia;
 
 /// <summary>
@@ -40,13 +44,13 @@ public sealed partial class App : Application
     public static void CheckAndDeleteLogFiles()
     {
         // 定义日志文件的目录
-        string logDirectory = AppDomain.CurrentDomain.BaseDirectory + "logs";
+        var logDirectory = AppDomain.CurrentDomain.BaseDirectory + "logs";
         log.Debug($"检查日志目录:{logDirectory}");
         // 定义要保留的日志文件的时间范围，这里是一周
-        TimeSpan timeSpan = TimeSpan.FromDays(2);
+        var timeSpan = TimeSpan.FromDays(2);
 
         // 获取当前的日期
-        DateTime currentDate = DateTime.Now;
+        var currentDate = DateTime.Now;
 
         // 获取目录下的所有日志文件，按照最后修改时间排序
         var logFiles = Directory.GetFiles(logDirectory)
@@ -76,7 +80,7 @@ public sealed partial class App : Application
         var eventWaitHandle = new EventWaitHandle(false, EventResetMode.AutoReset, "Kitopia", out var createNew);
         if (!createNew)
         {
-            MessageBox msg = new MessageBox();
+            var msg = new MessageBox();
             msg.Title = "Kitopia";
             msg.Content = "不能同时开启两个应用        ";
             msg.WindowStartupLocation = WindowStartupLocation.CenterScreen;
@@ -86,7 +90,7 @@ public sealed partial class App : Application
             // 使用ContinueWith来在任务完成后执行一个回调函数
             task.ContinueWith(e =>
             {
-                MessageBoxResult result = e.Result;
+                var result = e.Result;
             }).Wait();
             // System.Windows.MessageBox.Show("不能同时开启两个应用", "Kitopia");
             eventWaitHandle.Set();
@@ -111,7 +115,7 @@ public sealed partial class App : Application
                 new EventWaitHandle(false, EventResetMode.AutoReset, "Kitopia_appReload", out var appReload);
             if (!createNew)
             {
-                MessageBox msg = new MessageBox();
+                var msg = new MessageBox();
                 msg.Title = "Kitopia";
                 msg.Content = "右键菜单捕获出现异常,\n请关闭软件重试,将会导致部分功能异常        ";
                 msg.WindowStartupLocation = WindowStartupLocation.CenterScreen;
@@ -121,7 +125,7 @@ public sealed partial class App : Application
                 // 使用ContinueWith来在任务完成后执行一个回调函数
                 task.ContinueWith(e =>
                 {
-                    MessageBoxResult result = e.Result;
+                    var result = e.Result;
                 }).Wait();
                 //System.Windows.MessageBox.Show("右键菜单捕获出现异常,请关闭软件重试,将会导致部分功能异常", "Kitopia");
             }
@@ -166,7 +170,7 @@ public sealed partial class App : Application
         }
     }
 
-    static void Application_ApplicationExit(object? sender, EventArgs e)
+    private static void Application_ApplicationExit(object? sender, EventArgs e)
     {
         ConfigManger.Save();
         log.Info("程序退出");
@@ -174,17 +178,23 @@ public sealed partial class App : Application
 
     private void SetAutoStartup()
     {
-        string strName = AppDomain.CurrentDomain.BaseDirectory + "Kitopia.exe"; //获取要自动运行的应用程序名
+        var strName = AppDomain.CurrentDomain.BaseDirectory + "Kitopia.exe"; //获取要自动运行的应用程序名
         if (!File.Exists(strName)) //判断要自动运行的应用程序文件是否存在
+        {
             return;
-        RegistryKey registry =
+        }
+
+        var registry =
             Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run", true); //检索指定的子项
         if (registry == null) //若指定的子项不存在
+        {
             registry = Registry.CurrentUser.CreateSubKey(
                 "Software\\Microsoft\\Windows\\CurrentVersion\\Run"); //则创建指定的子项
+        }
+
         if (registry.GetValue("Kitopia") is null)
         {
-            MessageBox msg = new MessageBox();
+            var msg = new MessageBox();
             msg.Title = "Kitopia";
             msg.Content = "是否设置开机自启?\n可能被杀毒软件阻止      ";
             msg.WindowStartupLocation = WindowStartupLocation.CenterScreen;
@@ -195,7 +205,7 @@ public sealed partial class App : Application
             // 使用ContinueWith来在任务完成后执行一个回调函数
             task.ContinueWith(e =>
             {
-                MessageBoxResult result = e.Result;
+                var result = e.Result;
                 switch (result)
                 {
                     case MessageBoxResult.Primary:
@@ -246,7 +256,9 @@ public sealed partial class App : Application
             }
         }
         else
+        {
             log.Debug("程序自启已存在");
+        }
     }
 
     /// <summary>
@@ -347,8 +359,7 @@ public sealed partial class App : Application
         Exprint(e);
     }
 
-    private void Exprint(DispatcherUnhandledExceptionEventArgs e)
-    {
+    private void Exprint(DispatcherUnhandledExceptionEventArgs e) =>
         Current.Dispatcher.BeginInvoke(new Action(delegate
         {
             try
@@ -404,5 +415,4 @@ public sealed partial class App : Application
                 System.Windows.MessageBox.Show("程序发生致命错误，将终止，");
             }
         })).Wait();
-    }
 }

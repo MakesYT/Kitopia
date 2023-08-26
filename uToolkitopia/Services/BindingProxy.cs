@@ -1,24 +1,19 @@
-﻿using System.Windows;
+﻿#region
+
+using System.Windows;
+
+#endregion
 
 namespace Kitopia.Services;
 
 public class BindingProxy : Freezable
 {
-    protected override Freezable CreateInstanceCore()
-    {
-        return new BindingProxy();
-    }
+    protected override Freezable CreateInstanceCore() => new BindingProxy();
 
     public object Data
     {
-        get
-        {
-            return (object)GetValue(DataProperty);
-        }
-        set
-        {
-            SetValue(DataProperty, value);
-        }
+        get => (object)GetValue(DataProperty);
+        set => SetValue(DataProperty, value);
     }
 
     // Using a DependencyProperty as the backing store for Data.  This enables animation, styling, binding, etc...

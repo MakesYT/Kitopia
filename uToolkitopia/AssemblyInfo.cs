@@ -1,5 +1,9 @@
+#region
+
 using System.Windows;
 using log4net.Config;
+
+#endregion
 
 [assembly: ThemeInfo(
     ResourceDictionaryLocation.None, //where theme specific resource dictionaries are located

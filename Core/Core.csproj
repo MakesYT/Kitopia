@@ -12,8 +12,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Remove="Everything32.dll" />
-        <None Remove="Everything64.dll" />
+        <None Remove="Everything32.dll"/>
+        <None Remove="Everything64.dll"/>
     </ItemGroup>
     <ItemGroup>
         <COMReference Include="IWshRuntimeLibrary">
@@ -28,14 +28,14 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.0" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.0"/>
         <PackageReference Include="CoreCLR-NCalc" Version="2.2.113"/>
-        <PackageReference Include="log4net" Version="2.0.15" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-        <PackageReference Include="NPinyinPro" Version="0.3.3" />
-        <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
-        <PackageReference Include="System.Management" Version="7.0.1" />
-        <PackageReference Include="System.Runtime.InteropServices" Version="4.3.0" />
+        <PackageReference Include="log4net" Version="2.0.15"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+        <PackageReference Include="NPinyinPro" Version="0.3.3"/>
+        <PackageReference Include="System.Drawing.Common" Version="7.0.0"/>
+        <PackageReference Include="System.Management" Version="7.0.1"/>
+        <PackageReference Include="System.Runtime.InteropServices" Version="4.3.0"/>
         <PackageReference Include="Vanara.Core" Version="3.4.16"/>
         <PackageReference Include="Vanara.PInvoke.FirewallApi" Version="3.4.16"/>
         <PackageReference Include="Vanara.PInvoke.NetApi32" Version="3.4.15"/>
@@ -53,7 +53,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="SDKs\Msgs\" />
+        <Folder Include="SDKs\Msgs\"/>
     </ItemGroup>
 
 

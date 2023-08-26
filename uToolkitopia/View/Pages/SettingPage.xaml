@@ -16,88 +16,92 @@
       Title="HomePage">
 
     <Page.Resources>
-        
+
     </Page.Resources>
-   
-        <StackPanel Margin="42">
-            <Expander Header="个性化" FontSize="25" IsExpanded="True" FontWeight="Medium">
-                <Expander.Content>
 
-                    <StackPanel>
-                        <kitopia:SettingItems Title="主题颜色" Description="跟随系统,深色还是浅色?"> 
-                            <ComboBox ItemsSource="{Binding ThemeChoiceOptions}" SelectedValue="{Binding ThemeChoice}" />
-                            <kitopia:SettingItems.Icon>
-                                <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25"/>
-                            </kitopia:SettingItems.Icon>
-                        </kitopia:SettingItems>
-                    </StackPanel>
-                </Expander.Content>
-            </Expander>
-            <Expander Header="通用" FontSize="25" IsExpanded="True">
-                <Expander.Content>
-                    <StackPanel>
-                        <kitopia:SettingItems Title="开机自动启动" Description="可能被杀毒软件阻止"> 
-                            <ui:ToggleSwitch IsChecked="{Binding AutoStart}" />
-                            <kitopia:SettingItems.Icon>
-                                <ui:SymbolIcon Symbol="FlashAuto20" FontSize="25"/>
-                            </kitopia:SettingItems.Icon>
-                        </kitopia:SettingItems>
-                        
-                        
-                    </StackPanel>
-                </Expander.Content>
-            </Expander>
-            <Expander Header="搜索框" FontSize="25" IsExpanded="True">
-                <Expander.Content>
-                    <StackPanel>
+    <StackPanel Margin="42">
+        <Expander Header="个性化" FontSize="25" IsExpanded="True" FontWeight="Medium">
+            <Expander.Content>
 
-                        <kitopia:SettingItems  Title="激活快捷键" Description="修改搜索框快捷键" Padding="14,10,14,10" >
-                            <kitopia:HotKeyShow Tag="Kitopia_显示搜索框" Click="ButtonBase_OnClick" KeyType="{Binding HotKeys,Converter={StaticResource HotKeysToHotKeyShow},ConverterParameter='Kitopia_显示搜索框',Mode=OneWay,NotifyOnSourceUpdated=True,UpdateSourceTrigger=PropertyChanged}"
-                                                KeyName="{Binding HotKeys,Converter={StaticResource HotKeysToKeyName},ConverterParameter='Kitopia_显示搜索框',Mode=OneWay,NotifyOnSourceUpdated=True,UpdateSourceTrigger=PropertyChanged}"/>
-                            <kitopia:SettingItems.Icon>
-                                <ui:SymbolIcon Symbol="Keyboard20" FontSize="25"/>
-                            </kitopia:SettingItems.Icon>
-                        </kitopia:SettingItems>
-                        <kitopia:SettingItems Title="允许程序调用Everything索引文档" Description="索引文档依赖于此功能"> 
-                            <ui:ToggleSwitch Content="" IsChecked="{Binding UseEverything}" />
-                            <kitopia:SettingItems.Icon>
-                                <ui:SymbolIcon Symbol="DocumentSearch20" FontSize="25"/>
-                            </kitopia:SettingItems.Icon>
-                        </kitopia:SettingItems>
-                        <kitopia:SettingItems Title="自动启动Everything" Description="在Everything未启动时自动启动"> 
-                            <ui:ToggleSwitch IsChecked="{Binding AutoStartEverything}" />
-                            <kitopia:SettingItems.Icon>
-                                <ui:SymbolIcon Symbol="FlashAuto20" FontSize="25"/>
-                            </kitopia:SettingItems.Icon>
-                        </kitopia:SettingItems>
-                        <kitopia:SettingItems Title="允许程序读取剪贴板内容" Description="自动读取剪贴板路径和剪贴板图像保存依赖于此权限"> 
-                            <ui:ToggleSwitch Content="" IsChecked="{Binding CanReadClipboard}" />
-                            <kitopia:SettingItems.Icon>
-                                <ui:SymbolIcon Symbol="ClipboardSearch20" FontSize="25"/>
-                            </kitopia:SettingItems.Icon>
-                        </kitopia:SettingItems>
-                        <kitopia:SettingItems Title="最大历史数量" Description="决定在搜索框无搜索内容时显示最近打开软件的数量"> 
-                            <ComboBox ItemsSource="{Binding MaxHistoryOptions}" SelectedValue="{Binding MaxHistory}" />
-                            <kitopia:SettingItems.Icon>
-                                <ui:SymbolIcon Symbol="History20" FontSize="25"/>
-                            </kitopia:SettingItems.Icon>
-                        </kitopia:SettingItems>
-                        <kitopia:SettingItems Title="输入平滑延时" Description="在指定时间内不处理数据以减轻性能消耗">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding InputSmoothingMilliseconds}" FontSize="14" VerticalAlignment="Center" />
-                                <Slider Margin="10,0,0,0" TickFrequency="10" IsSnapToTickEnabled="True" Maximum="200" Minimum="0" Value="{Binding InputSmoothingMilliseconds}"
-                                        VerticalAlignment="Center"
-                                        ToolTip="{Binding Value, RelativeSource={RelativeSource Self}}" AutoToolTipPlacement="TopLeft"/>
-                                
-                            </StackPanel>
-                            <kitopia:SettingItems.Icon>
-                                <ui:SymbolIcon Symbol="TopSpeed20" FontSize="25"/>
-                            </kitopia:SettingItems.Icon>
-                        </kitopia:SettingItems>
-                    </StackPanel>
-                </Expander.Content>
-            </Expander>
+                <StackPanel>
+                    <kitopia:SettingItems Title="主题颜色" Description="跟随系统,深色还是浅色?">
+                        <ComboBox ItemsSource="{Binding ThemeChoiceOptions}" SelectedValue="{Binding ThemeChoice}" />
+                        <kitopia:SettingItems.Icon>
+                            <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25" />
+                        </kitopia:SettingItems.Icon>
+                    </kitopia:SettingItems>
+                </StackPanel>
+            </Expander.Content>
+        </Expander>
+        <Expander Header="通用" FontSize="25" IsExpanded="True">
+            <Expander.Content>
+                <StackPanel>
+                    <kitopia:SettingItems Title="开机自动启动" Description="可能被杀毒软件阻止">
+                        <ui:ToggleSwitch IsChecked="{Binding AutoStart}" />
+                        <kitopia:SettingItems.Icon>
+                            <ui:SymbolIcon Symbol="FlashAuto20" FontSize="25" />
+                        </kitopia:SettingItems.Icon>
+                    </kitopia:SettingItems>
 
-        </StackPanel>
-    
+
+                </StackPanel>
+            </Expander.Content>
+        </Expander>
+        <Expander Header="搜索框" FontSize="25" IsExpanded="True">
+            <Expander.Content>
+                <StackPanel>
+
+                    <kitopia:SettingItems Title="激活快捷键" Description="修改搜索框快捷键" Padding="14,10,14,10">
+                        <kitopia:HotKeyShow Tag="Kitopia_显示搜索框" Click="ButtonBase_OnClick"
+                                            KeyType="{Binding HotKeys,Converter={StaticResource HotKeysToHotKeyShow},ConverterParameter='Kitopia_显示搜索框',Mode=OneWay,NotifyOnSourceUpdated=True,UpdateSourceTrigger=PropertyChanged}"
+                                            KeyName="{Binding HotKeys,Converter={StaticResource HotKeysToKeyName},ConverterParameter='Kitopia_显示搜索框',Mode=OneWay,NotifyOnSourceUpdated=True,UpdateSourceTrigger=PropertyChanged}" />
+                        <kitopia:SettingItems.Icon>
+                            <ui:SymbolIcon Symbol="Keyboard20" FontSize="25" />
+                        </kitopia:SettingItems.Icon>
+                    </kitopia:SettingItems>
+                    <kitopia:SettingItems Title="允许程序调用Everything索引文档" Description="索引文档依赖于此功能">
+                        <ui:ToggleSwitch Content="" IsChecked="{Binding UseEverything}" />
+                        <kitopia:SettingItems.Icon>
+                            <ui:SymbolIcon Symbol="DocumentSearch20" FontSize="25" />
+                        </kitopia:SettingItems.Icon>
+                    </kitopia:SettingItems>
+                    <kitopia:SettingItems Title="自动启动Everything" Description="在Everything未启动时自动启动">
+                        <ui:ToggleSwitch IsChecked="{Binding AutoStartEverything}" />
+                        <kitopia:SettingItems.Icon>
+                            <ui:SymbolIcon Symbol="FlashAuto20" FontSize="25" />
+                        </kitopia:SettingItems.Icon>
+                    </kitopia:SettingItems>
+                    <kitopia:SettingItems Title="允许程序读取剪贴板内容" Description="自动读取剪贴板路径和剪贴板图像保存依赖于此权限">
+                        <ui:ToggleSwitch Content="" IsChecked="{Binding CanReadClipboard}" />
+                        <kitopia:SettingItems.Icon>
+                            <ui:SymbolIcon Symbol="ClipboardSearch20" FontSize="25" />
+                        </kitopia:SettingItems.Icon>
+                    </kitopia:SettingItems>
+                    <kitopia:SettingItems Title="最大历史数量" Description="决定在搜索框无搜索内容时显示最近打开软件的数量">
+                        <ComboBox ItemsSource="{Binding MaxHistoryOptions}" SelectedValue="{Binding MaxHistory}" />
+                        <kitopia:SettingItems.Icon>
+                            <ui:SymbolIcon Symbol="History20" FontSize="25" />
+                        </kitopia:SettingItems.Icon>
+                    </kitopia:SettingItems>
+                    <kitopia:SettingItems Title="输入平滑延时" Description="在指定时间内不处理数据以减轻性能消耗">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding InputSmoothingMilliseconds}" FontSize="14"
+                                       VerticalAlignment="Center" />
+                            <Slider Margin="10,0,0,0" TickFrequency="10" IsSnapToTickEnabled="True" Maximum="200"
+                                    Minimum="0" Value="{Binding InputSmoothingMilliseconds}"
+                                    VerticalAlignment="Center"
+                                    ToolTip="{Binding Value, RelativeSource={RelativeSource Self}}"
+                                    AutoToolTipPlacement="TopLeft" />
+
+                        </StackPanel>
+                        <kitopia:SettingItems.Icon>
+                            <ui:SymbolIcon Symbol="TopSpeed20" FontSize="25" />
+                        </kitopia:SettingItems.Icon>
+                    </kitopia:SettingItems>
+                </StackPanel>
+            </Expander.Content>
+        </Expander>
+
+    </StackPanel>
+
 </Page>

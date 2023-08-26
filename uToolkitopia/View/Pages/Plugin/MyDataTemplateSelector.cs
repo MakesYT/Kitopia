@@ -1,6 +1,10 @@
-﻿using System.Windows;
+﻿#region
+
+using System.Windows;
 using System.Windows.Controls;
 using Core.ViewModel.TaskEditor;
+
+#endregion
 
 namespace Kitopia.View.Pages.Plugin;
 

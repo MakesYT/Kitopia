@@ -1,6 +1,10 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Globalization;
 using System.Windows.Data;
+
+#endregion
 
 namespace Kitopia.Converter;
 
@@ -13,8 +17,6 @@ public class DoubleHalfConverter : IMultiValueConverter
     }
 
 
-    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-    {
+    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) =>
         throw new NotImplementedException();
-    }
 }

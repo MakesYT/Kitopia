@@ -1,13 +1,17 @@
-﻿using System.IO;
+﻿#region
+
+using System.IO;
 using Core.SDKs.Services.Plugin;
 using log4net;
 using Newtonsoft.Json;
+
+#endregion
 
 namespace Core.SDKs.Services.Config;
 
 public class ConfigManger
 {
-    public static Services.Config.Config Config = new();
+    public static Config Config = new();
     private static readonly ILog Log = LogManager.GetLogger(nameof(ConfigManger));
 
     public static void Init()
@@ -20,20 +24,20 @@ public class ConfigManger
         var configF = new FileInfo(AppDomain.CurrentDomain.BaseDirectory + "configs\\config.json");
         if (!configF.Exists)
         {
-            var j = JsonConvert.SerializeObject(new Services.Config.Config(), Formatting.Indented);
+            var j = JsonConvert.SerializeObject(new Config(), Formatting.Indented);
             File.WriteAllText(configF.FullName, j);
         }
 
         var json = File.ReadAllText(configF.FullName);
         try
         {
-            Config = JsonConvert.DeserializeObject<Services.Config.Config>(json)!;
+            Config = JsonConvert.DeserializeObject<Config>(json)!;
         }
         catch (Exception e)
         {
             Log.Error(e);
             Log.Error("配置文件加载失败");
-            Config = new Services.Config.Config();
+            Config = new Config();
         }
     }
 

@@ -1,9 +1,14 @@
+#region
+
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Core.SDKs;
 using Core.SDKs.Tools;
 using Vanara.Extensions;
+using Vanara.InteropServices;
 using Vanara.PInvoke;
+
+#endregion
 
 namespace TestProject1;
 
@@ -23,14 +28,17 @@ public class 文件索引
         var elapsedMs = watch.ElapsedMilliseconds;
         // 打印或者记录执行时间
         Console.WriteLine("Time elapsed: {0} ms", elapsedMs);
-        foreach (var item in set) Console.WriteLine(item);
+        foreach (var item in set)
+        {
+            Console.WriteLine(item);
+        }
     }
 
     [TestMethod]
     public void TestMethod2()
     {
         // 创建一个空的文件路径集合
-        List<string> filePaths = new List<string>();
+        List<string> filePaths = new();
 
 // 把桌面上的.lnk文件路径添加到集合中
         filePaths.AddRange(Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
@@ -72,14 +80,14 @@ public class 文件索引
     public void GetPackagesByPackageFamily()
     {
         // The package family name of the app you want to query
-        string packageFamilyName = "Microsoft.WindowsCalculator_8wekyb3d8bbwe";
+        var packageFamilyName = "Microsoft.WindowsCalculator_8wekyb3d8bbwe";
         Kernel32.GetPackagesByPackageFamily(packageFamilyName, out var packageFullNames);
         foreach (var packageFullName in packageFullNames)
         {
-            Kernel32.PACKAGE_INFO_REFERENCE reference = new Kernel32.PACKAGE_INFO_REFERENCE();
+            var reference = new Kernel32.PACKAGE_INFO_REFERENCE();
             Kernel32.OpenPackageInfoByFullName(packageFullName, 0, ref reference);
             uint bufferLength = 4096;
-            using Vanara.InteropServices.SafeCoTaskMemHandle mem =
+            using SafeCoTaskMemHandle mem =
                 new(1 * IntPtr.Size + bufferLength * StringHelper.GetCharSize(CharSet.Unicode));
             // = Kernel32.GetPackageInfo(reference, 0x00000010, ref bufferLength, reference.reserved, out var count);
             var win32Error = Kernel32.GetPackageInfo(reference, 0x00000010, ref bufferLength, mem, out var count);

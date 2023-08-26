@@ -1,7 +1,11 @@
-﻿using System.ComponentModel;
+﻿#region
+
+using System.ComponentModel;
 using System.Runtime.Serialization;
 using Core.SDKs.HotKey;
 using PluginCore;
+
+#endregion
 
 namespace Core.SDKs.Services.Config;
 

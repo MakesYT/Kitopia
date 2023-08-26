@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿#region
+
+using System.IO;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -10,6 +12,8 @@ using log4net;
 using NPinyin;
 using Vanara.PInvoke;
 using File = System.IO.File;
+
+#endregion
 
 namespace Core.SDKs.Tools;
 
@@ -60,11 +64,11 @@ public partial class AppTools
                             "Kitopia提示",
                             "Kitopia即将使用任务计划来创建绕过UAC启动Everything的快捷方式\n需要确认UAC权限\n按下取消则关闭自动启动功能\n路径:" +
                             AppDomain.CurrentDomain.BaseDirectory + "noUAC\\" + 程序名称 + ".lnk",
-                            (() =>
+                            () =>
                             {
                                 Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + "noUAC");
-                                string TempFileName = AppDomain.CurrentDomain.BaseDirectory + "noUAC\\" + 程序名称 + ".xml";
-                                string XML_Text =
+                                var TempFileName = AppDomain.CurrentDomain.BaseDirectory + "noUAC\\" + 程序名称 + ".xml";
+                                var XML_Text =
                                     "<?xml version=\"1.0\" encoding=\"UTF-16\"?>\n<Task version=\"1.2\" xmlns=\"http://schemas.microsoft.com/windows/2004/02/mit/task\">\n  <Triggers />\n  <Principals>\n    <Principal id=\"Author\">\n      <LogonType>InteractiveToken</LogonType>\n      <RunLevel>HighestAvailable</RunLevel>\n    </Principal>\n  </Principals>\n  <Settings>\n    <MultipleInstancesPolicy>Parallel</MultipleInstancesPolicy>\n    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>\n    <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>\n    <AllowHardTerminate>false</AllowHardTerminate>\n    <StartWhenAvailable>false</StartWhenAvailable>\n    <RunOnlyIfNetworkAvailable>false</RunOnlyIfNetworkAvailable>\n    <IdleSettings>\n      <StopOnIdleEnd>false</StopOnIdleEnd>\n      <RestartOnIdle>false</RestartOnIdle>\n    </IdleSettings>\n    <AllowStartOnDemand>true</AllowStartOnDemand>\n    <Enabled>true</Enabled>\n    <Hidden>false</Hidden>\n    <RunOnlyIfIdle>false</RunOnlyIfIdle>\n    <WakeToRun>false</WakeToRun>\n    <ExecutionTimeLimit>PT0S</ExecutionTimeLimit>\n    <Priority>7</Priority>\n  </Settings>\n  <Actions Context=\"Author\">\n    <Exec>"
                                     + Environment.NewLine +
                                     "      <Command>\"" +
@@ -72,13 +76,13 @@ public partial class AppTools
                                     "\"</Command>" + Environment.NewLine +
                                     "      <Arguments>-startup</Arguments>" + Environment.NewLine +
                                     "    </Exec>\n  </Actions>\n</Task>";
-                                System.IO.File.WriteAllText(TempFileName, XML_Text, Encoding.Unicode);
+                                File.WriteAllText(TempFileName, XML_Text, Encoding.Unicode);
 
                                 Shell32.ShellExecute(IntPtr.Zero, "runas", "schtasks.exe",
                                     "/create " + "/tn " + '"' + 程序名称 + '"' + " /xml " + '"' + @TempFileName + '"', "",
                                     ShowWindowCommand.SW_HIDE);
-                                WshShell shell = new WshShell();
-                                IWshShortcut shortcut =
+                                var shell = new WshShell();
+                                var shortcut =
                                     (IWshShortcut)shell.CreateShortcut(AppDomain.CurrentDomain.BaseDirectory +
                                                                        "noUAC\\" + 程序名称 + ".lnk");
                                 //Debug.Print(Path.GetDirectoryName(Application.ExecutablePath) + @"\" + TextBox_程序名称.Text + ".lnk");
@@ -87,14 +91,14 @@ public partial class AppTools
                                 shortcut.IconLocation = searchViewItem.OnlyKey + ", 0";
                                 shortcut.WindowStyle = 7;
                                 shortcut.Save();
-                                System.Threading.Thread.Sleep(200);
-                                System.IO.File.Delete(TempFileName);
+                                Thread.Sleep(200);
+                                File.Delete(TempFileName);
                                 log.Debug("创建Everything的noUAC任务计划完成");
                                 Shell32.ShellExecute(IntPtr.Zero, "open",
                                     AppDomain.CurrentDomain.BaseDirectory + "noUAC\\" + 程序名称 + ".lnk", "", "",
                                     ShowWindowCommand.SW_HIDE);
                                 action.Invoke();
-                            }), () =>
+                            }, () =>
                             {
                                 log.Debug("关闭自动启动Everything功能");
                                 ConfigManger.Config.autoStartEverything = false;
@@ -160,7 +164,7 @@ public partial class AppTools
         UWPAPPsTools.GetAll(collection);
 
         // 创建一个空的文件路径集合
-        List<string> filePaths = new List<string>();
+        List<string> filePaths = new();
 
 // 把桌面上的.lnk文件路径添加到集合中
         filePaths.AddRange(Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
@@ -211,7 +215,7 @@ public partial class AppTools
         //AutoStartEverything(collection);
         if (ErrorLnkList.Any())
         {
-            StringBuilder c = new StringBuilder("检测到多个无效的快捷方式\n需要Kitopia帮你清理吗?(该功能每个错误快捷方式只提示一次)\n以下为无效的快捷方式列表:\n");
+            var c = new StringBuilder("检测到多个无效的快捷方式\n需要Kitopia帮你清理吗?(该功能每个错误快捷方式只提示一次)\n以下为无效的快捷方式列表:\n");
             foreach (var s in ErrorLnkList)
             {
                 c.AppendLine(s);
@@ -220,7 +224,7 @@ public partial class AppTools
             log.Debug(c.ToString());
             ((IToastService)ServiceManager.Services!.GetService(typeof(IToastService))!).showMessageBox("Kitopia建议",
                 c.ToString(),
-                (() =>
+                () =>
                 {
                     foreach (var s in ErrorLnkList)
                     {
@@ -238,7 +242,7 @@ public partial class AppTools
                     }
 
                     ErrorLnkList.Clear();
-                }), (() =>
+                }, () =>
                 {
                     foreach (var s in ErrorLnkList)
                     {
@@ -249,7 +253,7 @@ public partial class AppTools
 
                     log.Debug("取消删除无效快捷方式");
                     ErrorLnkList.Clear();
-                }));
+                });
         }
     }
 
@@ -414,11 +418,11 @@ public partial class AppTools
         }
         else
         {
-            string url = "";
-            string relFile = "";
-            string fileContent = File.ReadAllText(file); // read the file content
-            string pattern = @"URL=(.*)"; // the regex pattern to match the url
-            Match match = Regex.Match(fileContent, pattern); // match the pattern
+            var url = "";
+            var relFile = "";
+            var fileContent = File.ReadAllText(file); // read the file content
+            var pattern = @"URL=(.*)"; // the regex pattern to match the url
+            var match = Regex.Match(fileContent, pattern); // match the pattern
             if (match.Success) // if a match is found
             {
                 url = match.Groups[1].Value.Replace("\r", ""); // get the url from the first group
@@ -434,8 +438,8 @@ public partial class AppTools
                 return;
             }
 
-            string pattern2 = @"IconFile=(.*)"; // the regex pattern to match the url
-            Match match2 = Regex.Match(fileContent, pattern2); // match the pattern
+            var pattern2 = @"IconFile=(.*)"; // the regex pattern to match the url
+            var match2 = Regex.Match(fileContent, pattern2); // match the pattern
             if (match2.Success) // if a match is found
             {
                 relFile = match2.Groups[1].Value.Replace("\r", ""); // get the url from the first group

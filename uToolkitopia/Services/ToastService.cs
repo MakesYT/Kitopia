@@ -1,10 +1,14 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Windows;
 using Core.SDKs.Services;
 using log4net;
 using Microsoft.Toolkit.Uwp.Notifications;
 using MessageBox = Kitopia.Controls.MessageBoxControl.MessageBox;
 using MessageBoxResult = Kitopia.Controls.MessageBoxControl.MessageBoxResult;
+
+#endregion
 
 namespace Kitopia.Services;
 
@@ -22,11 +26,10 @@ public class ToastService : IToastService
             .Show();
     }
 
-    public void showMessageBox(string Title, string Content, Action? yesAction, Action? noAction)
-    {
+    public void showMessageBox(string Title, string Content, Action? yesAction, Action? noAction) =>
         Application.Current.Dispatcher.BeginInvoke(() =>
         {
-            MessageBox msg = new MessageBox();
+            var msg = new MessageBox();
             msg.Title = Title;
             msg.Content = Content;
             msg.WindowStartupLocation = WindowStartupLocation.CenterScreen;
@@ -41,7 +44,7 @@ public class ToastService : IToastService
             // 使用ContinueWith来在任务完成后执行一个回调函数
             task.ContinueWith(e =>
             {
-                MessageBoxResult result = e.Result;
+                var result = e.Result;
                 switch (result)
                 {
                     case MessageBoxResult.Primary:
@@ -59,5 +62,4 @@ public class ToastService : IToastService
                 }
             });
         });
-    }
 }

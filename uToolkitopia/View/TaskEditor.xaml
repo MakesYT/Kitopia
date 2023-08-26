@@ -51,13 +51,6 @@
                       Transform="{Binding ViewportTransform, ElementName=Editor}"
                       Drawing="{DynamicResource SmallGridGeometry}" />
 
-        <DrawingBrush x:Key="LargeGridLinesDrawingBrush"
-                      TileMode="Tile"
-                      ViewportUnits="Absolute"
-                      Opacity="0.5"
-                      Viewport="0 0 100 100"
-                      Transform="{Binding ViewportTransform, ElementName=Editor}"
-                      Drawing="{DynamicResource LargeGridGeometry}" />
         <Storyboard x:Key="显示窗口">
 
             <DoubleAnimationUsingKeyFrames Storyboard.TargetName="border"

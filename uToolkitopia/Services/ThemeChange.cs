@@ -1,6 +1,10 @@
-﻿using Core.SDKs.Services;
+﻿#region
+
+using Core.SDKs.Services;
 using log4net;
 using Wpf.Ui.Appearance;
+
+#endregion
 
 namespace Kitopia.Services;
 
@@ -16,11 +20,11 @@ public class ThemeChange : IThemeChange
         switch (name)
         {
             case "theme_light":
-                Wpf.Ui.Appearance.ApplicationThemeManager.Apply(Wpf.Ui.Appearance.ApplicationTheme.Light);
+                ApplicationThemeManager.Apply(ApplicationTheme.Light);
                 break;
 
             default:
-                Wpf.Ui.Appearance.ApplicationThemeManager.Apply(Wpf.Ui.Appearance.ApplicationTheme.Dark);
+                ApplicationThemeManager.Apply(ApplicationTheme.Dark);
                 break;
         }
     }
@@ -30,11 +34,11 @@ public class ThemeChange : IThemeChange
         log.Debug(nameof(ThemeChange) + "的接口" + nameof(changeAnother) + "被调用");
 
 
-        var currentTheme = Wpf.Ui.Appearance.ApplicationThemeManager.GetAppTheme();
+        var currentTheme = ApplicationThemeManager.GetAppTheme();
 
-        Wpf.Ui.Appearance.ApplicationThemeManager.Apply(currentTheme == Wpf.Ui.Appearance.ApplicationTheme.Light
-            ? Wpf.Ui.Appearance.ApplicationTheme.Dark
-            : Wpf.Ui.Appearance.ApplicationTheme.Light);
+        ApplicationThemeManager.Apply(currentTheme == ApplicationTheme.Light
+            ? ApplicationTheme.Dark
+            : ApplicationTheme.Light);
     }
 
     public void followSys(bool follow)
@@ -44,12 +48,12 @@ public class ThemeChange : IThemeChange
 
         if (follow)
         {
-            var currentTheme = Wpf.Ui.Appearance.ApplicationThemeManager.GetAppTheme();
-            if (!Wpf.Ui.Appearance.ApplicationThemeManager.IsAppMatchesSystem())
+            var currentTheme = ApplicationThemeManager.GetAppTheme();
+            if (!ApplicationThemeManager.IsAppMatchesSystem())
             {
-                Wpf.Ui.Appearance.ApplicationThemeManager.Apply(currentTheme == Wpf.Ui.Appearance.ApplicationTheme.Light
-                    ? Wpf.Ui.Appearance.ApplicationTheme.Dark
-                    : Wpf.Ui.Appearance.ApplicationTheme.Light);
+                ApplicationThemeManager.Apply(currentTheme == ApplicationTheme.Light
+                    ? ApplicationTheme.Dark
+                    : ApplicationTheme.Light);
             }
         }
     }
@@ -59,6 +63,6 @@ public class ThemeChange : IThemeChange
         log.Debug(nameof(ThemeChange) + "的接口" + nameof(isDark) + "被调用");
 
 
-        return Wpf.Ui.Appearance.ApplicationThemeManager.GetAppTheme() == ApplicationTheme.Dark;
+        return ApplicationThemeManager.GetAppTheme() == ApplicationTheme.Dark;
     }
 }

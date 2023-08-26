@@ -1,8 +1,12 @@
-﻿using System.Drawing;
+﻿#region
+
+using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Xml;
 using Core.SDKs.Services;
+
+#endregion
 
 namespace Core.SDKs.Tools;
 
@@ -17,7 +21,7 @@ public class IconTools
 
     public void ClearCache()
     {
-        foreach (Icon iconsValue in _icons.Values)
+        foreach (var iconsValue in _icons.Values)
         {
             iconsValue.Dispose();
         }
@@ -84,14 +88,14 @@ public class IconTools
         {
             var index = 0;
             string dllPath;
-            XmlDocument xd = new XmlDocument();
+            var xd = new XmlDocument();
             xd.Load(path); //加载xml文档
-            XmlNode rootNode = xd.SelectSingleNode("MMC_ConsoleFile"); //得到xml文档的根节点
-            XmlNode BinaryStorage = rootNode.SelectSingleNode("VisualAttributes").SelectSingleNode("Icon");
+            var rootNode = xd.SelectSingleNode("MMC_ConsoleFile"); //得到xml文档的根节点
+            var BinaryStorage = rootNode.SelectSingleNode("VisualAttributes").SelectSingleNode("Icon");
             index = int.Parse(((XmlElement)BinaryStorage).GetAttribute("Index"));
             dllPath = ((XmlElement)BinaryStorage).GetAttribute("File");
 
-            dllPath = System.Environment.SystemDirectory + "\\" + dllPath.Split("\\").Last();
+            dllPath = Environment.SystemDirectory + "\\" + dllPath.Split("\\").Last();
             path = dllPath;
             if (cacheKey.Contains("taskschd.msc"))
             {
@@ -109,11 +113,14 @@ public class IconTools
             for (var i = 0; i < successCount; i++)
             {
                 //指针为空，跳过
-                if (hIcons[i] == IntPtr.Zero) continue;
+                if (hIcons[i] == IntPtr.Zero)
+                {
+                    continue;
+                }
 
                 using (var icon = Icon.FromHandle(hIcons[i]))
                 {
-                    Icon independenceIcon = (Icon)icon.Clone();
+                    var independenceIcon = (Icon)icon.Clone();
                     DestroyIcon(icon.Handle);
                     _icons.TryAdd(cacheKey, independenceIcon);
 
@@ -139,11 +146,14 @@ public class IconTools
             for (var i = 0; i < successCount; i++)
             {
                 //指针为空，跳过
-                if (hIcons[i] == IntPtr.Zero) continue;
+                if (hIcons[i] == IntPtr.Zero)
+                {
+                    continue;
+                }
 
                 using (var icon = Icon.FromHandle(hIcons[i]))
                 {
-                    Icon independenceIcon = (Icon)icon.Clone();
+                    var independenceIcon = (Icon)icon.Clone();
                     DestroyIcon(icon.Handle);
                     _icons.TryAdd(cacheKey, independenceIcon);
 
@@ -155,12 +165,12 @@ public class IconTools
         #endregion
 
 
-        SHFILEINFO shinfo = new SHFILEINFO();
+        var shinfo = new SHFILEINFO();
         SHGetFileInfo(
             path,
             0, ref shinfo, (uint)Marshal.SizeOf(shinfo),
             SHGFI_ICON | SHGFI_LARGEICON | SHGFI_USEFILEATTRIBUTES | SHGFI_OPENICON);
-        Icon independenceIcon12 = (Icon)System.Drawing.Icon.FromHandle(shinfo.hIcon).Clone();
+        var independenceIcon12 = (Icon)Icon.FromHandle(shinfo.hIcon).Clone();
         DestroyIcon(shinfo.hIcon);
         _icons.TryAdd(cacheKey, independenceIcon12);
         return independenceIcon12;
@@ -168,7 +178,7 @@ public class IconTools
         #region 32*32的Icon
 
         var icon1 = Icon.ExtractAssociatedIcon((string)path);
-        Icon independenceIcon1 = (Icon)icon1!.Clone();
+        var independenceIcon1 = (Icon)icon1!.Clone();
         DestroyIcon(icon1.Handle);
         _icons.TryAdd(cacheKey, independenceIcon1);
         return independenceIcon1;
@@ -178,7 +188,7 @@ public class IconTools
 
     public Icon? GetFormClipboard()
     {
-        Bitmap? bitmap =
+        var bitmap =
             ((IClipboardService)ServiceManager.Services.GetService(typeof(IClipboardService)))
             .GetBitmap();
         if (bitmap is null)
@@ -187,15 +197,15 @@ public class IconTools
         }
 
         var image = bitmap.GetThumbnailImage(48, 48, null, IntPtr.Zero); // 获取指定大小的缩略图
-        IconConverter converter = new IconConverter(); // 创建转换器对象
-        byte[] bytes = converter.ConvertTo(image, typeof(byte[])) as byte[]; // 将 image 转换为字节数组
-        Icon icon = converter.ConvertFrom(bytes) as Icon; // 将字节数组转换为 icon 对象
-        MemoryStream ms = new MemoryStream(); // 创建内存流
+        var converter = new IconConverter(); // 创建转换器对象
+        var bytes = converter.ConvertTo(image, typeof(byte[])) as byte[]; // 将 image 转换为字节数组
+        var icon = converter.ConvertFrom(bytes) as Icon; // 将字节数组转换为 icon 对象
+        var ms = new MemoryStream(); // 创建内存流
         icon.Save(ms); // 将 icon 保存到流中
         ms.Position = 0; // 重置流位置
         icon = new Icon(ms); // 从流中创建 icon 对象
         ms.Close(); // 关闭流
-        Icon independenceIcon12 = (Icon)icon.Clone();
+        var independenceIcon12 = (Icon)icon.Clone();
         DestroyIcon(icon.Handle);
         //_icons.Add(cacheKey,independenceIcon12);
         return independenceIcon12;
@@ -209,12 +219,12 @@ public class IconTools
             return fromPath;
         }
 
-        SHFILEINFO shinfo = new SHFILEINFO();
+        var shinfo = new SHFILEINFO();
         SHGetFileInfo(
             path,
             0, ref shinfo, (uint)Marshal.SizeOf(shinfo),
             SHGFI_ICON | SHGFI_LARGEICON);
-        Icon independenceIcon12 = (Icon)System.Drawing.Icon.FromHandle(shinfo.hIcon).Clone();
+        var independenceIcon12 = (Icon)Icon.FromHandle(shinfo.hIcon).Clone();
         DestroyIcon(shinfo.hIcon);
         _icons.TryAdd(path, independenceIcon12);
         return independenceIcon12;

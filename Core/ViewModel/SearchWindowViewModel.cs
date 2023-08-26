@@ -1,4 +1,6 @@
-﻿using System.Collections.Concurrent;
+﻿#region
+
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
@@ -16,6 +18,8 @@ using log4net;
 using NCalc;
 using Vanara.PInvoke;
 
+#endregion
+
 namespace Core.ViewModel;
 
 public partial class SearchWindowViewModel : ObservableRecipient
@@ -24,10 +28,9 @@ public partial class SearchWindowViewModel : ObservableRecipient
     private readonly Dictionary<string, SearchViewItem> _collection = new(400); //存储本机所有软件
 
     [ObservableProperty] private bool? _everythingIsOk = true;
-    static List<SearchViewItem> tempList = new List<SearchViewItem>(1000);
+    private static readonly List<SearchViewItem> tempList = new(1000);
 
-    [ObservableProperty]
-    private BindingList<SearchViewItem> _items = new BindingList<SearchViewItem>(tempList); //搜索界面显示的软件
+    [ObservableProperty] private BindingList<SearchViewItem> _items = new(tempList); //搜索界面显示的软件
 
 
     [ObservableProperty] private string? _search;
@@ -382,7 +385,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
             #region 数学运算
 
             var operators = new[] { '*', '+', '-', '/' };
-            string pattern = @"[\u4e00-\u9fa5a-zA-Z]+";
+            var pattern = @"[\u4e00-\u9fa5a-zA-Z]+";
             if (!Regex.Match(value, pattern).Success && value.IndexOfAny(operators) > 0)
             {
                 try
@@ -420,16 +423,28 @@ public partial class SearchWindowViewModel : ObservableRecipient
             var filtered = new ConcurrentBag<(SearchViewItem Item, int Weight)>();
             foreach (var item in _collection)
             {
-                int weight = 0;
+                var weight = 0;
                 foreach (var key in item.Value.Keys)
                 {
-                    if (string.IsNullOrEmpty(key)) continue;
+                    if (string.IsNullOrEmpty(key))
+                    {
+                        continue;
+                    }
 
-                    if (key.Contains(value)) weight += 2;
+                    if (key.Contains(value))
+                    {
+                        weight += 2;
+                    }
 
-                    if (key.StartsWith(value)) weight += 5;
+                    if (key.StartsWith(value))
+                    {
+                        weight += 5;
+                    }
 
-                    if (key.Equals(value, StringComparison.Ordinal)) weight += 10;
+                    if (key.Equals(value, StringComparison.Ordinal))
+                    {
+                        weight += 10;
+                    }
                 }
 
                 if (item.Value.OnlyKey.Contains("QQNT"))
@@ -452,7 +467,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
             const int limit = 100; // 限制次数
             Dictionary<SearchViewItem, int> nowHasLastOpens = new();
 
-            for (int i = sorted.Count - 1; i >= 0; i--)
+            for (var i = sorted.Count - 1; i >= 0; i--)
             {
                 if (ConfigManger.Config.lastOpens.TryGetValue(sorted[i].Item.OnlyKey, out var open))
                 {
@@ -611,8 +626,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
 
     [RelayCommand]
-    public async Task OpenFile(object searchViewItem)
-    {
+    public async Task OpenFile(object searchViewItem) =>
         await Task.Run(() =>
         {
             WeakReferenceMessenger.Default.Send("a", "SearchWindowClose");
@@ -646,8 +660,10 @@ public partial class SearchWindowViewModel : ObservableRecipient
                             ShowWindowCommand.SW_NORMAL);
                     }
                     else
+                    {
                         Shell32.ShellExecute(IntPtr.Zero, "open", item.OnlyKey, "", "",
                             ShowWindowCommand.SW_NORMAL);
+                    }
 
                     switch (item.FileType)
                     {
@@ -665,7 +681,9 @@ public partial class SearchWindowViewModel : ObservableRecipient
                                 ConfigManger.Config.lastOpens[item.OnlyKey]++;
                             }
                             else
+                            {
                                 ConfigManger.Config.lastOpens.Add(item.OnlyKey, 1);
+                            }
 
                             break;
                         }
@@ -680,11 +698,9 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 }
             }
         });
-    }
 
     [RelayCommand]
-    private async Task OpenFolder(object searchViewItem)
-    {
+    private async Task OpenFolder(object searchViewItem) =>
         await Task.Run(() =>
         {
             WeakReferenceMessenger.Default.Send("a", "SearchWindowClose");
@@ -709,7 +725,9 @@ public partial class SearchWindowViewModel : ObservableRecipient
                         ConfigManger.Config.lastOpens[item.OnlyKey]++;
                     }
                     else
+                    {
                         ConfigManger.Config.lastOpens.Add(item.OnlyKey, 1);
+                    }
 
                     break;
                 }
@@ -720,11 +738,9 @@ public partial class SearchWindowViewModel : ObservableRecipient
             Search = "";
             ConfigManger.Save();
         });
-    }
 
     [RelayCommand]
-    private async Task RunAsAdmin(object searchViewItem)
-    {
+    private async Task RunAsAdmin(object searchViewItem) =>
         await Task.Run(() =>
         {
             WeakReferenceMessenger.Default.Send("a", "SearchWindowClose");
@@ -738,8 +754,10 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     "", ShowWindowCommand.SW_NORMAL);
             }
             else
+            {
                 Shell32.ShellExecute(IntPtr.Zero, "runas", item.OnlyKey, "", "",
                     ShowWindowCommand.SW_NORMAL);
+            }
 
             switch (item.FileType)
             {
@@ -757,7 +775,9 @@ public partial class SearchWindowViewModel : ObservableRecipient
                         ConfigManger.Config.lastOpens[item.OnlyKey]++;
                     }
                     else
+                    {
                         ConfigManger.Config.lastOpens.Add(item.OnlyKey, 1);
+                    }
 
                     break;
                 }
@@ -768,7 +788,6 @@ public partial class SearchWindowViewModel : ObservableRecipient
             Search = "";
             ConfigManger.Save();
         });
-    }
 
     [RelayCommand]
     private void Star(SearchViewItem item)
@@ -852,8 +871,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    private async Task OpenFolderInTerminal(object searchViewItem)
-    {
+    private async Task OpenFolderInTerminal(object searchViewItem) =>
         await Task.Run(() =>
         {
             WeakReferenceMessenger.Default.Send("a", "SearchWindowClose");
@@ -892,7 +910,9 @@ public partial class SearchWindowViewModel : ObservableRecipient
                         ConfigManger.Config.lastOpens[item.OnlyKey]++;
                     }
                     else
+                    {
                         ConfigManger.Config.lastOpens.Add(item.OnlyKey, 1);
+                    }
 
                     break;
                 }
@@ -903,5 +923,4 @@ public partial class SearchWindowViewModel : ObservableRecipient
             Search = "";
             ConfigManger.Save();
         });
-    }
 }

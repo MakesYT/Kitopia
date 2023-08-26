@@ -1,4 +1,6 @@
-﻿using System.Collections.ObjectModel;
+﻿#region
+
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
 using System.Windows;
@@ -9,6 +11,8 @@ using Core.SDKs.Services.Plugin;
 using Core.SDKs.Tools;
 using PluginCore;
 using PluginCore.Attribute;
+
+#endregion
 
 namespace Core.ViewModel.TaskEditor;
 
@@ -69,7 +73,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
             };
             if (connectorItem.Interfaces is { Count: > 0 })
             {
-                List<string> interfaces = new List<string>();
+                List<string> interfaces = new();
                 foreach (var connectorItemInterface in connectorItem.Interfaces)
                 {
                     interfaces.Add(connectorItemInterface);
@@ -102,8 +106,8 @@ public partial class TaskEditorViewModel : ObservableRecipient
             {
                 if (methodInfo.GetCustomAttribute(typeof(PluginMethod)) is not null)
                 {
-                    var customAttribute = (PluginMethod)(methodInfo.GetCustomAttribute(typeof(PluginMethod)));
-                    PointItem pointItem = new PointItem()
+                    var customAttribute = (PluginMethod)methodInfo.GetCustomAttribute(typeof(PluginMethod));
+                    var pointItem = new PointItem()
                     {
                         Plugin = key,
                         MerthodName = methodInfo.Name,
@@ -115,7 +119,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                         Source = pointItem,
                         Type = typeof(NodeConnectorClass),
                         Title = "流输入",
-                        TypeName = "节点",
+                        TypeName = "节点"
                     });
                     for (var index = 0; index < methodInfo.GetParameters().Length; index++)
                     {
@@ -125,7 +129,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                             Source = pointItem,
                             Type = parameterInfo.ParameterType,
                             Title = customAttribute.GetParameterName(parameterInfo.Name),
-                            TypeName = BaseNodeMethodsGen.GetI18N(parameterInfo.ParameterType.FullName),
+                            TypeName = BaseNodeMethodsGen.GetI18N(parameterInfo.ParameterType.FullName)
                         });
                         //Log.Debug($"参数{index}:类型为{parameterInfo.ParameterType}");
                     }
@@ -138,7 +142,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                             var type = methodInfo.ReturnParameter.ParameterType;
                             foreach (var memberInfo in type.GetProperties())
                             {
-                                List<string> interfaces = new List<string>();
+                                List<string> interfaces = new();
                                 foreach (var @interface in memberInfo.PropertyType.GetInterfaces())
                                 {
                                     interfaces.Add(@interface.FullName);
@@ -157,7 +161,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                         }
                         else
                         {
-                            List<string> interfaces = new List<string>();
+                            List<string> interfaces = new();
                             foreach (var @interface in methodInfo.ReturnParameter.ParameterType.GetInterfaces())
                             {
                                 interfaces.Add(@interface.FullName);
@@ -205,11 +209,11 @@ public partial class TaskEditorViewModel : ObservableRecipient
         GetAllMethods();
         var nodify2 = new PointItem()
         {
-            Title = "任务1",
+            Title = "任务1"
         };
         nodify2.Output = new ObservableCollection<ConnectorItem>
         {
-            new ConnectorItem
+            new()
             {
                 IsOut = true,
                 Source = nodify2,

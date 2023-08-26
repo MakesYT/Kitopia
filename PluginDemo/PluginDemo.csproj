@@ -7,6 +7,11 @@
         <EnableDynamicLoading>true</EnableDynamicLoading>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <DebugType>none</DebugType>
+        <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    </PropertyGroup>
+
     <ItemGroup>
         <ProjectReference Include="..\PluginCore\PluginCore.csproj">
             <Private>false</Private>

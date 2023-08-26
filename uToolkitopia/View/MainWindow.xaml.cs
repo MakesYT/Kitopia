@@ -1,4 +1,6 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -18,7 +20,9 @@ using Vanara.PInvoke;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Contracts;
 using Wpf.Ui.Controls;
-using MessageBoxResult = Kitopia.Controls.MessageBoxControl.MessageBoxResult;
+using MessageBox = Kitopia.Controls.MessageBoxControl.MessageBox;
+
+#endregion
 
 namespace Kitopia.View;
 
@@ -29,8 +33,8 @@ public partial class MainWindow
     public MainWindow()
     {
         InitializeComponent();
-        var currentTheme = Wpf.Ui.Appearance.ApplicationThemeManager.GetAppTheme();
-        Wpf.Ui.Appearance.ApplicationThemeManager.Changed += ((theme, accent) =>
+        var currentTheme = ApplicationThemeManager.GetAppTheme();
+        ApplicationThemeManager.Changed += (theme, accent) =>
         {
             #region 同步Nodify主题
 
@@ -57,14 +61,14 @@ public partial class MainWindow
                         switch (theme)
                         {
                             case ApplicationTheme.Dark:
-                                applicationDictionaries[i] = new()
+                                applicationDictionaries[i] = new ResourceDictionary
                                 {
                                     Source = new Uri("pack://application:,,,/Nodify;component/Themes/Dark.xaml",
                                         UriKind.Absolute)
                                 };
                                 break;
                             case ApplicationTheme.Light:
-                                applicationDictionaries[i] = new()
+                                applicationDictionaries[i] = new ResourceDictionary
                                 {
                                     Source = new Uri("pack://application:,,,/Nodify;component/Themes/Light.xaml",
                                         UriKind.Absolute)
@@ -81,23 +85,23 @@ public partial class MainWindow
             log.Debug("Nodify主题切换完成");
 
             #endregion
-        });
+        };
         if (ConfigManger.Config.themeChoice == "跟随系统" &&
-            !Wpf.Ui.Appearance.ApplicationThemeManager.IsAppMatchesSystem())
+            !ApplicationThemeManager.IsAppMatchesSystem())
         {
             log.Debug("主题跟随系统,当前不符合切换主题");
 
 
-            Wpf.Ui.Appearance.ApplicationThemeManager.Apply(currentTheme == Wpf.Ui.Appearance.ApplicationTheme.Light
-                ? Wpf.Ui.Appearance.ApplicationTheme.Dark
-                : Wpf.Ui.Appearance.ApplicationTheme.Light);
+            ApplicationThemeManager.Apply(currentTheme == ApplicationTheme.Light
+                ? ApplicationTheme.Dark
+                : ApplicationTheme.Light);
         }
         else if (ConfigManger.Config.themeChoice == "深色")
         {
             log.Debug("主题切换到深色");
 
 
-            Wpf.Ui.Appearance.ApplicationThemeManager.Apply(Wpf.Ui.Appearance.ApplicationTheme.Dark);
+            ApplicationThemeManager.Apply(ApplicationTheme.Dark);
         }
 
         ServiceManager.Services.GetService<SearchWindow>().Visibility = Visibility.Hidden;
@@ -129,21 +133,25 @@ public partial class MainWindow
         var hWndSource = HwndSource.FromHwnd(m_Hwnd);
 
         // 添加处理程序
-        if (hWndSource != null) hWndSource.AddHook(WndProc);
+        if (hWndSource != null)
+        {
+            hWndSource.AddHook(WndProc);
+        }
+
         log.Debug("注册热键");
         InitHotKey();
 
         //NotifyIcon.HookWindow = hWndSource;
-        Wpf.Ui.Appearance.ApplicationThemeManager.Changed += ((theme, accent) =>
+        ApplicationThemeManager.Changed += (theme, accent) =>
         {
             WindowBackdrop.ApplyBackdrop(m_Hwnd, WindowBackdropType.Acrylic);
-        });
+        };
     }
 
     private void MainWindow_OnClosing(object? sender, CancelEventArgs e)
     {
         e.Cancel = true;
-        this.Visibility = Visibility.Hidden;
+        Visibility = Visibility.Hidden;
     }
 
 
@@ -168,14 +176,17 @@ public partial class MainWindow
 
 
         if (!failList.Any())
+        {
             return true;
-        string fail = "";
+        }
+
+        var fail = "";
         foreach (var hotKeyModel in failList)
         {
             fail += $"{hotKeyModel.MainName}_{hotKeyModel.Name}\n";
         }
 
-        Controls.MessageBoxControl.MessageBox msg = new Controls.MessageBoxControl.MessageBox();
+        var msg = new MessageBox();
         msg.Title = "Kitopia";
         msg.Content = $"无法注册下列快捷键\n{fail}\n现在你需要重新设置\n在设置界面按下取消以取消该快捷键注册";
         msg.WindowStartupLocation = WindowStartupLocation.CenterScreen;
@@ -185,12 +196,12 @@ public partial class MainWindow
         // 使用ContinueWith来在任务完成后执行一个回调函数
         task.ContinueWith(e =>
         {
-            MessageBoxResult result = e.Result;
+            var result = e.Result;
         }).Wait();
-        List<HotKeyModel> itemsToRemove = new List<HotKeyModel>();
+        List<HotKeyModel> itemsToRemove = new();
         foreach (var hotKeyModel in failList)
         {
-            HotKeyEditorWindow hotKeyEditor = new HotKeyEditorWindow($"{hotKeyModel.MainName}_{hotKeyModel.Name}");
+            var hotKeyEditor = new HotKeyEditorWindow($"{hotKeyModel.MainName}_{hotKeyModel.Name}");
             if (ServiceManager.Services.GetService<MainWindow>().Visibility != Visibility.Visible)
             {
                 hotKeyEditor.Height = 371;
@@ -250,7 +261,7 @@ public partial class MainWindow
                         {
                             try
                             {
-                                IDataObject data = Clipboard.GetDataObject()!;
+                                var data = Clipboard.GetDataObject()!;
                                 if (data.GetDataPresent(DataFormats.Text))
                                 {
                                     var text = (string)data.GetData(DataFormats.Text)!;

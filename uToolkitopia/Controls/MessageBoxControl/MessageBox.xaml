@@ -64,7 +64,6 @@
                                 <ui:DynamicScrollViewer>
                                     <TextBlock
                                         x:Name="Title"
-                                        Grid.Row="0"
                                         Margin="12,12,12,0"
                                         FontWeight="SemiBold"
                                         Text="{TemplateBinding Title}">
@@ -80,10 +79,10 @@
                                     ForceShutdown="False"
                                     ShowMaximize="False"
                                     ShowMinimize="False" />
-                                <ui:DynamicScrollViewer  Grid.Row="1" >
+                                <ui:DynamicScrollViewer Grid.Row="1">
                                     <ContentPresenter
                                         x:Name="ContentPresenter"
-                                   
+
                                         Margin="12,10,12,12"
                                         Content="{TemplateBinding Content}"
                                         ContentTemplate="{TemplateBinding ContentTemplate}"
@@ -97,7 +96,7 @@
                                         </ContentPresenter.Resources>
                                     </ContentPresenter>
                                 </ui:DynamicScrollViewer>
-                                
+
 
                                 <Border
                                     Grid.Row="2"

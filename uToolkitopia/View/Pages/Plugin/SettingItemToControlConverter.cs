@@ -1,10 +1,15 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using Core.SDKs.Services.Plugin;
 using Wpf.Ui.Controls;
+
+#endregion
 
 namespace Kitopia.View.Pages.Plugin;
 
@@ -13,7 +18,10 @@ public class SettingItemToControlConverter : IValueConverter
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         var setting = value as PluginSettingItem;
-        if (setting == null) return null;
+        if (setting == null)
+        {
+            return null;
+        }
 
         FrameworkElement control;
         switch (setting.ControlType)
@@ -37,10 +45,10 @@ public class SettingItemToControlConverter : IValueConverter
             switch (control)
             {
                 case ToggleSwitch:
-                    control.SetBinding(ToggleSwitch.IsCheckedProperty, binding);
+                    control.SetBinding(ToggleButton.IsCheckedProperty, binding);
                     break;
                 case ComboBox:
-                    control.SetBinding(ComboBox.SelectedValueProperty, binding);
+                    control.SetBinding(Selector.SelectedValueProperty, binding);
                     break;
             }
 
@@ -52,8 +60,6 @@ public class SettingItemToControlConverter : IValueConverter
         }
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    {
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
         throw new NotImplementedException();
-    }
 }

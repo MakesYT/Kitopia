@@ -1,6 +1,10 @@
-﻿using System.Windows;
+﻿#region
+
+using System.Windows;
 using System.Windows.Media;
 using Core.SDKs.Services.Config;
+
+#endregion
 
 namespace Kitopia.Assets;
 

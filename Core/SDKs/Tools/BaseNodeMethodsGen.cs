@@ -1,18 +1,22 @@
-﻿using System.Collections.ObjectModel;
+﻿#region
+
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Core.ViewModel.TaskEditor;
 using PluginCore;
+
+#endregion
 
 namespace Core.SDKs.Tools;
 
 public class BaseNodeMethodsGen
 {
-    static Dictionary<string, Type> _baseType = new Dictionary<string, Type>()
+    private static readonly Dictionary<string, Type> _baseType = new()
     {
         { "字符串", typeof(string) },
         { "布尔", typeof(bool) },
         { "整型", typeof(int) },
-        { "双精度浮点数", typeof(double) },
+        { "双精度浮点数", typeof(double) }
     };
 
     public static Dictionary<string, string> _i18n = new()
@@ -22,7 +26,7 @@ public class BaseNodeMethodsGen
         { "System.Int32", "整数" },
         { "System.Double", "浮点" },
         { "System.Object", "任意" },
-        { "PluginCore.NodeConnectorClass", "节点" },
+        { "PluginCore.NodeConnectorClass", "节点" }
     };
 
     public static string GetI18N(string key)
@@ -39,7 +43,7 @@ public class BaseNodeMethodsGen
     {
         foreach (var (key, value) in _baseType)
         {
-            PointItem String = new PointItem()
+            var String = new PointItem()
             {
                 Plugin = "Kitopia",
                 MerthodName = value.FullName,
@@ -74,7 +78,7 @@ public class BaseNodeMethodsGen
 
         //if
         {
-            PointItem String = new PointItem()
+            var String = new PointItem()
             {
                 Plugin = "Kitopia",
                 MerthodName = "判断",
@@ -107,7 +111,7 @@ public class BaseNodeMethodsGen
                     Source = String,
                     Type = typeof(bool),
                     Title = GetI18N(typeof(bool).FullName),
-                    TypeName = GetI18N(typeof(bool).FullName),
+                    TypeName = GetI18N(typeof(bool).FullName)
                 }
             };
             String.Input = StringinItems;
@@ -115,7 +119,7 @@ public class BaseNodeMethodsGen
         }
         //==
         {
-            PointItem String = new PointItem()
+            var String = new PointItem()
             {
                 Plugin = "Kitopia",
                 MerthodName = "相等",
@@ -140,14 +144,14 @@ public class BaseNodeMethodsGen
                     Source = String,
                     Type = typeof(object),
                     Title = GetI18N(typeof(object).FullName),
-                    TypeName = GetI18N(typeof(object).FullName),
+                    TypeName = GetI18N(typeof(object).FullName)
                 },
                 new ConnectorItem()
                 {
                     Source = String,
                     Type = typeof(object),
                     Title = GetI18N(typeof(object).FullName),
-                    TypeName = GetI18N(typeof(object).FullName),
+                    TypeName = GetI18N(typeof(object).FullName)
                 }
             };
             String.Input = StringinItems;

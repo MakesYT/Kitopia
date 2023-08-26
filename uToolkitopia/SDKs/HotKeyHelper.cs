@@ -1,8 +1,12 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections.Generic;
 using Core.SDKs.HotKey;
 using log4net;
 using Vanara.PInvoke;
+
+#endregion
 
 namespace Kitopia.SDKs;
 
@@ -24,14 +28,16 @@ public class HotKeyHelper
     public static List<HotKeyModel> RegisterGlobalHotKey(IEnumerable<HotKeyModel> hotKeyModelList, IntPtr hwnd,
         out Dictionary<string, int> hotKeySettingsDic)
     {
-        List<HotKeyModel> failList = new List<HotKeyModel>();
+        List<HotKeyModel> failList = new();
         foreach (var item in hotKeyModelList)
+        {
             if (!RegisterHotKey(item, hwnd))
             {
                 failList.Add(item);
 
                 log.Debug($"注册热键失败:{item.MainName}_{item.Name}");
             }
+        }
 
         hotKeySettingsDic = m_HotKeySettingsDic;
         return failList;
@@ -55,7 +61,10 @@ public class HotKeyHelper
         {
             // 全局原子不会在应用程序终止时自动删除。每次调用GlobalAddAtom函数，必须相应的调用GlobalDeleteAtom函数删除原子。
             if (!Kernel32.GlobalFindAtom(hotKeySetting).IsInvalid)
+            {
                 Kernel32.GlobalDeleteAtom(Kernel32.GlobalFindAtom(hotKeySetting));
+            }
+
             // 获取唯一标识符
             m_HotKeySettingsDic[hotKeySetting] = Kernel32.GlobalAddAtom(hotKeySetting).GetHashCode();
         }
@@ -66,7 +75,9 @@ public class HotKeyHelper
         }
 
         if (!hotKeyModel.IsUsable)
+        {
             return true;
+        }
 
         // 注册热键
         if (hotKeyModel.IsSelectShift)

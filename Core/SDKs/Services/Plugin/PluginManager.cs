@@ -1,7 +1,11 @@
-﻿using System.IO;
+﻿#region
+
+using System.IO;
 using System.Windows;
 using Core.SDKs.Services.Config;
 using log4net;
+
+#endregion
 
 namespace Core.SDKs.Services.Plugin;
 
@@ -13,14 +17,14 @@ public class PluginManager
     {
         ThreadPool.QueueUserWorkItem((e) =>
         {
-            DirectoryInfo pluginsDirectoryInfo = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "plugins");
+            var pluginsDirectoryInfo = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "plugins");
             if (!pluginsDirectoryInfo.Exists)
             {
                 Log.Debug($"插件目录不存在创建{pluginsDirectoryInfo.FullName}");
                 pluginsDirectoryInfo.Create();
             }
 
-            foreach (DirectoryInfo directoryInfo in pluginsDirectoryInfo.EnumerateDirectories())
+            foreach (var directoryInfo in pluginsDirectoryInfo.EnumerateDirectories())
             {
                 if (File.Exists($"{directoryInfo.FullName}\\{directoryInfo.Name}.dll"))
                 {

@@ -1,5 +1,9 @@
-﻿using System.Drawing;
+﻿#region
+
+using System.Drawing;
 using PluginCore;
+
+#endregion
 
 namespace Core.SDKs.Services.Plugin;
 
@@ -65,14 +69,10 @@ public class PluginInfoEx
         get;
     }
 
-    public string ToPlgString()
-    {
-        return $"{Author}_{PluginId}";
-    }
+    public string ToPlgString() => $"{Author}_{PluginId}";
 
-    public PluginInfo ToPluginInfo()
-    {
-        return new PluginInfo()
+    public PluginInfo ToPluginInfo() =>
+        new()
         {
             Author = Author,
             Description = Description,
@@ -81,5 +81,4 @@ public class PluginInfoEx
             Version = Version,
             VersionInt = VersionInt
         };
-    }
 }
