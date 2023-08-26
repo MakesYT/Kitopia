@@ -4,6 +4,7 @@
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:crt="clr-namespace:Kitopia.Converter"
              xmlns:c="clr-namespace:Kitopia.Assets"
+             StartupUri="View/MainWindow.xaml"
              >
     <Application.Resources>
 

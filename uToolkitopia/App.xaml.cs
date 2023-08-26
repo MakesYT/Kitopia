@@ -149,7 +149,7 @@ public sealed partial class App : Application
             PluginManager.Init();
             log.Info("插件管理器初始化完成");
 
-            var initWindow = ServiceManager.Services.GetService<InitWindow>();
+            var initWindow = ServiceManager.Services.GetService<MainWindow>();
             initWindow.Show();
             // initWindow.Close();
 
@@ -271,14 +271,6 @@ public sealed partial class App : Application
         services.AddSingleton<SearchWindow>(sq =>
         {
             return new SearchWindow { DataContext = sq.GetService<SearchWindowViewModel>() };
-        });
-        services.AddSingleton<InitWindowsViewModel>(e =>
-        {
-            return new InitWindowsViewModel { IsActive = true };
-        });
-        services.AddSingleton<InitWindow>(sq =>
-        {
-            return new InitWindow { DataContext = sq.GetService<InitWindowsViewModel>() };
         });
         services.AddSingleton<MainWindowViewModel>(e =>
         {

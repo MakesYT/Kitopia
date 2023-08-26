@@ -156,7 +156,7 @@ public partial class HotKeyEditorWindow : FluentWindow
 
         hotKeyModel.SelectKey = selectedKey;
         ConfigManger.Save();
-        setSuccess = ((InitWindow)(ServiceManager.Services.GetService(typeof(InitWindow)))).HotKeySet(hotKeyModel);
+        setSuccess = ((MainWindow)(ServiceManager.Services.GetService(typeof(MainWindow)))).HotKeySet(hotKeyModel);
         if (!setSuccess)
         {
             Controls.MessageBoxControl.MessageBox msg = new Controls.MessageBoxControl.MessageBox();

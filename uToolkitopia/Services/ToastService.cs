@@ -24,7 +24,7 @@ public class ToastService : IToastService
 
     public void showMessageBox(string Title, string Content, Action? yesAction, Action? noAction)
     {
-        Application.Current.Dispatcher.Invoke(() =>
+        Application.Current.Dispatcher.BeginInvoke(() =>
         {
             MessageBox msg = new MessageBox();
             msg.Title = Title;

@@ -6,12 +6,21 @@
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:pages="clr-namespace:Kitopia.View.Pages"
         xmlns:plugin="clr-namespace:Kitopia.View.Pages.Plugin"
+        xmlns:tray="http://schemas.lepo.co/wpfui/2022/xaml/tray"
+        xmlns:services="clr-namespace:Kitopia.Services"
+        xmlns:viewModel="clr-namespace:Core.ViewModel;assembly=Core"
         mc:Ignorable="d" Closing="MainWindow_OnClosing"
         WindowStartupLocation="CenterScreen" 
         ExtendsContentIntoTitleBar="True"
         WindowBackdropType="Acrylic"
+        d:DataContext="{d:DesignInstance viewModel:MainWindowViewModel}"
+        
+        
         WindowCornerPreference="Round"
         Title="Kitopia" Height="742" Width="1200" Visibility="Hidden">
+    <Window.Resources>
+        <services:BindingProxy x:Key="runRecordList" Data="{Binding}" />
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="50"/>
@@ -21,7 +30,14 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        
+        <tray:NotifyIcon x:Name="NotifyIcon" TooltipText="Kitopia" >
+            <tray:NotifyIcon.Menu>
+               
+                <ContextMenu DataContext="{StaticResource runRecordList}">
+                    <MenuItem Header="退出" Command="{Binding Data.ExitCommand}" />
+                </ContextMenu>
+            </tray:NotifyIcon.Menu>
+        </tray:NotifyIcon>
         <ui:NavigationView x:Name="NavigationView" Grid.Row="1"  PaneDisplayMode="LeftFluent" Grid.ColumnSpan="2" BreadcrumbBar="{Binding ElementName=BreadcrumbBar}">
             <ui:NavigationView.Header>
                 <StackPanel Margin="42,32,0,0">
