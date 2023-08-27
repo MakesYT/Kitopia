@@ -32,8 +32,10 @@
         </Grid.RowDefinitions>
         <tray:NotifyIcon x:Name="NotifyIcon" TooltipText="Kitopia">
             <tray:NotifyIcon.Menu>
-
-                <ContextMenu DataContext="{StaticResource runRecordList}" />
+                <ContextMenu DataContext="{StaticResource runRecordList}">
+                    <!-- ReSharper disable once Xaml.RedundantResource -->
+                    <MenuItem Header="退出" Command="{Binding Data.ExitCommand}" />
+                </ContextMenu>
             </tray:NotifyIcon.Menu>
         </tray:NotifyIcon>
         <ui:NavigationView x:Name="NavigationView" Grid.Row="1" PaneDisplayMode="LeftFluent" Grid.ColumnSpan="2"

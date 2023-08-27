@@ -17,6 +17,7 @@
     Title="TaskEditor" Height="450" Width="1800">
     <ui:FluentWindow.Resources>
         <taskEditor1:IfNullVisibilityHidden x:Key="IfNullVisibilityHidden" />
+        <taskEditor1:NodeBoderColor x:Key="NodeBoderColor" />
         <DataTemplate x:Key="StringTemplate" DataType="{x:Type taskEditor:ConnectorItem}">
             <ui:TextBox Margin="10,5,10,5" MinWidth="40" Text="{Binding InputObject}" PlaceholderText="字符串" />
         </DataTemplate>
@@ -296,7 +297,7 @@
                                      PendingConnection="{Binding PendingConnection}"
                                      DisconnectConnectorCommand="{Binding DisconnectConnectorCommand}"
                                      Connections="{Binding Connections}"
-                                     ItemsSource="{Binding Nodes}" BorderBrush="{DynamicResource Node.BorderBrush}">
+                                     ItemsSource="{Binding Nodes}" >
                     <nodify:NodifyEditor.Background>
                         <DynamicResource ResourceKey="SmallGridLinesDrawingBrush" />
                     </nodify:NodifyEditor.Background>
@@ -358,11 +359,6 @@
 
                             <Setter Property="Location"
                                     Value="{Binding Location, Mode=TwoWay}" />
-                            <Setter Property="BorderBrush">
-                                <Setter.Value>
-                                    <SolidColorBrush Color="{DynamicResource TextFillColorPrimary}" />
-                                </Setter.Value>
-                            </Setter>
                         </Style>
                     </nodify:NodifyEditor.ItemContainerStyle>
 
@@ -403,11 +399,13 @@
                     <nodify:NodifyEditor.ItemTemplate>
                         <DataTemplate DataType="{x:Type taskEditor:PointItem}">
                             <nodify:Node
+                                x:Name="Node"
                                 Input="{Binding Input}"
                                 VerticalAlignment="Center"
-
+                                
                                 Output="{Binding Output}">
                                 <nodify:Node.Resources>
+                                    
                                     <taskEditor1:InterfacesToString x:Key="InterfacesToString" />
                                     <DataTemplate x:Key="InputTemplate" DataType="{x:Type taskEditor:ConnectorItem}">
                                         <nodify:NodeInput
@@ -444,6 +442,7 @@
                                     </DataTemplate>
                                     <plugin:MyDataTemplateSelector x:Key="MyDataTemplateSelector" />
                                 </nodify:Node.Resources>
+                                
                                 <nodify:Node.Foreground>
                                     <SolidColorBrush Color="{DynamicResource ApplicationBackgroundColor}" />
                                 </nodify:Node.Foreground>

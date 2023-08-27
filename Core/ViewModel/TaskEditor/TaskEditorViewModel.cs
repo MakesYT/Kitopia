@@ -199,12 +199,21 @@ public partial class TaskEditorViewModel : ObservableRecipient
         PendingConnection = new PendingConnectionViewModel(this);
         DisconnectConnectorCommand = new RelayCommand<ConnectorItem>(connector =>
         {
-            var connection =
-                Enumerable.First<ConnectionItem>(Connections, x => x.Source == connector || x.Target == connector);
-            connection.Source.IsConnected =
-                false; // This is not correct if there are multiple connections to the same connector
-            connection.Target.IsConnected = false;
-            Connections.Remove(connection);
+            var connections = Connections.Where((e) => e.Source == connector || e.Target == connector).ToList();
+            for (var i = connections.Count - 1; i >= 0; i--)
+            {
+                var connection = connections[i];
+                Connections.Remove(connection);
+                if (Connections.All(e => e.Source != connection.Source))
+                {
+                    connection.Source.IsConnected = false;
+                }
+
+                if (Connections.All(e => e.Target != connection.Target))
+                {
+                    connection.Target.IsConnected = false;
+                }
+            }
         });
         GetAllMethods();
         var nodify2 = new PointItem()
@@ -230,29 +239,32 @@ public partial class TaskEditorViewModel : ObservableRecipient
     {
         if (source.IsConnected)
         {
-            var connectionsToRemove = Connections
-                .Where(e => e.Source == source)
-                .ToList();
-
-            foreach (var connection in connectionsToRemove)
+            if (Connections
+                .Any(e => e.Source == source && e.Target == target))
             {
-                connection.Source.IsConnected = false;
-                connection.Target.IsConnected = false;
-                Connections.Remove(connection);
+                return;
             }
         }
 
-        if (target.IsConnected)
+        if (source.Type.FullName == "PluginCore.NodeConnectorClass")
         {
-            var connectionsToRemove = Connections
-                .Where(e => e.Target == target)
-                .ToList();
-
-            foreach (var connection in connectionsToRemove)
+            if (source.IsConnected)
             {
-                connection.Source.IsConnected = false;
-                connection.Target.IsConnected = false;
-                Connections.Remove(connection);
+                var connectionsToRemove = Connections
+                    .Where(e => e.Source == source)
+                    .ToList();
+
+                foreach (var connection in connectionsToRemove)
+                {
+                    connection.Source.IsConnected = false;
+
+
+                    Connections.Remove(connection);
+                    if (Connections.All(e => e.Target != connection.Target))
+                    {
+                        connection.Target.IsConnected = false;
+                    }
+                }
             }
         }
 
@@ -278,9 +290,16 @@ public partial class PointItem : ObservableRecipient
     [ObservableProperty] private Point _location;
 
     [ObservableProperty] private string _title;
-
+    [ObservableProperty] private s节点状态 status = s节点状态.已验证;
     [ObservableProperty] private ObservableCollection<ConnectorItem> input = new();
     [ObservableProperty] private ObservableCollection<ConnectorItem> output = new();
+}
+
+public enum s节点状态
+{
+    未验证,
+    已验证,
+    错误
 }
 
 public partial class ConnectorItem : ObservableRecipient
