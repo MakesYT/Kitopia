@@ -13,6 +13,7 @@ namespace Core.ViewModel.TaskEditor;
 public partial class TaskEditorViewModel
 {
     private List<PointItem> _firstVerifyPointItems = new();
+    private List<PointItem> _firstPassesPointItems = new();
 
     [RelayCommand]
     private void VerifyNode()
@@ -35,7 +36,9 @@ public partial class TaskEditorViewModel
         }
 
         _firstVerifyPointItems = new List<PointItem>();
+        _firstPassesPointItems = new List<PointItem>();
         _firstVerifyPointItems.Add(Nodes[0]);
+        _firstPassesPointItems.Add(Nodes[0]);
         Nodes[0].Status = s节点状态.已验证;
         var connectionItem = Connections.FirstOrDefault((e) => e.Source == Nodes[0].Output[0]);
         if (connectionItem == null)
@@ -44,7 +47,14 @@ public partial class TaskEditorViewModel
         }
 
         var firstNodes = connectionItem.Target.Source;
-        ParsePointItem(firstNodes, true);
+        try
+        {
+            ParsePointItem(firstNodes, false, true);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
     }
 
     private void ToFirstVerify(bool notRealTime = false)
@@ -56,7 +66,9 @@ public partial class TaskEditorViewModel
 
         new Dictionary<ConnectionItem, object>();
         _firstVerifyPointItems = new List<PointItem>();
+        _firstPassesPointItems = new List<PointItem>();
         _firstVerifyPointItems.Add(Nodes[0]);
+        _firstPassesPointItems.Add(Nodes[0]);
         Nodes[0].Status = notRealTime ? s节点状态.已验证 : s节点状态.初步验证;
 
         var connectionItem = Connections.FirstOrDefault((e) => e.Source == Nodes[0].Output[0]);
@@ -66,13 +78,37 @@ public partial class TaskEditorViewModel
         }
 
         var firstNodes = connectionItem.Target.Source;
-        ParsePointItem(firstNodes);
+        ParsePointItem(firstNodes, false);
     }
 
-    public void ParsePointItem(PointItem nowPointItem, bool notRealTime = false)
+    public void ParsePointItem(PointItem nowPointItem, bool onlyForward, bool notRealTime = false)
     {
         bool valid = true;
+        lock (_firstVerifyPointItems)
+        {
+            if (_firstVerifyPointItems.Contains(nowPointItem))
+            {
+                return;
+            }
+        }
+
+        if (_firstVerifyPointItems.Contains(nowPointItem))
+        {
+            //如果包含则证明源节点已被解析
+            DateTime beforeDT = System.DateTime.Now;
+
+            while (_firstVerifyPointItems.Contains(nowPointItem) && !_firstPassesPointItems.Contains(nowPointItem))
+            {
+                DateTime afterDT = System.DateTime.Now;
+                if (afterDT.Subtract(beforeDT).Seconds >= 5)
+                {
+                    break;
+                }
+            }
+        }
+
         _firstVerifyPointItems.Add(nowPointItem);
+        List<Task> sourceDataTask = new();
         foreach (var connectorItem in nowPointItem.Input)
         {
             if (!connectorItem.IsConnected)
@@ -101,25 +137,46 @@ public partial class TaskEditorViewModel
             foreach (var item in connectionItem)
             {
                 var sourceSource = item.Source.Source;
-                if (_firstVerifyPointItems.Contains(sourceSource))
+                lock (_firstVerifyPointItems)
                 {
-                    //如果包含则证明源节点已被解析
-                    continue;
+                    if (_firstVerifyPointItems.Contains(sourceSource))
+                    {
+                        //如果包含则证明源节点已被解析
+                        DateTime beforeDT = System.DateTime.Now;
+
+                        while (_firstVerifyPointItems.Contains(sourceSource) &&
+                               !_firstPassesPointItems.Contains(sourceSource))
+                        {
+                            DateTime afterDT = System.DateTime.Now;
+                            if (afterDT.Subtract(beforeDT).Seconds >= 5)
+                            {
+                                break;
+                            }
+                        }
+
+                        continue;
+                    }
+
+                    var task = new Task(() =>
+                    {
+                        ParsePointItem(sourceSource, true, notRealTime);
+                    });
+                    task.Start();
+                    sourceDataTask.Add(task);
                 }
 
-                ParsePointItem(sourceSource, notRealTime);
+
                 //源解析完成
             }
         } //源数据全部生成
 
+        Task.WaitAll(sourceDataTask.ToArray(), TimeSpan.FromSeconds(10));
 
-        if (valid)
-        {
-            nowPointItem.Status = notRealTime ? s节点状态.已验证 : s节点状态.初步验证;
-        }
-        else
+
+        if (!valid)
         {
             nowPointItem.Status = s节点状态.错误;
+            _firstPassesPointItems.Add(nowPointItem);
             return;
         }
 
@@ -267,29 +324,43 @@ public partial class TaskEditorViewModel
             }
             catch (Exception e)
             {
-                nowPointItem.Status = s节点状态.错误;
-                return;
+                valid = false;
+                goto finnish;
             }
         }
 
-
-        foreach (var outputConnector in nowPointItem.Output)
+        if (!onlyForward)
         {
-            var thisToNextConnections = Connections.Where((e) => e.Source == outputConnector).ToList();
-            foreach (var thisToNextConnection in thisToNextConnections)
+            foreach (var outputConnector in nowPointItem.Output)
             {
-                var nextPointItem = thisToNextConnection.Target.Source;
-                if (_firstVerifyPointItems.Contains(nextPointItem))
+                var thisToNextConnections = Connections.Where((e) => e.Source == outputConnector).ToList();
+                foreach (var thisToNextConnection in thisToNextConnections)
                 {
-                    //如果包含则证明子节点已被解析
-                    continue;
-                }
+                    var nextPointItem = thisToNextConnection.Target.Source;
 
-                if (!outputConnector.IsNotUsed)
-                {
-                    ParsePointItem(nextPointItem, notRealTime);
+                    if (_firstVerifyPointItems.Contains(nextPointItem))
+                    {
+                        //如果包含则证明子节点已被解析
+                        continue;
+                    }
+
+                    if (!outputConnector.IsNotUsed)
+                    {
+                        ThreadPool.QueueUserWorkItem((e) =>
+                        {
+                            ParsePointItem(nextPointItem, false, notRealTime);
+                        });
+                    }
                 }
             }
         }
+
+        finnish:
+        if (valid)
+        {
+            nowPointItem.Status = notRealTime ? s节点状态.已验证 : s节点状态.初步验证;
+        }
+
+        _firstPassesPointItems.Add(nowPointItem);
     }
 }

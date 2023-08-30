@@ -447,10 +447,6 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     }
                 }
 
-                if (item.Value.OnlyKey.Contains("QQNT"))
-                {
-                }
-
                 if (weight > 0)
                 {
                     filtered.Add((item.Value, weight));
@@ -476,7 +472,8 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 }
             }
 
-            var sortedDict = nowHasLastOpens.OrderByDescending(p => p.Value).ToDictionary(p => p.Key, p => p.Value);
+            var sortedDict = nowHasLastOpens.AsParallel().OrderByDescending(p => p.Value)
+                .ToDictionary(p => p.Key, p => p.Value);
             foreach (var (searchViewItem, i) in sortedDict)
             {
                 Log.Debug("添加搜索结果" + searchViewItem.OnlyKey);
