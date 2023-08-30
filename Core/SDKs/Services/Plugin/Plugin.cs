@@ -27,7 +27,7 @@ public class Plugin
     private AssemblyLoadContextH? _plugin;
     private Assembly? _dll;
 
-    private IServiceProvider? ServiceProvider;
+    public IServiceProvider? ServiceProvider;
 
     // private Dictionary<Type, object>? _instance = new();
     public static PluginInfoEx GetPluginInfoEx(string assemblyPath, out WeakReference alcWeakRef)
@@ -147,9 +147,9 @@ public class Plugin
         }
     }
 
-    public List<MethodInfo> GetMethodInfos()
+    public Dictionary<string, MethodInfo> GetMethodInfos()
     {
-        var methodInfos = new List<MethodInfo>();
+        var methodInfos = new Dictionary<string, MethodInfo>();
         var t = _dll.GetExportedTypes();
         foreach (var type in t)
         {
@@ -160,7 +160,7 @@ public class Plugin
                     continue;
                 }
 
-                methodInfos.Add(methodInfo);
+                methodInfos.Add($"{type.FullName}_{methodInfo.Name}", methodInfo);
             }
         }
 

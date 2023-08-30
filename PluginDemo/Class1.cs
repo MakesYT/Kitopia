@@ -39,6 +39,7 @@ public class Class1 : IPlugin
         var services = new ServiceCollection();
         services.AddSingleton<Class1>();
         services.AddSingleton<Test1>();
+        services.AddSingleton<Test>();
         return services.BuildServiceProvider();
     }
 }

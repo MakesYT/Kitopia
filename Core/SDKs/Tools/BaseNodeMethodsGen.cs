@@ -109,6 +109,13 @@ public class BaseNodeMethodsGen
                 new ConnectorItem()
                 {
                     Source = String,
+                    Type = typeof(NodeConnectorClass),
+                    Title = "流输入",
+                    TypeName = "节点"
+                },
+                new ConnectorItem()
+                {
+                    Source = String,
                     Type = typeof(bool),
                     Title = GetI18N(typeof(bool).FullName),
                     TypeName = GetI18N(typeof(bool).FullName)
@@ -139,6 +146,13 @@ public class BaseNodeMethodsGen
             String.Output = StringoutItems;
             ObservableCollection<ConnectorItem> StringinItems = new()
             {
+                new ConnectorItem()
+                {
+                    Source = String,
+                    Type = typeof(NodeConnectorClass),
+                    Title = "流输入",
+                    TypeName = "节点"
+                },
                 new ConnectorItem()
                 {
                     Source = String,

@@ -52,6 +52,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 Title = connectorItem.Title,
                 Type = connectorItem.Type,
                 InputObject = connectorItem.InputObject,
+                AutoUnboxIndex = connectorItem.AutoUnboxIndex,
                 IsConnected = connectorItem.IsConnected,
                 IsSelf = connectorItem.IsSelf,
                 IsOut = connectorItem.IsOut
@@ -67,6 +68,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 Source = item,
                 Title = connectorItem.Title,
                 TypeName = connectorItem.TypeName,
+                AutoUnboxIndex = connectorItem.AutoUnboxIndex,
                 Type = connectorItem.Type,
                 IsConnected = connectorItem.IsConnected,
                 IsOut = connectorItem.IsOut
@@ -93,7 +95,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
 
     [ObservableProperty] private ObservableCollection<PointItem> nodes = new();
 
-    [ObservableProperty] private ObservableCollection<ConnectionItem> connections = new();
+    [ObservableProperty] private BindingList<ConnectionItem> connections = new();
 
     private void GetAllMethods()
     {
@@ -102,7 +104,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
 
         foreach (var (key, value) in PluginManager.EnablePlugin)
         {
-            foreach (var methodInfo in value.GetMethodInfos())
+            foreach (var (tm, methodInfo) in value.GetMethodInfos())
             {
                 if (methodInfo.GetCustomAttribute(typeof(PluginMethod)) is not null)
                 {
@@ -110,7 +112,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                     var pointItem = new PointItem()
                     {
                         Plugin = key,
-                        MerthodName = methodInfo.Name,
+                        MerthodName = tm,
                         Title = $"{key}_{customAttribute.Name}"
                     };
                     ObservableCollection<ConnectorItem> inpItems = new();
@@ -121,16 +123,49 @@ public partial class TaskEditorViewModel : ObservableRecipient
                         Title = "流输入",
                         TypeName = "节点"
                     });
+                    int autoUnboxIndex = 0;
                     for (var index = 0; index < methodInfo.GetParameters().Length; index++)
                     {
                         var parameterInfo = methodInfo.GetParameters()[index];
-                        inpItems.Add(new ConnectorItem()
+                        if (parameterInfo.ParameterType.GetCustomAttribute(typeof(AutoUnbox)) is not null)
                         {
-                            Source = pointItem,
-                            Type = parameterInfo.ParameterType,
-                            Title = customAttribute.GetParameterName(parameterInfo.Name),
-                            TypeName = BaseNodeMethodsGen.GetI18N(parameterInfo.ParameterType.FullName)
-                        });
+                            autoUnboxIndex++;
+                            var type = parameterInfo.ParameterType;
+                            foreach (var memberInfo in type.GetProperties())
+                            {
+                                List<string>? interfaces = null;
+                                if (!memberInfo.PropertyType.FullName.StartsWith("System."))
+                                {
+                                    interfaces = new();
+                                    foreach (var @interface in memberInfo.PropertyType.GetInterfaces())
+                                    {
+                                        interfaces.Add(@interface.FullName);
+                                    }
+                                }
+
+
+                                inpItems.Add(new ConnectorItem()
+                                {
+                                    Source = pointItem,
+                                    Type = memberInfo.PropertyType,
+                                    AutoUnboxIndex = autoUnboxIndex,
+                                    Interfaces = interfaces,
+                                    Title = customAttribute.GetParameterName(memberInfo.Name),
+                                    TypeName = BaseNodeMethodsGen.GetI18N(memberInfo.PropertyType.FullName),
+                                });
+                            }
+                        }
+                        else
+                        {
+                            inpItems.Add(new ConnectorItem()
+                            {
+                                Source = pointItem,
+                                Type = parameterInfo.ParameterType,
+                                Title = customAttribute.GetParameterName(parameterInfo.Name),
+                                TypeName = BaseNodeMethodsGen.GetI18N(parameterInfo.ParameterType.FullName)
+                            });
+                        }
+
                         //Log.Debug($"参数{index}:类型为{parameterInfo.ParameterType}");
                     }
 
@@ -139,19 +174,25 @@ public partial class TaskEditorViewModel : ObservableRecipient
                         ObservableCollection<ConnectorItem> outItems = new();
                         if (methodInfo.ReturnParameter.ParameterType.GetCustomAttribute(typeof(AutoUnbox)) is not null)
                         {
+                            autoUnboxIndex++;
                             var type = methodInfo.ReturnParameter.ParameterType;
                             foreach (var memberInfo in type.GetProperties())
                             {
-                                List<string> interfaces = new();
-                                foreach (var @interface in memberInfo.PropertyType.GetInterfaces())
+                                List<string>? interfaces = null;
+                                if (!memberInfo.PropertyType.FullName.StartsWith("System."))
                                 {
-                                    interfaces.Add(@interface.FullName);
+                                    interfaces = new();
+                                    foreach (var @interface in memberInfo.PropertyType.GetInterfaces())
+                                    {
+                                        interfaces.Add(@interface.FullName);
+                                    }
                                 }
 
                                 outItems.Add(new ConnectorItem()
                                 {
                                     Source = pointItem,
                                     Type = memberInfo.PropertyType,
+                                    AutoUnboxIndex = autoUnboxIndex,
                                     Interfaces = interfaces,
                                     Title = customAttribute.GetParameterName(memberInfo.Name),
                                     TypeName = BaseNodeMethodsGen.GetI18N(memberInfo.PropertyType.FullName),
@@ -180,7 +221,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                             });
                         }
 
-                        ;
+
                         pointItem.Output = outItems;
                     }
 
@@ -214,6 +255,8 @@ public partial class TaskEditorViewModel : ObservableRecipient
                     connection.Target.IsConnected = false;
                 }
             }
+
+            ToFirstVerify();
         });
         GetAllMethods();
         var nodify2 = new PointItem()
@@ -268,8 +311,9 @@ public partial class TaskEditorViewModel : ObservableRecipient
             }
         }
 
-        OnPropertyChanged(nameof(Connections));
         Connections.Add(new ConnectionItem(source, target));
+        ToFirstVerify();
+        //OnPropertyChanged(nameof(Connections));
     }
 }
 
@@ -290,7 +334,7 @@ public partial class PointItem : ObservableRecipient
     [ObservableProperty] private Point _location;
 
     [ObservableProperty] private string _title;
-    [ObservableProperty] private s节点状态 status = s节点状态.已验证;
+    [ObservableProperty] private s节点状态 status = s节点状态.未验证;
     [ObservableProperty] private ObservableCollection<ConnectorItem> input = new();
     [ObservableProperty] private ObservableCollection<ConnectorItem> output = new();
 }
@@ -299,7 +343,8 @@ public enum s节点状态
 {
     未验证,
     已验证,
-    错误
+    错误,
+    初步验证
 }
 
 public partial class ConnectorItem : ObservableRecipient
@@ -307,11 +352,16 @@ public partial class ConnectorItem : ObservableRecipient
     [ObservableProperty] private Point _anchor;
 
     [ObservableProperty] private bool _isConnected;
-
+    [ObservableProperty] private bool _isNotUsed = false;
     [ObservableProperty] private bool _isOut;
     [ObservableProperty] private bool _isSelf = false;
-    [ObservableProperty] private object? _inputObject;
+    [ObservableProperty] private object? _inputObject; //数据
 
+    public int AutoUnboxIndex
+    {
+        get;
+        set;
+    }
 
     public string TypeName
     {

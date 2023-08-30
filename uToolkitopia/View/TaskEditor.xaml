@@ -17,7 +17,6 @@
     Title="TaskEditor" Height="450" Width="1800">
     <ui:FluentWindow.Resources>
         <taskEditor1:IfNullVisibilityHidden x:Key="IfNullVisibilityHidden" />
-        <taskEditor1:NodeBoderColor x:Key="NodeBoderColor" />
         <DataTemplate x:Key="StringTemplate" DataType="{x:Type taskEditor:ConnectorItem}">
             <ui:TextBox Margin="10,5,10,5" MinWidth="40" Text="{Binding InputObject}" PlaceholderText="字符串" />
         </DataTemplate>
@@ -297,7 +296,7 @@
                                      PendingConnection="{Binding PendingConnection}"
                                      DisconnectConnectorCommand="{Binding DisconnectConnectorCommand}"
                                      Connections="{Binding Connections}"
-                                     ItemsSource="{Binding Nodes}" >
+                                     ItemsSource="{Binding Nodes}">
                     <nodify:NodifyEditor.Background>
                         <DynamicResource ResourceKey="SmallGridLinesDrawingBrush" />
                     </nodify:NodifyEditor.Background>
@@ -355,10 +354,38 @@
                         <SolidColorBrush Color="{DynamicResource ApplicationBackgroundColor}" Opacity="0.7" />
                     </nodify:NodifyEditor.Foreground>
                     <nodify:NodifyEditor.ItemContainerStyle>
-                        <Style TargetType="{x:Type nodify:ItemContainer}">
-
+                        <Style d:DataContext="{d:DesignInstance taskEditor:PointItem}"
+                               TargetType="{x:Type nodify:ItemContainer}">
+                            <Setter Property="BorderThickness" Value="2" />
                             <Setter Property="Location"
                                     Value="{Binding Location, Mode=TwoWay}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Status}"
+                                             Value="1">
+                                    <Setter Property="BorderBrush"
+                                            Value="GreenYellow" />
+
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Status}"
+                                             Value="2">
+                                    <Setter Property="BorderBrush"
+                                            Value="OrangeRed" />
+
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Status}"
+                                             Value="3">
+                                    <Setter Property="BorderBrush"
+                                            Value="Yellow" />
+
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Status}"
+                                             Value="0">
+                                    <Setter Property="BorderBrush"
+                                            Value="LightGray" />
+
+                                </DataTrigger>
+                            </Style.Triggers>
+
                         </Style>
                     </nodify:NodifyEditor.ItemContainerStyle>
 
@@ -402,35 +429,87 @@
                                 x:Name="Node"
                                 Input="{Binding Input}"
                                 VerticalAlignment="Center"
-                                
                                 Output="{Binding Output}">
                                 <nodify:Node.Resources>
-                                    
+
                                     <taskEditor1:InterfacesToString x:Key="InterfacesToString" />
                                     <DataTemplate x:Key="InputTemplate" DataType="{x:Type taskEditor:ConnectorItem}">
                                         <nodify:NodeInput
-
+                                            ToolTip="{Binding InputObject}"
+                                            ToolTipService.InitialShowDelay="0"
                                             IsConnected="{Binding IsConnected}"
                                             Anchor="{Binding Anchor, Mode=OneWayToSource}">
+
                                             <nodify:NodeInput.Header>
+
                                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
                                                             HorizontalAlignment="Right">
-
-
                                                     <TextBlock VerticalAlignment="Center" FontSize="12"
                                                                Text="{Binding TypeName}">
-                                                        <TextBlock.Background>
-                                                            <SolidColorBrush
-                                                                Color="{DynamicResource TextFillColorPrimary}"
-                                                                Opacity="0.6" />
-                                                        </TextBlock.Background>
-                                                        <TextBlock.Foreground>
-                                                            <SolidColorBrush
-                                                                Color="{DynamicResource ApplicationBackgroundColor}" />
-                                                        </TextBlock.Foreground>
+                                                        <TextBlock.Resources>
+                                                            <Style BasedOn="{StaticResource {x:Type TextBlock}}"
+                                                                   TargetType="{x:Type TextBlock}">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding  IsNotUsed}"
+                                                                        Value="True">
+                                                                        <Setter Property="Background">
+                                                                            <Setter.Value>
+                                                                                <SolidColorBrush
+                                                                                    Color="{DynamicResource ControlFillColorDisabled}"
+                                                                                    Opacity="0.6" />
+                                                                            </Setter.Value>
+                                                                        </Setter>
+                                                                        <Setter Property="Foreground">
+                                                                            <Setter.Value>
+                                                                                <SolidColorBrush
+                                                                                    Color="{DynamicResource TextFillColorTertiary}" />
+                                                                            </Setter.Value>
+                                                                        </Setter>
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding  IsNotUsed}"
+                                                                        Value="False">
+                                                                        <Setter Property="Background">
+                                                                            <Setter.Value>
+                                                                                <SolidColorBrush
+                                                                                    Color="{DynamicResource TextFillColorPrimary}"
+                                                                                    Opacity="0.6" />
+                                                                            </Setter.Value>
+                                                                        </Setter>
+                                                                        <Setter Property="Foreground">
+                                                                            <Setter.Value>
+                                                                                <SolidColorBrush
+                                                                                    Color="{DynamicResource ApplicationBackgroundColor}" />
+                                                                            </Setter.Value>
+                                                                        </Setter>
+
+
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+
+                                                            </Style>
+                                                        </TextBlock.Resources>
+
                                                     </TextBlock>
                                                     <TextBlock VerticalAlignment="Center" x:Name="textBlock"
-                                                               Text="{Binding Title}" />
+                                                               Text="{Binding Title}">
+                                                        <TextBlock.Resources>
+                                                            <Style BasedOn="{StaticResource {x:Type TextBlock}}"
+                                                                   TargetType="{x:Type TextBlock}">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding  IsNotUsed}"
+                                                                        Value="True">
+                                                                        <Setter Property="Foreground">
+                                                                            <Setter.Value>
+                                                                                <SolidColorBrush
+                                                                                    Color="{DynamicResource TextFillColorTertiary}" />
+                                                                            </Setter.Value>
+                                                                        </Setter>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+
+                                                            </Style>
+                                                        </TextBlock.Resources>
+                                                    </TextBlock>
                                                 </StackPanel>
                                             </nodify:NodeInput.Header>
                                             <nodify:NodeInput.BorderBrush>
@@ -442,7 +521,7 @@
                                     </DataTemplate>
                                     <plugin:MyDataTemplateSelector x:Key="MyDataTemplateSelector" />
                                 </nodify:Node.Resources>
-                                
+
                                 <nodify:Node.Foreground>
                                     <SolidColorBrush Color="{DynamicResource ApplicationBackgroundColor}" />
                                 </nodify:Node.Foreground>
@@ -464,6 +543,9 @@
                                 <nodify:Node.OutputConnectorTemplate>
                                     <DataTemplate DataType="{x:Type taskEditor:ConnectorItem}">
                                         <nodify:NodeOutput
+                                            x:Name="NodeOutput"
+                                            ToolTip="{Binding InputObject}"
+                                            ToolTipService.InitialShowDelay="0"
                                             VerticalAlignment="Center"
                                             IsConnected="{Binding IsConnected}"
                                             Anchor="{Binding Anchor, Mode=OneWayToSource}">
