@@ -1,37 +1,36 @@
-﻿<Page x:Class="Kitopia.View.Pages.Plugin.PluginManagerPage"
+﻿<Page x:Class="Kitopia.View.Pages.Plugin.CustomScenariosManagerPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:customScenario1="clr-namespace:Core.ViewModel.Pages.customScenario;assembly=Core"
+      mc:Ignorable="d"
       ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
       ui:Design.Foreground="{DynamicResource BodyColor}"
-      d:DataContext="{d:DesignInstance plugin:PluginManagerPageViewModel,
+      d:DataContext="{d:DesignInstance customScenario1:CustomScenariosManagerPageViewModel,
                                      IsDesignTimeCreatable=False}"
       Foreground="{DynamicResource BodyColor}"
-      mc:Ignorable="d"
-      xmlns:plugin="clr-namespace:Core.ViewModel.Pages.plugin;assembly=Core"
-      xmlns:plugin1="clr-namespace:Kitopia.View.Pages.Plugin"
-      xmlns:searchWindow="clr-namespace:Kitopia.Converter.SearchWindow"
-      Title="插件管理页面">
+      
+      Title="CustomScenariosManagerPage">
     <Page.Resources>
-        <plugin1:PluginInfoToInfo x:Key="PluginInfoToInfo" />
-
-
-        <searchWindow:PathToImageConverter x:Key="PathToImageConverter" />
+        
 
 
     </Page.Resources>
     <StackPanel Margin="42">
-        <TextBlock Margin="0" FontSize="18" FontWeight="DemiBold" Text="插件列表">
+        <TextBlock Margin="0" FontSize="18" FontWeight="DemiBold" Text="情景列表">
             <TextBlock.Foreground>
                 <SolidColorBrush Color="{DynamicResource TextFillColorPrimary}" />
             </TextBlock.Foreground>
         </TextBlock>
+        <StackPanel Orientation="Horizontal">
+            <ui:Button Content="新建情景" Command="{Binding NewCustomScenariosCommand}" />
+        </StackPanel>
         <ui:DataGrid VerticalScrollBarVisibility="Visible" IsReadOnly="True" x:Name="dataGrid" RowHeight="75"
                      GridLinesVisibility="None" ColumnWidth="*"
                      HeadersVisibility="None" MaxHeight="385" HorizontalContentAlignment="Stretch"
-                     ItemsSource="{Binding Items,UpdateSourceTrigger=PropertyChanged}" AutoGenerateColumns="False"
+                     ItemsSource="{Binding List,UpdateSourceTrigger=PropertyChanged}" AutoGenerateColumns="False"
                      Margin="0,10,0,0">
 
             <DataGrid.CellStyle>
@@ -59,7 +58,7 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <ui:Button HorizontalAlignment="Stretch" x:Name="Button"
-                                       Command="{Binding Path=DataContext.ToPluginSettingPageCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Page}}}"
+                                       Command="{Binding Path=DataContext.ToTaskEditPageCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Page}}}"
                                        CommandParameter="{Binding SelectedValue, ElementName=dataGrid}"
                                        Background="Transparent"
                                        Height="72" Margin="0"
@@ -77,16 +76,16 @@
                                         </Grid.ColumnDefinitions>
                                         <Image Grid.Column="0" HorizontalAlignment="Left" Focusable="False" Width="48"
                                                Height="48" Margin="0,0,12,0"
-                                               Source="{Binding Icon, Converter={StaticResource PathToImageConverter}}" />
+                                               />
                                         <StackPanel Grid.Column="1" Margin="5" VerticalAlignment="Center"
                                                     HorizontalAlignment="Stretch">
                                             <TextBlock VerticalAlignment="Center" Margin="0" Focusable="False"
-                                                       Text="{Binding Path=PluginName}"
+                                                       Text="{Binding Name}"
 
                                                        Background="{x:Null}"
                                                        FontWeight="Normal" FontSize="18" />
                                             <TextBlock VerticalAlignment="Top" Margin="0"
-                                                       Text="{Binding Path=.,Converter={StaticResource PluginInfoToInfo }}" />
+                                                       Text="{Binding Description}" />
                                         </StackPanel>
                                         <ui:DynamicScrollViewer Grid.Column="2" Height="60" VerticalAlignment="Center"
                                                                 HorizontalScrollBarVisibility="Hidden">
@@ -95,14 +94,8 @@
                                                           TextWrapping="Wrap"
                                                           Text="{Binding Description}" />
                                         </ui:DynamicScrollViewer>
-
-                                        <ui:ToggleSwitch
-                                            IsChecked="{Binding IsEnabled,Mode=OneWay}"
-                                            Margin="0,0,10,0" Grid.Column="3"
-                                            Command="{Binding Path=DataContext.SwitchCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Page}}}"
-                                            CommandParameter="{Binding}" />
+                                        
                                         <ui:SymbolIcon Grid.Column="4" Symbol="ChevronRight20" FontSize="20"
-                                                       Visibility="{Binding IsEnabled,Converter={StaticResource boolToVisibilityConverter},UpdateSourceTrigger=PropertyChanged}"
                                                        Margin="0,0,10,0" />
                                     </Grid>
                                 </StackPanel>

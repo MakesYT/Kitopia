@@ -15,6 +15,7 @@ using Core.SDKs.Services.Plugin;
 using Core.SDKs.Tools;
 using Core.ViewModel;
 using Core.ViewModel.Pages;
+using Core.ViewModel.Pages.customScenario;
 using Core.ViewModel.Pages.plugin;
 using Core.ViewModel.TaskEditor;
 using Kitopia.Services;
@@ -27,6 +28,7 @@ using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Win32;
 using Wpf.Ui.Contracts;
 using Wpf.Ui.Services;
+using ContentDialogService = Kitopia.Services.ContentDialogService;
 using MessageBox = Kitopia.Controls.MessageBoxControl.MessageBox;
 using MessageBoxResult = Kitopia.Controls.MessageBoxControl.MessageBoxResult;
 
@@ -152,7 +154,8 @@ public sealed partial class App : Application
             log.Info("配置文件初始化完成");
             PluginManager.Init();
             log.Info("插件管理器初始化完成");
-
+            CustomScenarioManger.Init();
+            log.Info("场景管理器初始化完成");
             var initWindow = ServiceManager.Services.GetService<MainWindow>();
             initWindow.Show();
             // initWindow.Close();
@@ -273,9 +276,8 @@ public sealed partial class App : Application
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddTransient<INavigationPageService, NavigationPageService>();
         services.AddTransient<IClipboardService, ClipboardService>();
-#if DEBUG
         services.AddTransient<ITaskEditorOpenService, TaskEditorOpenService>();
-#endif
+        services.AddTransient<IContentDialog, ContentDialogService>();
         services.AddSingleton<SearchWindowViewModel>(e =>
         {
             return new SearchWindowViewModel { IsActive = true };
@@ -332,6 +334,16 @@ public sealed partial class App : Application
         {
             return new TaskEditor() { DataContext = e.GetService<TaskEditorViewModel>() };
         });
+        services.AddTransient<CustomScenariosManagerPageViewModel>(e =>
+        {
+            return new CustomScenariosManagerPageViewModel { IsActive = true };
+        });
+        services.AddTransient<CustomScenariosManagerPage>(e =>
+        {
+            return new CustomScenariosManagerPage()
+                { DataContext = e.GetService<CustomScenariosManagerPageViewModel>() };
+        });
+
         return services.BuildServiceProvider();
     }
 

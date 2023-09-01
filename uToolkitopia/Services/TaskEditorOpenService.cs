@@ -12,12 +12,19 @@ public class TaskEditorOpenService : ITaskEditorOpenService
 {
     public void Open()
     {
-#if DEBUG
         Application.Current.Dispatcher.BeginInvoke(() =>
         {
             ((TaskEditor)ServiceManager.Services!.GetService(typeof(TaskEditor))!)!.Show();
         });
+    }
 
-#endif
+    public void Open(string name)
+    {
+        Application.Current.Dispatcher.BeginInvoke(() =>
+        {
+            var taskEditor = ((TaskEditor)ServiceManager.Services!.GetService(typeof(TaskEditor))!)!;
+            taskEditor.LoadTask(name);
+            taskEditor.Show();
+        });
     }
 }

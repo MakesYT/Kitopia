@@ -58,7 +58,7 @@
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
                 <ui:NavigationViewItem Content="任务" FontSize="14" Cursor="Hand"
-                                       TargetPageType="plugin:PluginManagerPage">
+                                       TargetPageType="plugin:CustomScenariosManagerPage">
                     <ui:NavigationViewItem.Icon>
                         <ui:SymbolIcon Symbol="TaskListLtr24" FontSize="25" />
                     </ui:NavigationViewItem.Icon>

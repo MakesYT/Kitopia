@@ -24,6 +24,11 @@ public partial class TaskEditor
         Height = SystemParameters.PrimaryScreenHeight * 2 / 3;
     }
 
+    public void LoadTask(string name)
+    {
+        ((TaskEditorViewModel)DataContext).Load(name);
+    }
+
     protected override void OnSourceInitialized(EventArgs e)
     {
         base.OnSourceInitialized(e);
@@ -33,6 +38,7 @@ public partial class TaskEditor
         {
             WindowBackdrop.ApplyBackdrop(m_Hwnd, WindowBackdropType.Acrylic);
         };
+        ((TaskEditorViewModel)DataContext).ContentPresenter = this.ContentPresenter;
     }
 
     private void ListBox_OnMouseMove(object sender, MouseEventArgs e)
@@ -84,5 +90,21 @@ public partial class TaskEditor
     private void NodifyEditor_DragLeave(object sender, DragEventArgs e)
     {
         //throw new System.NotImplementedException();
+    }
+
+    private void ListBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+    {
+        if (!e.Handled)
+        {
+            // ListView拦截鼠标滚轮事件
+            e.Handled = true;
+
+            // 激发一个鼠标滚轮事件，冒泡给外层ListView接收到
+            var eventArg = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta);
+            eventArg.RoutedEvent = UIElement.MouseWheelEvent;
+            eventArg.Source = sender;
+            var parent = ((Control)sender).Parent as UIElement;
+            parent.RaiseEvent(eventArg);
+        }
     }
 }

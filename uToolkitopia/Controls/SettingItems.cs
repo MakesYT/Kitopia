@@ -13,6 +13,19 @@ namespace Kitopia.Controls;
 public class SettingItems : ContentControl
 {
     [Bindable(true)]
+    [Category("TitleFontSize")]
+    public int TitleFontSize
+    {
+        get => (int)GetValue(TitleFontSizeProperty);
+        set => SetValue(TitleFontSizeProperty, value);
+    }
+
+    [Bindable(true)] public static readonly DependencyProperty TitleFontSizeProperty = DependencyProperty.Register(
+        nameof(TitleFontSize),
+        typeof(int), typeof(SettingItems),
+        new FrameworkPropertyMetadata(15));
+
+    [Bindable(true)]
     [Category("Title")]
     public string Title
     {
@@ -35,7 +48,7 @@ public class SettingItems : ContentControl
 
     public static readonly DependencyProperty DescriptionProperty = DependencyProperty.Register(nameof(Description),
         typeof(string), typeof(SettingItems),
-        new PropertyMetadata(""));
+        new PropertyMetadata(null));
 
 
     [Bindable(true)]

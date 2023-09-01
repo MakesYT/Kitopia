@@ -37,12 +37,12 @@
                                 TextElement.FontSize="{Binding Path=FontSize,RelativeSource={RelativeSource TemplatedParent}}"
                                 TextElement.Foreground="{TemplateBinding Foreground}" />
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <TextBlock Margin="0" Focusable="False"
+                                <TextBlock Margin="0" Focusable="False" x:Name="title"
                                            Text="{Binding Title, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
                                            FontSize="15"
                                            Background="{x:Null}"
                                            FontWeight="Normal" />
-                                <TextBlock Margin="0" Focusable="False"
+                                <TextBlock Margin="0" Focusable="False" x:Name="description"
                                            Text="{Binding Description, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
                                            FontSize="13"
                                            Foreground="{DynamicResource TextPlaceholderColorBrush}"
@@ -58,6 +58,12 @@
                                 TextElement.Foreground="{TemplateBinding Foreground}" />
                         </Grid>
                     </ui:Card>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Description" Value="{x:Null}">
+                            <Setter TargetName="description" Property="Visibility" Value="Collapsed" />
+                            
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

@@ -4,9 +4,10 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
 using System.Windows;
-using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Core.SDKs.Services;
+using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
 using Core.SDKs.Tools;
 using PluginCore;
@@ -18,9 +19,10 @@ namespace Core.ViewModel.TaskEditor;
 
 public partial class TaskEditorViewModel : ObservableRecipient
 {
-    public ICommand DisconnectConnectorCommand
+    public object ContentPresenter
     {
         get;
+        set;
     }
 
     public PendingConnectionViewModel PendingConnection
@@ -29,7 +31,13 @@ public partial class TaskEditorViewModel : ObservableRecipient
     }
 
     [ObservableProperty] private BindingList<object> _nodeMethods = new();
+    [ObservableProperty] private string _name = "任务1";
+    [ObservableProperty] private string _description;
 
+    partial void OnNameChanged(string value)
+    {
+        Nodes[0].Title = value;
+    }
 
     [RelayCommand]
     private void AddNodes(PointItem pointItem)
@@ -91,6 +99,107 @@ public partial class TaskEditorViewModel : ObservableRecipient
         item.Output = output;
         Nodes.Add(item);
         //OnPropertyChanged(nameof(Nodes));
+    }
+
+    private string? UUID;
+
+    [RelayCommand]
+    private void SaveCustomScenario()
+    {
+        CleanUnusedNode();
+        CustomScenario customScenario = new CustomScenario();
+        customScenario.UUID = UUID;
+        customScenario.Name = Name;
+        customScenario.Description = Description;
+        customScenario.connections = new List<ConnectionItem>(Connections);
+        customScenario.nodes = new List<PointItem>(Nodes);
+        CustomScenarioManger.Save(customScenario);
+        UUID = customScenario.UUID;
+    }
+
+    [RelayCommand]
+    private void SaveAndQuitCustomScenario(Window window)
+    {
+        CleanUnusedNode();
+        ((IContentDialog)ServiceManager.Services!.GetService(typeof(IContentDialog))!).ShowDialog(ContentPresenter,
+            "保存并退出?", "是否确定保存并退出",
+            () =>
+            {
+                CustomScenario customScenario = new CustomScenario();
+                customScenario.Name = Name;
+                customScenario.UUID = UUID;
+                customScenario.Description = Description;
+                customScenario.connections = new List<ConnectionItem>(Connections);
+                customScenario.nodes = new List<PointItem>(Nodes);
+                CustomScenarioManger.Save(customScenario);
+                UUID = customScenario.UUID;
+                Application.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    window.Close();
+                });
+            }, () =>
+            {
+            }
+        );
+    }
+
+    [RelayCommand]
+    private void CleanUnusedNode()
+    {
+        for (var i = Nodes.Count - 1; i >= 1; i--)
+        {
+            bool toRemove = true;
+
+            foreach (var connectorItem in Nodes[i].Input)
+            {
+                if (connectorItem.IsConnected)
+                {
+                    toRemove = false;
+                    break;
+                }
+            }
+
+            if (!toRemove)
+            {
+                return;
+            }
+
+            foreach (var connectorItem in Nodes[i].Output)
+            {
+                if (connectorItem.IsConnected)
+                {
+                    toRemove = false;
+                    break;
+                }
+            }
+
+            if (toRemove)
+            {
+                Nodes.Remove(Nodes[i]);
+            }
+        }
+    }
+
+    [RelayCommand]
+    private void DisconnectConnector(ConnectorItem connector)
+    {
+        var connections = Connections.Where((e) => e.Source == connector || e.Target == connector).ToList();
+        for (var i = connections.Count - 1; i >= 0; i--)
+        {
+            var connection = connections[i];
+            Connections.Remove(connection);
+            if (Connections.All(e => e.Source != connection.Source))
+            {
+                connection.Source.IsConnected = false;
+            }
+
+            if (Connections.All(e => e.Target != connection.Target))
+            {
+                connection.Target.IsConnected = false;
+            }
+        }
+
+        ToFirstVerify();
     }
 
     [ObservableProperty] private ObservableCollection<PointItem> nodes = new();
@@ -238,26 +347,6 @@ public partial class TaskEditorViewModel : ObservableRecipient
     public TaskEditorViewModel()
     {
         PendingConnection = new PendingConnectionViewModel(this);
-        DisconnectConnectorCommand = new RelayCommand<ConnectorItem>(connector =>
-        {
-            var connections = Connections.Where((e) => e.Source == connector || e.Target == connector).ToList();
-            for (var i = connections.Count - 1; i >= 0; i--)
-            {
-                var connection = connections[i];
-                Connections.Remove(connection);
-                if (Connections.All(e => e.Source != connection.Source))
-                {
-                    connection.Source.IsConnected = false;
-                }
-
-                if (Connections.All(e => e.Target != connection.Target))
-                {
-                    connection.Target.IsConnected = false;
-                }
-            }
-
-            ToFirstVerify();
-        });
         GetAllMethods();
         var nodify2 = new PointItem()
         {
@@ -276,6 +365,14 @@ public partial class TaskEditorViewModel : ObservableRecipient
         };
         Nodes.Add(nodify2);
         //nodeMethods.Add("new PointItem(){Title = \"Test\"}");
+    }
+
+    public void Load(string name)
+    {
+        var customScenario = CustomScenarioManger.CustomScenarios[name];
+        UUID = customScenario.UUID;
+        Nodes = new ObservableCollection<PointItem>(customScenario.nodes);
+        Connections = new BindingList<ConnectionItem>(customScenario.connections);
     }
 
     public void Connect(ConnectorItem source, ConnectorItem target)
