@@ -18,7 +18,7 @@ public partial class TaskEditorViewModel
     [RelayCommand]
     private void VerifyNode()
     {
-        foreach (var pointItem in Nodes)
+        foreach (var pointItem in Scenario.nodes)
         {
             pointItem.Status = s节点状态.未验证;
             foreach (var connectorItem in pointItem.Output)
@@ -37,10 +37,10 @@ public partial class TaskEditorViewModel
 
         _firstVerifyPointItems = new List<PointItem>();
         _firstPassesPointItems = new List<PointItem>();
-        _firstVerifyPointItems.Add(Nodes[0]);
-        _firstPassesPointItems.Add(Nodes[0]);
-        Nodes[0].Status = s节点状态.已验证;
-        var connectionItem = Connections.FirstOrDefault((e) => e.Source == Nodes[0].Output[0]);
+        _firstVerifyPointItems.Add(Scenario.nodes[0]);
+        _firstPassesPointItems.Add(Scenario.nodes[0]);
+        Scenario.nodes[0].Status = s节点状态.已验证;
+        var connectionItem = Scenario.connections.FirstOrDefault((e) => e.Source == Scenario.nodes[0].Output[0]);
         if (connectionItem == null)
         {
             return;
@@ -59,7 +59,7 @@ public partial class TaskEditorViewModel
 
     private void ToFirstVerify(bool notRealTime = false)
     {
-        foreach (var pointItem in Nodes)
+        foreach (var pointItem in Scenario.nodes)
         {
             pointItem.Status = s节点状态.未验证;
         }
@@ -67,11 +67,11 @@ public partial class TaskEditorViewModel
         new Dictionary<ConnectionItem, object>();
         _firstVerifyPointItems = new List<PointItem>();
         _firstPassesPointItems = new List<PointItem>();
-        _firstVerifyPointItems.Add(Nodes[0]);
-        _firstPassesPointItems.Add(Nodes[0]);
-        Nodes[0].Status = notRealTime ? s节点状态.已验证 : s节点状态.初步验证;
+        _firstVerifyPointItems.Add(Scenario.nodes[0]);
+        _firstPassesPointItems.Add(Scenario.nodes[0]);
+        Scenario.nodes[0].Status = notRealTime ? s节点状态.已验证 : s节点状态.初步验证;
 
-        var connectionItem = Connections.FirstOrDefault((e) => e.Source == Nodes[0].Output[0]);
+        var connectionItem = Scenario.connections.FirstOrDefault((e) => e.Source == Scenario.nodes[0].Output[0]);
         if (connectionItem == null)
         {
             return;
@@ -133,7 +133,7 @@ public partial class TaskEditorViewModel
             }
 
             //这是连接当前节点的节点
-            var connectionItem = Connections.Where((e) => e.Target == connectorItem).ToList();
+            var connectionItem = Scenario.connections.Where((e) => e.Target == connectorItem).ToList();
             foreach (var item in connectionItem)
             {
                 var sourceSource = item.Source.Source;
@@ -210,7 +210,8 @@ public partial class TaskEditorViewModel
                         {
                             nowPointItem.Output[0].InputObject = nowPointItem.Input[1].InputObject
                                 .Equals(nowPointItem.Input[2].InputObject);
-                            var nextNode = Connections.Where((e) => e.Source == nowPointItem.Output[0]).ToList();
+                            var nextNode = Scenario.connections.Where((e) => e.Source == nowPointItem.Output[0])
+                                .ToList();
                             foreach (var item in nextNode)
                             {
                                 item.Target.InputObject = nowPointItem.Output[0].InputObject;
@@ -239,7 +240,8 @@ public partial class TaskEditorViewModel
                             }
 
                             nowPointItem.Output[0].InputObject = userInputData;
-                            var nextNode = Connections.Where((e) => e.Source == nowPointItem.Output[0]).ToList();
+                            var nextNode = Scenario.connections.Where((e) => e.Source == nowPointItem.Output[0])
+                                .ToList();
                             foreach (var item in nextNode)
                             {
                                 item.Target.InputObject = userInputData;
@@ -297,7 +299,8 @@ public partial class TaskEditorViewModel
                                 {
                                     var value = invoke.GetPropertyValue<object>(memberInfo.Name);
                                     connectorItem.InputObject = value;
-                                    var nextNode = Connections.Where((e) => e.Source == connectorItem).ToList();
+                                    var nextNode = Scenario.connections.Where((e) => e.Source == connectorItem)
+                                        .ToList();
                                     foreach (var item in nextNode)
                                     {
                                         item.Target.InputObject = value;
@@ -313,7 +316,8 @@ public partial class TaskEditorViewModel
                         if (nowPointItem.Output.Any())
                         {
                             nowPointItem.Output[0].InputObject = invoke;
-                            var nextNode = Connections.Where((e) => e.Source == nowPointItem.Output[0]).ToList();
+                            var nextNode = Scenario.connections.Where((e) => e.Source == nowPointItem.Output[0])
+                                .ToList();
                             foreach (var item in nextNode)
                             {
                                 item.Target.InputObject = invoke;
@@ -333,7 +337,7 @@ public partial class TaskEditorViewModel
         {
             foreach (var outputConnector in nowPointItem.Output)
             {
-                var thisToNextConnections = Connections.Where((e) => e.Source == outputConnector).ToList();
+                var thisToNextConnections = Scenario.connections.Where((e) => e.Source == outputConnector).ToList();
                 foreach (var thisToNextConnection in thisToNextConnections)
                 {
                     var nextPointItem = thisToNextConnection.Target.Source;

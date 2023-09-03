@@ -6,8 +6,8 @@ using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using Wpf.Ui.Common;
 using Wpf.Ui.Controls;
+using Wpf.Ui.Input;
 using Wpf.Ui.Interop;
 
 #endregion

@@ -2,6 +2,7 @@
 
 using System.Windows;
 using Core.SDKs.Services;
+using Core.SDKs.Services.Config;
 using Kitopia.View;
 
 #endregion
@@ -18,7 +19,7 @@ public class TaskEditorOpenService : ITaskEditorOpenService
         });
     }
 
-    public void Open(string name)
+    public void Open(CustomScenario name)
     {
         Application.Current.Dispatcher.BeginInvoke(() =>
         {

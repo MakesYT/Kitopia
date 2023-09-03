@@ -1,12 +1,13 @@
-﻿using System.IO;
+﻿using System.Collections.ObjectModel;
+using System.IO;
 using log4net;
 using Newtonsoft.Json;
 
 namespace Core.SDKs.Services.Config;
 
-public class CustomScenarioManger
+public partial class CustomScenarioManger
 {
-    public static Dictionary<string, CustomScenario> CustomScenarios = new();
+    public static ObservableCollection<CustomScenario> CustomScenarios = new();
     private static readonly ILog Log = LogManager.GetLogger(nameof(CustomScenarioManger));
 
     public static void Init()
@@ -22,7 +23,7 @@ public class CustomScenarioManger
             var json = File.ReadAllText(fileInfo.FullName);
             try
             {
-                CustomScenarios.Add(fileInfo.Name, JsonConvert.DeserializeObject<CustomScenario>(json)!);
+                CustomScenarios.Add(JsonConvert.DeserializeObject<CustomScenario>(json)!);
             }
             catch (Exception e)
             {
@@ -38,7 +39,7 @@ public class CustomScenarioManger
         {
             var s = Guid.NewGuid().ToString();
             scenario.UUID = s;
-            CustomScenarios.Add(s, scenario);
+            CustomScenarios.Add(scenario);
         }
 
         var configF = new FileInfo(AppDomain.CurrentDomain.BaseDirectory + $"customScenarios\\{scenario.UUID}.json");
@@ -49,5 +50,24 @@ public class CustomScenarioManger
         setting.Formatting = Formatting.Indented;
 
         File.WriteAllText(configF.FullName, JsonConvert.SerializeObject(scenario, setting));
+    }
+
+    public static void Reload(CustomScenario scenario)
+    {
+        CustomScenarios.Remove(scenario);
+        var configF = new FileInfo(AppDomain.CurrentDomain.BaseDirectory + $"customScenarios\\{scenario.UUID}.json");
+        if (configF.Exists)
+        {
+            var json = File.ReadAllText(configF.FullName);
+            try
+            {
+                CustomScenarios.Add(JsonConvert.DeserializeObject<CustomScenario>(json)!);
+            }
+            catch (Exception e)
+            {
+                Log.Error(e);
+                Log.Error("情景文件加载失败");
+            }
+        }
     }
 }

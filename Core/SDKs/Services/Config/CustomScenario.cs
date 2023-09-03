@@ -1,8 +1,10 @@
-﻿using Core.ViewModel.TaskEditor;
+﻿using System.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
+using Core.ViewModel.TaskEditor;
 
 namespace Core.SDKs.Services.Config;
 
-public class CustomScenario
+public partial class CustomScenario : ObservableRecipient
 {
     public string? UUID
     {
@@ -10,18 +12,21 @@ public class CustomScenario
         set;
     }
 
-    public List<PointItem> nodes = new();
-    public List<ConnectionItem> connections = new();
-
-    public string Name
+    public BindingList<PointItem> nodes
     {
         get;
         set;
-    } = "";
+    } = new();
 
-    public string Description
+    public BindingList<ConnectionItem> connections
     {
         get;
         set;
-    } = "";
+    } = new();
+
+    [ObservableProperty] [NotifyPropertyChangedRecipients]
+    public string _name = "任务";
+
+    [ObservableProperty] [NotifyPropertyChangedRecipients]
+    public string _description = "";
 }

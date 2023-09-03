@@ -31,17 +31,12 @@ public partial class TaskEditorViewModel : ObservableRecipient
     }
 
     [ObservableProperty] private BindingList<object> _nodeMethods = new();
-    [ObservableProperty] private string _name = "任务1";
-    [ObservableProperty] private string _description;
 
-    partial void OnNameChanged(string value)
-    {
-        Nodes[0].Title = value;
-    }
 
     [RelayCommand]
     private void AddNodes(PointItem pointItem)
     {
+        IsModified = true;
         var item = new PointItem()
         {
             Title = pointItem.Title,
@@ -97,42 +92,34 @@ public partial class TaskEditorViewModel : ObservableRecipient
 
         item.Input = input;
         item.Output = output;
-        Nodes.Add(item);
+        Scenario.nodes.Add(item);
         //OnPropertyChanged(nameof(Nodes));
     }
 
-    private string? UUID;
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(SaveCustomScenarioCommand))]
+    [NotifyCanExecuteChangedFor(nameof(SaveAndQuitCustomScenarioCommand))]
+    public bool _isModified = false;
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsModified))]
     private void SaveCustomScenario()
     {
         CleanUnusedNode();
-        CustomScenario customScenario = new CustomScenario();
-        customScenario.UUID = UUID;
-        customScenario.Name = Name;
-        customScenario.Description = Description;
-        customScenario.connections = new List<ConnectionItem>(Connections);
-        customScenario.nodes = new List<PointItem>(Nodes);
-        CustomScenarioManger.Save(customScenario);
-        UUID = customScenario.UUID;
+
+        IsModified = false;
+        CustomScenarioManger.Save(Scenario);
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsModified))]
     private void SaveAndQuitCustomScenario(Window window)
     {
         CleanUnusedNode();
-        ((IContentDialog)ServiceManager.Services!.GetService(typeof(IContentDialog))!).ShowDialog(ContentPresenter,
+        ((IContentDialog)ServiceManager.Services!.GetService(typeof(IContentDialog))!).ShowDialogAsync(ContentPresenter,
             "保存并退出?", "是否确定保存并退出",
             () =>
             {
-                CustomScenario customScenario = new CustomScenario();
-                customScenario.Name = Name;
-                customScenario.UUID = UUID;
-                customScenario.Description = Description;
-                customScenario.connections = new List<ConnectionItem>(Connections);
-                customScenario.nodes = new List<PointItem>(Nodes);
-                CustomScenarioManger.Save(customScenario);
-                UUID = customScenario.UUID;
+                IsModified = false;
+                CustomScenarioManger.Save(Scenario);
                 Application.Current.Dispatcher.BeginInvoke(() =>
                 {
                     window.Close();
@@ -146,11 +133,11 @@ public partial class TaskEditorViewModel : ObservableRecipient
     [RelayCommand]
     private void CleanUnusedNode()
     {
-        for (var i = Nodes.Count - 1; i >= 1; i--)
+        for (var i = Scenario.nodes.Count - 1; i >= 1; i--)
         {
             bool toRemove = true;
 
-            foreach (var connectorItem in Nodes[i].Input)
+            foreach (var connectorItem in Scenario.nodes[i].Input)
             {
                 if (connectorItem.IsConnected)
                 {
@@ -164,7 +151,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 return;
             }
 
-            foreach (var connectorItem in Nodes[i].Output)
+            foreach (var connectorItem in Scenario.nodes[i].Output)
             {
                 if (connectorItem.IsConnected)
                 {
@@ -175,7 +162,8 @@ public partial class TaskEditorViewModel : ObservableRecipient
 
             if (toRemove)
             {
-                Nodes.Remove(Nodes[i]);
+                IsModified = true;
+                Scenario.nodes.Remove(Scenario.nodes[i]);
             }
         }
     }
@@ -183,28 +171,31 @@ public partial class TaskEditorViewModel : ObservableRecipient
     [RelayCommand]
     private void DisconnectConnector(ConnectorItem connector)
     {
-        var connections = Connections.Where((e) => e.Source == connector || e.Target == connector).ToList();
+        var connections = Scenario.connections.Where((e) => e.Source == connector || e.Target == connector).ToList();
         for (var i = connections.Count - 1; i >= 0; i--)
         {
             var connection = connections[i];
-            Connections.Remove(connection);
-            if (Connections.All(e => e.Source != connection.Source))
+            Scenario.connections.Remove(connection);
+            if (Scenario.connections.All(e => e.Source != connection.Source))
             {
                 connection.Source.IsConnected = false;
             }
 
-            if (Connections.All(e => e.Target != connection.Target))
+            if (Scenario.connections.All(e => e.Target != connection.Target))
             {
                 connection.Target.IsConnected = false;
             }
+
+            IsModified = true;
         }
 
         ToFirstVerify();
     }
 
-    [ObservableProperty] private ObservableCollection<PointItem> nodes = new();
+    [ObservableProperty] private CustomScenario _scenario = new CustomScenario() { IsActive = true };
+    //[ObservableProperty] private ObservableCollection<PointItem> nodes = new();
 
-    [ObservableProperty] private BindingList<ConnectionItem> connections = new();
+    //[ObservableProperty] private BindingList<ConnectionItem> connections = new();
 
     private void GetAllMethods()
     {
@@ -346,6 +337,19 @@ public partial class TaskEditorViewModel : ObservableRecipient
 
     public TaskEditorViewModel()
     {
+        Scenario.PropertyChanged += (e, s) =>
+        {
+            switch (s.PropertyName)
+            {
+                case "Name":
+                {
+                    Scenario.nodes[0].Title = Scenario.Name;
+                    break;
+                }
+            }
+
+            IsModified = true;
+        };
         PendingConnection = new PendingConnectionViewModel(this);
         GetAllMethods();
         var nodify2 = new PointItem()
@@ -363,23 +367,68 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 Title = "开始"
             }
         };
-        Nodes.Add(nodify2);
+        Scenario.nodes.Add(nodify2);
         //nodeMethods.Add("new PointItem(){Title = \"Test\"}");
     }
 
-    public void Load(string name)
+    public void Load(CustomScenario customScenario)
     {
-        var customScenario = CustomScenarioManger.CustomScenarios[name];
-        UUID = customScenario.UUID;
-        Nodes = new ObservableCollection<PointItem>(customScenario.nodes);
-        Connections = new BindingList<ConnectionItem>(customScenario.connections);
+        Scenario = customScenario;
+        Scenario.PropertyChanged += (e, s) =>
+        {
+            switch (s.PropertyName)
+            {
+                case "Name":
+                {
+                    Scenario.nodes[0].Title = Scenario.Name;
+                    break;
+                }
+            }
+
+            IsModified = true;
+        };
+    }
+
+
+    private Window _window;
+
+    [RelayCommand]
+    private void Load(object window)
+    {
+        _window = (Window)window;
+    }
+
+    [RelayCommand]
+    public void ReloadScenario(CancelEventArgs e)
+    {
+        if (IsModified)
+        {
+            e.Cancel = true;
+            ((IToastService)ServiceManager.Services!.GetService(typeof(IToastService))!).showMessageBoxW(
+                "不保存退出?", "是否确定不保存退出", "取消", "不保存", "保存并退出",
+                () =>
+                {
+                    IsModified = false;
+                    CustomScenarioManger.Save(Scenario);
+                    _window.Close();
+                }, () =>
+                {
+                    IsModified = false;
+                    CustomScenarioManger.Reload(Scenario);
+                    _window.Close();
+                }, () =>
+                {
+                    e.Cancel = true;
+                }
+            );
+        }
     }
 
     public void Connect(ConnectorItem source, ConnectorItem target)
     {
         if (source.IsConnected)
         {
-            if (Connections
+            if (Scenario.connections
                 .Any(e => e.Source == source && e.Target == target))
             {
                 return;
@@ -390,7 +439,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
         {
             if (source.IsConnected)
             {
-                var connectionsToRemove = Connections
+                var connectionsToRemove = Scenario.connections
                     .Where(e => e.Source == source)
                     .ToList();
 
@@ -399,8 +448,8 @@ public partial class TaskEditorViewModel : ObservableRecipient
                     connection.Source.IsConnected = false;
 
 
-                    Connections.Remove(connection);
-                    if (Connections.All(e => e.Target != connection.Target))
+                    Scenario.connections.Remove(connection);
+                    if (Scenario.connections.All(e => e.Target != connection.Target))
                     {
                         connection.Target.IsConnected = false;
                     }
@@ -408,7 +457,8 @@ public partial class TaskEditorViewModel : ObservableRecipient
             }
         }
 
-        Connections.Add(new ConnectionItem(source, target));
+        IsModified = true;
+        Scenario.connections.Add(new ConnectionItem(source, target));
         ToFirstVerify();
         //OnPropertyChanged(nameof(Connections));
     }

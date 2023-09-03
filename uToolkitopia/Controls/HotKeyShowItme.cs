@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using Wpf.Ui.Common;
 using Wpf.Ui.Controls;
 using Wpf.Ui.Converters;
 using Button = System.Windows.Controls.Button;

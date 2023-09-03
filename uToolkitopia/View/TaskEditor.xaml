@@ -15,6 +15,7 @@
     WindowCornerPreference="Round"
     ExtendsContentIntoTitleBar="True"
     mc:Ignorable="d"
+    
     d:DataContext="{d:DesignInstance {x:Type taskEditor:TaskEditorViewModel}}"
     Title="TaskEditor" Height="450" Width="1800">
     <ui:FluentWindow.Resources>
@@ -67,6 +68,17 @@
             </ThicknessAnimationUsingKeyFrames>
         </Storyboard>
     </ui:FluentWindow.Resources>
+    <b:Interaction.Triggers>
+        <b:EventTrigger EventName="Closing">
+            <b:InvokeCommandAction Command="{Binding ReloadScenarioCommand}" PassEventArgsToCommand="True" />
+        </b:EventTrigger>
+        <b:EventTrigger EventName="DataContextChanged">
+            <b:InvokeCommandAction Command="{Binding LoadCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" />
+        </b:EventTrigger>
+        <b:EventTrigger EventName="Loaded">
+            <b:InvokeCommandAction Command="{Binding LoadCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" />
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
 
 
     <Grid>
@@ -112,13 +124,13 @@
 
                             <StackPanel>
                                 <controls:SettingItems Margin="0" Title="情景名称" FontSize="20">
-                                    <TextBox Text="{Binding Name,UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBox Text="{Binding Scenario.Name,UpdateSourceTrigger=PropertyChanged,NotifyOnTargetUpdated=True,NotifyOnSourceUpdated=True}" />
                                     <controls:SettingItems.Icon>
                                         <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25" />
                                     </controls:SettingItems.Icon>
                                 </controls:SettingItems>
                                 <controls:SettingItems Margin="0" Title="情景描述" FontSize="20">
-                                    <TextBox TextWrapping="Wrap" Text="{Binding Description,UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBox TextWrapping="Wrap" Text="{Binding Scenario.Description,UpdateSourceTrigger=PropertyChanged}" />
                                     <controls:SettingItems.Icon>
                                         <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25" />
                                     </controls:SettingItems.Icon>
@@ -322,6 +334,7 @@
                 <b:EventTrigger EventName="Loaded">
                     <b:ControlStoryboardAction Storyboard="{DynamicResource 显示窗口}" ControlStoryboardOption="Play" />
                 </b:EventTrigger>
+                
             </b:Interaction.Triggers>
         </Border>
 
@@ -334,6 +347,7 @@
                     </Grid.Background>
                 </Grid>
                 <nodify:NodifyEditor x:Name="Editor"
+                                     d:DataContext="{}"
                                      DataContext="{Binding}"
                                      AllowDrop="True"
                                      DragDrop.Drop="NodifyEditor_Drop"
@@ -345,8 +359,8 @@
 
                                      PendingConnection="{Binding PendingConnection}"
                                      DisconnectConnectorCommand="{Binding DisconnectConnectorCommand}"
-                                     Connections="{Binding Connections}"
-                                     ItemsSource="{Binding Nodes}">
+                                     Connections="{Binding Scenario.connections}"
+                                     ItemsSource="{Binding Scenario.nodes}">
                     <nodify:NodifyEditor.Background>
                         <DynamicResource ResourceKey="SmallGridLinesDrawingBrush" />
                     </nodify:NodifyEditor.Background>

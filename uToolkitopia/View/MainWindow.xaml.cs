@@ -17,8 +17,8 @@ using Kitopia.SDKs;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
 using Vanara.PInvoke;
+using Wpf.Ui;
 using Wpf.Ui.Appearance;
-using Wpf.Ui.Contracts;
 using Wpf.Ui.Controls;
 using MessageBox = Kitopia.Controls.MessageBoxControl.MessageBox;
 

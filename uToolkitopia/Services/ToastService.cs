@@ -50,8 +50,6 @@ public class ToastService : IToastService
                     case MessageBoxResult.Primary:
                     {
                         yesAction.Invoke();
-
-
                         break;
                     }
                     case MessageBoxResult.None:
@@ -61,5 +59,50 @@ public class ToastService : IToastService
                     }
                 }
             });
+        });
+
+    public void showMessageBoxW(string title, object content, string CloseButtonText, string SecondaryButtonText,
+        string PrimaryButtonText, Action? yes, Action? no, Action? cancel) =>
+        Application.Current.Dispatcher.BeginInvoke(() =>
+        {
+            var msg = new MessageBox();
+            msg.Title = title;
+            msg.Content = content;
+            msg.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            if (no is not null)
+            {
+                msg.SecondaryButtonText = SecondaryButtonText;
+            }
+
+            if (cancel is not null)
+            {
+                msg.CloseButtonText = CloseButtonText;
+            }
+
+            msg.PrimaryButtonText = PrimaryButtonText;
+            msg.FontSize = 15;
+            var task = msg.ShowDialogAsync().GetAwaiter();
+
+            // 使用ContinueWith来在任务完成后执行一个回调函数
+
+
+            switch (task.GetResult())
+            {
+                case MessageBoxResult.Primary:
+                {
+                    yes.Invoke();
+                    break;
+                }
+                case MessageBoxResult.None:
+                {
+                    cancel.Invoke();
+                    break;
+                }
+                case MessageBoxResult.Secondary:
+                {
+                    no.Invoke();
+                    break;
+                }
+            }
         });
 }

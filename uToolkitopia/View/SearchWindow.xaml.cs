@@ -25,6 +25,7 @@ public partial class SearchWindow : FluentWindow
     public SearchWindow()
     {
         InitializeComponent();
+
         WeakReferenceMessenger.Default.Register<string, string>(this, "SearchWindowClose", (_, _) =>
         {
             Application.Current.Dispatcher.BeginInvoke(() =>

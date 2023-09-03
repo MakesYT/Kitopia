@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
+using Core.SDKs.Services.Config;
 using Core.ViewModel.TaskEditor;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
@@ -24,7 +25,7 @@ public partial class TaskEditor
         Height = SystemParameters.PrimaryScreenHeight * 2 / 3;
     }
 
-    public void LoadTask(string name)
+    public void LoadTask(CustomScenario name)
     {
         ((TaskEditorViewModel)DataContext).Load(name);
     }

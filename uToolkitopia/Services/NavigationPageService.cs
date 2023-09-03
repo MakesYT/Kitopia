@@ -3,7 +3,7 @@
 using System;
 using Core.SDKs.Services;
 using Microsoft.Extensions.DependencyInjection;
-using Wpf.Ui.Contracts;
+using Wpf.Ui;
 
 #endregion
 
