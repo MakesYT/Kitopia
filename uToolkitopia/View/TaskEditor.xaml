@@ -15,7 +15,7 @@
     WindowCornerPreference="Round"
     ExtendsContentIntoTitleBar="True"
     mc:Ignorable="d"
-    
+
     d:DataContext="{d:DesignInstance {x:Type taskEditor:TaskEditorViewModel}}"
     Title="TaskEditor" Height="450" Width="1800">
     <ui:FluentWindow.Resources>
@@ -73,10 +73,12 @@
             <b:InvokeCommandAction Command="{Binding ReloadScenarioCommand}" PassEventArgsToCommand="True" />
         </b:EventTrigger>
         <b:EventTrigger EventName="DataContextChanged">
-            <b:InvokeCommandAction Command="{Binding LoadCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" />
+            <b:InvokeCommandAction Command="{Binding LoadCommand}"
+                                   CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" />
         </b:EventTrigger>
         <b:EventTrigger EventName="Loaded">
-            <b:InvokeCommandAction Command="{Binding LoadCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" />
+            <b:InvokeCommandAction Command="{Binding LoadCommand}"
+                                   CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" />
         </b:EventTrigger>
     </b:Interaction.Triggers>
 
@@ -99,7 +101,7 @@
         <!-- 左边部分 -->
         <Border x:Name="border" Grid.Row="1" Grid.Column="0" Padding="0,0,0,0">
             <ScrollViewer>
-                <ListBox x:Name="ListBox"  PreviewMouseWheel="ListBox_PreviewMouseWheel">
+                <ListBox x:Name="ListBox" PreviewMouseWheel="ListBox_PreviewMouseWheel">
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource {x:Type ListBoxItem}}">
                             <Setter Property="Template">
@@ -124,13 +126,15 @@
 
                             <StackPanel>
                                 <controls:SettingItems Margin="0" Title="情景名称" FontSize="20">
-                                    <TextBox Text="{Binding Scenario.Name,UpdateSourceTrigger=PropertyChanged,NotifyOnTargetUpdated=True,NotifyOnSourceUpdated=True}" />
+                                    <TextBox
+                                        Text="{Binding Scenario.Name,UpdateSourceTrigger=PropertyChanged,NotifyOnTargetUpdated=True,NotifyOnSourceUpdated=True}" />
                                     <controls:SettingItems.Icon>
                                         <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25" />
                                     </controls:SettingItems.Icon>
                                 </controls:SettingItems>
                                 <controls:SettingItems Margin="0" Title="情景描述" FontSize="20">
-                                    <TextBox TextWrapping="Wrap" Text="{Binding Scenario.Description,UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBox TextWrapping="Wrap"
+                                             Text="{Binding Scenario.Description,UpdateSourceTrigger=PropertyChanged}" />
                                     <controls:SettingItems.Icon>
                                         <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25" />
                                     </controls:SettingItems.Icon>
@@ -138,7 +142,88 @@
                             </StackPanel>
                         </Expander.Content>
                     </Expander>
+                    <Expander Header="触发条件" FontSize="15" IsExpanded="True" FontWeight="Medium">
+                        <Expander.Content>
 
+                            <StackPanel>
+                                <Expander x:Name="CardExpander"
+                                    IsEnabled="{Binding Scenario.ExecutionManual,Mode=OneWay}"
+                                    Padding="0,0,10,0">
+                                    <Expander.Header>
+                                        <controls:SettingItems Margin="0" Title="手动触发" FontSize="20"
+                                                               BorderThickness="0">
+                                            <controls:ResetIsEnabled>
+                                                <ui:ToggleSwitch IsChecked="{Binding Scenario.ExecutionManual,Mode=TwoWay}">
+                                                    <b:Interaction.Triggers>
+                                                        <b:DataTrigger Binding="{Binding ElementName=CardExpander,Path=IsEnabled}" Value="False">
+                                                            <b:ChangePropertyAction TargetObject="{Binding ElementName=CardExpander}" PropertyName="IsExpanded" Value="False" />
+                                                        </b:DataTrigger>
+                                                    </b:Interaction.Triggers>
+                                                </ui:ToggleSwitch>
+                                            </controls:ResetIsEnabled>
+
+                                            <controls:SettingItems.Icon>
+                                                <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25" />
+                                            </controls:SettingItems.Icon>
+                                        </controls:SettingItems>
+                                    </Expander.Header>
+                                    <ListBox>
+                                        <ListBoxItem>dds</ListBoxItem>
+                                    </ListBox>
+                                </Expander>
+                                <Expander x:Name="CardExpander2"
+                                          IsEnabled="{Binding Scenario.ExecutionIntervalSpecifies,Mode=OneWay}"
+                                          Padding="0,0,10,0">
+                                    <Expander.Header>
+                                        <controls:SettingItems Margin="0" Title="周期性触发" FontSize="20"
+                                                               BorderThickness="0">
+                                            <controls:ResetIsEnabled>
+                                                <ui:ToggleSwitch IsChecked="{Binding Scenario.ExecutionIntervalSpecifies,Mode=TwoWay}">
+                                                    <b:Interaction.Triggers>
+                                                        <b:DataTrigger Binding="{Binding ElementName=CardExpander2,Path=IsEnabled}" Value="False">
+                                                            <b:ChangePropertyAction TargetObject="{Binding ElementName=CardExpander2}" PropertyName="IsExpanded" Value="False" />
+                                                        </b:DataTrigger>
+                                                    </b:Interaction.Triggers>
+                                                </ui:ToggleSwitch>
+                                            </controls:ResetIsEnabled>
+
+                                            <controls:SettingItems.Icon>
+                                                <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25" />
+                                            </controls:SettingItems.Icon>
+                                        </controls:SettingItems>
+                                    </Expander.Header>
+                                    <ListBox>
+                                        <ListBoxItem>dds</ListBoxItem>
+                                    </ListBox>
+                                </Expander>
+                                <Expander x:Name="CardExpander3"
+                                          IsEnabled="{Binding Scenario.ExecutionScheduleTime,Mode=OneWay}"
+                                          Padding="0,0,10,0">
+                                    <Expander.Header>
+                                        <controls:SettingItems Margin="0" Title="定时触发" FontSize="20"
+                                                               BorderThickness="0">
+                                            <controls:ResetIsEnabled>
+                                                <ui:ToggleSwitch IsChecked="{Binding Scenario.ExecutionScheduleTime,Mode=TwoWay}">
+                                                    <b:Interaction.Triggers>
+                                                        <b:DataTrigger Binding="{Binding ElementName=CardExpander3,Path=IsEnabled}" Value="False">
+                                                            <b:ChangePropertyAction TargetObject="{Binding ElementName=CardExpander3}" PropertyName="IsExpanded" Value="False" />
+                                                        </b:DataTrigger>
+                                                    </b:Interaction.Triggers>
+                                                </ui:ToggleSwitch>
+                                            </controls:ResetIsEnabled>
+
+                                            <controls:SettingItems.Icon>
+                                                <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25" />
+                                            </controls:SettingItems.Icon>
+                                        </controls:SettingItems>
+                                    </Expander.Header>
+                                    <ListBox>
+                                        <ListBoxItem>dds</ListBoxItem>
+                                    </ListBox>
+                                </Expander>
+                            </StackPanel>
+                        </Expander.Content>
+                    </Expander>
                     <ListBox MouseMove="ListBox_OnMouseMove"
                              PreviewMouseWheel="ListBox_PreviewMouseWheel"
                              ItemsSource="{Binding NodeMethods, Mode=OneWay, NotifyOnSourceUpdated=True, UpdateSourceTrigger=PropertyChanged}">
@@ -334,7 +419,7 @@
                 <b:EventTrigger EventName="Loaded">
                     <b:ControlStoryboardAction Storyboard="{DynamicResource 显示窗口}" ControlStoryboardOption="Play" />
                 </b:EventTrigger>
-                
+
             </b:Interaction.Triggers>
         </Border>
 
