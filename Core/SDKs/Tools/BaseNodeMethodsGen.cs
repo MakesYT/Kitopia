@@ -39,8 +39,9 @@ public class BaseNodeMethodsGen
         return key;
     }
 
-    public static void GenBaseNodeMethods(BindingList<object> nodeMethods)
+    public static void GenBaseNodeMethods(BindingList<BindingList<object>> nodeMethods)
     {
+        var nodes = new BindingList<object>();
         foreach (var (key, value) in _baseType)
         {
             var String = new PointItem()
@@ -73,7 +74,7 @@ public class BaseNodeMethodsGen
                 }
             };
             String.Input = StringinItems;
-            nodeMethods.Add(String);
+            nodes.Add(String);
         } //基本数值类型
 
         //if
@@ -122,7 +123,7 @@ public class BaseNodeMethodsGen
                 }
             };
             String.Input = StringinItems;
-            nodeMethods.Add(String);
+            nodes.Add(String);
         }
         //==
         {
@@ -169,7 +170,8 @@ public class BaseNodeMethodsGen
                 }
             };
             String.Input = StringinItems;
-            nodeMethods.Add(String);
+            nodes.Add(String);
         }
+        nodeMethods.Add(nodes);
     }
 }

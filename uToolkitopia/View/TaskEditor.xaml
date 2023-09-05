@@ -10,12 +10,13 @@
     xmlns:taskEditor1="clr-namespace:Kitopia.Converter.TaskEditor"
     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:controls="clr-namespace:Kitopia.Controls"
+    xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=System.ComponentModel.TypeConverter"
     x:Class="Kitopia.View.TaskEditor"
     WindowBackdropType="Acrylic"
     WindowCornerPreference="Round"
     ExtendsContentIntoTitleBar="True"
     mc:Ignorable="d"
-
+    d:DesignHeight="1800"
     d:DataContext="{d:DesignInstance {x:Type taskEditor:TaskEditorViewModel}}"
     Title="TaskEditor" Height="450" Width="1800">
     <ui:FluentWindow.Resources>
@@ -85,8 +86,8 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*" />
-            <ColumnDefinition Width="4*" />
+            <ColumnDefinition Width="3*" />
+            <ColumnDefinition Width="10*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="42" />
@@ -147,16 +148,21 @@
 
                             <StackPanel>
                                 <Expander x:Name="CardExpander"
-                                    IsEnabled="{Binding Scenario.ExecutionManual,Mode=OneWay}"
-                                    Padding="0,0,10,0">
+                                          IsEnabled="{Binding Scenario.ExecutionManual,Mode=OneWay}"
+                                          Padding="0,0,10,0">
                                     <Expander.Header>
                                         <controls:SettingItems Margin="0" Title="手动触发" FontSize="20"
                                                                BorderThickness="0">
                                             <controls:ResetIsEnabled>
-                                                <ui:ToggleSwitch IsChecked="{Binding Scenario.ExecutionManual,Mode=TwoWay}">
+                                                <ui:ToggleSwitch
+                                                    IsChecked="{Binding Scenario.ExecutionManual,Mode=TwoWay}">
                                                     <b:Interaction.Triggers>
-                                                        <b:DataTrigger Binding="{Binding ElementName=CardExpander,Path=IsEnabled}" Value="False">
-                                                            <b:ChangePropertyAction TargetObject="{Binding ElementName=CardExpander}" PropertyName="IsExpanded" Value="False" />
+                                                        <b:DataTrigger
+                                                            Binding="{Binding ElementName=CardExpander,Path=IsEnabled}"
+                                                            Value="False">
+                                                            <b:ChangePropertyAction
+                                                                TargetObject="{Binding ElementName=CardExpander}"
+                                                                PropertyName="IsExpanded" Value="False" />
                                                         </b:DataTrigger>
                                                     </b:Interaction.Triggers>
                                                 </ui:ToggleSwitch>
@@ -178,10 +184,15 @@
                                         <controls:SettingItems Margin="0" Title="周期性触发" FontSize="20"
                                                                BorderThickness="0">
                                             <controls:ResetIsEnabled>
-                                                <ui:ToggleSwitch IsChecked="{Binding Scenario.ExecutionIntervalSpecifies,Mode=TwoWay}">
+                                                <ui:ToggleSwitch
+                                                    IsChecked="{Binding Scenario.ExecutionIntervalSpecifies,Mode=TwoWay}">
                                                     <b:Interaction.Triggers>
-                                                        <b:DataTrigger Binding="{Binding ElementName=CardExpander2,Path=IsEnabled}" Value="False">
-                                                            <b:ChangePropertyAction TargetObject="{Binding ElementName=CardExpander2}" PropertyName="IsExpanded" Value="False" />
+                                                        <b:DataTrigger
+                                                            Binding="{Binding ElementName=CardExpander2,Path=IsEnabled}"
+                                                            Value="False">
+                                                            <b:ChangePropertyAction
+                                                                TargetObject="{Binding ElementName=CardExpander2}"
+                                                                PropertyName="IsExpanded" Value="False" />
                                                         </b:DataTrigger>
                                                     </b:Interaction.Triggers>
                                                 </ui:ToggleSwitch>
@@ -203,10 +214,15 @@
                                         <controls:SettingItems Margin="0" Title="定时触发" FontSize="20"
                                                                BorderThickness="0">
                                             <controls:ResetIsEnabled>
-                                                <ui:ToggleSwitch IsChecked="{Binding Scenario.ExecutionScheduleTime,Mode=TwoWay}">
+                                                <ui:ToggleSwitch
+                                                    IsChecked="{Binding Scenario.ExecutionScheduleTime,Mode=TwoWay}">
                                                     <b:Interaction.Triggers>
-                                                        <b:DataTrigger Binding="{Binding ElementName=CardExpander3,Path=IsEnabled}" Value="False">
-                                                            <b:ChangePropertyAction TargetObject="{Binding ElementName=CardExpander3}" PropertyName="IsExpanded" Value="False" />
+                                                        <b:DataTrigger
+                                                            Binding="{Binding ElementName=CardExpander3,Path=IsEnabled}"
+                                                            Value="False">
+                                                            <b:ChangePropertyAction
+                                                                TargetObject="{Binding ElementName=CardExpander3}"
+                                                                PropertyName="IsExpanded" Value="False" />
                                                         </b:DataTrigger>
                                                     </b:Interaction.Triggers>
                                                 </ui:ToggleSwitch>
@@ -224,60 +240,10 @@
                             </StackPanel>
                         </Expander.Content>
                     </Expander>
-                    <ListBox MouseMove="ListBox_OnMouseMove"
+                    <ListBox MouseMove="ListBox_OnMouseMove" Padding="0" Margin="0"
                              PreviewMouseWheel="ListBox_PreviewMouseWheel"
                              ItemsSource="{Binding NodeMethods, Mode=OneWay, NotifyOnSourceUpdated=True, UpdateSourceTrigger=PropertyChanged}">
-                        <ListBox.Resources>
 
-                            <!-- Declare some data templates for different types of data -->
-                            <taskEditor1:InterfacesToString x:Key="InterfacesToString" />
-                            <DataTemplate x:Key="InputTemplate" DataType="{x:Type taskEditor:ConnectorItem}">
-
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Border Background="Transparent">
-                                        <!-- Set the border color to red -->
-                                        <Border.BorderBrush>
-                                            <SolidColorBrush Color="{DynamicResource SystemAccentColorSecondary}"
-                                                             Opacity="0.5" />
-                                        </Border.BorderBrush>
-                                        <!-- Set the border thickness to 2 -->
-                                        <Border.BorderThickness>2</Border.BorderThickness>
-                                        <!-- Set the border corner radius to 10 -->
-                                        <Border.CornerRadius>10</Border.CornerRadius>
-                                        <!-- Set the padding to 10 -->
-                                        <Border.Padding>5</Border.Padding>
-                                        <!-- Set the margin to 20 -->
-                                        <Border.Margin>5</Border.Margin>
-                                    </Border>
-                                    <!-- Declare a TextBlock element and give it a name -->
-
-                                    <TextBlock VerticalAlignment="Center" x:Name="textBlock" FontSize="12"
-
-                                               Text="{Binding TypeName}">
-                                        <TextBlock.Background>
-                                            <SolidColorBrush Color="{DynamicResource TextFillColorPrimary}"
-                                                             Opacity="0.6" />
-                                        </TextBlock.Background>
-                                        <TextBlock.Foreground>
-                                            <SolidColorBrush Color="{DynamicResource ApplicationBackgroundColor}" />
-                                        </TextBlock.Foreground>
-                                    </TextBlock>
-
-
-                                    <TextBlock VerticalAlignment="Center"
-                                               Text="{Binding Title}">
-                                        <TextBlock.Foreground>
-                                            <SolidColorBrush Color="{DynamicResource TextFillColorPrimary}" />
-                                        </TextBlock.Foreground>
-                                    </TextBlock>
-                                </StackPanel>
-
-
-                            </DataTemplate>
-                            <!-- Declare a data template selector and assign it to a resource key -->
-                            <plugin:MyDataTemplateSelector x:Key="MyDataTemplateSelector" />
-
-                        </ListBox.Resources>
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource {x:Type ListBoxItem}}">
                                 <Setter Property="Template">
@@ -286,7 +252,7 @@
                                             <Border
                                                 x:Name="Border"
                                                 Margin="0"
-                                                Padding="{TemplateBinding Padding}"
+                                                Padding="0"
                                                 Background="Transparent"
                                                 BorderThickness="1"
                                                 CornerRadius="{TemplateBinding Border.CornerRadius}">
@@ -298,6 +264,88 @@
                             </Style>
                         </ListBox.ItemContainerStyle>
                         <ListBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type componentModel:BindingList`1}">
+                                <Expander Header="{Binding [0].Plugin}" Margin="0">
+                                    <ListBox MouseMove="ListBox_OnMouseMove" Margin="0"
+                                             PreviewMouseWheel="ListBox_PreviewMouseWheel"
+                                             ItemsSource="{Binding }">
+                                        <ListBox.ItemContainerStyle>
+                                            <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                                            <Border
+                                                                x:Name="Border"
+                                                                Margin="0"
+                                                                Padding="{TemplateBinding Padding}"
+                                                                Background="Transparent"
+                                                                BorderThickness="1"
+                                                                CornerRadius="{TemplateBinding Border.CornerRadius}">
+                                                                <ContentPresenter />
+                                                            </Border>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </ListBox.ItemContainerStyle>
+                                        <ListBox.Resources>
+
+                                            <!-- Declare some data templates for different types of data -->
+                                            <taskEditor1:InterfacesToString x:Key="InterfacesToString" />
+                                            <DataTemplate x:Key="InputTemplate"
+                                                          DataType="{x:Type taskEditor:ConnectorItem}">
+
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <Border Background="Transparent">
+                                                        <!-- Set the border color to red -->
+                                                        <Border.BorderBrush>
+                                                            <SolidColorBrush
+                                                                Color="{DynamicResource SystemAccentColorSecondary}"
+                                                                Opacity="0.5" />
+                                                        </Border.BorderBrush>
+                                                        <!-- Set the border thickness to 2 -->
+                                                        <Border.BorderThickness>2</Border.BorderThickness>
+                                                        <!-- Set the border corner radius to 10 -->
+                                                        <Border.CornerRadius>10</Border.CornerRadius>
+                                                        <!-- Set the padding to 10 -->
+                                                        <Border.Padding>5</Border.Padding>
+                                                        <!-- Set the margin to 20 -->
+                                                        <Border.Margin>5</Border.Margin>
+                                                    </Border>
+                                                    <!-- Declare a TextBlock element and give it a name -->
+
+                                                    <TextBlock VerticalAlignment="Center" x:Name="textBlock"
+                                                               FontSize="12"
+
+                                                               Text="{Binding TypeName}">
+                                                        <TextBlock.Background>
+                                                            <SolidColorBrush
+                                                                Color="{DynamicResource TextFillColorPrimary}"
+                                                                Opacity="0.6" />
+                                                        </TextBlock.Background>
+                                                        <TextBlock.Foreground>
+                                                            <SolidColorBrush
+                                                                Color="{DynamicResource ApplicationBackgroundColor}" />
+                                                        </TextBlock.Foreground>
+                                                    </TextBlock>
+
+
+                                                    <TextBlock VerticalAlignment="Center"
+                                                               Text="{Binding Title}">
+                                                        <TextBlock.Foreground>
+                                                            <SolidColorBrush
+                                                                Color="{DynamicResource TextFillColorPrimary}" />
+                                                        </TextBlock.Foreground>
+                                                    </TextBlock>
+                                                </StackPanel>
+
+
+                                            </DataTemplate>
+                                            <!-- Declare a data template selector and assign it to a resource key -->
+                                            <plugin:MyDataTemplateSelector x:Key="MyDataTemplateSelector" />
+
+                                        </ListBox.Resources>
+                                        <ListBox.ItemTemplate>
                             <DataTemplate DataType="{x:Type taskEditor:PointItem}">
                                 <DockPanel Panel.ZIndex="1">
                                     <Grid DockPanel.Dock="Top">
@@ -408,6 +456,12 @@
                                 </DockPanel>
 
                             </DataTemplate>
+                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </Expander>
+
+                            </DataTemplate>
+
                         </ListBox.ItemTemplate>
 
 

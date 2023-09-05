@@ -30,7 +30,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
         get;
     }
 
-    [ObservableProperty] private BindingList<object> _nodeMethods = new();
+    [ObservableProperty] private BindingList<BindingList<object>> _nodeMethods = new();
 
 
     [RelayCommand]
@@ -204,6 +204,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
 
         foreach (var (key, value) in PluginManager.EnablePlugin)
         {
+            var methods = new BindingList<object>();
             foreach (var (tm, methodInfo) in value.GetMethodInfos())
             {
                 if (methodInfo.GetCustomAttribute(typeof(PluginMethod)) is not null)
@@ -327,11 +328,14 @@ public partial class TaskEditorViewModel : ObservableRecipient
 
 
                     pointItem.Input = inpItems;
-                    NodeMethods.Add(pointItem);
+
+                    methods.Add(pointItem);
                 }
 
                 //Log.Debug($"输出:类型为{methodInfo.ReturnParameter.ParameterType}");
             }
+
+            NodeMethods.Add(methods);
         }
     }
 
