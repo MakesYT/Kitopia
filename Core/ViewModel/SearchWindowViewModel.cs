@@ -382,6 +382,26 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 }
             }
 
+            //自定义情景
+            foreach (var customScenario in CustomScenarioManger.CustomScenarios)
+            {
+                if (!customScenario.ExecutionManual || !customScenario.Key.Contains(value))
+                {
+                    continue;
+                }
+
+                var viewItem1 = new SearchViewItem()
+                {
+                    FileName = "执行自定义情景:" + customScenario.Name,
+                    FileType = FileType.自定义情景,
+                    OnlyKey = customScenario.UUID,
+                    Icon = null,
+                    IconSymbol = 0xF78B,
+                    IsVisible = true
+                };
+                Items.Add(viewItem1);
+            }
+
             #region 数学运算
 
             var operators = new[] { '*', '+', '-', '/' };
@@ -649,17 +669,21 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 case "Math": break;
                 default:
                 {
-                    if (item.FileType == FileType.UWP应用)
+                    switch (item.FileType)
                     {
-                        //explorer.exe shell:AppsFolder\Microsoft.WindowsMaps_8wekyb3d8bbwe!App
-                        Shell32.ShellExecute(IntPtr.Zero, "open", "explorer.exe",
-                            $"shell:AppsFolder\\{item.OnlyKey}!App", "",
-                            ShowWindowCommand.SW_NORMAL);
-                    }
-                    else
-                    {
-                        Shell32.ShellExecute(IntPtr.Zero, "open", item.OnlyKey, "", "",
-                            ShowWindowCommand.SW_NORMAL);
+                        case FileType.UWP应用:
+                            //explorer.exe shell:AppsFolder\Microsoft.WindowsMaps_8wekyb3d8bbwe!App
+                            Shell32.ShellExecute(IntPtr.Zero, "open", "explorer.exe",
+                                $"shell:AppsFolder\\{item.OnlyKey}!App", "",
+                                ShowWindowCommand.SW_NORMAL);
+                            break;
+                        case FileType.自定义情景:
+                            CustomScenarioManger.CustomScenarios.First((e) => e.UUID == item.OnlyKey).Run();
+                            break;
+                        default:
+                            Shell32.ShellExecute(IntPtr.Zero, "open", item.OnlyKey, "", "",
+                                ShowWindowCommand.SW_NORMAL);
+                            break;
                     }
 
                     switch (item.FileType)

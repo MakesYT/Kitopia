@@ -1,8 +1,8 @@
 ﻿#region
 
 using System.Windows;
+using Core.SDKs.CustomScenario;
 using Core.SDKs.Services;
-using Core.SDKs.Services.Config;
 using Kitopia.View;
 
 #endregion

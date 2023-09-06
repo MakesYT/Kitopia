@@ -147,7 +147,7 @@
                         <Expander.Content>
 
                             <StackPanel>
-                                <Expander x:Name="CardExpander"
+                                <Expander x:Name="CardExpander" IsExpanded="True"
                                           IsEnabled="{Binding Scenario.ExecutionManual,Mode=OneWay}"
                                           Padding="0,0,10,0">
                                     <Expander.Header>
@@ -171,11 +171,20 @@
                                             <controls:SettingItems.Icon>
                                                 <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25" />
                                             </controls:SettingItems.Icon>
+                                            
+                                            
                                         </controls:SettingItems>
                                     </Expander.Header>
-                                    <ListBox>
-                                        <ListBoxItem>dds</ListBoxItem>
-                                    </ListBox>
+                                    <controls:SettingItems Margin="0" Title="关键词" FontSize="20"
+                                                           BorderThickness="0">
+                                        <controls:ResetIsEnabled>
+                                            <ui:TextBox Text="{Binding Scenario.Key,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" />
+                                        </controls:ResetIsEnabled>
+
+                                        <controls:SettingItems.Icon>
+                                            <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25" />
+                                        </controls:SettingItems.Icon>
+                                    </controls:SettingItems>
                                 </Expander>
                                 <Expander x:Name="CardExpander2"
                                           IsEnabled="{Binding Scenario.ExecutionIntervalSpecifies,Mode=OneWay}"
@@ -265,7 +274,7 @@
                         </ListBox.ItemContainerStyle>
                         <ListBox.ItemTemplate>
                             <DataTemplate DataType="{x:Type componentModel:BindingList`1}">
-                                <Expander Header="{Binding [0].Plugin}" Margin="0">
+                                <Expander Header="{Binding [0].Plugin}" Margin="0" >
                                     <ListBox MouseMove="ListBox_OnMouseMove" Margin="0"
                                              PreviewMouseWheel="ListBox_PreviewMouseWheel"
                                              ItemsSource="{Binding }">
@@ -493,7 +502,7 @@
                                      DragDrop.DragOver="NodifyEditor_DragOver"
                                      DragDrop.DragEnter="NodifyEditor_DragEnter"
                                      DragDrop.DragLeave="NodifyEditor_DragLeave"
-
+                                     
                                      EnableRealtimeSelection="True"
 
                                      PendingConnection="{Binding PendingConnection}"
@@ -558,8 +567,10 @@
                     </nodify:NodifyEditor.Foreground>
                     <nodify:NodifyEditor.ItemContainerStyle>
                         <Style d:DataContext="{d:DesignInstance taskEditor:PointItem}"
-                               TargetType="{x:Type nodify:ItemContainer}">
+                               TargetType="{x:Type nodify:ItemContainer}"
+                               BasedOn="{StaticResource {x:Type nodify:ItemContainer}}">
                             <Setter Property="BorderThickness" Value="2" />
+                            <Setter Property="SelectedBorderThickness" Value="3" />
                             <Setter Property="Location"
                                     Value="{Binding Location, Mode=TwoWay}" />
                             <Style.Triggers>

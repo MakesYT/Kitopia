@@ -130,5 +130,6 @@ public enum FileType
     命令,
     数学运算,
     UWP应用,
+    自定义情景,
     None
 }

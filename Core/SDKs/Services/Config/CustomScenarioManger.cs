@@ -7,7 +7,7 @@ namespace Core.SDKs.Services.Config;
 
 public partial class CustomScenarioManger
 {
-    public static ObservableCollection<CustomScenario> CustomScenarios = new();
+    public static ObservableCollection<SDKs.CustomScenario.CustomScenario> CustomScenarios = new();
     private static readonly ILog Log = LogManager.GetLogger(nameof(CustomScenarioManger));
 
     public static void Init()
@@ -23,7 +23,7 @@ public partial class CustomScenarioManger
             var json = File.ReadAllText(fileInfo.FullName);
             try
             {
-                CustomScenarios.Add(JsonConvert.DeserializeObject<CustomScenario>(json)!);
+                CustomScenarios.Add(JsonConvert.DeserializeObject<SDKs.CustomScenario.CustomScenario>(json)!);
             }
             catch (Exception e)
             {
@@ -33,7 +33,7 @@ public partial class CustomScenarioManger
         }
     }
 
-    public static void Save(CustomScenario scenario)
+    public static void Save(SDKs.CustomScenario.CustomScenario scenario)
     {
         if (scenario.UUID is null)
         {
@@ -52,7 +52,7 @@ public partial class CustomScenarioManger
         File.WriteAllText(configF.FullName, JsonConvert.SerializeObject(scenario, setting));
     }
 
-    public static void Reload(CustomScenario scenario)
+    public static void Reload(SDKs.CustomScenario.CustomScenario scenario)
     {
         CustomScenarios.Remove(scenario);
         var configF = new FileInfo(AppDomain.CurrentDomain.BaseDirectory + $"customScenarios\\{scenario.UUID}.json");
@@ -61,7 +61,7 @@ public partial class CustomScenarioManger
             var json = File.ReadAllText(configF.FullName);
             try
             {
-                CustomScenarios.Add(JsonConvert.DeserializeObject<CustomScenario>(json)!);
+                CustomScenarios.Add(JsonConvert.DeserializeObject<SDKs.CustomScenario.CustomScenario>(json)!);
             }
             catch (Exception e)
             {

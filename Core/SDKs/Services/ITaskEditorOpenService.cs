@@ -1,9 +1,7 @@
-﻿using Core.SDKs.Services.Config;
-
-namespace Core.SDKs.Services;
+﻿namespace Core.SDKs.Services;
 
 public interface ITaskEditorOpenService
 {
     void Open();
-    void Open(CustomScenario name);
+    void Open(CustomScenario.CustomScenario name);
 }

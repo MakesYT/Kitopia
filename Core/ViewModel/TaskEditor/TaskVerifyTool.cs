@@ -20,7 +20,6 @@ public partial class TaskEditorViewModel
     {
         foreach (var pointItem in Scenario.nodes)
         {
-            pointItem.Status = s节点状态.未验证;
             foreach (var connectorItem in pointItem.Output)
             {
                 connectorItem.InputObject = null;
@@ -32,6 +31,35 @@ public partial class TaskEditorViewModel
                 {
                     connectorItem.InputObject = null;
                 }
+            }
+        }
+
+        for (var i = Scenario.nodes.Count - 1; i >= 1; i--)
+        {
+            bool toRemove = true;
+
+            foreach (var connectorItem in Scenario.nodes[i].Input)
+            {
+                if (connectorItem.IsConnected)
+                {
+                    toRemove = false;
+                    break;
+                }
+            }
+
+            foreach (var connectorItem in Scenario.nodes[i].Output)
+            {
+                if (connectorItem.IsConnected)
+                {
+                    toRemove = false;
+                    break;
+                }
+            }
+
+            if (toRemove)
+            {
+                IsModified = true;
+                Scenario.nodes[i].Status = s节点状态.未验证;
             }
         }
 
@@ -59,9 +87,33 @@ public partial class TaskEditorViewModel
 
     private void ToFirstVerify(bool notRealTime = false)
     {
-        foreach (var pointItem in Scenario.nodes)
+        for (var i = Scenario.nodes.Count - 1; i >= 1; i--)
         {
-            pointItem.Status = s节点状态.未验证;
+            bool toRemove = true;
+
+            foreach (var connectorItem in Scenario.nodes[i].Input)
+            {
+                if (connectorItem.IsConnected)
+                {
+                    toRemove = false;
+                    break;
+                }
+            }
+
+            foreach (var connectorItem in Scenario.nodes[i].Output)
+            {
+                if (connectorItem.IsConnected)
+                {
+                    toRemove = false;
+                    break;
+                }
+            }
+
+            if (toRemove)
+            {
+                IsModified = true;
+                Scenario.nodes[i].Status = s节点状态.未验证;
+            }
         }
 
         new Dictionary<ConnectionItem, object>();
@@ -194,6 +246,7 @@ public partial class TaskEditorViewModel
                             if (nowPointItem.Input[1].InputObject is true)
                             {
                                 nowPointItem.Output[0].InputObject = "当前流";
+                                nowPointItem.Output[0].IsNotUsed = false;
                                 nowPointItem.Output[1].IsNotUsed = true;
                                 nowPointItem.Output[1].InputObject = "未使用的流";
                             }
@@ -202,6 +255,7 @@ public partial class TaskEditorViewModel
                                 nowPointItem.Output[1].InputObject = "当前流";
                                 nowPointItem.Output[0].InputObject = "未使用的流";
                                 nowPointItem.Output[0].IsNotUsed = true;
+                                nowPointItem.Output[1].IsNotUsed = false;
                             }
 
                             break;

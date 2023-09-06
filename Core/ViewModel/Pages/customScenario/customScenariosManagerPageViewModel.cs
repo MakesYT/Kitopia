@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Core.SDKs.CustomScenario;
 using Core.SDKs.Services;
-using Core.SDKs.Services.Config;
 
 namespace Core.ViewModel.Pages.customScenario;
 

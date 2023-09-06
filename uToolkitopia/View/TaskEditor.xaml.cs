@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
-using Core.SDKs.Services.Config;
+using Core.SDKs.CustomScenario;
 using Core.ViewModel.TaskEditor;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
