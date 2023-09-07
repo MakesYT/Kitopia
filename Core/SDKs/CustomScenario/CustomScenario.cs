@@ -10,6 +10,15 @@ namespace Core.SDKs.CustomScenario;
 
 public partial class CustomScenario : ObservableRecipient
 {
+    private List<Task> _tasks = new();
+
+    [ObservableProperty] [NotifyPropertyChangedRecipients]
+    public bool executionAuto = false;
+
+
+    [ObservableProperty] [NotifyPropertyChangedRecipients]
+    public List<object> autoScenarios = new List<object>();
+
     /// <summary>
     /// 手动执行
     /// </summary>
@@ -67,6 +76,12 @@ public partial class CustomScenario : ObservableRecipient
 
     public void Run()
     {
+        foreach (var task in _tasks)
+        {
+            task.Dispose();
+        }
+
+        _tasks.Clear();
         foreach (var pointItem in nodes)
         {
             //pointItem.Status = s节点状态.未验证;
@@ -106,7 +121,15 @@ public partial class CustomScenario : ObservableRecipient
         }
     }
 
-    public void ParsePointItem(PointItem nowPointItem, bool onlyForward)
+    public void Stop()
+    {
+        foreach (var task in _tasks)
+        {
+            task.Dispose();
+        }
+    }
+
+    private void ParsePointItem(PointItem nowPointItem, bool onlyForward)
     {
         bool valid = true;
         lock (_firstVerifyPointItems)
@@ -187,6 +210,7 @@ public partial class CustomScenario : ObservableRecipient
                         ParsePointItem(sourceSource, true);
                     });
                     task.Start();
+                    _tasks.Add(task);
                     sourceDataTask.Add(task);
                 }
 
@@ -195,7 +219,7 @@ public partial class CustomScenario : ObservableRecipient
             }
         } //源数据全部生成
 
-        Task.WaitAll(sourceDataTask.ToArray(), TimeSpan.FromSeconds(10));
+        Task.WaitAll(sourceDataTask.ToArray());
 
 
         if (!valid)
@@ -372,10 +396,12 @@ public partial class CustomScenario : ObservableRecipient
 
                     if (!outputConnector.IsNotUsed)
                     {
-                        ThreadPool.QueueUserWorkItem((e) =>
+                        var item = new Task(() =>
                         {
                             ParsePointItem(nextPointItem, false);
                         });
+                        item.Start();
+                        _tasks.Add(item);
                     }
                 }
             }

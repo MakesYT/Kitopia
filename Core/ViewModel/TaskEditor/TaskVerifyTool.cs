@@ -14,10 +14,17 @@ public partial class TaskEditorViewModel
 {
     private List<PointItem> _firstVerifyPointItems = new();
     private List<PointItem> _firstPassesPointItems = new();
+    private List<Task> _tasks = new();
 
     [RelayCommand]
     private void VerifyNode()
     {
+        foreach (var task in _tasks)
+        {
+            task.Dispose();
+        }
+
+        _tasks.Clear();
         foreach (var pointItem in Scenario.nodes)
         {
             foreach (var connectorItem in pointItem.Output)
@@ -87,6 +94,12 @@ public partial class TaskEditorViewModel
 
     private void ToFirstVerify(bool notRealTime = false)
     {
+        foreach (var task in _tasks)
+        {
+            task.Dispose();
+        }
+
+        _tasks.Clear();
         for (var i = Scenario.nodes.Count - 1; i >= 1; i--)
         {
             bool toRemove = true;
@@ -214,6 +227,7 @@ public partial class TaskEditorViewModel
                         ParsePointItem(sourceSource, true, notRealTime);
                     });
                     task.Start();
+                    _tasks.Add(task);
                     sourceDataTask.Add(task);
                 }
 
@@ -404,10 +418,12 @@ public partial class TaskEditorViewModel
 
                     if (!outputConnector.IsNotUsed)
                     {
-                        ThreadPool.QueueUserWorkItem((e) =>
+                        var item = new Task(() =>
                         {
-                            ParsePointItem(nextPointItem, false, notRealTime);
+                            ParsePointItem(nextPointItem, false);
                         });
+                        item.Start();
+                        _tasks.Add(item);
                     }
                 }
             }

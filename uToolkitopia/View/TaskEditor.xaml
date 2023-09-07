@@ -186,6 +186,36 @@
                                         </controls:SettingItems.Icon>
                                     </controls:SettingItems>
                                 </Expander>
+                                <Expander x:Name="CardExpander4" IsExpanded="True"
+                                          IsEnabled="{Binding Scenario.ExecutionManual,Mode=OneWay}"
+                                          Padding="0,0,10,0">
+                                    <Expander.Header>
+                                        <controls:SettingItems Margin="0" Title="自动触发" FontSize="20"
+                                                               BorderThickness="0">
+                                            <controls:ResetIsEnabled>
+                                                <ui:ToggleSwitch
+                                                    IsChecked="{Binding Scenario.ExecutionAuto,Mode=TwoWay}">
+                                                    <b:Interaction.Triggers>
+                                                        <b:DataTrigger
+                                                            Binding="{Binding ElementName=CardExpander4,Path=IsEnabled}"
+                                                            Value="False">
+                                                            <b:ChangePropertyAction
+                                                                TargetObject="{Binding ElementName=CardExpander4}"
+                                                                PropertyName="IsExpanded" Value="False" />
+                                                        </b:DataTrigger>
+                                                    </b:Interaction.Triggers>
+                                                </ui:ToggleSwitch>
+                                            </controls:ResetIsEnabled>
+
+                                            <controls:SettingItems.Icon>
+                                                <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25" />
+                                            </controls:SettingItems.Icon>
+                                            
+                                            
+                                        </controls:SettingItems>
+                                    </Expander.Header>
+                                    
+                                </Expander>
                                 <Expander x:Name="CardExpander2"
                                           IsEnabled="{Binding Scenario.ExecutionIntervalSpecifies,Mode=OneWay}"
                                           Padding="0,0,10,0">
