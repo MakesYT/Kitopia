@@ -171,20 +171,55 @@
                                             <controls:SettingItems.Icon>
                                                 <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25" />
                                             </controls:SettingItems.Icon>
-                                            
-                                            
+
+
                                         </controls:SettingItems>
                                     </Expander.Header>
-                                    <controls:SettingItems Margin="0" Title="关键词" FontSize="20"
-                                                           BorderThickness="0">
-                                        <controls:ResetIsEnabled>
-                                            <ui:TextBox Text="{Binding Scenario.Key,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" />
-                                        </controls:ResetIsEnabled>
+                                    <StackPanel>
+                                        <controls:SettingItems Margin="0" Title="关键词" FontSize="20"
+                                                               BorderThickness="0">
+                                            <controls:SettingItems.Icon>
+                                                <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25" />
+                                            </controls:SettingItems.Icon>
+                                        </controls:SettingItems>
+                                        <Grid ColumnSpan="10" RowSpan="5" Margin="10">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="36" />
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="*" />
+                                                <RowDefinition Height="70" />
+                                            </Grid.RowDefinitions>
+                                            <ListBox Margin="0,0,10,0" x:Name="keys" SelectedIndex="{Binding IsSelected}"
+                                                     ItemsSource="{Binding Scenario.Keys}" />
 
-                                        <controls:SettingItems.Icon>
-                                            <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25" />
-                                        </controls:SettingItems.Icon>
-                                    </controls:SettingItems>
+
+                                            <ui:Button Command="{Binding DelKeyCommand}"
+                                                       CommandParameter="{Binding ElementName=keys,Path=SelectedValue}"
+                                                       Grid.Row="0" Grid.Column="1" Height="36" Width="36">
+                                                <ui:Button.Icon>
+                                                    <ui:SymbolIcon Symbol="Subtract12" Foreground="OrangeRed"
+                                                                   FontSize="25" />
+                                                </ui:Button.Icon>
+                                            </ui:Button>
+                                            <ui:Button Command="{Binding AddKeyCommand}"
+                                                       CommandParameter="{Binding KeyValue}" Grid.Row="1"
+                                                       Grid.Column="1" Height="36" Width="36">
+                                                <ui:Button.Icon>
+                                                    <ui:SymbolIcon Symbol="Add12" Foreground="GreenYellow"
+                                                                   FontSize="25" />
+                                                </ui:Button.Icon>
+                                            </ui:Button>
+                                            <DockPanel Grid.Row="1" Grid.Column="0" Margin="10" Height="40">
+                                                <ui:TextBox 
+                                                            Text="{Binding KeyValue,UpdateSourceTrigger=PropertyChanged}"
+                                                             />
+                                            </DockPanel>
+                                        </Grid>
+
+                                    </StackPanel>
+
                                 </Expander>
                                 <Expander x:Name="CardExpander4" IsExpanded="True"
                                           IsEnabled="{Binding Scenario.ExecutionManual,Mode=OneWay}"
@@ -210,11 +245,11 @@
                                             <controls:SettingItems.Icon>
                                                 <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25" />
                                             </controls:SettingItems.Icon>
-                                            
-                                            
+
+
                                         </controls:SettingItems>
                                     </Expander.Header>
-                                    
+
                                 </Expander>
                                 <Expander x:Name="CardExpander2"
                                           IsEnabled="{Binding Scenario.ExecutionIntervalSpecifies,Mode=OneWay}"
@@ -304,12 +339,13 @@
                         </ListBox.ItemContainerStyle>
                         <ListBox.ItemTemplate>
                             <DataTemplate DataType="{x:Type componentModel:BindingList`1}">
-                                <Expander Header="{Binding [0].Plugin}" Margin="0" >
+                                <Expander Header="{Binding [0].Plugin}" Margin="0">
                                     <ListBox MouseMove="ListBox_OnMouseMove" Margin="0"
                                              PreviewMouseWheel="ListBox_PreviewMouseWheel"
                                              ItemsSource="{Binding }">
                                         <ListBox.ItemContainerStyle>
-                                            <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                                            <Style TargetType="{x:Type ListBoxItem}"
+                                                   BasedOn="{StaticResource {x:Type ListBoxItem}}">
                                                 <Setter Property="Template">
                                                     <Setter.Value>
                                                         <ControlTemplate TargetType="{x:Type ListBoxItem}">
@@ -385,117 +421,126 @@
 
                                         </ListBox.Resources>
                                         <ListBox.ItemTemplate>
-                            <DataTemplate DataType="{x:Type taskEditor:PointItem}">
-                                <DockPanel Panel.ZIndex="1">
-                                    <Grid DockPanel.Dock="Top">
-                                        <Rectangle
+                                            <DataTemplate DataType="{x:Type taskEditor:PointItem}">
+                                                <DockPanel Panel.ZIndex="1">
+                                                    <Grid DockPanel.Dock="Top">
+                                                        <Rectangle
 
-                                            Height="20">
-                                            <Rectangle.Fill>
-                                                <SolidColorBrush Color="{DynamicResource SystemAccentColorSecondary}"
-                                                                 Opacity="0.5" />
-                                            </Rectangle.Fill>
-                                        </Rectangle>
-                                        <TextBlock HorizontalAlignment="Center" Text="{Binding Title}"
-                                                   Foreground="White" />
-                                    </Grid>
-                                    <Grid>
-                                        <Rectangle>
-                                            <Rectangle.Fill>
-                                                <SolidColorBrush Color="{DynamicResource ApplicationBackgroundColor}"
-                                                                 Opacity="0.2" />
-                                            </Rectangle.Fill>
-                                        </Rectangle>
-                                        <DockPanel>
-                                            <ItemsControl DockPanel.Dock="Left" ItemsSource="{Binding Input}">
-                                                <!-- Set the ItemsPanel to a StackPanel with horizontal orientation -->
-                                                <ItemsControl.ItemsPanel>
-                                                    <ItemsPanelTemplate>
-                                                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" />
-                                                    </ItemsPanelTemplate>
-                                                </ItemsControl.ItemsPanel>
-                                                <!-- Set the ItemTemplate to a Button with the content bound to the item -->
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <Grid>
-                                                            <!-- Use a ContentControl to display the single element -->
-                                                            <ContentControl Content="{Binding}"
-                                                                            ContentTemplateSelector="{StaticResource MyDataTemplateSelector}" />
-                                                        </Grid>
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
-                                            </ItemsControl>
-
-
-                                            <ItemsControl DockPanel.Dock="Right" VerticalAlignment="Center"
-                                                          ItemsSource="{Binding Output}">
-                                                <!-- Set the ItemsPanel to a StackPanel with horizontal orientation -->
-                                                <ItemsControl.ItemsPanel>
-                                                    <ItemsPanelTemplate>
-                                                        <StackPanel Orientation="Vertical" HorizontalAlignment="Right" />
-                                                    </ItemsPanelTemplate>
-                                                </ItemsControl.ItemsPanel>
-                                                <!-- Set the ItemTemplate to a Button with the content bound to the item -->
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
-                                                                    HorizontalAlignment="Right">
-
-                                                            <TextBlock VerticalAlignment="Center" x:Name="textBlock"
-                                                                       Text="{Binding Title}">
-                                                                <TextBlock.Foreground>
-                                                                    <SolidColorBrush
-                                                                        Color="{DynamicResource TextFillColorPrimary}" />
-                                                                </TextBlock.Foreground>
-                                                            </TextBlock>
-                                                            <TextBlock VerticalAlignment="Center" FontSize="12"
-
-                                                                       Text="{Binding TypeName}">
-                                                                <TextBlock.Background>
-                                                                    <SolidColorBrush
-                                                                        Color="{DynamicResource TextFillColorPrimary}"
-                                                                        Opacity="0.6" />
-
-                                                                </TextBlock.Background>
-                                                                <TextBlock.Foreground>
-                                                                    <SolidColorBrush
-                                                                        Color="{DynamicResource ApplicationBackgroundColor}" />
-                                                                </TextBlock.Foreground>
-                                                            </TextBlock>
-                                                            <ui:SymbolIcon Symbol="AddCircle20"
-                                                                           ToolTip="{Binding Interfaces, Converter={StaticResource InterfacesToString}}"
-                                                                           ToolTipService.InitialShowDelay="0"
-                                                                           Visibility="{Binding Interfaces, Converter={StaticResource IfNullVisibilityHidden}}" />
-                                                            <Border Background="Transparent">
-                                                                <!-- Set the border color to red -->
-                                                                <Border.BorderBrush>
-                                                                    <SolidColorBrush
-                                                                        Color="{DynamicResource SystemAccentColorSecondary}"
-                                                                        Opacity="0.5" />
-                                                                </Border.BorderBrush>
-                                                                <!-- Set the border thickness to 2 -->
-                                                                <Border.BorderThickness>2</Border.BorderThickness>
-                                                                <!-- Set the border corner radius to 10 -->
-                                                                <Border.CornerRadius>10</Border.CornerRadius>
-                                                                <!-- Set the padding to 10 -->
-                                                                <Border.Padding>5</Border.Padding>
-                                                                <!-- Set the margin to 20 -->
-                                                                <Border.Margin>5</Border.Margin>
-                                                            </Border>
-                                                            <!-- Declare a TextBlock element and give it a name -->
-
-                                                        </StackPanel>
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
-                                            </ItemsControl>
-                                        </DockPanel>
-                                    </Grid>
+                                                            Height="20">
+                                                            <Rectangle.Fill>
+                                                                <SolidColorBrush
+                                                                    Color="{DynamicResource SystemAccentColorSecondary}"
+                                                                    Opacity="0.5" />
+                                                            </Rectangle.Fill>
+                                                        </Rectangle>
+                                                        <TextBlock HorizontalAlignment="Center" Text="{Binding Title}"
+                                                                   Foreground="White" />
+                                                    </Grid>
+                                                    <Grid>
+                                                        <Rectangle>
+                                                            <Rectangle.Fill>
+                                                                <SolidColorBrush
+                                                                    Color="{DynamicResource ApplicationBackgroundColor}"
+                                                                    Opacity="0.2" />
+                                                            </Rectangle.Fill>
+                                                        </Rectangle>
+                                                        <DockPanel>
+                                                            <ItemsControl DockPanel.Dock="Left"
+                                                                          ItemsSource="{Binding Input}">
+                                                                <!-- Set the ItemsPanel to a StackPanel with horizontal orientation -->
+                                                                <ItemsControl.ItemsPanel>
+                                                                    <ItemsPanelTemplate>
+                                                                        <StackPanel Orientation="Vertical"
+                                                                            VerticalAlignment="Center" />
+                                                                    </ItemsPanelTemplate>
+                                                                </ItemsControl.ItemsPanel>
+                                                                <!-- Set the ItemTemplate to a Button with the content bound to the item -->
+                                                                <ItemsControl.ItemTemplate>
+                                                                    <DataTemplate>
+                                                                        <Grid>
+                                                                            <!-- Use a ContentControl to display the single element -->
+                                                                            <ContentControl Content="{Binding}"
+                                                                                ContentTemplateSelector="{StaticResource MyDataTemplateSelector}" />
+                                                                        </Grid>
+                                                                    </DataTemplate>
+                                                                </ItemsControl.ItemTemplate>
+                                                            </ItemsControl>
 
 
-                                </DockPanel>
+                                                            <ItemsControl DockPanel.Dock="Right"
+                                                                          VerticalAlignment="Center"
+                                                                          ItemsSource="{Binding Output}">
+                                                                <!-- Set the ItemsPanel to a StackPanel with horizontal orientation -->
+                                                                <ItemsControl.ItemsPanel>
+                                                                    <ItemsPanelTemplate>
+                                                                        <StackPanel Orientation="Vertical"
+                                                                            HorizontalAlignment="Right" />
+                                                                    </ItemsPanelTemplate>
+                                                                </ItemsControl.ItemsPanel>
+                                                                <!-- Set the ItemTemplate to a Button with the content bound to the item -->
+                                                                <ItemsControl.ItemTemplate>
+                                                                    <DataTemplate>
+                                                                        <StackPanel Orientation="Horizontal"
+                                                                            VerticalAlignment="Center"
+                                                                            HorizontalAlignment="Right">
 
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
+                                                                            <TextBlock VerticalAlignment="Center"
+                                                                                x:Name="textBlock"
+                                                                                Text="{Binding Title}">
+                                                                                <TextBlock.Foreground>
+                                                                                    <SolidColorBrush
+                                                                                        Color="{DynamicResource TextFillColorPrimary}" />
+                                                                                </TextBlock.Foreground>
+                                                                            </TextBlock>
+                                                                            <TextBlock VerticalAlignment="Center"
+                                                                                FontSize="12"
+
+                                                                                Text="{Binding TypeName}">
+                                                                                <TextBlock.Background>
+                                                                                    <SolidColorBrush
+                                                                                        Color="{DynamicResource TextFillColorPrimary}"
+                                                                                        Opacity="0.6" />
+
+                                                                                </TextBlock.Background>
+                                                                                <TextBlock.Foreground>
+                                                                                    <SolidColorBrush
+                                                                                        Color="{DynamicResource ApplicationBackgroundColor}" />
+                                                                                </TextBlock.Foreground>
+                                                                            </TextBlock>
+                                                                            <ui:SymbolIcon Symbol="AddCircle20"
+                                                                                ToolTip="{Binding Interfaces, Converter={StaticResource InterfacesToString}}"
+                                                                                ToolTipService.InitialShowDelay="0"
+                                                                                Visibility="{Binding Interfaces, Converter={StaticResource IfNullVisibilityHidden}}" />
+                                                                            <Border Background="Transparent">
+                                                                                <!-- Set the border color to red -->
+                                                                                <Border.BorderBrush>
+                                                                                    <SolidColorBrush
+                                                                                        Color="{DynamicResource SystemAccentColorSecondary}"
+                                                                                        Opacity="0.5" />
+                                                                                </Border.BorderBrush>
+                                                                                <!-- Set the border thickness to 2 -->
+                                                                                <Border.BorderThickness>2</Border.BorderThickness>
+                                                                                <!-- Set the border corner radius to 10 -->
+                                                                                <Border.CornerRadius>10</Border.CornerRadius>
+                                                                                <!-- Set the padding to 10 -->
+                                                                                <Border.Padding>5</Border.Padding>
+                                                                                <!-- Set the margin to 20 -->
+                                                                                <Border.Margin>5</Border.Margin>
+                                                                            </Border>
+                                                                            <!-- Declare a TextBlock element and give it a name -->
+
+                                                                        </StackPanel>
+                                                                    </DataTemplate>
+                                                                </ItemsControl.ItemTemplate>
+                                                            </ItemsControl>
+                                                        </DockPanel>
+                                                    </Grid>
+
+
+                                                </DockPanel>
+
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
                                     </ListBox>
                                 </Expander>
 
@@ -532,7 +577,7 @@
                                      DragDrop.DragOver="NodifyEditor_DragOver"
                                      DragDrop.DragEnter="NodifyEditor_DragEnter"
                                      DragDrop.DragLeave="NodifyEditor_DragLeave"
-                                     
+
                                      EnableRealtimeSelection="True"
 
                                      PendingConnection="{Binding PendingConnection}"

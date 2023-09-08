@@ -385,7 +385,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
             //自定义情景
             foreach (var customScenario in CustomScenarioManger.CustomScenarios)
             {
-                if (!customScenario.ExecutionManual || !customScenario.Key.Contains(value))
+                if (!customScenario.ExecutionManual || !customScenario.Keys.Contains(value))
                 {
                     continue;
                 }
