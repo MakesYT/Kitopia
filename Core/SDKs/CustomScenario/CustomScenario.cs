@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Core.SDKs.Services.Plugin;
@@ -27,7 +28,7 @@ public partial class CustomScenario : ObservableRecipient
 
 
     [ObservableProperty] [NotifyPropertyChangedRecipients]
-    public string key;
+    public ObservableCollection<string> keys = new();
 
     /// <summary>
     /// 间隔指定时间执行

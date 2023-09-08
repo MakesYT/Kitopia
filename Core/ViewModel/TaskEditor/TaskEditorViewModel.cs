@@ -194,9 +194,6 @@ public partial class TaskEditorViewModel : ObservableRecipient
     }
 
     [ObservableProperty] private CustomScenario _scenario = new CustomScenario() { IsActive = true };
-    //[ObservableProperty] private ObservableCollection<PointItem> nodes = new();
-
-    //[ObservableProperty] private BindingList<ConnectionItem> connections = new();
 
     private void GetAllMethods()
     {
@@ -344,13 +341,9 @@ public partial class TaskEditorViewModel : ObservableRecipient
     {
         Scenario.PropertyChanged += (e, s) =>
         {
-            switch (s.PropertyName)
+            if (s.PropertyName == "Name")
             {
-                case "Name":
-                {
-                    Scenario.nodes[0].Title = Scenario.Name;
-                    break;
-                }
+                Scenario.nodes[0].Title = Scenario.Name;
             }
 
             IsModified = true;
@@ -467,6 +460,66 @@ public partial class TaskEditorViewModel : ObservableRecipient
         ToFirstVerify();
         //OnPropertyChanged(nameof(Connections));
     }
+
+    #region 自定义关键词
+
+    [NotifyCanExecuteChangedFor(nameof(DelKeyCommand))] [ObservableProperty]
+    private int _isSelected = -1;
+
+    partial void OnIsSelectedChanged(int value)
+    {
+        if (value >= -1)
+        {
+            CanDel = true;
+        }
+        else
+        {
+            CanDel = false;
+        }
+
+        OnPropertyChanged(nameof(CanDel));
+        DelKeyCommand.NotifyCanExecuteChanged();
+    }
+
+    [ObservableProperty] private bool canDel = false;
+
+    [RelayCommand(CanExecute = nameof(CanDel))]
+    private void DelKey(string key)
+    {
+        Scenario.Keys.Remove(key);
+        IsModified = true;
+    }
+
+    [NotifyPropertyChangedFor(nameof(CanAdd))]
+    [NotifyCanExecuteChangedFor(nameof(DelKeyCommand))]
+    [NotifyCanExecuteChangedFor(nameof(AddKeyCommand))]
+    [ObservableProperty]
+    private string _keyValue = String.Empty;
+
+    partial void OnKeyValueChanged(string value)
+    {
+        CanAdd = !string.IsNullOrEmpty(value);
+
+        OnPropertyChanged(nameof(CanAdd));
+        AddNodesCommand.NotifyCanExecuteChanged();
+    }
+
+    [ObservableProperty] private bool canAdd = false;
+
+    [RelayCommand(CanExecute = nameof(CanAdd))]
+    private void AddKey(string key)
+    {
+        if (Scenario.Keys.Contains(key))
+        {
+            return;
+        }
+
+        KeyValue = null;
+        Scenario.Keys.Add(key);
+        IsModified = true;
+    }
+
+    #endregion
 }
 
 public partial class PointItem : ObservableRecipient
