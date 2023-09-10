@@ -106,12 +106,19 @@ public partial class MainWindow
 
         ServiceManager.Services.GetService<SearchWindow>().Visibility = Visibility.Hidden;
 
+        NavigationView.Loaded += (_, _) =>
+        {
+            var navigationService = ServiceManager.Services!.GetService<INavigationService>()!;
 
-        NavigationView.SetServiceProvider(ServiceManager.Services!);
+            navigationService.SetNavigationControl(NavigationView);
+            //NavigationView.Transition = ServiceManager.Services!.GetService<INavigationService>();
+            NavigationView.SetServiceProvider(ServiceManager.Services!);
+        };
+        //NavigationView.OnApplyTemplate();
 
-        ServiceManager.Services!.GetService<INavigationService>()!.SetNavigationControl(NavigationView);
+
         //TOD
-        Close();
+        //Close();
     }
 
     /// <summary>

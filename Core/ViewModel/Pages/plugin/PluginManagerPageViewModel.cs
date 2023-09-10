@@ -102,7 +102,8 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
             return;
         }
 
-        ((INavigationPageService)ServiceManager.Services!.GetService(typeof(INavigationPageService))).Navigate("插件设置");
+        ((INavigationPageService)ServiceManager.Services!.GetService(typeof(INavigationPageService))).Navigate(
+            "PluginSetting");
         ((PluginSettingViewModel)ServiceManager.Services!.GetService(typeof(PluginSettingViewModel)))
             .ChangePlugin(pluginInfoEx);
     }
