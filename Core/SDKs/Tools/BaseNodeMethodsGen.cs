@@ -172,6 +172,47 @@ public class BaseNodeMethodsGen
             String.Input = StringinItems;
             nodes.Add(String);
         }
+        //1 to 2
+        {
+            var String = new PointItem()
+            {
+                Plugin = "Kitopia",
+                MerthodName = "一对二",
+                Title = "一对二"
+            };
+            ObservableCollection<ConnectorItem> StringoutItems = new()
+            {
+                new ConnectorItem()
+                {
+                    Source = String,
+                    Type = typeof(NodeConnectorClass),
+                    Title = "流输出",
+                    IsOut = true,
+                    TypeName = "节点"
+                },
+                new ConnectorItem()
+                {
+                    Source = String,
+                    Type = typeof(NodeConnectorClass),
+                    IsOut = true,
+                    Title = "流输出",
+                    TypeName = "节点"
+                }
+            };
+            String.Output = StringoutItems;
+            ObservableCollection<ConnectorItem> StringinItems = new()
+            {
+                new ConnectorItem()
+                {
+                    Source = String,
+                    Type = typeof(NodeConnectorClass),
+                    Title = "流输入",
+                    TypeName = "节点"
+                }
+            };
+            String.Input = StringinItems;
+            nodes.Add(String);
+        }
         nodeMethods.Add(nodes);
     }
 }

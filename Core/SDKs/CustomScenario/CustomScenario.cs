@@ -1,27 +1,32 @@
-﻿using System.Collections.ObjectModel;
+﻿#region
+
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Core.SDKs.Services.Plugin;
 using Core.ViewModel.TaskEditor;
+using log4net;
 using PluginCore.Attribute;
 using Vanara.Extensions.Reflection;
+
+#endregion
 
 namespace Core.SDKs.CustomScenario;
 
 public partial class CustomScenario : ObservableRecipient
 {
-    private List<Task> _tasks = new();
+    private static readonly ILog Log = LogManager.GetLogger(nameof(CustomScenario));
 
     [ObservableProperty] [NotifyPropertyChangedRecipients]
     public bool executionAuto = false;
 
 
     [ObservableProperty] [NotifyPropertyChangedRecipients]
-    public List<object> autoScenarios = new List<object>();
+    public List<object> autoScenarios = new();
 
     /// <summary>
-    /// 手动执行
+    ///     手动执行
     /// </summary>
     [ObservableProperty] [NotifyPropertyChangedRecipients]
     public bool executionManual = true;
@@ -31,7 +36,7 @@ public partial class CustomScenario : ObservableRecipient
     public ObservableCollection<string> keys = new();
 
     /// <summary>
-    /// 间隔指定时间执行
+    ///     间隔指定时间执行
     /// </summary>
     [ObservableProperty] [NotifyPropertyChangedRecipients]
     public bool executionIntervalSpecifies = false;
@@ -40,7 +45,7 @@ public partial class CustomScenario : ObservableRecipient
     public List<TimeSpan> intervalSpecifiesTimeSpan;
 
     /// <summary>
-    /// 指定时间执行
+    ///     指定时间执行
     /// </summary>
     [ObservableProperty] [NotifyPropertyChangedRecipients]
     public bool executionScheduleTime = false;
@@ -72,20 +77,19 @@ public partial class CustomScenario : ObservableRecipient
     [ObservableProperty] [NotifyPropertyChangedRecipients]
     public string _description = "";
 
-    private List<PointItem> _firstVerifyPointItems = new();
-    private List<PointItem> _firstPassesPointItems = new();
+    private Dictionary<PointItem, Task?> _tasks = new();
 
     public void Run()
     {
         foreach (var task in _tasks)
         {
-            task.Dispose();
+            //TODO: 
+            //task.Dispose();
         }
 
         _tasks.Clear();
         foreach (var pointItem in nodes)
         {
-            //pointItem.Status = s节点状态.未验证;
             foreach (var connectorItem in pointItem.Output)
             {
                 connectorItem.InputObject = null;
@@ -100,11 +104,8 @@ public partial class CustomScenario : ObservableRecipient
             }
         }
 
-        _firstVerifyPointItems = new List<PointItem>();
-        _firstPassesPointItems = new List<PointItem>();
-        _firstVerifyPointItems.Add(nodes[0]);
-        _firstPassesPointItems.Add(nodes[0]);
-        //nodes[0].Status = s节点状态.已验证;
+        _tasks.Add(nodes[0], null);
+        nodes[0].Status = s节点状态.已验证;
         var connectionItem = connections.FirstOrDefault((e) => e.Source == nodes[0].Output[0]);
         if (connectionItem == null)
         {
@@ -126,107 +127,91 @@ public partial class CustomScenario : ObservableRecipient
     {
         foreach (var task in _tasks)
         {
-            task.Dispose();
+            //TODO:
+            //task.Dispose();
         }
     }
 
     private void ParsePointItem(PointItem nowPointItem, bool onlyForward)
     {
+        Log.Debug($"解析节点:{nowPointItem.Title}");
         bool valid = true;
-        lock (_firstVerifyPointItems)
-        {
-            if (_firstVerifyPointItems.Contains(nowPointItem))
-            {
-                return;
-            }
-        }
-
-        if (_firstVerifyPointItems.Contains(nowPointItem))
-        {
-            //如果包含则证明源节点已被解析
-            DateTime beforeDT = System.DateTime.Now;
-
-            while (_firstVerifyPointItems.Contains(nowPointItem) && !_firstPassesPointItems.Contains(nowPointItem))
-            {
-                DateTime afterDT = System.DateTime.Now;
-                if (afterDT.Subtract(beforeDT).Seconds >= 5)
-                {
-                    break;
-                }
-            }
-        }
-
-        _firstVerifyPointItems.Add(nowPointItem);
         List<Task> sourceDataTask = new();
-        foreach (var connectorItem in nowPointItem.Input)
+        try
         {
-            if (!connectorItem.IsConnected)
+            foreach (var connectorItem in nowPointItem.Input)
             {
-                if (connectorItem.Type.FullName != "PluginCore.NodeConnectorClass")
+                try
                 {
-                    //当前节点有一个输入参数不存在,验证失败
-                    if (!connectorItem.IsSelf)
+                    if (!connectorItem.IsConnected)
                     {
-                        valid = false;
-                        break;
-                    }
-                }
-                else
-                {
-                    connectorItem.IsNotUsed = true;
-                }
-            }
-            else if (connectorItem.Type.FullName == "PluginCore.NodeConnectorClass")
-            {
-                connectorItem.IsNotUsed = false;
-            }
-
-            //这是连接当前节点的节点
-            var connectionItem = connections.Where((e) => e.Target == connectorItem).ToList();
-            foreach (var item in connectionItem)
-            {
-                var sourceSource = item.Source.Source;
-                lock (_firstVerifyPointItems)
-                {
-                    if (_firstVerifyPointItems.Contains(sourceSource))
-                    {
-                        //如果包含则证明源节点已被解析
-                        DateTime beforeDT = System.DateTime.Now;
-
-                        while (_firstVerifyPointItems.Contains(sourceSource) &&
-                               !_firstPassesPointItems.Contains(sourceSource))
+                        if (connectorItem.Type.FullName != "PluginCore.NodeConnectorClass")
                         {
-                            DateTime afterDT = System.DateTime.Now;
-                            if (afterDT.Subtract(beforeDT).Seconds >= 5)
+                            //当前节点有一个输入参数不存在,验证失败
+                            if (!connectorItem.IsSelf)
                             {
+                                valid = false;
                                 break;
                             }
                         }
-
-                        continue;
+                        else
+                        {
+                            connectorItem.IsNotUsed = true;
+                        }
                     }
-
-                    var task = new Task(() =>
+                    else if (connectorItem.Type.FullName == "PluginCore.NodeConnectorClass")
                     {
-                        ParsePointItem(sourceSource, true);
-                    });
-                    task.Start();
-                    _tasks.Add(task);
-                    sourceDataTask.Add(task);
+                        connectorItem.IsNotUsed = false;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.Debug(e);
                 }
 
+                //这是连接当前节点的节点
+                var connectionItem = connections.Where((e) => e.Target == connectorItem).ToList();
 
-                //源解析完成
+                foreach (var item in connectionItem)
+                {
+                    var sourceSource = item.Source.Source;
+                    lock (_tasks)
+                    {
+                        if (_tasks.TryGetValue(sourceSource, out var task1))
+                        {
+                            if (task1 is not null)
+                            {
+                                sourceDataTask.Add(task1);
+                            }
+
+                            continue;
+                        }
+                        else
+                        {
+                            var task = new Task(() =>
+                            {
+                                ParsePointItem(sourceSource, true);
+                            });
+                            task.Start();
+                            // Log.Debug(sourceSource.Title);
+                            _tasks.Add(sourceSource, task);
+                            sourceDataTask.Add(task);
+                        }
+                    }
+                }
             }
+        }
+        catch (Exception e)
+        {
+            Log.Error(e);
         } //源数据全部生成
 
         Task.WaitAll(sourceDataTask.ToArray());
-
-
         if (!valid)
         {
-            //nowPointItem.Status = s节点状态.错误;
-            _firstPassesPointItems.Add(nowPointItem);
+            nowPointItem.Status = s节点状态.错误;
+            //_firstPassesPointItems.Add(nowPointItem);
+            Log.Debug($"解析节点失败:{nowPointItem.Title}");
             return;
         }
 
@@ -242,15 +227,25 @@ public partial class CustomScenario : ObservableRecipient
                         {
                             if (nowPointItem.Input[1].InputObject is true)
                             {
+                                nowPointItem.Output[0].InputObject = "当前流";
                                 nowPointItem.Output[0].IsNotUsed = false;
                                 nowPointItem.Output[1].IsNotUsed = true;
+                                nowPointItem.Output[1].InputObject = "未使用的流";
                             }
                             else
                             {
+                                nowPointItem.Output[1].InputObject = "当前流";
+                                nowPointItem.Output[0].InputObject = "未使用的流";
                                 nowPointItem.Output[0].IsNotUsed = true;
                                 nowPointItem.Output[1].IsNotUsed = false;
                             }
 
+                            break;
+                        }
+                        case "一对二":
+                        {
+                            nowPointItem.Output[0].InputObject = "流1";
+                            nowPointItem.Output[1].InputObject = "流2";
                             break;
                         }
                         case "相等":
@@ -375,6 +370,7 @@ public partial class CustomScenario : ObservableRecipient
             }
             catch (Exception e)
             {
+                Log.Debug(e.ToString());
                 valid = false;
                 goto finnish;
             }
@@ -389,28 +385,35 @@ public partial class CustomScenario : ObservableRecipient
                 {
                     var nextPointItem = thisToNextConnection.Target.Source;
 
-                    if (_firstVerifyPointItems.Contains(nextPointItem))
-                    {
-                        //如果包含则证明子节点已被解析
-                        continue;
-                    }
 
                     if (!outputConnector.IsNotUsed)
                     {
-                        var item = new Task(() =>
+                        lock (_tasks)
                         {
-                            ParsePointItem(nextPointItem, false);
-                        });
-                        item.Start();
-                        _tasks.Add(item);
+                            if (_tasks.ContainsKey(nextPointItem))
+                            {
+                                return;
+                            }
+                            else
+                            {
+                                var task = new Task(() =>
+                                {
+                                    ParsePointItem(nextPointItem, true);
+                                });
+                                task.Start();
+                                _tasks.Add(nextPointItem, task);
+                            }
+                        }
                     }
                 }
             }
         }
 
         finnish:
-
-
-        _firstPassesPointItems.Add(nowPointItem);
+        if (valid)
+        {
+            //nowPointItem.Status = notRealTime ? s节点状态.已验证 : s节点状态.初步验证;
+            Log.Debug($"解析节点完成:{nowPointItem.Title}");
+        }
     }
 }

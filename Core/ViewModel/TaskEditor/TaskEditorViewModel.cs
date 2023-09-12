@@ -11,6 +11,8 @@ using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
 using Core.SDKs.Tools;
+using log4net;
+using Newtonsoft.Json;
 using PluginCore;
 using PluginCore.Attribute;
 
@@ -25,6 +27,8 @@ public partial class TaskEditorViewModel : ObservableRecipient
         get;
         set;
     }
+
+    private static readonly ILog Log = LogManager.GetLogger(nameof(TaskEditorViewModel));
 
     public PendingConnectionViewModel PendingConnection
     {
@@ -558,6 +562,7 @@ public partial class ConnectorItem : ObservableRecipient
         set;
     }
 
+    [JsonConverter(typeof(TypeJsonConverter))]
     public Type Type
     {
         get;

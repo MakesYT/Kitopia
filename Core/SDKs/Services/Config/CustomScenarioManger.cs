@@ -47,6 +47,7 @@ public partial class CustomScenarioManger
         var setting = new JsonSerializerSettings();
         setting.PreserveReferencesHandling = PreserveReferencesHandling.Objects;
         setting.ReferenceLoopHandling = ReferenceLoopHandling.Serialize;
+        setting.TypeNameHandling = TypeNameHandling.None;
         setting.Formatting = Formatting.Indented;
 
         File.WriteAllText(configF.FullName, JsonConvert.SerializeObject(scenario, setting));
