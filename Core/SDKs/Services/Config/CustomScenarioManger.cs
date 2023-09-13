@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO;
+using Core.SDKs.Services.Plugin;
 using log4net;
 using Newtonsoft.Json;
 
@@ -12,25 +13,32 @@ public partial class CustomScenarioManger
 
     public static void Init()
     {
-        if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "customScenarios"))
+        new Task(() =>
         {
-            Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + "customScenarios");
-        }
+            while (!PluginManager.isInitialized)
+            {
+            }
 
-        var info = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "customScenarios");
-        foreach (var fileInfo in info.GetFiles())
-        {
-            var json = File.ReadAllText(fileInfo.FullName);
-            try
+            if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "customScenarios"))
             {
-                CustomScenarios.Add(JsonConvert.DeserializeObject<SDKs.CustomScenario.CustomScenario>(json)!);
+                Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + "customScenarios");
             }
-            catch (Exception e)
+
+            var info = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "customScenarios");
+            foreach (var fileInfo in info.GetFiles())
             {
-                Log.Error(e);
-                Log.Error("情景文件加载失败");
+                var json = File.ReadAllText(fileInfo.FullName);
+                try
+                {
+                    CustomScenarios.Add(JsonConvert.DeserializeObject<SDKs.CustomScenario.CustomScenario>(json)!);
+                }
+                catch (Exception e1)
+                {
+                    Log.Error(e1);
+                    Log.Error("情景文件加载失败");
+                }
             }
-        }
+        }).Start();
     }
 
     public static void Save(SDKs.CustomScenario.CustomScenario scenario)

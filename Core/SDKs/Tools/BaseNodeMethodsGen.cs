@@ -68,6 +68,7 @@ public class BaseNodeMethodsGen
                 {
                     Source = String,
                     Type = value,
+                    InputObject = value.IsValueType ? Activator.CreateInstance(value) : null,
                     Title = GetI18N(value.FullName),
                     TypeName = GetI18N(value.FullName),
                     IsSelf = true

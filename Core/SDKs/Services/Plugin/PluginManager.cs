@@ -12,6 +12,7 @@ namespace Core.SDKs.Services.Plugin;
 public class PluginManager
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(PluginManager));
+    public static bool isInitialized = false;
 
     public static void Init()
     {
@@ -70,8 +71,22 @@ public class PluginManager
 
 
 #endif
+            isInitialized = true;
         });
     }
 
     public static Dictionary<string, Plugin> EnablePlugin = new();
+
+    public static string? GetPlugnNameByTypeName(string typeName)
+    {
+        foreach (var (key, value) in EnablePlugin)
+        {
+            if (value.IsMyType(typeName))
+            {
+                return key;
+            }
+        }
+
+        return null;
+    }
 }

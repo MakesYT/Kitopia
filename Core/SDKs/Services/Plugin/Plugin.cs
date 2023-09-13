@@ -29,6 +29,33 @@ public class Plugin
 
     public IServiceProvider? ServiceProvider;
 
+    public bool IsMyType(string typeName)
+    {
+        foreach (var type in _dll.GetTypes())
+        {
+            if (type.FullName == typeName)
+            {
+                return true;
+            }
+        }
+
+        return false;
+        return _dll.GetTypes().Any(t => t.FullName == typeName);
+    }
+
+    public Type GetType(string typeName)
+    {
+        foreach (var type in _dll.GetTypes())
+        {
+            if (type.FullName == typeName)
+            {
+                return type;
+            }
+        }
+
+        return null;
+    }
+
     // private Dictionary<Type, object>? _instance = new();
     public static PluginInfoEx GetPluginInfoEx(string assemblyPath, out WeakReference alcWeakRef)
     {
