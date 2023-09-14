@@ -106,6 +106,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
     [NotifyCanExecuteChangedFor(nameof(SaveAndQuitCustomScenarioCommand))]
     public bool _isModified = false;
 
+
     [RelayCommand(CanExecute = nameof(IsModified))]
     private void SaveCustomScenario()
     {

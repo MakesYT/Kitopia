@@ -3,10 +3,12 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
+using System.Runtime.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Core.SDKs.Services.Plugin;
 using Core.ViewModel.TaskEditor;
 using log4net;
+using Newtonsoft.Json;
 using PluginCore.Attribute;
 using Vanara.Extensions.Reflection;
 
@@ -18,39 +20,40 @@ public partial class CustomScenario : ObservableRecipient
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(CustomScenario));
 
-    [ObservableProperty] [NotifyPropertyChangedRecipients]
+    [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
+    public bool _isRunning = false;
+
+    [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
     public bool executionAuto = false;
 
-
-    [ObservableProperty] [NotifyPropertyChangedRecipients]
+    [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
     public List<object> autoScenarios = new();
 
     /// <summary>
     ///     手动执行
     /// </summary>
-    [ObservableProperty] [NotifyPropertyChangedRecipients]
+    [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
     public bool executionManual = true;
 
-
-    [ObservableProperty] [NotifyPropertyChangedRecipients]
+    [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
     public ObservableCollection<string> keys = new();
 
     /// <summary>
     ///     间隔指定时间执行
     /// </summary>
-    [ObservableProperty] [NotifyPropertyChangedRecipients]
+    [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
     public bool executionIntervalSpecifies = false;
 
-    [ObservableProperty] [NotifyPropertyChangedRecipients]
+    [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
     public List<TimeSpan> intervalSpecifiesTimeSpan;
 
     /// <summary>
     ///     指定时间执行
     /// </summary>
-    [ObservableProperty] [NotifyPropertyChangedRecipients]
+    [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
     public bool executionScheduleTime = false;
 
-    [ObservableProperty] [NotifyPropertyChangedRecipients]
+    [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
     public TimeSpan scheduleTime;
 
     public string? UUID
@@ -71,16 +74,22 @@ public partial class CustomScenario : ObservableRecipient
         set;
     } = new();
 
-    [ObservableProperty] [NotifyPropertyChangedRecipients]
+    [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
     public string _name = "任务";
 
-    [ObservableProperty] [NotifyPropertyChangedRecipients]
+    [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
     public string _description = "";
 
     private Dictionary<PointItem, Task?> _tasks = new();
 
-    public void Run()
+    public void Run(bool realTime = false)
     {
+        StartRun(!realTime);
+    }
+
+    private void StartRun(bool notRealTime)
+    {
+        IsRunning = true;
         foreach (var task in _tasks)
         {
             //TODO: 
@@ -88,19 +97,51 @@ public partial class CustomScenario : ObservableRecipient
         }
 
         _tasks.Clear();
-        foreach (var pointItem in nodes)
+        if (notRealTime)
         {
-            foreach (var connectorItem in pointItem.Output)
+            foreach (var pointItem in nodes)
             {
-                connectorItem.InputObject = null;
-            }
-
-            foreach (var connectorItem in pointItem.Input)
-            {
-                if (!connectorItem.IsSelf)
+                foreach (var connectorItem in pointItem.Output)
                 {
                     connectorItem.InputObject = null;
                 }
+
+                foreach (var connectorItem in pointItem.Input)
+                {
+                    if (!connectorItem.IsSelf)
+                    {
+                        connectorItem.InputObject = null;
+                    }
+                }
+            }
+        }
+
+        for (var i = nodes.Count - 1; i >= 1; i--)
+        {
+            bool toRemove = true;
+
+            foreach (var connectorItem in nodes[i].Input)
+            {
+                if (connectorItem.IsConnected)
+                {
+                    toRemove = false;
+                    break;
+                }
+            }
+
+            foreach (var connectorItem in nodes[i].Output)
+            {
+                if (connectorItem.IsConnected)
+                {
+                    toRemove = false;
+                    break;
+                }
+            }
+
+            if (toRemove)
+            {
+                Broadcast<bool>(false, true, nameof(ExecutionIntervalSpecifies));
+                nodes[i].Status = s节点状态.未验证;
             }
         }
 
@@ -115,11 +156,39 @@ public partial class CustomScenario : ObservableRecipient
         var firstNodes = connectionItem.Target.Source;
         try
         {
-            ParsePointItem(firstNodes, false);
+            ParsePointItem(firstNodes, false, notRealTime);
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
+        }
+
+        if (notRealTime)
+        {
+            new Task(() =>
+            {
+                while (true)
+                {
+                    Thread.Sleep(100);
+                    Log.Debug("1");
+                    bool f = true;
+                    foreach (var (key, value) in _tasks)
+                    {
+                        if (value != null && !value.IsCompleted)
+                        {
+                            f = false;
+                            break;
+                        }
+                    }
+
+                    if (f)
+                    {
+                        IsRunning = false;
+                        Log.Debug($"场景运行完成:{Name}");
+                        break;
+                    }
+                }
+            }).Start();
         }
     }
 
@@ -132,7 +201,7 @@ public partial class CustomScenario : ObservableRecipient
         }
     }
 
-    private void ParsePointItem(PointItem nowPointItem, bool onlyForward)
+    public void ParsePointItem(PointItem nowPointItem, bool onlyForward, bool notRealTime)
     {
         Log.Debug($"解析节点:{nowPointItem.Title}");
         bool valid = true;
@@ -190,7 +259,7 @@ public partial class CustomScenario : ObservableRecipient
                         {
                             var task = new Task(() =>
                             {
-                                ParsePointItem(sourceSource, true);
+                                ParsePointItem(sourceSource, true, notRealTime);
                             });
                             task.Start();
                             // Log.Debug(sourceSource.Title);
@@ -212,10 +281,11 @@ public partial class CustomScenario : ObservableRecipient
             nowPointItem.Status = s节点状态.错误;
             //_firstPassesPointItems.Add(nowPointItem);
             Log.Debug($"解析节点失败:{nowPointItem.Title}");
-            return;
+            goto finnish;
         }
 
 
+        if (notRealTime)
         {
             try
             {
@@ -398,7 +468,7 @@ public partial class CustomScenario : ObservableRecipient
                             {
                                 var task = new Task(() =>
                                 {
-                                    ParsePointItem(nextPointItem, true);
+                                    ParsePointItem(nextPointItem, true, notRealTime);
                                 });
                                 task.Start();
                                 _tasks.Add(nextPointItem, task);
@@ -412,8 +482,15 @@ public partial class CustomScenario : ObservableRecipient
         finnish:
         if (valid)
         {
-            //nowPointItem.Status = notRealTime ? s节点状态.已验证 : s节点状态.初步验证;
+            nowPointItem.Status = notRealTime ? s节点状态.已验证 : s节点状态.初步验证;
             Log.Debug($"解析节点完成:{nowPointItem.Title}");
         }
+    }
+
+    [OnDeserializing]
+    // ReSharper disable once UnusedMember.Local
+    // ReSharper disable once UnusedParameter.Local
+    private void OnDeserializing(StreamingContext context) //反序列化时hotkeys的默认值会被添加,需要先清空
+    {
     }
 }

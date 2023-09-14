@@ -1,4 +1,5 @@
-﻿using Core.SDKs.Services.Plugin;
+﻿using Core.SDKs.CustomScenario;
+using Core.SDKs.Services.Plugin;
 using Newtonsoft.Json;
 
 namespace Core.SDKs.Services.Config;
@@ -47,9 +48,10 @@ public class TypeJsonConverter : JsonConverter
                         }
                     }
                 }
-            }
 
-            return type;
+                throw new CustomScenarioLoadFromJsonException(strings[0], strings[1]);
+            }
+            else return type;
         }
         else
         {
@@ -59,6 +61,6 @@ public class TypeJsonConverter : JsonConverter
             }
         }
 
-        return null;
+        throw new CustomScenarioLoadFromJsonException(strings[0], strings[1]);
     }
 }
