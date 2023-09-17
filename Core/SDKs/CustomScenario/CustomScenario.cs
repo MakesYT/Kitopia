@@ -197,7 +197,7 @@ public partial class CustomScenario : ObservableRecipient
         foreach (var task in _tasks)
         {
             //TODO:
-            //task.Dispose();
+            //task.Value.
         }
     }
 

@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
+using Core.SDKs.CustomScenario;
 using Core.SDKs.HotKey;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
@@ -145,6 +146,10 @@ public partial class MainWindow
             hWndSource.AddHook(WndProc);
         }
 
+        AppDomain.CurrentDomain.ProcessExit += new EventHandler((_, _) =>
+        {
+            CustomScenarioExecutor.Exit();
+        });
         log.Debug("注册热键");
         InitHotKey();
 
@@ -239,9 +244,16 @@ public partial class MainWindow
 
     private IntPtr WndProc(IntPtr hWnd, int msg, IntPtr wideParam, IntPtr longParam, ref bool handled)
     {
-        switch (msg)
+        var windowMessage = (User32.WindowMessage)msg;
+        //log.Debug(windowMessage);
+        switch (windowMessage)
         {
-            case 0x312:
+            case User32.WindowMessage.WM_QUERYENDSESSION:
+            {
+                CustomScenarioExecutor.SystemClose();
+                break;
+            }
+            case User32.WindowMessage.WM_HOTKEY:
                 var sid = wideParam.ToInt32();
                 if (sid == m_HotKeySettings["Kitopia_显示搜索框"])
                 {
