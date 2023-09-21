@@ -25,7 +25,7 @@ public record Config
 
 
     public List<string> alwayShows = new();
-
+    public List<string> ignoreItems = new();
     public List<string> customCollections = new();
 
     public BindingList<HotKeyModel> hotKeys = new()

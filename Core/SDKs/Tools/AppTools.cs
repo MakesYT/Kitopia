@@ -1,5 +1,6 @@
 ﻿#region
 
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
@@ -161,8 +162,17 @@ public partial class AppTools
         bool logging = false)
     {
         log.Debug("索引全部软件及收藏项目");
-        UWPAPPsTools.GetAll(collection);
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
 
+
+        UWPAPPsTools.GetAll(collection);
+        stopwatch.Stop();
+
+        log.Debug($"索引UWP软件耗时{stopwatch.ElapsedMilliseconds}ms");
+
+        stopwatch.Reset();
+        stopwatch.Start();
         // 创建一个空的文件路径集合
         List<string> filePaths = new();
 
@@ -212,6 +222,8 @@ public partial class AppTools
         {
         }
 
+        stopwatch.Stop();
+        log.Debug($"索引软件耗时{stopwatch.ElapsedMilliseconds}ms");
         //AutoStartEverything(collection);
         if (ErrorLnkList.Any())
         {
@@ -260,6 +272,7 @@ public partial class AppTools
     public static async Task AppSolverA(Dictionary<string, SearchViewItem> collection, string file,
         bool star = false, bool logging = false)
     {
+        //log.Debug(Thread.CurrentThread.ManagedThreadId);
         var localizedName = Shell32.SHCreateItemFromParsingName<Shell32.IShellItem>(file)
             .GetDisplayName(Shell32.SIGDN.SIGDN_NORMALDISPLAY);
 
@@ -370,6 +383,12 @@ public partial class AppTools
 
                     return;
                 }
+
+                if (ConfigManger.Config.ignoreItems.Contains(targetPath))
+                {
+                    log.Debug("忽略索引:\n" + targetPath);
+                    return;
+                }
             }
             else
             {
@@ -382,9 +401,11 @@ public partial class AppTools
                 return;
             }
 
-            if (refFileInfo.Extension != ".url" && refFileInfo.Extension != ".txt" && refFileInfo.Extension != ".chm" &&
+
+            var extension = refFileInfo.Extension;
+            if (extension != ".url" && extension != ".txt" && extension != ".chm" &&
                 !refFileInfo.Name.Contains("powershell.exe") && !refFileInfo.Name.Contains("cmd.exe") &&
-                refFileInfo.Extension != ".pdf" && refFileInfo.Extension != ".bat" &&
+                extension != ".pdf" && extension != ".bat" &&
                 !fileInfo.Name.Contains("install") &&
                 !fileInfo.Name.Contains("安装") && !fileInfo.Name.Contains("卸载"))
             {

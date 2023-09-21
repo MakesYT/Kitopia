@@ -4,10 +4,12 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.HotKey;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
+using Core.SDKs.Tools;
 using log4net;
 using Microsoft.Win32;
 
@@ -33,6 +35,7 @@ public partial class SettingPageViewModel : ObservableRecipient
     [ObservableProperty] private string _themeChoice = "跟随系统";
     [ObservableProperty] private bool _useEverything = true;
     [ObservableProperty] private BindingList<HotKeyModel> _hotKeys;
+    [ObservableProperty] private BindingList<string> _ignoreItems;
 
     public SettingPageViewModel()
     {
@@ -42,6 +45,7 @@ public partial class SettingPageViewModel : ObservableRecipient
         UseEverything = ConfigManger.Config.useEverything;
         MaxHistory = ConfigManger.Config.maxHistory;
         CanReadClipboard = ConfigManger.Config.canReadClipboard;
+        IgnoreItems = new BindingList<string>(ConfigManger.Config.ignoreItems);
         HotKeys = ConfigManger.Config.hotKeys;
         InputSmoothingMilliseconds = ConfigManger.Config.inputSmoothingMilliseconds;
         WeakReferenceMessenger.Default.Register<string, string>(this, "hotkey", (_, _) =>
@@ -78,6 +82,19 @@ public partial class SettingPageViewModel : ObservableRecipient
         ConfigManger.Config.themeChoice = value;
         ConfigManger.Save();
     }
+
+    [RelayCommand]
+    private void DelKey(string key)
+    {
+        ConfigManger.Config.ignoreItems.Remove(key);
+        IgnoreItems.Remove(key);
+        IgnoreItems.ResetBindings();
+        AppTools.AppSolverA(
+            ((SearchWindowViewModel)ServiceManager.Services.GetService(typeof(SearchWindowViewModel)))._collection, key,
+            false);
+        ConfigManger.Save();
+    }
+
 
     partial void OnInputSmoothingMillisecondsChanged(int value)
     {

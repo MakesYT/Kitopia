@@ -2,11 +2,34 @@
 
 namespace Core.SDKs.CustomScenario;
 
+public enum CustomScenarioType
+{
+    Startup,
+    Exit,
+    SystemClose
+}
+
 public static class CustomScenarioExecutor
 {
-    public static List<string> OnStartup = new();
-    public static List<string> OnExit = new();
-    public static List<string> OnSystemClose = new();
+    private static List<string> OnStartup = new();
+    private static List<string> OnExit = new();
+    private static List<string> OnSystemClose = new();
+
+    public static void AddAutoCustomScenario(string scenarioName, CustomScenarioType scenarioType)
+    {
+        switch (scenarioType)
+        {
+            case CustomScenarioType.Startup:
+                OnStartup.Add(scenarioName);
+                break;
+            case CustomScenarioType.Exit:
+                OnExit.Add(scenarioName);
+                break;
+            case CustomScenarioType.SystemClose:
+                OnSystemClose.Add(scenarioName);
+                break;
+        }
+    }
 
     public static void Startup()
     {

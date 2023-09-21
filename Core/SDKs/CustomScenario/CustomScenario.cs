@@ -89,6 +89,11 @@ public partial class CustomScenario : ObservableRecipient
 
     private void StartRun(bool notRealTime)
     {
+        if (IsRunning)
+        {
+            return;
+        }
+
         IsRunning = true;
         foreach (var task in _tasks)
         {

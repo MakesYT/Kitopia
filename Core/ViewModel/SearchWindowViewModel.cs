@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -15,8 +16,8 @@ using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using Core.SDKs.Tools;
 using log4net;
-using NCalc;
 using Vanara.PInvoke;
+using Expression = NCalc.Expression;
 
 #endregion
 
@@ -25,7 +26,7 @@ namespace Core.ViewModel;
 public partial class SearchWindowViewModel : ObservableRecipient
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(SearchWindowViewModel));
-    private readonly Dictionary<string, SearchViewItem> _collection = new(400); //存储本机所有软件
+    public readonly Dictionary<string, SearchViewItem> _collection = new(400); //存储本机所有软件
 
     [ObservableProperty] private bool? _everythingIsOk = true;
     private static readonly List<SearchViewItem> tempList = new(1000);
@@ -719,6 +720,21 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 }
             }
         });
+
+    [RelayCommand]
+    private async Task IgnoreItem(SearchViewItem searchViewItem)
+    {
+        await Task.Run(() =>
+        {
+            ConfigManger.Config.ignoreItems.Add(searchViewItem.OnlyKey);
+            ConfigManger.Save();
+            _collection.Remove(searchViewItem.OnlyKey);
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Items.Remove(searchViewItem);
+            });
+        });
+    }
 
     [RelayCommand]
     private async Task OpenFolder(object searchViewItem) =>

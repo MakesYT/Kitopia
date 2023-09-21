@@ -98,6 +98,39 @@
                             <ui:SymbolIcon Symbol="TopSpeed20" FontSize="25" />
                         </kitopia:SettingItems.Icon>
                     </kitopia:SettingItems>
+                    <Expander x:Name="CardExpander" IsExpanded="True" Padding="0,0,10,0">
+                        <Expander.Header>
+                            <kitopia:SettingItems Margin="0" Title="忽略的项目" FontSize="20" Description="指定哪些项目忽略检索"
+                                                  BorderThickness="0">
+                                <kitopia:SettingItems.Icon>
+                                    <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25" />
+                                </kitopia:SettingItems.Icon>
+                            </kitopia:SettingItems>
+                        </Expander.Header>
+                        <StackPanel>
+                            
+                            <Grid ColumnSpan="10" RowSpan="5" Margin="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="36" />
+                                </Grid.ColumnDefinitions>
+                                <ListBox Margin="0,0,10,0" x:Name="keys" SelectedIndex="-1"
+                                         ItemsSource="{Binding IgnoreItems}" />
+
+
+                                <ui:Button Command="{Binding DelKeyCommand}"
+                                           CommandParameter="{Binding ElementName=keys,Path=SelectedValue}"
+                                           Grid.Row="0" Grid.Column="1" Height="36" Width="36">
+                                    <ui:Button.Icon>
+                                        <ui:SymbolIcon Symbol="Subtract12" Foreground="OrangeRed"
+                                                       FontSize="25" />
+                                    </ui:Button.Icon>
+                                </ui:Button>
+                            </Grid>
+
+                        </StackPanel>
+
+                    </Expander>
                 </StackPanel>
             </Expander.Content>
         </Expander>

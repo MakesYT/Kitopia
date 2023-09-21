@@ -206,11 +206,7 @@ public partial class MainWindow
         msg.FontSize = 15;
         var task = msg.ShowDialogAsync();
         // 使用ContinueWith来在任务完成后执行一个回调函数
-        task.ContinueWith(e =>
-        {
-            var result = e.Result;
-        }).Wait();
-        List<HotKeyModel> itemsToRemove = new();
+        task.Wait();
         foreach (var hotKeyModel in failList)
         {
             var hotKeyEditor = new HotKeyEditorWindow($"{hotKeyModel.MainName}_{hotKeyModel.Name}");
