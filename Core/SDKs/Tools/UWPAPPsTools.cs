@@ -3,6 +3,7 @@
 using System.Drawing;
 using System.IO;
 using System.Xml;
+using Core.SDKs.Services.Config;
 using log4net;
 using Vanara.Extensions;
 using Vanara.PInvoke;
@@ -56,6 +57,12 @@ public class UWPAPPsTools
     private static async Task AppContainerAnalyse(FirewallApi.INET_FIREWALL_APP_CONTAINER appContainer,
         Dictionary<string, SearchViewItem> items)
     {
+        if (ConfigManger.Config.ignoreItems.Contains(appContainer.appContainerName))
+        {
+            log.Debug("忽略索引:\n" + appContainer.appContainerName);
+            return;
+        }
+
         //log.Debug(Thread.CurrentThread.ManagedThreadId);
         if (string.IsNullOrWhiteSpace(appContainer.appContainerName) ||
             string.IsNullOrWhiteSpace(appContainer.displayName) ||
@@ -101,10 +108,11 @@ public class UWPAPPsTools
             return;
         }
 
+        var id = Application.Attributes["Id"].Value;
         XmlNode? VisualElements = null;
         foreach (XmlNode applicationChildNode in Application.ChildNodes)
         {
-            Console.WriteLine(applicationChildNode.Name);
+            //Console.WriteLine(applicationChildNode.Name);
             if (applicationChildNode.Name.Contains("VisualElements"))
             {
                 VisualElements = applicationChildNode;
@@ -135,7 +143,7 @@ public class UWPAPPsTools
                         var searchViewItem = new SearchViewItem()
                         {
                             FileName = fileName,
-                            OnlyKey = appContainer.appContainerName,
+                            OnlyKey = $"{appContainer.appContainerName}!{id}",
                             FileType = FileType.UWP应用,
                             Keys = keys,
                             Icon = (Icon?)icon.Clone(),
@@ -143,7 +151,7 @@ public class UWPAPPsTools
                         };
 
                         log.Debug(
-                            $"appContainerName:{appContainer.appContainerName},\n displayName:{searchViewItem.FileName},\nworkingDirectory:{appContainer.workingDirectory}\n");
+                            $"完成索引UWP应用{fileName},ID:{searchViewItem.OnlyKey}");
                         //Console.WriteLine(searchViewItem);
                         items.TryAdd(appContainer.appContainerName, searchViewItem);
                         return;
@@ -168,14 +176,14 @@ public class UWPAPPsTools
                                 var searchViewItem = new SearchViewItem()
                                 {
                                     FileName = fileName,
-                                    OnlyKey = appContainer.appContainerName,
+                                    OnlyKey = $"{appContainer.appContainerName}!{id}",
                                     FileType = FileType.UWP应用,
                                     Keys = keys,
                                     Icon = (Icon?)icon.Clone(),
                                     IsVisible = true
                                 };
-                                Console.WriteLine(
-                                    $"appContainerName:{appContainer.appContainerName},\n displayName:{searchViewItem.FileName},\nworkingDirectory:{appContainer.workingDirectory}\n");
+                                log.Debug(
+                                    $"完成索引UWP应用{fileName},ID:{searchViewItem.OnlyKey}");
                                 //Console.WriteLine(searchViewItem);
                                 items.TryAdd(appContainer.appContainerName, searchViewItem);
                                 break;

@@ -107,28 +107,24 @@
                                 </kitopia:SettingItems.Icon>
                             </kitopia:SettingItems>
                         </Expander.Header>
-                        <StackPanel>
-                            
-                            <Grid ColumnSpan="10" RowSpan="5" Margin="10">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="36" />
-                                </Grid.ColumnDefinitions>
-                                <ListBox Margin="0,0,10,0" x:Name="keys" SelectedIndex="-1"
-                                         ItemsSource="{Binding IgnoreItems}" />
 
+                        <DataGrid IsReadOnly="True" AutoGenerateColumns="False" PreviewMouseWheel="ListBox_PreviewMouseWheel"
+                                  Margin="0,0,10,0" x:Name="keys" SelectedIndex="-1"
+                                  ItemsSource="{Binding IgnoreItems}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding .}" />
+                                <DataGridTemplateColumn>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ui:Button Content="删除" 
+                                                       CommandParameter="{Binding .}"
+                                                       Command="{Binding Path=DataContext.DelKeyCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Expander}}}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
 
-                                <ui:Button Command="{Binding DelKeyCommand}"
-                                           CommandParameter="{Binding ElementName=keys,Path=SelectedValue}"
-                                           Grid.Row="0" Grid.Column="1" Height="36" Width="36">
-                                    <ui:Button.Icon>
-                                        <ui:SymbolIcon Symbol="Subtract12" Foreground="OrangeRed"
-                                                       FontSize="25" />
-                                    </ui:Button.Icon>
-                                </ui:Button>
-                            </Grid>
-
-                        </StackPanel>
 
                     </Expander>
                 </StackPanel>

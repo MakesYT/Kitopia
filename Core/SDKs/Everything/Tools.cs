@@ -2,6 +2,7 @@
 
 using System.IO;
 using System.Text;
+using Core.SDKs.Services.Config;
 using Core.SDKs.Tools;
 
 #endregion
@@ -40,6 +41,11 @@ public class Tools
             if (Items.ContainsKey(filePath))
             {
                 continue;
+            }
+
+            if (ConfigManger.Config.ignoreItems.Contains(filePath))
+            {
+                return;
             }
 
             var fileInfo = new FileInfo(filePath);
@@ -95,6 +101,11 @@ public class Tools
             if (Items.ContainsKey(filePath))
             {
                 continue;
+            }
+
+            if (ConfigManger.Config.ignoreItems.Contains(filePath))
+            {
+                return;
             }
 
             var fileInfo = new FileInfo(filePath);

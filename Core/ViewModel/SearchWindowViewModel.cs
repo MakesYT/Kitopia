@@ -675,7 +675,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                         case FileType.UWP应用:
                             //explorer.exe shell:AppsFolder\Microsoft.WindowsMaps_8wekyb3d8bbwe!App
                             Shell32.ShellExecute(IntPtr.Zero, "open", "explorer.exe",
-                                $"shell:AppsFolder\\{item.OnlyKey}!App", "",
+                                $"shell:AppsFolder\\{item.OnlyKey}", "",
                                 ShowWindowCommand.SW_NORMAL);
                             break;
                         case FileType.自定义情景:

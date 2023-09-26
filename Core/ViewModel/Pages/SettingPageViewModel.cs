@@ -3,6 +3,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -39,19 +40,22 @@ public partial class SettingPageViewModel : ObservableRecipient
 
     public SettingPageViewModel()
     {
-        ThemeChoice = ConfigManger.Config.themeChoice;
-        AutoStart = ConfigManger.Config.autoStart;
-        AutoStartEverything = ConfigManger.Config.autoStartEverything;
-        UseEverything = ConfigManger.Config.useEverything;
-        MaxHistory = ConfigManger.Config.maxHistory;
-        CanReadClipboard = ConfigManger.Config.canReadClipboard;
-        IgnoreItems = new BindingList<string>(ConfigManger.Config.ignoreItems);
-        HotKeys = ConfigManger.Config.hotKeys;
-        InputSmoothingMilliseconds = ConfigManger.Config.inputSmoothingMilliseconds;
-        WeakReferenceMessenger.Default.Register<string, string>(this, "hotkey", (_, _) =>
+        Application.Current.Dispatcher.BeginInvoke(() =>
         {
+            ThemeChoice = ConfigManger.Config.themeChoice;
+            AutoStart = ConfigManger.Config.autoStart;
+            AutoStartEverything = ConfigManger.Config.autoStartEverything;
+            UseEverything = ConfigManger.Config.useEverything;
+            MaxHistory = ConfigManger.Config.maxHistory;
+            CanReadClipboard = ConfigManger.Config.canReadClipboard;
+            IgnoreItems = new BindingList<string>(ConfigManger.Config.ignoreItems);
             HotKeys = ConfigManger.Config.hotKeys;
-            OnPropertyChanged(nameof(HotKeys));
+            InputSmoothingMilliseconds = ConfigManger.Config.inputSmoothingMilliseconds;
+            WeakReferenceMessenger.Default.Register<string, string>(this, "hotkey", (_, _) =>
+            {
+                HotKeys = ConfigManger.Config.hotKeys;
+                OnPropertyChanged(nameof(HotKeys));
+            });
         });
     }
 
@@ -84,15 +88,19 @@ public partial class SettingPageViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    private void DelKey(string key)
+    private async Task DelKey(string key)
     {
-        ConfigManger.Config.ignoreItems.Remove(key);
-        IgnoreItems.Remove(key);
-        IgnoreItems.ResetBindings();
-        AppTools.AppSolverA(
-            ((SearchWindowViewModel)ServiceManager.Services.GetService(typeof(SearchWindowViewModel)))._collection, key,
-            false);
-        ConfigManger.Save();
+        await Application.Current.Dispatcher.BeginInvoke(() =>
+        {
+            IgnoreItems.Remove(key);
+            // IgnoreItems.ResetBindings();
+            AppTools.AppSolverA(
+                ((SearchWindowViewModel)ServiceManager.Services.GetService(typeof(SearchWindowViewModel)))._collection,
+                key,
+                false);
+            ConfigManger.Save();
+        });
+        //ConfigManger.Config.ignoreItems.Remove(key);
     }
 
 

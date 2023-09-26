@@ -459,6 +459,12 @@ public partial class AppTools
                 return;
             }
 
+            if (ConfigManger.Config.ignoreItems.Contains(url))
+            {
+                log.Debug("忽略索引:\n" + url);
+                return;
+            }
+
             var pattern2 = @"IconFile=(.*)"; // the regex pattern to match the url
             var match2 = Regex.Match(fileContent, pattern2); // match the pattern
             if (match2.Success) // if a match is found
