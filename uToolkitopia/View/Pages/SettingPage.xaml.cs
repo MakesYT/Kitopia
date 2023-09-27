@@ -3,8 +3,10 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using Core.SDKs.Services;
 using Kitopia.Controls;
+using log4net;
 using Microsoft.Extensions.DependencyInjection;
 
 #endregion
@@ -13,6 +15,8 @@ namespace Kitopia.View.Pages;
 
 public partial class SettingPage : Page
 {
+    private static readonly ILog log = LogManager.GetLogger(nameof(SettingPage));
+
     public SettingPage()
     {
         InitializeComponent();
@@ -31,17 +35,57 @@ public partial class SettingPage : Page
 
     private void ListBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
     {
-        if (!e.Handled)
-        {
-            // ListView拦截鼠标滚轮事件
-            e.Handled = true;
+        var dataGrid = (DataGrid)sender;
+        var dependencyObject = GetScrollViewer(dataGrid);
 
-            // 激发一个鼠标滚轮事件，冒泡给外层ListView接收到
+        Rect bounds = dataGrid.TransformToAncestor(Window.GetWindow(this))
+            .TransformBounds(new Rect(0.0, 0.0, dataGrid.ActualWidth, dataGrid.ActualHeight));
+        Rect rect = new Rect(0.0, 0.0, this.WindowWidth, this.WindowHeight);
+
+        {
+            if (!rect.Contains(bounds))
+            {
+                e.Handled = true;
+                var eventArg = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta);
+                eventArg.RoutedEvent = UIElement.MouseWheelEvent;
+                eventArg.Source = sender;
+                var parent = ((Control)sender).Parent as UIElement;
+                parent.RaiseEvent(eventArg);
+            }
+        }
+
+        if (dependencyObject.ContentVerticalOffset >= dependencyObject.ScrollableHeight && e.Delta < 0)
+        {
             var eventArg = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta);
             eventArg.RoutedEvent = UIElement.MouseWheelEvent;
             eventArg.Source = sender;
             var parent = ((Control)sender).Parent as UIElement;
             parent.RaiseEvent(eventArg);
         }
+
+        if (dependencyObject.ContentVerticalOffset == 0 && e.Delta > 0)
+        {
+            var eventArg = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta);
+            eventArg.RoutedEvent = UIElement.MouseWheelEvent;
+            eventArg.Source = sender;
+            var parent = ((Control)sender).Parent as UIElement;
+            parent.RaiseEvent(eventArg);
+        }
+    }
+
+    private ScrollViewer GetScrollViewer(DataGrid dataGrid)
+    {
+        if (VisualTreeHelper.GetChildrenCount(dataGrid) == 0)
+        {
+            return null;
+        }
+
+        // 获取DataGrid的第一个子元素，它是一个Border
+        var border = VisualTreeHelper.GetChild(dataGrid, 0) as Border;
+
+        // 获取Border的子元素，它是一个ScrollViewer
+        var scrollViewer = border.Child as ScrollViewer;
+
+        return scrollViewer;
     }
 }

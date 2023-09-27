@@ -22,11 +22,11 @@ public partial class SettingPageViewModel : ObservableRecipient
 {
     private static readonly ILog log = LogManager.GetLogger("SettingPageViewModel");
 
-    [ObservableProperty]
-    private IList<int> _maxHistoryOptions = new ObservableCollection<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+    [ObservableProperty] private ObservableCollection<int> _maxHistoryOptions = new ObservableCollection<int>
+        { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
     [ObservableProperty]
-    private IList<string> _themeChoiceOptions = new ObservableCollection<string> { "跟随系统", "深色", "浅色" };
+    private ObservableCollection<string> _themeChoiceOptions = new ObservableCollection<string> { "跟随系统", "深色", "浅色" };
 
     [ObservableProperty] private bool _autoStart = true;
     [ObservableProperty] private bool _autoStartEverything = true;
@@ -49,11 +49,11 @@ public partial class SettingPageViewModel : ObservableRecipient
             MaxHistory = ConfigManger.Config.maxHistory;
             CanReadClipboard = ConfigManger.Config.canReadClipboard;
             IgnoreItems = new BindingList<string>(ConfigManger.Config.ignoreItems);
-            HotKeys = ConfigManger.Config.hotKeys;
+            HotKeys = new BindingList<HotKeyModel>(ConfigManger.Config.hotKeys);
             InputSmoothingMilliseconds = ConfigManger.Config.inputSmoothingMilliseconds;
             WeakReferenceMessenger.Default.Register<string, string>(this, "hotkey", (_, _) =>
             {
-                HotKeys = ConfigManger.Config.hotKeys;
+                //HotKeys = ConfigManger.Config.hotKeys;
                 OnPropertyChanged(nameof(HotKeys));
             });
         });

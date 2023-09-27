@@ -108,8 +108,8 @@
                             </kitopia:SettingItems>
                         </Expander.Header>
 
-                        <DataGrid IsReadOnly="True" AutoGenerateColumns="False" PreviewMouseWheel="ListBox_PreviewMouseWheel"
-                                  Margin="0,0,10,0" x:Name="keys" SelectedIndex="-1"
+                        <DataGrid IsReadOnly="True" AutoGenerateColumns="False" PreviewMouseWheel="ListBox_PreviewMouseWheel"  
+                                  Margin="0,0,10,0" x:Name="keys" SelectedIndex="-1" MaxHeight="400"
                                   ItemsSource="{Binding IgnoreItems}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Binding="{Binding .}" />

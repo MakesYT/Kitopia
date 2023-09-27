@@ -1,6 +1,5 @@
 ﻿#region
 
-using System.ComponentModel;
 using System.Runtime.Serialization;
 using Core.SDKs.HotKey;
 using PluginCore;
@@ -28,7 +27,7 @@ public record Config
     public List<string> ignoreItems = new();
     public List<string> customCollections = new();
 
-    public BindingList<HotKeyModel> hotKeys = new()
+    public List<HotKeyModel> hotKeys = new()
     {
         new HotKeyModel
         {
