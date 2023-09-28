@@ -249,12 +249,20 @@
 
                                         </controls:SettingItems>
                                     </Expander.Header>
-                                    <controls:SettingItems Margin="0" Title="情景描述" FontSize="20">
-                                        
-                                        <controls:SettingItems.Icon>
-                                            <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25" />
-                                        </controls:SettingItems.Icon>
-                                    </controls:SettingItems>
+                                    <StackPanel  Margin="15,5,5,5" Orientation="Vertical">
+                                        <StackPanel  VerticalAlignment="Center" Orientation="Horizontal">
+                                            <CheckBox />
+                                            <ui:TextBlock VerticalAlignment="Center" Text="Kitopia启动时运行" />
+                                        </StackPanel>
+                                        <StackPanel  VerticalAlignment="Center" Orientation="Horizontal">
+                                            <CheckBox />
+                                            <ui:TextBlock VerticalAlignment="Center" Text="关机时运行" />
+                                        </StackPanel>
+                                        <StackPanel  VerticalAlignment="Center" Orientation="Horizontal">
+                                            <CheckBox />
+                                            <ui:TextBlock VerticalAlignment="Center" Text="启动时运行" />
+                                        </StackPanel>
+                                    </StackPanel>
                                 </Expander>
                                 <Expander x:Name="CardExpander2"
                                           IsEnabled="{Binding Scenario.ExecutionIntervalSpecifies,Mode=OneWay}"

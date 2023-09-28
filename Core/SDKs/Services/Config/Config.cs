@@ -2,6 +2,7 @@
 
 using System.Runtime.Serialization;
 using Core.SDKs.HotKey;
+using Newtonsoft.Json;
 using PluginCore;
 
 #endregion
@@ -10,8 +11,8 @@ namespace Core.SDKs.Services.Config;
 
 public record Config
 {
-    public int verInt = 0;
-    public string ver = "0.0.2";
+    [JsonIgnore] public int verInt = 0;
+    [JsonIgnore] public string ver = "0.0.2";
     public bool useEverything = true;
     public bool autoStart = true;
     public bool autoStartEverything = true;

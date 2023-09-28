@@ -41,6 +41,7 @@
         <searchWindow:PathToImageConverter x:Key="PathToImageConverter" />
         <searchWindow:SearchItemToInfo x:Key="SearchItemToInfo" />
         <searchWindow:IfNullVisibilityHidden x:Key="IfNullVisibilityHidden" />
+        <searchWindow:CanIgnoreCtr x:Key="CanIgnoreCtr" />
     </Window.Resources>
     <StackPanel Margin="10" MinHeight="150">
         <ui:TextBox VerticalContentAlignment="Center" VerticalAlignment="Center" IsTabStop="False"
@@ -90,7 +91,8 @@
                             <ContextMenu DataContext="{StaticResource Command}">
                                 <!-- ReSharper disable once Xaml.RedundantResource -->
                                 
-                                <MenuItem Header="忽略" Command="{Binding Data}"
+                                <MenuItem Header="忽略" Command="{Binding Data}" 
+                                          Visibility="{Binding Source={StaticResource CommandParameter},Path=Data.FileType,Converter={StaticResource CanIgnoreCtr}}"
                                           CommandParameter="{Binding Source={StaticResource CommandParameter},Path=Data}" />
                             </ContextMenu>
                             
