@@ -6,11 +6,12 @@
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:pages="clr-namespace:Core.ViewModel.Pages;assembly=Core"
       xmlns:kitopia="clr-namespace:Kitopia.Controls"
+      ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
+      ui:Design.Foreground="{DynamicResource BodyColor}"
       d:DataContext="{d:DesignInstance pages:SettingPageViewModel,
                                      IsDesignTimeCreatable=False}"
-      ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
-      ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-      Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+
+      Foreground="{DynamicResource BodyColor}"
 
       mc:Ignorable="d"
       Title="HomePage">
@@ -98,7 +99,7 @@
                             <ui:SymbolIcon Symbol="TopSpeed20" FontSize="25" />
                         </kitopia:SettingItems.Icon>
                     </kitopia:SettingItems>
-                    <Expander x:Name="CardExpander" IsExpanded="True" Padding="0,0,10,0">
+                    <Expander x:Name="CardExpander" IsExpanded="False" Padding="0,0,10,0">
                         <Expander.Header>
                             <kitopia:SettingItems Margin="0" Title="忽略的项目" FontSize="20" Description="指定哪些项目忽略检索"
                                                   BorderThickness="0">
@@ -108,7 +109,8 @@
                             </kitopia:SettingItems>
                         </Expander.Header>
 
-                        <DataGrid IsReadOnly="True" AutoGenerateColumns="False" PreviewMouseWheel="ListBox_PreviewMouseWheel"  
+                        <DataGrid IsReadOnly="True" AutoGenerateColumns="False"
+                                  PreviewMouseWheel="ListBox_PreviewMouseWheel"
                                   Margin="0,0,10,0" x:Name="keys" SelectedIndex="-1" MaxHeight="400"
                                   ItemsSource="{Binding IgnoreItems}">
                             <DataGrid.Columns>
@@ -116,7 +118,7 @@
                                 <DataGridTemplateColumn>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <ui:Button Content="删除" 
+                                            <ui:Button Content="删除"
                                                        CommandParameter="{Binding .}"
                                                        Command="{Binding Path=DataContext.DelKeyCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Expander}}}" />
                                         </DataTemplate>

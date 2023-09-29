@@ -6,6 +6,8 @@
                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                  xmlns:controls="clr-namespace:Kitopia.Controls"
                  mc:Ignorable="d"
+                 ExtendsContentIntoTitleBar="True"
+                 WindowBackdropType="Acrylic"
                  Title="HotKeyEditorWindow" Height="225" Width="400" KeyDown="HotKeyEditorWindow_OnKeyDown"
                  KeyUp="HotKeyEditorWindow_OnKeyUp">
     <Grid>

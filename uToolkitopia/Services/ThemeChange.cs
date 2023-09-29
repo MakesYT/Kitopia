@@ -3,6 +3,7 @@
 using Core.SDKs.Services;
 using log4net;
 using Wpf.Ui.Appearance;
+using Wpf.Ui.Controls;
 
 #endregion
 
@@ -20,11 +21,11 @@ public class ThemeChange : IThemeChange
         switch (name)
         {
             case "theme_light":
-                ApplicationThemeManager.Apply(ApplicationTheme.Light);
+                ApplicationThemeManager.Apply(ApplicationTheme.Light, WindowBackdropType.Acrylic);
                 break;
 
             default:
-                ApplicationThemeManager.Apply(ApplicationTheme.Dark);
+                ApplicationThemeManager.Apply(ApplicationTheme.Dark, WindowBackdropType.Acrylic);
                 break;
         }
     }

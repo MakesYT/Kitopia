@@ -15,9 +15,9 @@
                  WindowBackdropType="Acrylic"
                  d:DataContext="{d:DesignInstance viewModel:MainWindowViewModel}"
                     d:IsHidden="False"
-                 
+                 Visibility="Hidden"
                  WindowCornerPreference="Round"
-                 Title="Kitopia" Height="742" Width="1200" Visibility="Hidden">
+                 Title="Kitopia" Height="742" Width="1200" >
     <Window.Resources>
         <services:BindingProxy x:Key="runRecordList" Data="{Binding}" />
     </Window.Resources>

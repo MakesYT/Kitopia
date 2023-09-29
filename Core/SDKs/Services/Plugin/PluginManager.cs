@@ -67,7 +67,7 @@ public class PluginManager
             }
 
             Plugin.LoadBypath($"{pluginInfoEx1.Author}_{pluginInfoEx1.PluginId}", pluginInfoEx1.Path);
-            ((ITaskEditorOpenService)ServiceManager.Services!.GetService(typeof(ITaskEditorOpenService))!)!.Open();
+            //((ITaskEditorOpenService)ServiceManager.Services!.GetService(typeof(ITaskEditorOpenService))!)!.Open();
 
 
 #endif

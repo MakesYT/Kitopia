@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
@@ -26,6 +27,7 @@ using log4net;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Win32;
+using Vanara.PInvoke;
 using Wpf.Ui;
 using ContentDialogService = Kitopia.Services.ContentDialogService;
 using MessageBox = Kitopia.Controls.MessageBoxControl.MessageBox;
@@ -156,10 +158,22 @@ public sealed partial class App : Application
             CustomScenarioManger.Init();
             log.Info("场景管理器初始化完成");
             var initWindow = ServiceManager.Services.GetService<MainWindow>();
-            initWindow.Show();
-            // initWindow.Close();
-
-            Current.MainWindow = ServiceManager.Services.GetService<MainWindow>();
+            typeof(Window).GetMethod("VerifyContextAndObjectState", BindingFlags.NonPublic | BindingFlags.Instance)!
+                .Invoke(initWindow, null);
+            typeof(Window).GetMethod("VerifyCanShow", BindingFlags.NonPublic | BindingFlags.Instance)!
+                .Invoke(initWindow, null);
+            typeof(Window).GetMethod("VerifyNotClosing", BindingFlags.NonPublic | BindingFlags.Instance)!
+                .Invoke(initWindow, null);
+            typeof(Window).GetMethod("VerifyConsistencyWithAllowsTransparency",
+                    BindingFlags.NonPublic | BindingFlags.Instance,
+                    null, new Type[] { }, null)!
+                .Invoke(initWindow, null);
+            typeof(Window).GetMethod("UpdateVisibilityProperty", BindingFlags.NonPublic | BindingFlags.Instance)!
+                .Invoke(initWindow, new object?[] { Visibility.Visible });
+            ShowHelper(initWindow!);
+            initWindow!.Hide();
+            Current.MainWindow = initWindow;
+            //initWindow.Visibility = Visibility.Hidden;
             ServicePointManager.DefaultConnectionLimit = 10240;
 
             if (ConfigManger.Config.autoStart)
@@ -170,6 +184,35 @@ public sealed partial class App : Application
 
             base.OnStartup(e);
         }
+    }
+
+    private object? ShowHelper(Window window)
+    {
+        var type = typeof(Window);
+        if ((bool)type.GetField("_disposed", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(window)!)
+        {
+            return null;
+        }
+
+        type.GetField("_isClosing", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(window, false);
+        if ((bool)type.GetField("_isVisible", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(window)!)
+        {
+            return null;
+        }
+
+        typeof(Window).GetMethod("SetShowKeyboardCueState", BindingFlags.NonPublic | BindingFlags.Instance)!
+            .Invoke(window, null);
+        typeof(Window).GetMethod("SafeCreateWindowDuringShow", BindingFlags.NonPublic | BindingFlags.Instance)!
+            .Invoke(window, null);
+        User32.ShowWindow(new HandleRef(window,
+            (IntPtr)type.GetProperty("CriticalHandle", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .GetValue(window)!).Handle, ShowWindowCommand.SW_HIDE);
+        //UnsafeNativeMethods.ShowWindow(new HandleRef(this, CriticalHandle), nCmd);
+        typeof(Window).GetMethod("SafeStyleSetter", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(window,
+            null);
+
+
+        return null;
     }
 
     private static void Application_ApplicationExit(object? sender, EventArgs e)
@@ -277,71 +320,28 @@ public sealed partial class App : Application
         services.AddTransient<IClipboardService, ClipboardService>();
         services.AddTransient<ITaskEditorOpenService, TaskEditorOpenService>();
         services.AddTransient<IContentDialog, ContentDialogService>();
-        services.AddSingleton<SearchWindowViewModel>(e =>
-        {
-            return new SearchWindowViewModel { IsActive = true };
-        });
-        services.AddSingleton<SearchWindow>(sq =>
-        {
-            return new SearchWindow { DataContext = sq.GetService<SearchWindowViewModel>() };
-        });
-        services.AddSingleton<MainWindowViewModel>(e =>
-        {
-            return new MainWindowViewModel { IsActive = true };
-        });
-        services.AddSingleton<MainWindow>(sq =>
-        {
-            return new MainWindow { DataContext = sq.GetService<MainWindowViewModel>() };
-        });
-        services.AddTransient<SettingPageViewModel>(e =>
-        {
-            return new SettingPageViewModel { IsActive = true };
-        });
+        services.AddSingleton<SearchWindowViewModel>(e => new SearchWindowViewModel { IsActive = true });
+        services.AddSingleton<SearchWindow>(sq => new SearchWindow
+            { DataContext = sq.GetService<SearchWindowViewModel>() });
+        services.AddSingleton<MainWindowViewModel>(e => new MainWindowViewModel { IsActive = true });
+        services.AddSingleton<MainWindow>(sq => new MainWindow { DataContext = sq.GetService<MainWindowViewModel>() });
+        services.AddTransient<SettingPageViewModel>(e => new SettingPageViewModel { IsActive = true });
         services.AddTransient<SettingPage>(e =>
-        {
-            return new SettingPage() { DataContext = e.GetService<SettingPageViewModel>() };
-        });
-        services.AddTransient<HomePageViewModel>(e =>
-        {
-            return new HomePageViewModel { IsActive = true };
-        });
-        services.AddTransient<HomePage>(e =>
-        {
-            return new HomePage() { DataContext = e.GetService<HomePageViewModel>() };
-        });
-        services.AddTransient<PluginManagerPageViewModel>(e =>
-        {
-            return new PluginManagerPageViewModel { IsActive = true };
-        });
-        services.AddTransient<PluginManagerPage>(e =>
-        {
-            return new PluginManagerPage() { DataContext = e.GetService<PluginManagerPageViewModel>() };
-        });
-        services.AddSingleton<PluginSettingViewModel>(e =>
-        {
-            return new PluginSettingViewModel { IsActive = true };
-        });
-        services.AddSingleton<PluginSetting>(e =>
-        {
-            return new PluginSetting() { DataContext = e.GetService<PluginSettingViewModel>() };
-        });
-        services.AddTransient<TaskEditorViewModel>(e =>
-        {
-            return new TaskEditorViewModel { IsActive = true };
-        });
-        services.AddTransient<TaskEditor>(e =>
-        {
-            return new TaskEditor() { DataContext = e.GetService<TaskEditorViewModel>() };
-        });
-        services.AddTransient<CustomScenariosManagerPageViewModel>(e =>
-        {
-            return new CustomScenariosManagerPageViewModel { IsActive = true };
-        });
-        services.AddTransient<CustomScenariosManagerPage>(e =>
-        {
-            return new CustomScenariosManagerPage()
-                { DataContext = e.GetService<CustomScenariosManagerPageViewModel>() };
-        });
+            new SettingPage() { DataContext = e.GetService<SettingPageViewModel>() });
+        services.AddTransient<HomePageViewModel>(e => new HomePageViewModel { IsActive = true });
+        services.AddTransient<HomePage>(e => new HomePage() { DataContext = e.GetService<HomePageViewModel>() });
+        services.AddTransient<PluginManagerPageViewModel>(e => new PluginManagerPageViewModel { IsActive = true });
+        services.AddTransient<PluginManagerPage>(e => new PluginManagerPage()
+            { DataContext = e.GetService<PluginManagerPageViewModel>() });
+        services.AddSingleton<PluginSettingViewModel>(e => new PluginSettingViewModel { IsActive = true });
+        services.AddSingleton<PluginSetting>(e => new PluginSetting()
+            { DataContext = e.GetService<PluginSettingViewModel>() });
+        services.AddTransient<TaskEditorViewModel>(e => new TaskEditorViewModel { IsActive = true });
+        services.AddTransient<TaskEditor>(e => new TaskEditor() { DataContext = e.GetService<TaskEditorViewModel>() });
+        services.AddTransient<CustomScenariosManagerPageViewModel>(e => new CustomScenariosManagerPageViewModel
+            { IsActive = true });
+        services.AddTransient<CustomScenariosManagerPage>(e => new CustomScenariosManagerPage()
+            { DataContext = e.GetService<CustomScenariosManagerPageViewModel>() });
 
         return services.BuildServiceProvider();
     }

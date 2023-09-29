@@ -21,6 +21,7 @@ namespace Core.ViewModel.Pages;
 public partial class SettingPageViewModel : ObservableRecipient
 {
     private static readonly ILog log = LogManager.GetLogger("SettingPageViewModel");
+    private bool _isInitializing = false;
 
     [ObservableProperty] private ObservableCollection<int> _maxHistoryOptions = new ObservableCollection<int>
         { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
@@ -56,12 +57,18 @@ public partial class SettingPageViewModel : ObservableRecipient
                 //HotKeys = ConfigManger.Config.hotKeys;
                 OnPropertyChanged(nameof(HotKeys));
             });
+            _isInitializing = false;
         });
     }
 
 
     partial void OnThemeChoiceChanged(string value)
     {
+        if (_isInitializing)
+        {
+            return;
+        }
+
         switch (value)
         {
             case "跟随系统":
@@ -106,6 +113,11 @@ public partial class SettingPageViewModel : ObservableRecipient
 
     partial void OnInputSmoothingMillisecondsChanged(int value)
     {
+        if (_isInitializing)
+        {
+            return;
+        }
+
         ConfigManger.Config.inputSmoothingMilliseconds = value;
         ConfigManger.Save();
     }
@@ -113,18 +125,33 @@ public partial class SettingPageViewModel : ObservableRecipient
 
     partial void OnMaxHistoryChanged(int value)
     {
+        if (_isInitializing)
+        {
+            return;
+        }
+
         ConfigManger.Config.maxHistory = value;
         ConfigManger.Save();
     }
 
     partial void OnCanReadClipboardChanged(bool value)
     {
+        if (_isInitializing)
+        {
+            return;
+        }
+
         ConfigManger.Config.canReadClipboard = value;
         ConfigManger.Save();
     }
 
     partial void OnAutoStartEverythingChanged(bool value)
     {
+        if (_isInitializing)
+        {
+            return;
+        }
+
         ConfigManger.Config.autoStartEverything = value;
         ConfigManger.Save();
     }
@@ -132,6 +159,11 @@ public partial class SettingPageViewModel : ObservableRecipient
 
     partial void OnAutoStartChanged(bool value)
     {
+        if (_isInitializing)
+        {
+            return;
+        }
+
         ConfigManger.Config.autoStart = value;
         ConfigManger.Save();
         if (value)
@@ -180,6 +212,11 @@ public partial class SettingPageViewModel : ObservableRecipient
 
     partial void OnUseEverythingChanged(bool value)
     {
+        if (_isInitializing)
+        {
+            return;
+        }
+
         ConfigManger.Config.useEverything = value;
         ((SearchWindowViewModel)ServiceManager.Services.GetService(typeof(SearchWindowViewModel))).EverythingIsOk =
             !value;
