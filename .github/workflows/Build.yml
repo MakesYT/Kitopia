@@ -38,6 +38,11 @@ jobs:
         run: |
           New-Item -Path .\.sonar\scanner -ItemType Directory
           dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v1.0.5
       - name: Build and analyze
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
@@ -48,5 +53,6 @@ jobs:
           git clone https://github.com/MakesYT/wpfui.git
           cd Kitopia
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"kitopia" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="${{ secrets.SONAR_HOST_URL }}"
+           nuget restore Kitopia.sln
            msbuild.exe Kitopia.sln /p:platform="Any CPU" /p:configuration="Release"
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
