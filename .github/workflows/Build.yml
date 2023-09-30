@@ -49,7 +49,7 @@ jobs:
         shell: powershell
         run: |
           cd ..
-          git clone https://github.com/MakesYT/nodify.git
+          git clone https://github.com/miroiu/nodify.git
           git clone https://github.com/MakesYT/wpfui.git
           cd Kitopia
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"kitopia" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="${{ secrets.SONAR_HOST_URL }}"
