@@ -9,7 +9,6 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
-using Core.SDKs.CustomScenario;
 using Core.SDKs.HotKey;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
@@ -148,7 +147,7 @@ public partial class MainWindow
 
         AppDomain.CurrentDomain.ProcessExit += new EventHandler((_, _) =>
         {
-            CustomScenarioExecutor.Exit();
+            //CustomScenarioExecutor.Exit();
         });
         log.Debug("注册热键");
         InitHotKey();
@@ -244,9 +243,14 @@ public partial class MainWindow
         //log.Debug(windowMessage);
         switch (windowMessage)
         {
+            case User32.WindowMessage.WM_ACTIVATEAPP:
+            {
+                // CustomScenarioExecutor.SystemClose();
+                break;
+            }
             case User32.WindowMessage.WM_QUERYENDSESSION:
             {
-                CustomScenarioExecutor.SystemClose();
+                // CustomScenarioExecutor.SystemClose();
                 break;
             }
             case User32.WindowMessage.WM_HOTKEY:

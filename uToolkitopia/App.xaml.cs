@@ -47,16 +47,16 @@ public sealed partial class App : Application
     public static void CheckAndDeleteLogFiles()
     {
         // 定义日志文件的目录
-        var logDirectory = AppDomain.CurrentDomain.BaseDirectory + "logs";
+        var logDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
         log.Debug($"检查日志目录:{logDirectory}");
         // 定义要保留的日志文件的时间范围，这里是一周
         var timeSpan = TimeSpan.FromDays(2);
 
         // 获取当前的日期
-        var currentDate = DateTime.Now;
+        var currentDate = DateTime.Today;
 
         // 获取目录下的所有日志文件，按照最后修改时间排序
-        var logFiles = Directory.GetFiles(logDirectory)
+        var logFiles = Directory.EnumerateFiles(logDirectory)
             .Select(f => new FileInfo(f))
             .OrderByDescending(f => f.LastWriteTime);
 
@@ -64,16 +64,15 @@ public sealed partial class App : Application
         foreach (var logFile in logFiles)
         {
             // 计算日志文件的最后修改时间和当前日期的差值
-            var diff = currentDate - logFile.LastWriteTime;
-
             // 如果差值大于要保留的时间范围，就删除该日志文件
-            if (diff > timeSpan)
+            if (currentDate - logFile.LastWriteTime > timeSpan)
             {
                 log.Debug($"删除日志文件:{logFile.FullName}");
                 logFile.Delete();
             }
         }
     }
+
 
     [DllImport("user32.dll", EntryPoint = "SetForegroundWindow", SetLastError = true)]
     public static extern void SetForegroundWindow(IntPtr hwnd);
