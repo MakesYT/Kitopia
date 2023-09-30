@@ -54,5 +54,5 @@ jobs:
           cd Kitopia
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"kitopia" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="${{ secrets.SONAR_HOST_URL }}"
            nuget restore Kitopia.sln
-           msbuild.exe Kitopia.sln /p:platform="Any CPU" /p:configuration="Release"
+           msbuild.exe uToolkitopia\Kitopia.csproj /p:platform="Any CPU" /p:configuration="Release"
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
