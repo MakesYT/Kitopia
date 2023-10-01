@@ -407,7 +407,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
             var operators = new[] { '*', '+', '-', '/' };
             var pattern = @"[\u4e00-\u9fa5a-zA-Z]+";
-            if (!Regex.Match(value, pattern).Success && value.IndexOfAny(operators) > 0)
+            if (!Regex.Match(value, pattern, RegexOptions.NonBacktracking).Success && value.IndexOfAny(operators) > 0)
             {
                 try
                 {
@@ -916,8 +916,13 @@ public partial class SearchWindowViewModel : ObservableRecipient
             Log.Debug("打开指定内容在终端中" + item.OnlyKey);
             var startInfo = new ProcessStartInfo
             {
-                FileName = "cmd.exe"
+                FileName = @"C:\Windows\System32\cmd.exe"
             };
+            if (!File.Exists(@"C:\Windows\System32\cmd.exe"))
+            {
+                Log.Debug("64");
+                startInfo.FileName = @"C:\Windows\sysnative\cmd.exe";
+            }
 
             if (item.FileInfo != null)
             {

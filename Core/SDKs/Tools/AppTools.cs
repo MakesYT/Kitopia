@@ -443,7 +443,7 @@ public partial class AppTools
             var relFile = "";
             var fileContent = File.ReadAllText(file); // read the file content
             var pattern = @"URL=(.*)"; // the regex pattern to match the url
-            var match = Regex.Match(fileContent, pattern); // match the pattern
+            var match = Regex.Match(fileContent, pattern, RegexOptions.NonBacktracking); // match the pattern
             if (match.Success) // if a match is found
             {
                 url = match.Groups[1].Value.Replace("\r", ""); // get the url from the first group
@@ -466,7 +466,7 @@ public partial class AppTools
             }
 
             var pattern2 = @"IconFile=(.*)"; // the regex pattern to match the url
-            var match2 = Regex.Match(fileContent, pattern2); // match the pattern
+            var match2 = Regex.Match(fileContent, pattern2, RegexOptions.NonBacktracking); // match the pattern
             if (match2.Success) // if a match is found
             {
                 relFile = match2.Groups[1].Value.Replace("\r", ""); // get the url from the first group

@@ -36,7 +36,12 @@ public partial class ErrorDialog : Window
     {
         using (var process = new Process())
         {
-            process.StartInfo.FileName = "cmd.exe";
+            process.StartInfo.FileName = @"C:\Windows\System32\cmd.exe";
+            if (!File.Exists($@"C:\Windows\System32\cmd.exe"))
+            {
+                process.StartInfo.FileName = @"C:\Windows\sysnative\cmd.exe";
+            }
+
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardInput = true;
             process.StartInfo.RedirectStandardOutput = true;
