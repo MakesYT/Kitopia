@@ -44,10 +44,6 @@
                          Geometry="M0,0 L0,1 0.03,1 0.03,0.03 1,0.03 1,0 Z"
                          Brush="{DynamicResource NodifyEditor.SelectionRectangleBackgroundBrush}" />
 
-        <GeometryDrawing x:Key="LargeGridGeometry"
-                         Geometry="M0,0 L0,1 0.015,1 0.015,0.015 1,0.015 1,0 Z"
-                         Brush="{DynamicResource NodifyEditor.SelectionRectangleBackgroundBrush}" />
-
         <DrawingBrush x:Key="SmallGridLinesDrawingBrush"
                       TileMode="Tile"
                       ViewportUnits="Absolute"
@@ -191,7 +187,8 @@
                                                 <RowDefinition Height="*" />
                                                 <RowDefinition Height="70" />
                                             </Grid.RowDefinitions>
-                                            <ListBox Margin="0,0,10,0" x:Name="keys" SelectedIndex="{Binding IsSelected}"
+                                            <ListBox Margin="0,0,10,0" x:Name="keys"
+                                                     SelectedIndex="{Binding IsSelected}"
                                                      ItemsSource="{Binding Scenario.Keys}" />
 
 
@@ -212,9 +209,8 @@
                                                 </ui:Button.Icon>
                                             </ui:Button>
                                             <DockPanel Grid.Row="1" Grid.Column="0" Margin="10" Height="40">
-                                                <ui:TextBox 
-                                                            Text="{Binding KeyValue,UpdateSourceTrigger=PropertyChanged}"
-                                                             />
+                                                <ui:TextBox
+                                                    Text="{Binding KeyValue,UpdateSourceTrigger=PropertyChanged}" />
                                             </DockPanel>
                                         </Grid>
 
@@ -249,16 +245,16 @@
 
                                         </controls:SettingItems>
                                     </Expander.Header>
-                                    <StackPanel  Margin="15,5,5,5" Orientation="Vertical">
-                                        <StackPanel  VerticalAlignment="Center" Orientation="Horizontal">
+                                    <StackPanel Margin="15,5,5,5" Orientation="Vertical">
+                                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                                             <CheckBox />
                                             <ui:TextBlock VerticalAlignment="Center" Text="Kitopia启动时运行" />
                                         </StackPanel>
-                                        <StackPanel  VerticalAlignment="Center" Orientation="Horizontal">
+                                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                                             <CheckBox />
                                             <ui:TextBlock VerticalAlignment="Center" Text="关机时运行" />
                                         </StackPanel>
-                                        <StackPanel  VerticalAlignment="Center" Orientation="Horizontal">
+                                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                                             <CheckBox />
                                             <ui:TextBlock VerticalAlignment="Center" Text="启动时运行" />
                                         </StackPanel>

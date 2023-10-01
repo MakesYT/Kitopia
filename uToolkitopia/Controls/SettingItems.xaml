@@ -62,7 +62,7 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="Description" Value="{x:Null}">
                             <Setter TargetName="description" Property="Visibility" Value="Collapsed" />
-                            
+
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

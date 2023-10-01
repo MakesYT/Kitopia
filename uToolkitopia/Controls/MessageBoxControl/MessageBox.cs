@@ -21,6 +21,149 @@ namespace Kitopia.Controls.MessageBoxControl;
 [ToolboxBitmap(typeof(MessageBox), "MessageBox.bmp")]
 public class MessageBox : Window
 {
+    protected TaskCompletionSource<MessageBoxResult>? Tcs;
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MessageBox" /> class.
+    /// </summary>
+    public MessageBox()
+    {
+        Topmost = true;
+        SetValue(TemplateButtonCommandProperty, new RelayCommand<MessageBoxButton>(OnButtonClick));
+
+        PreviewMouseDoubleClick += static (_, args) => args.Handled = true;
+
+        Loaded += static (sender, _) =>
+        {
+            var self = (MessageBox)sender;
+            self.OnLoaded();
+        };
+    }
+
+    [Obsolete($"Use {nameof(ShowDialogAsync)} instead")]
+    public new void Show() => throw new InvalidOperationException($"Use {nameof(ShowDialogAsync)} instead");
+
+    [Obsolete($"Use {nameof(ShowDialogAsync)} instead")]
+    public new bool? ShowDialog() => throw new InvalidOperationException($"Use {nameof(ShowDialogAsync)} instead");
+
+    [Obsolete($"Use {nameof(Close)} with MessageBoxResult instead")]
+    public new void Close() =>
+        throw new InvalidOperationException($"Use {nameof(Close)} with MessageBoxResult instead");
+
+    /// <summary>
+    ///     Displays a message box
+    /// </summary>
+    /// <returns>
+    ///     <see cref="MessageBoxResult" />
+    /// </returns>
+    /// <exception cref="TaskCanceledException"></exception>
+    public async Task<MessageBoxResult> ShowDialogAsync(bool showAsDialog = true,
+        CancellationToken cancellationToken = default)
+    {
+        Tcs = new TaskCompletionSource<MessageBoxResult>();
+        var tokenRegistration =
+            cancellationToken.Register(o => Tcs.TrySetCanceled((CancellationToken)o!), cancellationToken);
+
+        try
+        {
+            RemoveTitleBarAndApplyMica();
+
+            if (showAsDialog)
+            {
+                base.ShowDialog();
+            }
+            else
+            {
+                base.Show();
+            }
+
+            return await Tcs.Task;
+        }
+        finally
+        {
+#if NET6_0_OR_GREATER
+            await tokenRegistration.DisposeAsync();
+#else
+            tokenRegistration.Dispose();
+#endif
+        }
+    }
+
+    /// <summary>
+    ///     Occurs after Loading event
+    /// </summary>
+    protected virtual void OnLoaded()
+    {
+        var rootElement = (UIElement)GetVisualChild(0)!;
+
+        ResizeToContentSize(rootElement);
+        CenterWindowOnScreen();
+    }
+
+    /// <summary>
+    ///     Sets Width and Height
+    /// </summary>
+    /// <param name="rootElement"></param>
+    protected virtual void ResizeToContentSize(UIElement rootElement)
+    {
+        var desiredSize = rootElement.DesiredSize;
+
+        //left and right margin
+        const double margin = 12.0 * 2;
+
+        Width = desiredSize.Width + margin;
+        Height = desiredSize.Height;
+
+        ResizeWidth(rootElement);
+        ResizeHeight(rootElement);
+    }
+
+    protected override void OnClosing(CancelEventArgs e)
+    {
+        base.OnClosing(e);
+
+        if (e.Cancel)
+        {
+            return;
+        }
+
+        Tcs?.TrySetResult(MessageBoxResult.None);
+    }
+
+    protected virtual void CenterWindowOnScreen()
+    {
+        //TODO MessageBox should be displayed on the window on which the application
+
+        var screenWidth = SystemParameters.PrimaryScreenWidth;
+        var screenHeight = SystemParameters.PrimaryScreenHeight;
+
+        Left = screenWidth / 2 - Width / 2;
+        Top = screenHeight / 2 - Height / 2;
+    }
+
+    /// <summary>
+    ///     Occurs after the <see cref="MessageBoxButton" /> is clicked
+    /// </summary>
+    /// <param name="button"></param>
+    protected virtual void OnButtonClick(MessageBoxButton button)
+    {
+        var result = button switch
+        {
+            MessageBoxButton.Primary => MessageBoxResult.Primary,
+            MessageBoxButton.Secondary => MessageBoxResult.Secondary,
+            _ => MessageBoxResult.None
+        };
+
+        Tcs?.TrySetResult(result);
+        base.Close();
+    }
+
+    private void RemoveTitleBarAndApplyMica()
+    {
+        UnsafeNativeMethods.RemoveWindowTitlebarContents(this);
+        WindowBackdrop.ApplyBackdrop(this, WindowBackdropType.Mica);
+    }
+
     #region Static properties
 
     /// <summary>
@@ -237,149 +380,6 @@ public class MessageBox : Window
     public IRelayCommand TemplateButtonCommand => (IRelayCommand)GetValue(TemplateButtonCommandProperty);
 
     #endregion
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="MessageBox" /> class.
-    /// </summary>
-    public MessageBox()
-    {
-        Topmost = true;
-        SetValue(TemplateButtonCommandProperty, new RelayCommand<MessageBoxButton>(OnButtonClick));
-
-        PreviewMouseDoubleClick += static (_, args) => args.Handled = true;
-
-        Loaded += static (sender, _) =>
-        {
-            var self = (MessageBox)sender;
-            self.OnLoaded();
-        };
-    }
-
-    protected TaskCompletionSource<MessageBoxResult>? Tcs;
-
-    [Obsolete($"Use {nameof(ShowDialogAsync)} instead")]
-    public new void Show() => throw new InvalidOperationException($"Use {nameof(ShowDialogAsync)} instead");
-
-    [Obsolete($"Use {nameof(ShowDialogAsync)} instead")]
-    public new bool? ShowDialog() => throw new InvalidOperationException($"Use {nameof(ShowDialogAsync)} instead");
-
-    [Obsolete($"Use {nameof(Close)} with MessageBoxResult instead")]
-    public new void Close() =>
-        throw new InvalidOperationException($"Use {nameof(Close)} with MessageBoxResult instead");
-
-    /// <summary>
-    ///     Displays a message box
-    /// </summary>
-    /// <returns>
-    ///     <see cref="MessageBoxResult" />
-    /// </returns>
-    /// <exception cref="TaskCanceledException"></exception>
-    public async Task<MessageBoxResult> ShowDialogAsync(bool showAsDialog = true,
-        CancellationToken cancellationToken = default)
-    {
-        Tcs = new TaskCompletionSource<MessageBoxResult>();
-        var tokenRegistration =
-            cancellationToken.Register(o => Tcs.TrySetCanceled((CancellationToken)o!), cancellationToken);
-
-        try
-        {
-            RemoveTitleBarAndApplyMica();
-
-            if (showAsDialog)
-            {
-                base.ShowDialog();
-            }
-            else
-            {
-                base.Show();
-            }
-
-            return await Tcs.Task;
-        }
-        finally
-        {
-#if NET6_0_OR_GREATER
-            await tokenRegistration.DisposeAsync();
-#else
-            tokenRegistration.Dispose();
-#endif
-        }
-    }
-
-    /// <summary>
-    ///     Occurs after Loading event
-    /// </summary>
-    protected virtual void OnLoaded()
-    {
-        var rootElement = (UIElement)GetVisualChild(0)!;
-
-        ResizeToContentSize(rootElement);
-        CenterWindowOnScreen();
-    }
-
-    /// <summary>
-    ///     Sets Width and Height
-    /// </summary>
-    /// <param name="rootElement"></param>
-    protected virtual void ResizeToContentSize(UIElement rootElement)
-    {
-        var desiredSize = rootElement.DesiredSize;
-
-        //left and right margin
-        const double margin = 12.0 * 2;
-
-        Width = desiredSize.Width + margin;
-        Height = desiredSize.Height;
-
-        ResizeWidth(rootElement);
-        ResizeHeight(rootElement);
-    }
-
-    protected override void OnClosing(CancelEventArgs e)
-    {
-        base.OnClosing(e);
-
-        if (e.Cancel)
-        {
-            return;
-        }
-
-        Tcs?.TrySetResult(MessageBoxResult.None);
-    }
-
-    protected virtual void CenterWindowOnScreen()
-    {
-        //TODO MessageBox should be displayed on the window on which the application
-
-        var screenWidth = SystemParameters.PrimaryScreenWidth;
-        var screenHeight = SystemParameters.PrimaryScreenHeight;
-
-        Left = screenWidth / 2 - Width / 2;
-        Top = screenHeight / 2 - Height / 2;
-    }
-
-    /// <summary>
-    ///     Occurs after the <see cref="MessageBoxButton" /> is clicked
-    /// </summary>
-    /// <param name="button"></param>
-    protected virtual void OnButtonClick(MessageBoxButton button)
-    {
-        var result = button switch
-        {
-            MessageBoxButton.Primary => MessageBoxResult.Primary,
-            MessageBoxButton.Secondary => MessageBoxResult.Secondary,
-            _ => MessageBoxResult.None
-        };
-
-        Tcs?.TrySetResult(result);
-        base.Close();
-    }
-
-    private void RemoveTitleBarAndApplyMica()
-    {
-        UnsafeNativeMethods.RemoveWindowTitlebarContents(this);
-        WindowBackdrop.ApplyBackdrop(this, WindowBackdropType.Mica);
-    }
 
     #region Resize private methods
 

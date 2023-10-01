@@ -84,18 +84,19 @@
                                Background="Transparent"
                                PreviewKeyDown="Button_PreviewKeyDown">
                         <ui:Button.Resources>
-                            <services:BindingProxy x:Key="Command" Data="{Binding Path=DataContext.IgnoreItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:FluentWindow}}}" />
+                            <services:BindingProxy x:Key="Command"
+                                                   Data="{Binding Path=DataContext.IgnoreItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:FluentWindow}}}" />
                             <services:BindingProxy x:Key="CommandParameter" Data="{Binding}" />
                         </ui:Button.Resources>
                         <ui:Button.ContextMenu>
                             <ContextMenu DataContext="{StaticResource Command}">
                                 <!-- ReSharper disable once Xaml.RedundantResource -->
-                                
-                                <MenuItem Header="忽略" Command="{Binding Data}" 
+
+                                <MenuItem Header="忽略" Command="{Binding Data}"
                                           Visibility="{Binding Source={StaticResource CommandParameter},Path=Data.FileType,Converter={StaticResource CanIgnoreCtr}}"
                                           CommandParameter="{Binding Source={StaticResource CommandParameter},Path=Data}" />
                             </ContextMenu>
-                            
+
                         </ui:Button.ContextMenu>
                         <Grid HorizontalAlignment="Left" Margin="5,0,0,0">
                             <Grid.ColumnDefinitions>

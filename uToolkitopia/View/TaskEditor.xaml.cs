@@ -25,10 +25,7 @@ public partial class TaskEditor
         Height = SystemParameters.PrimaryScreenHeight * 2 / 3;
     }
 
-    public void LoadTask(CustomScenario name)
-    {
-        ((TaskEditorViewModel)DataContext).Load(name);
-    }
+    public void LoadTask(CustomScenario name) => ((TaskEditorViewModel)DataContext).Load(name);
 
     protected override void OnSourceInitialized(EventArgs e)
     {
@@ -39,7 +36,7 @@ public partial class TaskEditor
         {
             WindowBackdrop.ApplyBackdrop(m_Hwnd, WindowBackdropType.Acrylic);
         };
-        ((TaskEditorViewModel)DataContext).ContentPresenter = this.ContentPresenter;
+        ((TaskEditorViewModel)DataContext).ContentPresenter = ContentPresenter;
     }
 
     private void ListBox_OnMouseMove(object sender, MouseEventArgs e)
@@ -64,11 +61,11 @@ public partial class TaskEditor
         {
             if (e.OriginalSource is Border)
             {
-                var command = add.Command as ICommand;
+                var command = add.Command;
                 if (command != null &&
                     command.CanExecute(fromListNode)) // Check if the command is not null and can be executed
                 {
-                    var point = e.GetPosition((IInputElement)Editor);
+                    var point = e.GetPosition(Editor);
                     point.X += Editor.ViewportLocation.X;
                     point.Y += Editor.ViewportLocation.Y;
                     fromListNode.Location = point;
@@ -102,7 +99,7 @@ public partial class TaskEditor
 
             // 激发一个鼠标滚轮事件，冒泡给外层ListView接收到
             var eventArg = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta);
-            eventArg.RoutedEvent = UIElement.MouseWheelEvent;
+            eventArg.RoutedEvent = MouseWheelEvent;
             eventArg.Source = sender;
             var parent = ((Control)sender).Parent as UIElement;
             parent.RaiseEvent(eventArg);

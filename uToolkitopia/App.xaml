@@ -3,8 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:crt="clr-namespace:Kitopia.Converter"
-             xmlns:c="clr-namespace:Kitopia.Assets"
-             >
+             xmlns:c="clr-namespace:Kitopia.Assets">
     <Application.Resources>
 
         <ResourceDictionary>

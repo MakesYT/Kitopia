@@ -1,5 +1,9 @@
-﻿using System.Windows;
+﻿#region
+
+using System.Windows;
 using System.Windows.Controls;
+
+#endregion
 
 namespace Kitopia.Controls;
 
@@ -10,10 +14,10 @@ public class ResetIsEnabled : ContentControl
         IsEnabledProperty.OverrideMetadata(
             typeof(ResetIsEnabled),
             new UIPropertyMetadata(
-                defaultValue: true,
-                propertyChangedCallback: (_, __) =>
+                true,
+                (_, __) =>
                 {
                 },
-                coerceValueCallback: (_, x) => x));
+                (_, x) => x));
     }
 }

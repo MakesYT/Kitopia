@@ -14,10 +14,10 @@
                  ExtendsContentIntoTitleBar="True"
                  WindowBackdropType="Acrylic"
                  d:DataContext="{d:DesignInstance viewModel:MainWindowViewModel}"
-                    d:IsHidden="False"
+                 d:IsHidden="False"
                  Visibility="Hidden"
                  WindowCornerPreference="Round"
-                 Title="Kitopia" Height="742" Width="1200" >
+                 Title="Kitopia" Height="742" Width="1200">
     <Window.Resources>
         <services:BindingProxy x:Key="runRecordList" Data="{Binding}" />
     </Window.Resources>
@@ -40,7 +40,7 @@
         </tray:NotifyIcon>
         <ui:NavigationView x:Name="NavigationView" Grid.Row="1" PaneDisplayMode="LeftFluent" Grid.ColumnSpan="2"
                            BreadcrumbBar="{Binding ElementName=BreadcrumbBar}">
-                           
+
             <ui:NavigationView.Header>
                 <StackPanel Margin="42,32,0,0">
                     <ui:BreadcrumbBar x:Name="BreadcrumbBar" />
@@ -65,7 +65,8 @@
                     </ui:NavigationViewItem.Icon>
 
                 </ui:NavigationViewItem>
-                <ui:NavigationViewItem Visibility="Collapsed" Content="插件设置" FontSize="14" Cursor="Hand" TargetPageTag="PluginSetting"
+                <ui:NavigationViewItem Visibility="Collapsed" Content="插件设置" FontSize="14" Cursor="Hand"
+                                       TargetPageTag="PluginSetting"
                                        TargetPageType="plugin:PluginSetting" />
             </ui:NavigationView.MenuItems>
             <ui:NavigationView.FooterMenuItems>

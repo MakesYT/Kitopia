@@ -15,9 +15,6 @@ namespace Kitopia.Converter.SearchWindow;
 
 public class PathToImageConverter : IValueConverter
 {
-    [DllImport("gdi32.dll")]
-    public static extern bool DeleteObject(IntPtr hObject);
-
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value == null)
@@ -45,4 +42,7 @@ public class PathToImageConverter : IValueConverter
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
         throw new NotImplementedException();
+
+    [DllImport("gdi32.dll")]
+    public static extern bool DeleteObject(IntPtr hObject);
 }

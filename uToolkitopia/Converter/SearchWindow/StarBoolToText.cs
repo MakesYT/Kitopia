@@ -41,5 +41,5 @@ public class StarBoolToText : IValueConverter
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
-        (bool)!(bool)value;
+        !(bool)value;
 }

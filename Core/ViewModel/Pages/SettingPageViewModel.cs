@@ -23,11 +23,9 @@ public partial class SettingPageViewModel : ObservableRecipient
     private static readonly ILog log = LogManager.GetLogger("SettingPageViewModel");
     private bool _isInitializing = false;
 
-    [ObservableProperty] private ObservableCollection<int> _maxHistoryOptions = new ObservableCollection<int>
-        { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+    [ObservableProperty] private ObservableCollection<int> _maxHistoryOptions = new() { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
-    [ObservableProperty]
-    private ObservableCollection<string> _themeChoiceOptions = new ObservableCollection<string> { "跟随系统", "深色", "浅色" };
+    [ObservableProperty] private ObservableCollection<string> _themeChoiceOptions = new() { "跟随系统", "深色", "浅色" };
 
     [ObservableProperty] private bool _autoStart = true;
     [ObservableProperty] private bool _autoStartEverything = true;
@@ -95,8 +93,7 @@ public partial class SettingPageViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    private async Task DelKey(string key)
-    {
+    private async Task DelKey(string key) =>
         await Application.Current.Dispatcher.BeginInvoke(() =>
         {
             IgnoreItems.Remove(key);
@@ -107,9 +104,7 @@ public partial class SettingPageViewModel : ObservableRecipient
                 false);
             ConfigManger.Save();
         });
-        //ConfigManger.Config.ignoreItems.Remove(key);
-    }
-
+    //ConfigManger.Config.ignoreItems.Remove(key);
 
     partial void OnInputSmoothingMillisecondsChanged(int value)
     {

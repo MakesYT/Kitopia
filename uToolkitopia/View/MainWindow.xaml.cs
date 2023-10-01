@@ -30,6 +30,16 @@ public partial class MainWindow
 {
     private static readonly ILog log = LogManager.GetLogger(nameof(MainWindow));
 
+    /// <summary>
+    ///     记录快捷键注册项的唯一标识符
+    /// </summary>
+    private Dictionary<string, int> m_HotKeySettings = new();
+
+    /// <summary>
+    ///     当前窗口句柄
+    /// </summary>
+    private IntPtr m_Hwnd;
+
     public MainWindow()
     {
         InitializeComponent();
@@ -121,16 +131,6 @@ public partial class MainWindow
         //Close();
     }
 
-    /// <summary>
-    ///     记录快捷键注册项的唯一标识符
-    /// </summary>
-    private Dictionary<string, int> m_HotKeySettings = new();
-
-    /// <summary>
-    ///     当前窗口句柄
-    /// </summary>
-    private IntPtr m_Hwnd;
-
     protected override void OnSourceInitialized(EventArgs e)
     {
         base.OnSourceInitialized(e);
@@ -145,10 +145,10 @@ public partial class MainWindow
             hWndSource.AddHook(WndProc);
         }
 
-        AppDomain.CurrentDomain.ProcessExit += new EventHandler((_, _) =>
+        AppDomain.CurrentDomain.ProcessExit += (_, _) =>
         {
             //CustomScenarioExecutor.Exit();
-        });
+        };
         log.Debug("注册热键");
         InitHotKey();
 
@@ -301,7 +301,7 @@ public partial class MainWindow
                         }
 
                         ServiceManager.Services.GetService<SearchWindow>()!.tx.SelectAll();
-                        ThreadPool.QueueUserWorkItem((e) =>
+                        ThreadPool.QueueUserWorkItem(e =>
                         {
                             ServiceManager.Services.GetService<SearchWindowViewModel>()!.ReloadApps();
                         });

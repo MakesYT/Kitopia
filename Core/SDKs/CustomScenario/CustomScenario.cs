@@ -21,40 +21,40 @@ public partial class CustomScenario : ObservableRecipient
     private static readonly ILog Log = LogManager.GetLogger(nameof(CustomScenario));
 
     [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
-    public bool _isRunning = false;
+    private bool _isRunning = false;
 
     [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
-    public bool executionAuto = false;
+    private bool executionAuto = false;
 
     [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
-    public List<object> autoScenarios = new();
+    private List<object> autoScenarios = new();
 
     /// <summary>
     ///     手动执行
     /// </summary>
     [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
-    public bool executionManual = true;
+    private bool executionManual = true;
 
     [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
-    public ObservableCollection<string> keys = new();
+    private ObservableCollection<string> keys = new();
 
     /// <summary>
     ///     间隔指定时间执行
     /// </summary>
     [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
-    public bool executionIntervalSpecifies = false;
+    private bool executionIntervalSpecifies = false;
 
     [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
-    public List<TimeSpan> intervalSpecifiesTimeSpan;
+    private List<TimeSpan> intervalSpecifiesTimeSpan;
 
     /// <summary>
     ///     指定时间执行
     /// </summary>
     [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
-    public bool executionScheduleTime = false;
+    private bool executionScheduleTime = false;
 
     [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
-    public TimeSpan scheduleTime;
+    private TimeSpan scheduleTime;
 
     public string? UUID
     {
@@ -75,10 +75,10 @@ public partial class CustomScenario : ObservableRecipient
     } = new();
 
     [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
-    public string _name = "任务";
+    private string _name = "任务";
 
     [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
-    public string _description = "";
+    private string _description = "";
 
     private Dictionary<PointItem, Task?> _tasks = new();
 

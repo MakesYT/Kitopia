@@ -1,7 +1,11 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Windows.Controls;
 using Core.SDKs.Services;
 using Wpf.Ui.Controls;
+
+#endregion
 
 namespace Kitopia.Services;
 
@@ -14,9 +18,9 @@ public class ContentDialogService : IContentDialog
             Title = title,
             Content = content,
             CloseButtonText = "关闭",
-            PrimaryButtonText = "确定",
+            PrimaryButtonText = "确定"
         };
-        dialog.ShowAsync().ContinueWith((e) =>
+        dialog.ShowAsync().ContinueWith(e =>
         {
             switch (e.Result)
             {
@@ -43,9 +47,9 @@ public class ContentDialogService : IContentDialog
             Content = content,
             CloseButtonText = CloseButtonText,
             SecondaryButtonText = SecondaryButtonText,
-            PrimaryButtonText = PrimaryButtonText,
+            PrimaryButtonText = PrimaryButtonText
         };
-        dialog.ShowAsync().ContinueWith((e) =>
+        dialog.ShowAsync().ContinueWith(e =>
         {
             switch (e.Result)
             {

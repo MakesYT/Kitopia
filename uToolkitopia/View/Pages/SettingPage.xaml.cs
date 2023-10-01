@@ -38,16 +38,16 @@ public partial class SettingPage : Page
         var dataGrid = (DataGrid)sender;
         var dependencyObject = GetScrollViewer(dataGrid);
 
-        Rect bounds = dataGrid.TransformToAncestor(Window.GetWindow(this))
+        var bounds = dataGrid.TransformToAncestor(Window.GetWindow(this))
             .TransformBounds(new Rect(0.0, 0.0, dataGrid.ActualWidth, dataGrid.ActualHeight));
-        Rect rect = new Rect(0.0, 0.0, this.WindowWidth, this.WindowHeight);
+        var rect = new Rect(0.0, 0.0, WindowWidth, WindowHeight);
 
         {
             if (!rect.Contains(bounds))
             {
                 e.Handled = true;
                 var eventArg = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta);
-                eventArg.RoutedEvent = UIElement.MouseWheelEvent;
+                eventArg.RoutedEvent = MouseWheelEvent;
                 eventArg.Source = sender;
                 var parent = ((Control)sender).Parent as UIElement;
                 parent.RaiseEvent(eventArg);
@@ -57,7 +57,7 @@ public partial class SettingPage : Page
         if (dependencyObject.ContentVerticalOffset >= dependencyObject.ScrollableHeight && e.Delta < 0)
         {
             var eventArg = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta);
-            eventArg.RoutedEvent = UIElement.MouseWheelEvent;
+            eventArg.RoutedEvent = MouseWheelEvent;
             eventArg.Source = sender;
             var parent = ((Control)sender).Parent as UIElement;
             parent.RaiseEvent(eventArg);
@@ -66,7 +66,7 @@ public partial class SettingPage : Page
         if (dependencyObject.ContentVerticalOffset == 0 && e.Delta > 0)
         {
             var eventArg = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta);
-            eventArg.RoutedEvent = UIElement.MouseWheelEvent;
+            eventArg.RoutedEvent = MouseWheelEvent;
             eventArg.Source = sender;
             var parent = ((Control)sender).Parent as UIElement;
             parent.RaiseEvent(eventArg);

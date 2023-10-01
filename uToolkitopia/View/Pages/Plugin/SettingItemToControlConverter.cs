@@ -54,10 +54,8 @@ public class SettingItemToControlConverter : IValueConverter
 
             return control;
         }
-        else
-        {
-            return null;
-        }
+
+        return null;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>

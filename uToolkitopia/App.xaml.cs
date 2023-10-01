@@ -326,20 +326,20 @@ public sealed partial class App : Application
         services.AddSingleton<MainWindow>(sq => new MainWindow { DataContext = sq.GetService<MainWindowViewModel>() });
         services.AddTransient<SettingPageViewModel>(e => new SettingPageViewModel { IsActive = true });
         services.AddTransient<SettingPage>(e =>
-            new SettingPage() { DataContext = e.GetService<SettingPageViewModel>() });
+            new SettingPage { DataContext = e.GetService<SettingPageViewModel>() });
         services.AddTransient<HomePageViewModel>(e => new HomePageViewModel { IsActive = true });
-        services.AddTransient<HomePage>(e => new HomePage() { DataContext = e.GetService<HomePageViewModel>() });
+        services.AddTransient<HomePage>(e => new HomePage { DataContext = e.GetService<HomePageViewModel>() });
         services.AddTransient<PluginManagerPageViewModel>(e => new PluginManagerPageViewModel { IsActive = true });
-        services.AddTransient<PluginManagerPage>(e => new PluginManagerPage()
+        services.AddTransient<PluginManagerPage>(e => new PluginManagerPage
             { DataContext = e.GetService<PluginManagerPageViewModel>() });
         services.AddSingleton<PluginSettingViewModel>(e => new PluginSettingViewModel { IsActive = true });
-        services.AddSingleton<PluginSetting>(e => new PluginSetting()
+        services.AddSingleton<PluginSetting>(e => new PluginSetting
             { DataContext = e.GetService<PluginSettingViewModel>() });
         services.AddTransient<TaskEditorViewModel>(e => new TaskEditorViewModel { IsActive = true });
-        services.AddTransient<TaskEditor>(e => new TaskEditor() { DataContext = e.GetService<TaskEditorViewModel>() });
+        services.AddTransient<TaskEditor>(e => new TaskEditor { DataContext = e.GetService<TaskEditorViewModel>() });
         services.AddTransient<CustomScenariosManagerPageViewModel>(e => new CustomScenariosManagerPageViewModel
             { IsActive = true });
-        services.AddTransient<CustomScenariosManagerPage>(e => new CustomScenariosManagerPage()
+        services.AddTransient<CustomScenariosManagerPage>(e => new CustomScenariosManagerPage
             { DataContext = e.GetService<CustomScenariosManagerPageViewModel>() });
 
         return services.BuildServiceProvider();

@@ -25,6 +25,14 @@ public class HotKeyShow : Button
         Shift = 0100
     }
 
+    public static readonly DependencyProperty KeyTypeProperty = DependencyProperty.Register(nameof(KeyType),
+        typeof(KeyTypeE), typeof(System.Windows.Controls.Button),
+        new PropertyMetadata(KeyTypeE.Alt));
+
+    public static readonly DependencyProperty KeyNameProperty = DependencyProperty.Register(nameof(KeyName),
+        typeof(string), typeof(System.Windows.Controls.Button),
+        new PropertyMetadata("空格"));
+
     [Bindable(true)]
     [Category("KeyType")]
     public KeyTypeE KeyType
@@ -33,10 +41,6 @@ public class HotKeyShow : Button
         set => SetValue(KeyTypeProperty, value);
     }
 
-    public static readonly DependencyProperty KeyTypeProperty = DependencyProperty.Register(nameof(KeyType),
-        typeof(KeyTypeE), typeof(System.Windows.Controls.Button),
-        new PropertyMetadata(KeyTypeE.Alt));
-
     [Bindable(true)]
     [Category("KeyName")]
     public string KeyName
@@ -44,8 +48,4 @@ public class HotKeyShow : Button
         get => (string)GetValue(KeyNameProperty);
         set => SetValue(KeyNameProperty, value);
     }
-
-    public static readonly DependencyProperty KeyNameProperty = DependencyProperty.Register(nameof(KeyName),
-        typeof(string), typeof(System.Windows.Controls.Button),
-        new PropertyMetadata("空格"));
 }

@@ -102,16 +102,7 @@ public class SearchViewItem : ICloneable, IDisposable
             Icon = null;
         }
 
-        if (FileInfo != null)
-        {
-            FileInfo = null;
-        }
-
-        if (Keys != null)
-        {
-            Keys.Clear();
-            Keys = null;
-        }
+        GC.SuppressFinalize(this);
     }
 }
 

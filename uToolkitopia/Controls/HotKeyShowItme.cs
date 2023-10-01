@@ -82,15 +82,6 @@ public class HotKeyShowItme : Button, IAppearanceControl
         set => SetValue(IconProperty, value);
     }
 
-    /// <inheritdoc />
-    [Bindable(true)]
-    [Category("Appearance")]
-    public ControlAppearance Appearance
-    {
-        get => (ControlAppearance)GetValue(AppearanceProperty);
-        set => SetValue(AppearanceProperty, value);
-    }
-
     /// <summary>
     ///     Background <see cref="Brush" /> when the user interacts with an element with a pointing device.
     /// </summary>
@@ -144,5 +135,14 @@ public class HotKeyShowItme : Button, IAppearanceControl
     {
         get => (Brush)GetValue(PressedBorderBrushProperty);
         set => SetValue(PressedBorderBrushProperty, value);
+    }
+
+    /// <inheritdoc />
+    [Bindable(true)]
+    [Category("Appearance")]
+    public ControlAppearance Appearance
+    {
+        get => (ControlAppearance)GetValue(AppearanceProperty);
+        set => SetValue(AppearanceProperty, value);
     }
 }

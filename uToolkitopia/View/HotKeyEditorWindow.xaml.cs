@@ -17,7 +17,11 @@ namespace Kitopia.View;
 
 public partial class HotKeyEditorWindow : FluentWindow
 {
+    private bool isFinnish;
     public string name;
+
+    private EKey? selectedKey;
+    private bool setSuccess;
 
     public HotKeyEditorWindow(string name)
     {
@@ -25,7 +29,7 @@ public partial class HotKeyEditorWindow : FluentWindow
         this.name = name;
         Name.Text = $"快捷键:{name}";
 
-        var hotKeyModel = ConfigManger.Config.hotKeys.FirstOrDefault((e) =>
+        var hotKeyModel = ConfigManger.Config.hotKeys.FirstOrDefault(e =>
         {
             if ($"{e.MainName}_{e.Name}".Equals(name))
             {
@@ -57,8 +61,6 @@ public partial class HotKeyEditorWindow : FluentWindow
         selectedKey = hotKeyModel.SelectKey;
         KeyName.Content = hotKeyModel.SelectKey.ToString();
     }
-
-    private EKey? selectedKey;
 
     private void HotKeyEditorWindow_OnKeyDown(object sender, KeyEventArgs e)
     {
@@ -119,9 +121,6 @@ public partial class HotKeyEditorWindow : FluentWindow
     {
     }
 
-    private bool isFinnish = false;
-    private bool setSuccess = false;
-
     public bool GetResult()
     {
         while (!isFinnish)
@@ -133,7 +132,7 @@ public partial class HotKeyEditorWindow : FluentWindow
 
     private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
     {
-        var hotKeyModel = ConfigManger.Config.hotKeys.FirstOrDefault((e) =>
+        var hotKeyModel = ConfigManger.Config.hotKeys.FirstOrDefault(e =>
         {
             if ($"{e.MainName}_{e.Name}".Equals(name))
             {
