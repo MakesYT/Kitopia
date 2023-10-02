@@ -45,7 +45,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
         LoadLast();
     }
 
-    public async void AddCollection(string search)
+    public async Task AddCollection(string search)
     {
         await AppTools.AppSolverA(_collection, search, false);
     }

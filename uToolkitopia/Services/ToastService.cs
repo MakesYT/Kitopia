@@ -90,17 +90,17 @@ public class ToastService : IToastService
             {
                 case MessageBoxResult.Primary:
                 {
-                    yes.Invoke();
+                    yes?.Invoke();
                     break;
                 }
                 case MessageBoxResult.None:
                 {
-                    cancel.Invoke();
+                    cancel?.Invoke();
                     break;
                 }
                 case MessageBoxResult.Secondary:
                 {
-                    no.Invoke();
+                    no?.Invoke();
                     break;
                 }
             }
