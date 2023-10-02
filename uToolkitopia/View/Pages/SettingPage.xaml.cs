@@ -1,10 +1,12 @@
 ﻿#region
 
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Core.SDKs.Services;
+using Core.SDKs.Services.Config;
 using Kitopia.Controls;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,7 +26,21 @@ public partial class SettingPage : Page
 
     private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
     {
-        var hotKeyEditor = new HotKeyEditorWindow(((HotKeyShow)sender).Tag.ToString());
+        var hotKeyModel = ConfigManger.Config.hotKeys.FirstOrDefault(e =>
+        {
+            if ($"{e.MainName}_{e.Name}".Equals(((HotKeyShow)sender).Tag.ToString()))
+            {
+                return true;
+            }
+
+            return false;
+        });
+        if (hotKeyModel == null)
+        {
+            return;
+        }
+
+        var hotKeyEditor = new HotKeyEditorWindow(hotKeyModel);
         hotKeyEditor.Height = ServiceManager.Services.GetService<MainWindow>().Height / 2;
         hotKeyEditor.Width = ServiceManager.Services.GetService<MainWindow>().Width / 2;
         hotKeyEditor.Owner = ServiceManager.Services.GetService<MainWindow>();

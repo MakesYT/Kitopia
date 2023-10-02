@@ -88,7 +88,7 @@
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                             <TextBlock Text="{Binding InputSmoothingMilliseconds}" FontSize="14"
                                        VerticalAlignment="Center" />
-                            <Slider Margin="10,0,0,0" TickFrequency="10" IsSnapToTickEnabled="True" Maximum="200"
+                            <Slider Margin="10,0,0,0" TickFrequency="10" IsSnapToTickEnabled="True" Maximum="1000"
                                     Minimum="0" Value="{Binding InputSmoothingMilliseconds}"
                                     VerticalAlignment="Center"
                                     ToolTip="{Binding Value, RelativeSource={RelativeSource Self}}"

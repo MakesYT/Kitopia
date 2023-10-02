@@ -8,6 +8,7 @@ namespace Core.SDKs.Tools;
 
 public class DelayAction
 {
+    private readonly string _lock1 = "0";
     private Timer? _timerDbc;
 
     /// <summary>
@@ -18,10 +19,11 @@ public class DelayAction
     /// <param name="action"></param>
     public void Debounce(int timeMs, TaskScheduler invoker, Action action)
     {
-        lock (this)
+        lock (_lock1)
         {
             if (_timerDbc == null)
             {
+                Task.Factory.StartNew(action, CancellationToken.None, TaskCreationOptions.None, invoker);
                 _timerDbc = new Timer(timeMs);
                 _timerDbc.AutoReset = false;
                 _timerDbc.Elapsed += (_, _) =>

@@ -208,7 +208,7 @@ public partial class MainWindow
         task.Wait();
         foreach (var hotKeyModel in failList)
         {
-            var hotKeyEditor = new HotKeyEditorWindow($"{hotKeyModel.MainName}_{hotKeyModel.Name}");
+            var hotKeyEditor = new HotKeyEditorWindow(hotKeyModel);
             if (ServiceManager.Services.GetService<MainWindow>().Visibility != Visibility.Visible)
             {
                 hotKeyEditor.Height = 371;

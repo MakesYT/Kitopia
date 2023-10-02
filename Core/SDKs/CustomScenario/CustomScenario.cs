@@ -80,7 +80,7 @@ public partial class CustomScenario : ObservableRecipient
     [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
     private string _description = "";
 
-    private Dictionary<PointItem, Task?> _tasks = new();
+    private readonly Dictionary<PointItem, Task?> _tasks = new();
 
     public void Run(bool realTime = false)
     {

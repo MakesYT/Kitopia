@@ -10,7 +10,6 @@ using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.HotKey;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
-using Core.SDKs.Tools;
 using log4net;
 using Microsoft.Win32;
 
@@ -98,10 +97,8 @@ public partial class SettingPageViewModel : ObservableRecipient
         {
             IgnoreItems.Remove(key);
             // IgnoreItems.ResetBindings();
-            AppTools.AppSolverA(
-                ((SearchWindowViewModel)ServiceManager.Services.GetService(typeof(SearchWindowViewModel)))._collection,
-                key,
-                false);
+            ((SearchWindowViewModel)ServiceManager.Services.GetService(typeof(SearchWindowViewModel)))
+                .AddCollection(key);
             ConfigManger.Save();
         });
     //ConfigManger.Config.ignoreItems.Remove(key);

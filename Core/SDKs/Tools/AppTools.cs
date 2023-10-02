@@ -166,7 +166,7 @@ public partial class AppTools
         stopwatch.Start();
 
 
-        UWPAPPsTools.GetAll(collection);
+        UwpTools.GetAll(collection).Wait();
         stopwatch.Stop();
 
         log.Debug($"索引UWP软件耗时{stopwatch.ElapsedMilliseconds}ms");

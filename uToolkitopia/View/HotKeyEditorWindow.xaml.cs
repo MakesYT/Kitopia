@@ -1,6 +1,5 @@
 ﻿#region
 
-using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using Windows.System;
@@ -18,26 +17,17 @@ namespace Kitopia.View;
 public partial class HotKeyEditorWindow : FluentWindow
 {
     private bool isFinnish;
-    public string name;
-
+    private HotKeyModel? _hotKeyModel;
     private EKey? selectedKey;
     private bool setSuccess;
 
-    public HotKeyEditorWindow(string name)
+    public HotKeyEditorWindow(HotKeyModel hotKeyModel)
     {
         InitializeComponent();
-        this.name = name;
-        Name.Text = $"快捷键:{name}";
+        _hotKeyModel = hotKeyModel;
+        Name.Text = $"快捷键:{hotKeyModel.MainName}_{hotKeyModel.Name}";
 
-        var hotKeyModel = ConfigManger.Config.hotKeys.FirstOrDefault(e =>
-        {
-            if ($"{e.MainName}_{e.Name}".Equals(name))
-            {
-                return true;
-            }
 
-            return false;
-        });
         if (hotKeyModel.IsSelectAlt)
         {
             Alt.Visibility = Visibility.Visible;
@@ -132,49 +122,40 @@ public partial class HotKeyEditorWindow : FluentWindow
 
     private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
     {
-        var hotKeyModel = ConfigManger.Config.hotKeys.FirstOrDefault(e =>
-        {
-            if ($"{e.MainName}_{e.Name}".Equals(name))
-            {
-                return true;
-            }
-
-            return false;
-        });
         if (Alt.Visibility == Visibility.Visible)
         {
-            hotKeyModel.IsSelectAlt = true;
+            _hotKeyModel.IsSelectAlt = true;
         }
         else
         {
-            hotKeyModel.IsSelectAlt = false;
+            _hotKeyModel.IsSelectAlt = false;
         }
 
         if (Win.Visibility == Visibility.Visible)
         {
-            hotKeyModel.IsSelectWin = true;
+            _hotKeyModel.IsSelectWin = true;
         }
         else
         {
-            hotKeyModel.IsSelectWin = false;
+            _hotKeyModel.IsSelectWin = false;
         }
 
         if (Shift.Visibility == Visibility.Visible)
         {
-            hotKeyModel.IsSelectShift = true;
+            _hotKeyModel.IsSelectShift = true;
         }
         else
         {
-            hotKeyModel.IsSelectShift = false;
+            _hotKeyModel.IsSelectShift = false;
         }
 
         if (Ctrl.Visibility == Visibility.Visible)
         {
-            hotKeyModel.IsSelectCtrl = true;
+            _hotKeyModel.IsSelectCtrl = true;
         }
         else
         {
-            hotKeyModel.IsSelectCtrl = false;
+            _hotKeyModel.IsSelectCtrl = false;
         }
 
         if (selectedKey is null)
@@ -182,14 +163,14 @@ public partial class HotKeyEditorWindow : FluentWindow
             return;
         }
 
-        hotKeyModel.SelectKey = selectedKey;
+        _hotKeyModel.SelectKey = selectedKey;
         ConfigManger.Save();
-        setSuccess = ((MainWindow)ServiceManager.Services.GetService(typeof(MainWindow))).HotKeySet(hotKeyModel);
+        setSuccess = ((MainWindow)ServiceManager.Services.GetService(typeof(MainWindow))).HotKeySet(_hotKeyModel);
         if (!setSuccess)
         {
             var msg = new MessageBox();
             msg.Title = "Kitopia";
-            msg.Content = $"无法注册快捷键\n{hotKeyModel.MainName}_{hotKeyModel.Name}\n现在你需要重新设置\n在设置界面按下取消以取消该快捷键注册";
+            msg.Content = $"无法注册快捷键\n{_hotKeyModel.MainName}_{_hotKeyModel.Name}\n现在你需要重新设置\n在设置界面按下取消以取消该快捷键注册";
             msg.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             msg.CloseButtonText = "确定";
             msg.FontSize = 15;

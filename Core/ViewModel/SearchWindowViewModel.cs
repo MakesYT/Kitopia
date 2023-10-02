@@ -26,12 +26,12 @@ namespace Core.ViewModel;
 public partial class SearchWindowViewModel : ObservableRecipient
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(SearchWindowViewModel));
-    public readonly Dictionary<string, SearchViewItem> _collection = new(400); //存储本机所有软件
+    private readonly Dictionary<string, SearchViewItem> _collection = new(400); //存储本机所有软件
 
     [ObservableProperty] private bool? _everythingIsOk = true;
-    private static readonly List<SearchViewItem> tempList = new(1000);
+    private static readonly List<SearchViewItem> TempList = new(1000);
 
-    [ObservableProperty] private BindingList<SearchViewItem> _items = new(tempList); //搜索界面显示的软件
+    [ObservableProperty] private BindingList<SearchViewItem> _items = new(TempList); //搜索界面显示的软件
 
 
     [ObservableProperty] private string? _search;
@@ -43,6 +43,11 @@ public partial class SearchWindowViewModel : ObservableRecipient
     {
         ReloadApps(true);
         LoadLast();
+    }
+
+    public async void AddCollection(string search)
+    {
+        await AppTools.AppSolverA(_collection, search, false);
     }
 
     public void ReloadApps(bool logging = false)

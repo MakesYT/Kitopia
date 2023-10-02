@@ -74,9 +74,6 @@ public sealed partial class App : Application
     }
 
 
-    [DllImport("user32.dll", EntryPoint = "SetForegroundWindow", SetLastError = true)]
-    public static extern void SetForegroundWindow(IntPtr hwnd);
-
     protected override void OnStartup(StartupEventArgs e)
     {
         var eventWaitHandle = new EventWaitHandle(false, EventResetMode.AutoReset, "Kitopia", out var createNew);
@@ -88,13 +85,7 @@ public sealed partial class App : Application
             msg.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             msg.CloseButtonText = "确定";
             msg.FontSize = 15;
-            var task = msg.ShowDialogAsync();
-            // 使用ContinueWith来在任务完成后执行一个回调函数
-            task.ContinueWith(e =>
-            {
-                var result = e.Result;
-            }).Wait();
-            // System.Windows.MessageBox.Show("不能同时开启两个应用", "Kitopia");
+            msg.ShowDialogAsync().Wait();
             eventWaitHandle.Set();
             Environment.Exit(0);
         }
@@ -106,8 +97,9 @@ public sealed partial class App : Application
                 Dispatcher.Invoke(() =>
                 {
                     ServiceManager.Services.GetService<SearchWindow>().Show();
-                    SetForegroundWindow(new WindowInteropHelper(ServiceManager.Services.GetService<SearchWindow>())
-                        .Handle);
+                    User32.SetForegroundWindow(
+                        new WindowInteropHelper(ServiceManager.Services.GetService<SearchWindow>())
+                            .Handle);
 
                     ServiceManager.Services.GetService<SearchWindow>().tx.Focus();
                 });
