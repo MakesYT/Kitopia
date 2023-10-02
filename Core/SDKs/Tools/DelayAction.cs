@@ -8,7 +8,7 @@ namespace Core.SDKs.Tools;
 
 public class DelayAction
 {
-    private readonly string _lock1 = "0";
+    private readonly object _lock1 = new();
     private Timer? _timerDbc;
 
     /// <summary>

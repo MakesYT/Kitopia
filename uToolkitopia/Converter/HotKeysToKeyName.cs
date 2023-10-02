@@ -23,6 +23,11 @@ public class HotKeysToKeyName : IValueConverter
 
             return false;
         });
+        if (hotKeyModel == null)
+        {
+            return string.Empty;
+        }
+
         return hotKeyModel.SelectKey.ToString();
     }
 

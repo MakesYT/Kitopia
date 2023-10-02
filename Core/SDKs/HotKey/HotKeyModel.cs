@@ -68,7 +68,7 @@ public class HotKeyModel
     /// <summary>
     ///     选中的按键
     /// </summary>
-    public EKey? SelectKey
+    public EKey SelectKey
     {
         get;
         set;

@@ -49,12 +49,12 @@ public class ToastService : IToastService
                 {
                     case MessageBoxResult.Primary:
                     {
-                        yesAction.Invoke();
+                        yesAction?.Invoke();
                         break;
                     }
                     case MessageBoxResult.None:
                     {
-                        noAction.Invoke();
+                        noAction?.Invoke();
                         break;
                     }
                 }

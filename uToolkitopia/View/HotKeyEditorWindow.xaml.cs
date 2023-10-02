@@ -163,7 +163,7 @@ public partial class HotKeyEditorWindow : FluentWindow
             return;
         }
 
-        _hotKeyModel.SelectKey = selectedKey;
+        _hotKeyModel.SelectKey = selectedKey.Value;
         ConfigManger.Save();
         setSuccess = ((MainWindow)ServiceManager.Services.GetService(typeof(MainWindow))).HotKeySet(_hotKeyModel);
         if (!setSuccess)

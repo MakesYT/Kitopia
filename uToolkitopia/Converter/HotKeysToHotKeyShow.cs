@@ -25,6 +25,11 @@ public class HotKeysToHotKeyShow : IValueConverter
             return false;
         });
         var type = 0000;
+        if (hotKeyModel == null)
+        {
+            return type;
+        }
+
         if (hotKeyModel.IsSelectAlt)
         {
             type += 10;
