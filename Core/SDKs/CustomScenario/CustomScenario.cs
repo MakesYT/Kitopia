@@ -23,12 +23,6 @@ public partial class CustomScenario : ObservableRecipient
     [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
     private bool _isRunning = false;
 
-    [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
-    private bool executionAuto = false;
-
-    [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
-    private List<object> autoScenarios = new();
-
     /// <summary>
     ///     手动执行
     /// </summary>
@@ -37,24 +31,6 @@ public partial class CustomScenario : ObservableRecipient
 
     [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
     private ObservableCollection<string> keys = new();
-
-    /// <summary>
-    ///     间隔指定时间执行
-    /// </summary>
-    [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
-    private bool executionIntervalSpecifies = false;
-
-    [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
-    private List<TimeSpan> intervalSpecifiesTimeSpan;
-
-    /// <summary>
-    ///     指定时间执行
-    /// </summary>
-    [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
-    private bool executionScheduleTime = false;
-
-    [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
-    private TimeSpan scheduleTime;
 
     public string? UUID
     {
@@ -79,6 +55,9 @@ public partial class CustomScenario : ObservableRecipient
 
     [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
     private string _description = "";
+
+    [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
+    private List<CustomScenarioInvoke> _autoTriggerType = new();
 
     private readonly Dictionary<PointItem, Task?> _tasks = new();
 
@@ -145,7 +124,6 @@ public partial class CustomScenario : ObservableRecipient
 
             if (toRemove)
             {
-                Broadcast<bool>(false, true, nameof(ExecutionIntervalSpecifies));
                 nodes[i].Status = s节点状态.未验证;
             }
         }

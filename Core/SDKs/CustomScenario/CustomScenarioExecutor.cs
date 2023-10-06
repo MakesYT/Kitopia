@@ -1,7 +1,24 @@
 ﻿namespace Core.SDKs.CustomScenario;
 
-public static class CustomScenarioExecutor
+public class CustomScenarioExecutor
 {
-    public static event Action SoftwareStartuped;
-    public static event Action SoftwareShutdowning;
+    private List<CustomScenario> scenarios = new();
+
+    public void AddCustomScenario(CustomScenario scenario)
+    {
+        scenarios.Add(scenario);
+    }
+
+    public void Execute()
+    {
+        foreach (var scenario in scenarios)
+        {
+            scenario.Run();
+        }
+    }
+
+    public void DelCustomScenario(CustomScenario scenario)
+    {
+        scenarios.Remove(scenario);
+    }
 }

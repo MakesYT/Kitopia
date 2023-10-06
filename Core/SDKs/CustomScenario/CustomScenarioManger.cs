@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO;
+using Core.SDKs.CustomScenario;
 using Core.SDKs.Services.Plugin;
 using log4net;
 using Newtonsoft.Json;
@@ -30,7 +31,44 @@ public partial class CustomScenarioManger
                 var json = File.ReadAllText(fileInfo.FullName);
                 try
                 {
-                    CustomScenarios.Add(JsonConvert.DeserializeObject<SDKs.CustomScenario.CustomScenario>(json)!);
+                    var deserializeObject = JsonConvert.DeserializeObject<SDKs.CustomScenario.CustomScenario>(json)!;
+                    foreach (var value in deserializeObject.AutoTriggerType)
+                    {
+                        if (value.IsUsed)
+                        {
+                            switch (value.AutoTriggerType)
+                            {
+                                case AutoTriggerType.系统关闭时:
+                                {
+                                    CustomScenarioExecutorManager.SystemShutdown.AddCustomScenario(deserializeObject);
+                                    break;
+                                }
+                                case AutoTriggerType.软件关闭时:
+                                {
+                                    CustomScenarioExecutorManager.SoftwareShutdown.AddCustomScenario(deserializeObject);
+                                    break;
+                                }
+                                case AutoTriggerType.软件启动时:
+                                {
+                                    CustomScenarioExecutorManager.SoftwareStarted.AddCustomScenario(deserializeObject);
+                                    break;
+                                }
+                                case AutoTriggerType.Custom:
+                                {
+                                    if (CustomScenarioExecutorManager.CustomExecutors.ContainsKey(
+                                            value.AutoTriggerTypeFrom))
+                                    {
+                                        CustomScenarioExecutorManager.CustomExecutors[value.AutoTriggerTypeFrom]
+                                            .AddCustomScenario(deserializeObject);
+                                    }
+
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    CustomScenarios.Add(deserializeObject);
                 }
                 catch (Exception e1)
                 {

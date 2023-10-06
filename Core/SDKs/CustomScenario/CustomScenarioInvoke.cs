@@ -10,14 +10,21 @@ public enum TriggerType
 
 public enum AutoTriggerType
 {
-    软件启动时,
-    软件关闭时,
-    系统关闭时,
+    软件启动时 = 0,
+    软件关闭时 = 1,
+    系统关闭时 = 2,
+    Custom = 1000
 }
 
 public class CustomScenarioInvoke
 {
     private CustomScenario _customScenario;
+
+    public bool IsUsed
+    {
+        get;
+        set;
+    } = false;
 
     public TriggerType TriggerType
     {
@@ -26,6 +33,12 @@ public class CustomScenarioInvoke
     }
 
     public AutoTriggerType AutoTriggerType
+    {
+        get;
+        set;
+    }
+
+    public string AutoTriggerTypeFrom
     {
         get;
         set;

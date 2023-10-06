@@ -247,7 +247,7 @@
                                     </Expander.Header>
                                     <StackPanel Margin="15,5,5,5" Orientation="Vertical">
                                         <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                                            <CheckBox />
+                                            <CheckBox IsChecked=""/>
                                             <ui:TextBlock VerticalAlignment="Center" Text="Kitopia启动时运行" />
                                         </StackPanel>
                                         <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
@@ -260,66 +260,7 @@
                                         </StackPanel>
                                     </StackPanel>
                                 </Expander>
-                                <Expander x:Name="CardExpander2"
-                                          IsEnabled="{Binding Scenario.ExecutionIntervalSpecifies,Mode=OneWay}"
-                                          Padding="0,0,10,0">
-                                    <Expander.Header>
-                                        <controls:SettingItems Margin="0" Title="周期性触发" FontSize="20"
-                                                               BorderThickness="0">
-                                            <controls:ResetIsEnabled>
-                                                <ui:ToggleSwitch
-                                                    IsChecked="{Binding Scenario.ExecutionIntervalSpecifies,Mode=TwoWay}">
-                                                    <b:Interaction.Triggers>
-                                                        <b:DataTrigger
-                                                            Binding="{Binding ElementName=CardExpander2,Path=IsEnabled}"
-                                                            Value="False">
-                                                            <b:ChangePropertyAction
-                                                                TargetObject="{Binding ElementName=CardExpander2}"
-                                                                PropertyName="IsExpanded" Value="False" />
-                                                        </b:DataTrigger>
-                                                    </b:Interaction.Triggers>
-                                                </ui:ToggleSwitch>
-                                            </controls:ResetIsEnabled>
-
-                                            <controls:SettingItems.Icon>
-                                                <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25" />
-                                            </controls:SettingItems.Icon>
-                                        </controls:SettingItems>
-                                    </Expander.Header>
-                                    <ListBox>
-                                        <ListBoxItem>dds</ListBoxItem>
-                                    </ListBox>
-                                </Expander>
-                                <Expander x:Name="CardExpander3"
-                                          IsEnabled="{Binding Scenario.ExecutionScheduleTime,Mode=OneWay}"
-                                          Padding="0,0,10,0">
-                                    <Expander.Header>
-                                        <controls:SettingItems Margin="0" Title="定时触发" FontSize="20"
-                                                               BorderThickness="0">
-                                            <controls:ResetIsEnabled>
-                                                <ui:ToggleSwitch
-                                                    IsChecked="{Binding Scenario.ExecutionScheduleTime,Mode=TwoWay}">
-                                                    <b:Interaction.Triggers>
-                                                        <b:DataTrigger
-                                                            Binding="{Binding ElementName=CardExpander3,Path=IsEnabled}"
-                                                            Value="False">
-                                                            <b:ChangePropertyAction
-                                                                TargetObject="{Binding ElementName=CardExpander3}"
-                                                                PropertyName="IsExpanded" Value="False" />
-                                                        </b:DataTrigger>
-                                                    </b:Interaction.Triggers>
-                                                </ui:ToggleSwitch>
-                                            </controls:ResetIsEnabled>
-
-                                            <controls:SettingItems.Icon>
-                                                <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25" />
-                                            </controls:SettingItems.Icon>
-                                        </controls:SettingItems>
-                                    </Expander.Header>
-                                    <ListBox>
-                                        <ListBoxItem>dds</ListBoxItem>
-                                    </ListBox>
-                                </Expander>
+                                
                             </StackPanel>
                         </Expander.Content>
                     </Expander>
