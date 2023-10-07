@@ -68,6 +68,7 @@ public partial class CustomScenarioManger
                         }
                     }
 
+                    deserializeObject.IsRunning = false;
                     CustomScenarios.Add(deserializeObject);
                 }
                 catch (Exception e1)

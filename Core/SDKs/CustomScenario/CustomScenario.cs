@@ -73,7 +73,11 @@ public partial class CustomScenario : ObservableRecipient
             return;
         }
 
-        IsRunning = true;
+        if (notRealTime)
+        {
+            IsRunning = true;
+        }
+
         foreach (var task in _tasks)
         {
             //TODO: 
@@ -102,24 +106,11 @@ public partial class CustomScenario : ObservableRecipient
 
         for (var i = nodes.Count - 1; i >= 1; i--)
         {
-            bool toRemove = true;
+            var toRemove = nodes[i].Input.All(connectorItem => !connectorItem.IsConnected);
 
-            foreach (var connectorItem in nodes[i].Input)
+            if (nodes[i].Output.Any(connectorItem => connectorItem.IsConnected))
             {
-                if (connectorItem.IsConnected)
-                {
-                    toRemove = false;
-                    break;
-                }
-            }
-
-            foreach (var connectorItem in nodes[i].Output)
-            {
-                if (connectorItem.IsConnected)
-                {
-                    toRemove = false;
-                    break;
-                }
+                toRemove = false;
             }
 
             if (toRemove)
@@ -146,6 +137,7 @@ public partial class CustomScenario : ObservableRecipient
             Console.WriteLine(e);
         }
 
+        //监听任务是否结束
         if (notRealTime)
         {
             new Task(() =>
@@ -153,23 +145,26 @@ public partial class CustomScenario : ObservableRecipient
                 while (true)
                 {
                     Thread.Sleep(100);
-                    Log.Debug("1");
-                    bool f = true;
-                    foreach (var (key, value) in _tasks)
+                    var f = true;
+                    foreach (var (_, value) in _tasks)
                     {
-                        if (value != null && !value.IsCompleted)
+                        if (value is not { IsCompleted: false })
                         {
-                            f = false;
-                            break;
+                            continue;
                         }
-                    }
 
-                    if (f)
-                    {
-                        IsRunning = false;
-                        Log.Debug($"场景运行完成:{Name}");
+                        f = false;
                         break;
                     }
+
+                    if (!f)
+                    {
+                        continue;
+                    }
+
+                    IsRunning = false;
+                    Log.Debug($"场景运行完成:{Name}");
+                    break;
                 }
             }).Start();
         }
@@ -184,10 +179,10 @@ public partial class CustomScenario : ObservableRecipient
         }
     }
 
-    public void ParsePointItem(PointItem nowPointItem, bool onlyForward, bool notRealTime)
+    private void ParsePointItem(PointItem nowPointItem, bool onlyForward, bool notRealTime)
     {
         Log.Debug($"解析节点:{nowPointItem.Title}");
-        bool valid = true;
+        var valid = true;
         List<Task> sourceDataTask = new();
         try
         {
@@ -224,9 +219,8 @@ public partial class CustomScenario : ObservableRecipient
                 //这是连接当前节点的节点
                 var connectionItem = connections.Where((e) => e.Target == connectorItem).ToList();
 
-                foreach (var item in connectionItem)
+                foreach (var sourceSource in connectionItem.Select(item => item.Source.Source))
                 {
-                    var sourceSource = item.Source.Source;
                     lock (_tasks)
                     {
                         if (_tasks.TryGetValue(sourceSource, out var task1))
@@ -235,8 +229,6 @@ public partial class CustomScenario : ObservableRecipient
                             {
                                 sourceDataTask.Add(task1);
                             }
-
-                            continue;
                         }
                         else
                         {
@@ -259,11 +251,25 @@ public partial class CustomScenario : ObservableRecipient
         } //源数据全部生成
 
         Task.WaitAll(sourceDataTask.ToArray());
+        //这是连接当前节点的节点
+
+        foreach (var connectorItem in nowPointItem.Input)
+        {
+            //这是连接当前节点的节点
+            var connectionItem = connections.Where((e) => e.Target == connectorItem).ToList();
+
+            foreach (var sourceSource in connectionItem.Select(item => item.Source.Source))
+            {
+                if (sourceSource.Status == s节点状态.错误)
+                {
+                    valid = false;
+                }
+            }
+        }
+
+        //源数据全部生成
         if (!valid)
         {
-            nowPointItem.Status = s节点状态.错误;
-            //_firstPassesPointItems.Add(nowPointItem);
-            Log.Debug($"解析节点失败:{nowPointItem.Title}");
             goto finnish;
         }
 
@@ -351,13 +357,13 @@ public partial class CustomScenario : ObservableRecipient
                     var plugin = PluginManager.EnablePlugin[nowPointItem.Plugin];
                     var methodInfo = plugin.GetMethodInfos()[nowPointItem.MerthodName];
                     List<object> list = new();
-                    int index = 1;
+                    var index = 1;
                     foreach (var parameterInfo in methodInfo.GetParameters())
                     {
                         if (parameterInfo.ParameterType.GetCustomAttribute(typeof(AutoUnbox)) is not null)
                         {
                             var autoUnboxIndex = nowPointItem.Input[index].AutoUnboxIndex;
-                            List<object> parameterList = new List<object>();
+                            var parameterList = new List<object>();
                             List<Type> parameterTypesList = new();
                             while (nowPointItem.Input.Count >= index &&
                                    nowPointItem.Input[index].AutoUnboxIndex == autoUnboxIndex)
@@ -434,29 +440,23 @@ public partial class CustomScenario : ObservableRecipient
             foreach (var outputConnector in nowPointItem.Output)
             {
                 var thisToNextConnections = connections.Where((e) => e.Source == outputConnector).ToList();
-                foreach (var thisToNextConnection in thisToNextConnections)
+                foreach (var nextPointItem in thisToNextConnections
+                             .Select(thisToNextConnection => thisToNextConnection.Target.Source)
+                             .Where(nextPointItem => !outputConnector.IsNotUsed))
                 {
-                    var nextPointItem = thisToNextConnection.Target.Source;
-
-
-                    if (!outputConnector.IsNotUsed)
+                    lock (_tasks)
                     {
-                        lock (_tasks)
+                        if (_tasks.ContainsKey(nextPointItem))
                         {
-                            if (_tasks.ContainsKey(nextPointItem))
-                            {
-                                return;
-                            }
-                            else
-                            {
-                                var task = new Task(() =>
-                                {
-                                    ParsePointItem(nextPointItem, true, notRealTime);
-                                });
-                                task.Start();
-                                _tasks.Add(nextPointItem, task);
-                            }
+                            return;
                         }
+
+                        var task = new Task(() =>
+                        {
+                            ParsePointItem(nextPointItem, false, notRealTime);
+                        });
+                        task.Start();
+                        _tasks.Add(nextPointItem, task);
                     }
                 }
             }
@@ -467,6 +467,11 @@ public partial class CustomScenario : ObservableRecipient
         {
             nowPointItem.Status = notRealTime ? s节点状态.已验证 : s节点状态.初步验证;
             Log.Debug($"解析节点完成:{nowPointItem.Title}");
+        }
+        else
+        {
+            nowPointItem.Status = s节点状态.错误;
+            Log.Debug($"解析节点失败:{nowPointItem.Title}");
         }
     }
 
