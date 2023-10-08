@@ -184,71 +184,60 @@ public partial class CustomScenario : ObservableRecipient
         Log.Debug($"解析节点:{nowPointItem.Title}");
         var valid = true;
         List<Task> sourceDataTask = new();
-        try
+
+        foreach (var connectorItem in nowPointItem.Input)
         {
-            foreach (var connectorItem in nowPointItem.Input)
+            if (!connectorItem.IsConnected)
             {
-                try
+                if (connectorItem.Type.FullName != "PluginCore.NodeConnectorClass")
                 {
-                    if (!connectorItem.IsConnected)
+                    //当前节点有一个输入参数不存在,验证失败
+                    if (!connectorItem.IsSelf)
                     {
-                        if (connectorItem.Type.FullName != "PluginCore.NodeConnectorClass")
-                        {
-                            //当前节点有一个输入参数不存在,验证失败
-                            if (!connectorItem.IsSelf)
-                            {
-                                valid = false;
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            connectorItem.IsNotUsed = true;
-                        }
-                    }
-                    else if (connectorItem.Type.FullName == "PluginCore.NodeConnectorClass")
-                    {
-                        connectorItem.IsNotUsed = false;
+                        valid = false;
+                        break;
                     }
                 }
-                catch (Exception e)
+                else
                 {
-                    Log.Debug(e);
+                    connectorItem.IsNotUsed = true;
                 }
+            }
+            else if (connectorItem.Type.FullName == "PluginCore.NodeConnectorClass")
+            {
+                connectorItem.IsNotUsed = false;
+            }
 
-                //这是连接当前节点的节点
-                var connectionItem = connections.Where((e) => e.Target == connectorItem).ToList();
 
-                foreach (var sourceSource in connectionItem.Select(item => item.Source.Source))
+            //这是连接当前节点的节点
+            var connectionItem = connections.Where((e) => e.Target == connectorItem).ToList();
+
+            foreach (var sourceSource in connectionItem.Select(item => item.Source.Source))
+            {
+                lock (_tasks)
                 {
-                    lock (_tasks)
+                    if (_tasks.TryGetValue(sourceSource, out var task1))
                     {
-                        if (_tasks.TryGetValue(sourceSource, out var task1))
+                        if (task1 is not null)
                         {
-                            if (task1 is not null)
-                            {
-                                sourceDataTask.Add(task1);
-                            }
+                            sourceDataTask.Add(task1);
                         }
-                        else
+                    }
+                    else
+                    {
+                        var task = new Task(() =>
                         {
-                            var task = new Task(() =>
-                            {
-                                ParsePointItem(sourceSource, true, notRealTime);
-                            });
-                            task.Start();
-                            // Log.Debug(sourceSource.Title);
-                            _tasks.Add(sourceSource, task);
-                            sourceDataTask.Add(task);
-                        }
+                            ParsePointItem(sourceSource, true, notRealTime);
+                        });
+                        task.Start();
+                        // Log.Debug(sourceSource.Title);
+                        _tasks.Add(sourceSource, task);
+                        sourceDataTask.Add(task);
                     }
                 }
             }
         }
-        catch (Exception e)
-        {
-            Log.Error(e);
-        } //源数据全部生成
+        //源数据全部生成
 
         Task.WaitAll(sourceDataTask.ToArray());
         //这是连接当前节点的节点
@@ -309,8 +298,20 @@ public partial class CustomScenario : ObservableRecipient
                         }
                         case "相等":
                         {
-                            nowPointItem.Output[0].InputObject = nowPointItem.Input[1].InputObject
-                                .Equals(nowPointItem.Input[2].InputObject);
+                            if (nowPointItem.Input[1].InputObject is null)
+                            {
+                                nowPointItem.Output[0].InputObject = false;
+                            }
+                            else if (nowPointItem.Input[2].InputObject is null)
+                            {
+                                nowPointItem.Output[0].InputObject = false;
+                            }
+                            else
+                            {
+                                nowPointItem.Output[0].InputObject =
+                                    nowPointItem.Input[1].InputObject!.Equals(nowPointItem.Input[2].InputObject);
+                            }
+
                             var nextNode = connections.Where((e) => e.Source == nowPointItem.Output[0])
                                 .ToList();
                             foreach (var item in nextNode)
@@ -329,15 +330,14 @@ public partial class CustomScenario : ObservableRecipient
                             }
 
                             var userInputData = userInputConnector.InputObject;
-                            if (nowPointItem.MerthodName == "System.Int32")
-                            {
-                                userInputData = int.Parse(userInputData.ToString());
-                            }
-
                             if (userInputData is null or "")
                             {
-                                //这是用户自输入控件没有数据直接抛出异常
                                 throw new NullReferenceException();
+                            }
+
+                            if (nowPointItem.MerthodName == "System.Int32")
+                            {
+                                userInputData = int.Parse(userInputData.ToString()!);
                             }
 
                             nowPointItem.Output[0].InputObject = userInputData;
@@ -360,6 +360,9 @@ public partial class CustomScenario : ObservableRecipient
                     var index = 1;
                     foreach (var parameterInfo in methodInfo.GetParameters())
                     {
+                        var inputObject = nowPointItem.Input[index].InputObject ??
+                                          throw new NullReferenceException("nowPointItem.Input[index].InputObject");
+
                         if (parameterInfo.ParameterType.GetCustomAttribute(typeof(AutoUnbox)) is not null)
                         {
                             var autoUnboxIndex = nowPointItem.Input[index].AutoUnboxIndex;
@@ -368,25 +371,23 @@ public partial class CustomScenario : ObservableRecipient
                             while (nowPointItem.Input.Count >= index &&
                                    nowPointItem.Input[index].AutoUnboxIndex == autoUnboxIndex)
                             {
-                                parameterList.Add(nowPointItem.Input[index].InputObject);
-                                parameterTypesList.Add(nowPointItem.Input[index].InputObject.GetType());
+                                parameterList.Add(inputObject);
+                                parameterTypesList.Add(inputObject.GetType());
                                 index++;
                             }
 
-                            var instance = parameterInfo.ParameterType.GetConstructor(parameterTypesList.ToArray())
+                            var instance = parameterInfo.ParameterType.GetConstructor(parameterTypesList.ToArray())!
                                 .Invoke(parameterList.ToArray());
                             list.Add(instance);
                             continue;
                         }
-                        else
-                        {
-                            list.Add(nowPointItem.Input[index].InputObject);
-                        }
+
+                        list.Add(inputObject);
 
                         index++;
                     }
 
-                    var invoke = methodInfo.Invoke(plugin.ServiceProvider.GetService(methodInfo.DeclaringType),
+                    var invoke = methodInfo.Invoke(plugin.ServiceProvider!.GetService(methodInfo.DeclaringType!),
                         list.ToArray());
 
                     if (methodInfo.ReturnParameter.ParameterType.GetCustomAttribute(typeof(AutoUnbox)) is not null)
@@ -442,7 +443,7 @@ public partial class CustomScenario : ObservableRecipient
                 var thisToNextConnections = connections.Where((e) => e.Source == outputConnector).ToList();
                 foreach (var nextPointItem in thisToNextConnections
                              .Select(thisToNextConnection => thisToNextConnection.Target.Source)
-                             .Where(nextPointItem => !outputConnector.IsNotUsed))
+                             .Where(_ => !outputConnector.IsNotUsed))
                 {
                     lock (_tasks)
                     {
