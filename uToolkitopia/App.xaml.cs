@@ -308,6 +308,7 @@ public sealed partial class App : Application
         services.AddTransient<IToastService, ToastService>();
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddTransient<INavigationPageService, NavigationPageService>();
+        services.AddTransient<ILabelWindowService, LabelWindowService>();
         services.AddTransient<IClipboardService, ClipboardService>();
         services.AddTransient<ITaskEditorOpenService, TaskEditorOpenService>();
         services.AddTransient<IContentDialog, ContentDialogService>();
@@ -333,7 +334,9 @@ public sealed partial class App : Application
             { IsActive = true });
         services.AddTransient<CustomScenariosManagerPage>(e => new CustomScenariosManagerPage
             { DataContext = e.GetService<CustomScenariosManagerPageViewModel>() });
-
+        services.AddTransient<LabelWindowViewModel>(e => new LabelWindowViewModel());
+        services.AddTransient<LabelWindow>(e => new LabelWindow()
+            { DataContext = e.GetService<LabelWindowViewModel>() });
         return services.BuildServiceProvider();
     }
 

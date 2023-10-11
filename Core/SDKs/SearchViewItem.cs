@@ -122,5 +122,6 @@ public enum FileType
     数学运算,
     UWP应用,
     自定义情景,
+    便签,
     None
 }

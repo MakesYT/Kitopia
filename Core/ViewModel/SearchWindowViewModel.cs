@@ -619,6 +619,16 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     }
                 }
 
+                var searchViewItem3 = new SearchViewItem()
+                {
+                    FileName = "将内容添加至便签" + value,
+                    FileType = FileType.便签,
+                    OnlyKey = value,
+                    Icon = null,
+                    IconSymbol = 0xF6EC,
+                    IsVisible = true
+                };
+                Items.Add(searchViewItem3);
                 var searchViewItem = new SearchViewItem()
                 {
                     Url = "https://www.bing.com/search?q=" + value,
@@ -685,6 +695,10 @@ public partial class SearchWindowViewModel : ObservableRecipient
                             break;
                         case FileType.自定义情景:
                             CustomScenarioManger.CustomScenarios.First((e) => e.UUID == item.OnlyKey).Run();
+                            break;
+                        case FileType.便签:
+                            ((ILabelWindowService)ServiceManager.Services.GetService(typeof(ILabelWindowService))!)
+                                .Show(item.OnlyKey);
                             break;
                         default:
                             Shell32.ShellExecute(IntPtr.Zero, "open", item.OnlyKey, "", "",

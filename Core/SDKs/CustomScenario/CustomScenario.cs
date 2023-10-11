@@ -59,7 +59,7 @@ public partial class CustomScenario : ObservableRecipient
     [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
     private List<CustomScenarioInvoke> _autoTriggerType = new();
 
-    private readonly Dictionary<PointItem, Task?> _tasks = new();
+    private readonly Dictionary<PointItem, Thread?> _tasks = new();
 
     public void Run(bool realTime = false)
     {
@@ -80,8 +80,7 @@ public partial class CustomScenario : ObservableRecipient
 
         foreach (var task in _tasks)
         {
-            //TODO: 
-            //task.Dispose();
+            task.Value?.Interrupt();
         }
 
         _tasks.Clear();
@@ -148,7 +147,12 @@ public partial class CustomScenario : ObservableRecipient
                     var f = true;
                     foreach (var (_, value) in _tasks)
                     {
-                        if (value is not { IsCompleted: false })
+                        if (value is null)
+                        {
+                            continue;
+                        }
+
+                        if (!value.IsAlive)
                         {
                             continue;
                         }
@@ -174,8 +178,7 @@ public partial class CustomScenario : ObservableRecipient
     {
         foreach (var task in _tasks)
         {
-            //TODO:
-            //task.Value.
+            task.Value?.Interrupt();
         }
     }
 
@@ -183,7 +186,7 @@ public partial class CustomScenario : ObservableRecipient
     {
         Log.Debug($"解析节点:{nowPointItem.Title}");
         var valid = true;
-        List<Task> sourceDataTask = new();
+        List<Thread> sourceDataTask = new();
 
         foreach (var connectorItem in nowPointItem.Input)
         {
@@ -225,7 +228,7 @@ public partial class CustomScenario : ObservableRecipient
                     }
                     else
                     {
-                        var task = new Task(() =>
+                        var task = new Thread(() =>
                         {
                             ParsePointItem(sourceSource, true, notRealTime);
                         });
@@ -239,7 +242,10 @@ public partial class CustomScenario : ObservableRecipient
         }
         //源数据全部生成
 
-        Task.WaitAll(sourceDataTask.ToArray());
+        foreach (var thread in sourceDataTask)
+        {
+            thread.Join();
+        }
         //这是连接当前节点的节点
 
         foreach (var connectorItem in nowPointItem.Input)
@@ -360,9 +366,6 @@ public partial class CustomScenario : ObservableRecipient
                     var index = 1;
                     foreach (var parameterInfo in methodInfo.GetParameters())
                     {
-                        var inputObject = nowPointItem.Input[index].InputObject ??
-                                          throw new NullReferenceException("nowPointItem.Input[index].InputObject");
-
                         if (parameterInfo.ParameterType.GetCustomAttribute(typeof(AutoUnbox)) is not null)
                         {
                             var autoUnboxIndex = nowPointItem.Input[index].AutoUnboxIndex;
@@ -371,18 +374,46 @@ public partial class CustomScenario : ObservableRecipient
                             while (nowPointItem.Input.Count >= index &&
                                    nowPointItem.Input[index].AutoUnboxIndex == autoUnboxIndex)
                             {
-                                parameterList.Add(inputObject);
-                                parameterTypesList.Add(inputObject.GetType());
+                                var item = nowPointItem.Input[index].InputObject;
+                                if (item != null)
+                                {
+                                    parameterList.Add(item);
+                                    parameterTypesList.Add(item.GetType());
+                                }
+                                else
+                                {
+                                    valid = false;
+                                    goto finnish;
+                                }
+
                                 index++;
                             }
 
-                            var instance = parameterInfo.ParameterType.GetConstructor(parameterTypesList.ToArray())!
-                                .Invoke(parameterList.ToArray());
-                            list.Add(instance);
+                            var instance = parameterInfo.ParameterType.GetConstructor(parameterTypesList.ToArray())
+                                ?.Invoke(parameterList.ToArray());
+                            if (instance != null)
+                            {
+                                list.Add(instance);
+                            }
+                            else
+                            {
+                                valid = false;
+                                goto finnish;
+                            }
+
                             continue;
                         }
 
-                        list.Add(inputObject);
+                        var inputObject = nowPointItem.Input[index].InputObject;
+                        if (inputObject != null)
+                        {
+                            list.Add(inputObject);
+                        }
+                        else
+                        {
+                            valid = false;
+                            goto finnish;
+                        }
 
                         index++;
                     }
@@ -452,7 +483,7 @@ public partial class CustomScenario : ObservableRecipient
                             return;
                         }
 
-                        var task = new Task(() =>
+                        var task = new Thread(() =>
                         {
                             ParsePointItem(nextPointItem, false, notRealTime);
                         });
