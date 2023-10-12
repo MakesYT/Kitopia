@@ -361,7 +361,9 @@ public partial class CustomScenario : ObservableRecipient
                 else
                 {
                     var plugin = PluginManager.EnablePlugin[nowPointItem.Plugin];
-                    var methodInfo = plugin.GetMethodInfos()[nowPointItem.MerthodName];
+                    var customScenarioNodeMethod = PluginOverall.CustomScenarioNodeMethods[nowPointItem.Plugin];
+
+                    var methodInfo = customScenarioNodeMethod[nowPointItem.MerthodName].Item1;
                     List<object> list = new();
                     var index = 1;
                     foreach (var parameterInfo in methodInfo.GetParameters())

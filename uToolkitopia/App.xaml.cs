@@ -24,6 +24,7 @@ using Kitopia.View;
 using Kitopia.View.Pages;
 using Kitopia.View.Pages.Plugin;
 using log4net;
+using log4net.Config;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Win32;
@@ -96,18 +97,18 @@ public sealed partial class App : Application
             {
                 Dispatcher.Invoke(() =>
                 {
-                    ServiceManager.Services.GetService<SearchWindow>().Show();
+                    ServiceManager.Services.GetService<SearchWindow>()!.Show();
                     User32.SetForegroundWindow(
-                        new WindowInteropHelper(ServiceManager.Services.GetService<SearchWindow>())
+                        new WindowInteropHelper(ServiceManager.Services.GetService<SearchWindow>()!)
                             .Handle);
 
-                    ServiceManager.Services.GetService<SearchWindow>().tx.Focus();
+                    ServiceManager.Services.GetService<SearchWindow>()!.tx.Focus();
                 });
             }, null, -1, false);
             log.Info("注册EventWaitHandle");
             var appReloadEventWaitHandle =
                 new EventWaitHandle(false, EventResetMode.AutoReset, "Kitopia_appReload", out var appReload);
-            if (!createNew)
+            if (!appReload)
             {
                 var msg = new MessageBox();
                 msg.Title = "Kitopia";
@@ -117,17 +118,13 @@ public sealed partial class App : Application
                 msg.FontSize = 15;
                 var task = msg.ShowDialogAsync();
                 // 使用ContinueWith来在任务完成后执行一个回调函数
-                task.ContinueWith(e =>
-                {
-                    var result = e.Result;
-                }).Wait();
-                //System.Windows.MessageBox.Show("右键菜单捕获出现异常,请关闭软件重试,将会导致部分功能异常", "Kitopia");
+                task.Wait();
             }
             else
             {
-                ThreadPool.RegisterWaitForSingleObject(eventWaitHandle, (_, _) =>
+                ThreadPool.RegisterWaitForSingleObject(appReloadEventWaitHandle, (_, _) =>
                 {
-                    ServiceManager.Services.GetService<SearchWindowViewModel>().ReloadApps();
+                    ServiceManager.Services.GetService<SearchWindowViewModel>()!.ReloadApps();
                 }, null, -1, false);
             }
 
@@ -137,6 +134,12 @@ public sealed partial class App : Application
             Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 #endif
+
+            var assembly = Assembly.GetExecutingAssembly();
+            var logConfigStream = assembly.GetManifestResourceStream("Kitopia.log4net.config")!;
+
+            XmlConfigurator.Configure(logConfigStream);
+
             CheckAndDeleteLogFiles();
             AppDomain.CurrentDomain.ProcessExit += Application_ApplicationExit;
             ServiceManager.Services = ConfigureServices();

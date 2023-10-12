@@ -1,9 +1,12 @@
 ﻿#region
 
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Core.SDKs.Services.Config;
+using Core.SDKs.Tools;
+using Core.ViewModel.TaskEditor;
 using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -147,7 +150,7 @@ public class Plugin
             }
         }
 
-        Console.WriteLine($"Response from the plugin: GetVersion(): {pluginInfoEx.PluginId}");
+        //Console.WriteLine($"Response from the plugin: GetVersion(): {pluginInfoEx.PluginId}");
 
 
         // This initiates the unload of the HostAssemblyLoadContext. The actual unloading doesn't happen
@@ -161,6 +164,7 @@ public class Plugin
         _plugin = new AssemblyLoadContextH(path, path.Split("\\").Last() + "_plugin");
         _dll = _plugin.LoadFromAssemblyPath(path);
         var t = _dll.GetExportedTypes();
+        Dictionary<string, (MethodInfo, object)> methodInfos = new();
         foreach (var type in t)
         {
             if (type.GetInterface("IPlugin") != null)
@@ -171,27 +175,143 @@ public class Plugin
 
                 ((IPlugin)ServiceProvider.GetService(type)).OnEnabled();
             }
-        }
-    }
 
-    public Dictionary<string, MethodInfo> GetMethodInfos()
-    {
-        var methodInfos = new Dictionary<string, MethodInfo>();
-        var t = _dll.GetExportedTypes();
-        foreach (var type in t)
-        {
             foreach (var methodInfo in type.GetMethods())
             {
-                if (!methodInfo.GetCustomAttributes(typeof(PluginMethod)).Any())
+                if (methodInfo.GetCustomAttributes(typeof(PluginMethod)).Any()) //情景的可用节点
                 {
-                    continue;
+                    methodInfos.Add($"{type.FullName}_{methodInfo.Name}",
+                        (methodInfo, GetPointItemByMethodInfo(methodInfo)));
                 }
-
-                methodInfos.Add($"{type.FullName}_{methodInfo.Name}", methodInfo);
             }
         }
 
-        return methodInfos;
+        PluginOverall.CustomScenarioNodeMethods.Add($"{PluginInfo.Author}_{PluginInfo.PluginId}", methodInfos);
+    }
+
+    private object GetPointItemByMethodInfo(MethodInfo methodInfo)
+    {
+        var customAttribute = (PluginMethod)methodInfo.GetCustomAttribute(typeof(PluginMethod));
+        var pointItem = new PointItem()
+        {
+            Plugin = $"{PluginInfo.Author}_{PluginInfo.PluginId}",
+            MerthodName = $"{methodInfo.DeclaringType.FullName}_{methodInfo.Name}",
+            Title = $"{PluginInfo.Author}_{PluginInfo.PluginId}_{customAttribute.Name}"
+        };
+        ObservableCollection<ConnectorItem> inpItems = new();
+        inpItems.Add(new ConnectorItem()
+        {
+            Source = pointItem,
+            Type = typeof(NodeConnectorClass),
+            Title = "流输入",
+            TypeName = "节点"
+        });
+        int autoUnboxIndex = 0;
+        for (var index = 0; index < methodInfo.GetParameters().Length; index++)
+        {
+            var parameterInfo = methodInfo.GetParameters()[index];
+            if (parameterInfo.ParameterType.GetCustomAttribute(typeof(AutoUnbox)) is not null)
+            {
+                autoUnboxIndex++;
+                var type = parameterInfo.ParameterType;
+                foreach (var memberInfo in type.GetProperties())
+                {
+                    List<string>? interfaces = null;
+                    if (!memberInfo.PropertyType.FullName.StartsWith("System."))
+                    {
+                        interfaces = new();
+                        foreach (var @interface in memberInfo.PropertyType.GetInterfaces())
+                        {
+                            interfaces.Add(@interface.FullName);
+                        }
+                    }
+
+
+                    inpItems.Add(new ConnectorItem()
+                    {
+                        Source = pointItem,
+                        Type = memberInfo.PropertyType,
+                        AutoUnboxIndex = autoUnboxIndex,
+                        Interfaces = interfaces,
+                        Title = customAttribute.GetParameterName(memberInfo.Name),
+                        TypeName = BaseNodeMethodsGen.GetI18N(memberInfo.PropertyType.FullName),
+                    });
+                }
+            }
+            else
+            {
+                inpItems.Add(new ConnectorItem()
+                {
+                    Source = pointItem,
+                    Type = parameterInfo.ParameterType,
+                    Title = customAttribute.GetParameterName(parameterInfo.Name),
+                    TypeName = BaseNodeMethodsGen.GetI18N(parameterInfo.ParameterType.FullName)
+                });
+            }
+
+            //Log.Debug($"参数{index}:类型为{parameterInfo.ParameterType}");
+        }
+
+        if (methodInfo.ReturnParameter.ParameterType != typeof(void))
+        {
+            ObservableCollection<ConnectorItem> outItems = new();
+            if (methodInfo.ReturnParameter.ParameterType.GetCustomAttribute(typeof(AutoUnbox)) is not null)
+            {
+                autoUnboxIndex++;
+                var type = methodInfo.ReturnParameter.ParameterType;
+                foreach (var memberInfo in type.GetProperties())
+                {
+                    List<string>? interfaces = null;
+                    if (!memberInfo.PropertyType.FullName.StartsWith("System."))
+                    {
+                        interfaces = new();
+                        foreach (var @interface in memberInfo.PropertyType.GetInterfaces())
+                        {
+                            interfaces.Add(@interface.FullName);
+                        }
+                    }
+
+                    outItems.Add(new ConnectorItem()
+                    {
+                        Source = pointItem,
+                        Type = memberInfo.PropertyType,
+                        AutoUnboxIndex = autoUnboxIndex,
+                        Interfaces = interfaces,
+                        Title = customAttribute.GetParameterName(memberInfo.Name),
+                        TypeName = BaseNodeMethodsGen.GetI18N(memberInfo.PropertyType.FullName),
+                        IsOut = true
+                    });
+                }
+            }
+            else
+            {
+                List<string> interfaces = new();
+                foreach (var @interface in methodInfo.ReturnParameter.ParameterType.GetInterfaces())
+                {
+                    interfaces.Add(@interface.FullName);
+                }
+
+
+                outItems.Add(new ConnectorItem()
+                {
+                    Source = pointItem,
+                    Type = methodInfo.ReturnParameter.ParameterType,
+                    Title = customAttribute.GetParameterName("return"),
+                    Interfaces = interfaces,
+                    TypeName =
+                        BaseNodeMethodsGen.GetI18N(methodInfo.ReturnParameter.ParameterType.FullName),
+                    IsOut = true
+                });
+            }
+
+
+            pointItem.Output = outItems;
+        }
+
+
+        pointItem.Input = inpItems;
+
+        return pointItem;
     }
 
     public List<FieldInfo> GetFieldInfos()

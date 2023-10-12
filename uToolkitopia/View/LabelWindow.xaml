@@ -5,6 +5,7 @@
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                  xmlns:pages="clr-namespace:Core.ViewModel.Pages;assembly=Core"
+                 xmlns:services="clr-namespace:Kitopia.Services"
                  mc:Ignorable="d"
                  ExtendsContentIntoTitleBar="True"
                  WindowBackdropType="Acrylic" d:DataContext="{d:DesignInstance pages:LabelWindowViewModel}"
@@ -20,18 +21,45 @@
             <ColumnDefinition Width="100" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <ui:TitleBar Grid.ColumnSpan="2" CanMaximize="False" ShowMaximize="False" ShowMinimize="False" />
+        <ui:TitleBar Grid.ColumnSpan="2" CanMaximize="False" ShowMaximize="False" ShowMinimize="False" Height="30" />
 
-        <ui:TextBox    Grid.Row="1" Grid.ColumnSpan="2" Grid.RowSpan="2" x:Name="RichTextBox" FontSize="{Binding FontSize}">
+        <ui:TextBox Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="0" Grid.RowSpan="2" x:Name="RichTextBox"
+                    ClearButtonEnabled="False" TextWrapping="Wrap" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                    FontSize="{Binding FontSize}">
+            <ui:TextBox.Style>
+                <Style TargetType="{x:Type ui:TextBox}">
+                    <Style.Triggers>
+                        <Trigger Property="IsFocused" Value="True">
+                            
+                            <Setter  Property="Background">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="LightGoldenrodYellow" Opacity="0.7" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+
+            </ui:TextBox.Style>
+            <ui:TextBox.Resources>
+                <services:BindingProxy x:Key="DataCon" Data="{Binding}" />
+            </ui:TextBox.Resources>
             <ui:TextBox.Background>
                 <SolidColorBrush Color="LightGoldenrodYellow" Opacity="0.7" />
             </ui:TextBox.Background>
+            <ui:TextBox.ContextMenu>
+                <ContextMenu>
+                    <!-- ReSharper disable once Xaml.RedundantResource -->
+                    <MenuItem Header="字号" FontSize="16">
+                        <ui:NumberBox ClearButtonEnabled="False"
+                                      Value="{Binding Source={StaticResource DataCon},Path=Data.FontSize }"
+                                      MaxDecimalPlaces="0" />
+
+                    </MenuItem>
+
+                </ContextMenu>
+            </ui:TextBox.ContextMenu>
         </ui:TextBox>
-        <ui:NumberBox ClearButtonEnabled="False" Grid.Row="2" Grid.Column="0" Value="{Binding FontSize,Mode=TwoWay}" MaxDecimalPlaces="0">
-            <ui:NumberBox.Background>
-                <SolidColorBrush Color="AliceBlue" />
-            </ui:NumberBox.Background>
-        </ui:NumberBox>
 
 
     </Grid>

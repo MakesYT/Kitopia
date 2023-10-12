@@ -26,9 +26,9 @@
         <Content Include="bin\Debug\net7.0-windows10.0.19041.0\configs\config.json"/>
         <Content Include="bin\Debug\net7.0-windows10.0.19041.0\configs\Kitopia_Demo.json"/>
         <Content Include="bin\Debug\net7.0-windows10.0.19041.0\configs\_.json"/>
-        <Content Include="log4net.config">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
+        <EmbeddedResource Include="log4net.config">
+            <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+        </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>

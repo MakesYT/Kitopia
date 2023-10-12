@@ -2,7 +2,6 @@
 
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Reflection;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -14,7 +13,6 @@ using Core.SDKs.Tools;
 using log4net;
 using Newtonsoft.Json;
 using PluginCore;
-using PluginCore.Attribute;
 
 #endregion
 
@@ -204,138 +202,12 @@ public partial class TaskEditorViewModel : ObservableRecipient
     {
         BaseNodeMethodsGen.GenBaseNodeMethods(NodeMethods);
 
-
-        foreach (var (key, value) in PluginManager.EnablePlugin)
+        foreach (var customScenarioNodeMethod in PluginOverall.CustomScenarioNodeMethods)
         {
             var methods = new BindingList<object>();
-            foreach (var (tm, methodInfo) in value.GetMethodInfos())
+            foreach (var keyValuePair in customScenarioNodeMethod.Value)
             {
-                if (methodInfo.GetCustomAttribute(typeof(PluginMethod)) is not null)
-                {
-                    var customAttribute = (PluginMethod)methodInfo.GetCustomAttribute(typeof(PluginMethod));
-                    var pointItem = new PointItem()
-                    {
-                        Plugin = key,
-                        MerthodName = tm,
-                        Title = $"{key}_{customAttribute.Name}"
-                    };
-                    ObservableCollection<ConnectorItem> inpItems = new();
-                    inpItems.Add(new ConnectorItem()
-                    {
-                        Source = pointItem,
-                        Type = typeof(NodeConnectorClass),
-                        Title = "流输入",
-                        TypeName = "节点"
-                    });
-                    int autoUnboxIndex = 0;
-                    for (var index = 0; index < methodInfo.GetParameters().Length; index++)
-                    {
-                        var parameterInfo = methodInfo.GetParameters()[index];
-                        if (parameterInfo.ParameterType.GetCustomAttribute(typeof(AutoUnbox)) is not null)
-                        {
-                            autoUnboxIndex++;
-                            var type = parameterInfo.ParameterType;
-                            foreach (var memberInfo in type.GetProperties())
-                            {
-                                List<string>? interfaces = null;
-                                if (!memberInfo.PropertyType.FullName.StartsWith("System."))
-                                {
-                                    interfaces = new();
-                                    foreach (var @interface in memberInfo.PropertyType.GetInterfaces())
-                                    {
-                                        interfaces.Add(@interface.FullName);
-                                    }
-                                }
-
-
-                                inpItems.Add(new ConnectorItem()
-                                {
-                                    Source = pointItem,
-                                    Type = memberInfo.PropertyType,
-                                    AutoUnboxIndex = autoUnboxIndex,
-                                    Interfaces = interfaces,
-                                    Title = customAttribute.GetParameterName(memberInfo.Name),
-                                    TypeName = BaseNodeMethodsGen.GetI18N(memberInfo.PropertyType.FullName),
-                                });
-                            }
-                        }
-                        else
-                        {
-                            inpItems.Add(new ConnectorItem()
-                            {
-                                Source = pointItem,
-                                Type = parameterInfo.ParameterType,
-                                Title = customAttribute.GetParameterName(parameterInfo.Name),
-                                TypeName = BaseNodeMethodsGen.GetI18N(parameterInfo.ParameterType.FullName)
-                            });
-                        }
-
-                        //Log.Debug($"参数{index}:类型为{parameterInfo.ParameterType}");
-                    }
-
-                    if (methodInfo.ReturnParameter.ParameterType != typeof(void))
-                    {
-                        ObservableCollection<ConnectorItem> outItems = new();
-                        if (methodInfo.ReturnParameter.ParameterType.GetCustomAttribute(typeof(AutoUnbox)) is not null)
-                        {
-                            autoUnboxIndex++;
-                            var type = methodInfo.ReturnParameter.ParameterType;
-                            foreach (var memberInfo in type.GetProperties())
-                            {
-                                List<string>? interfaces = null;
-                                if (!memberInfo.PropertyType.FullName.StartsWith("System."))
-                                {
-                                    interfaces = new();
-                                    foreach (var @interface in memberInfo.PropertyType.GetInterfaces())
-                                    {
-                                        interfaces.Add(@interface.FullName);
-                                    }
-                                }
-
-                                outItems.Add(new ConnectorItem()
-                                {
-                                    Source = pointItem,
-                                    Type = memberInfo.PropertyType,
-                                    AutoUnboxIndex = autoUnboxIndex,
-                                    Interfaces = interfaces,
-                                    Title = customAttribute.GetParameterName(memberInfo.Name),
-                                    TypeName = BaseNodeMethodsGen.GetI18N(memberInfo.PropertyType.FullName),
-                                    IsOut = true
-                                });
-                            }
-                        }
-                        else
-                        {
-                            List<string> interfaces = new();
-                            foreach (var @interface in methodInfo.ReturnParameter.ParameterType.GetInterfaces())
-                            {
-                                interfaces.Add(@interface.FullName);
-                            }
-
-
-                            outItems.Add(new ConnectorItem()
-                            {
-                                Source = pointItem,
-                                Type = methodInfo.ReturnParameter.ParameterType,
-                                Title = customAttribute.GetParameterName("return"),
-                                Interfaces = interfaces,
-                                TypeName =
-                                    BaseNodeMethodsGen.GetI18N(methodInfo.ReturnParameter.ParameterType.FullName),
-                                IsOut = true
-                            });
-                        }
-
-
-                        pointItem.Output = outItems;
-                    }
-
-
-                    pointItem.Input = inpItems;
-
-                    methods.Add(pointItem);
-                }
-
-                //Log.Debug($"输出:类型为{methodInfo.ReturnParameter.ParameterType}");
+                methods.Add(keyValuePair.Value.Item2);
             }
 
             NodeMethods.Add(methods);

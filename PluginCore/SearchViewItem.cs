@@ -1,5 +1,7 @@
 ﻿#region
 
+using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 
@@ -81,6 +83,12 @@ public class SearchViewItem : ICloneable, IDisposable
         get;
     }
 
+    public Action<SearchViewItem>? Action
+    {
+        set;
+        get;
+    }
+
     public object Clone() =>
         new SearchViewItem()
         {
@@ -88,6 +96,7 @@ public class SearchViewItem : ICloneable, IDisposable
             IsVisible = IsVisible,
             FileType = FileType,
             IsStared = IsStared,
+            Action = Action,
             OnlyKey = OnlyKey,
             FileInfo = FileInfo != null ? new FileInfo(FileInfo.FullName) : null,
             Icon = (Icon?)Icon?.Clone(),
@@ -123,5 +132,6 @@ public enum FileType
     UWP应用,
     自定义情景,
     便签,
+    自定义,
     None
 }
