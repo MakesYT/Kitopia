@@ -47,30 +47,31 @@ public class PluginManager
                             Application.Current.Dispatcher.BeginInvoke(() =>
                             {
                                 Plugin.LoadBypath($"{pluginInfoEx.Author}_{pluginInfoEx.PluginId}", pluginInfoEx.Path);
-                            });
+                            }).Wait();
                         }
                     }
                 }
             }
-#if DEBUG
-            Log.Debug("Debug加载测试插件");
 
-            var pluginInfoEx1 = Plugin.GetPluginInfoEx(
-                @"D:\WPF.net\uToolkitopia\PluginDemo\bin\Debug\net7.0-windows\PluginDemo.dll",
-                out var alcWeakRef1);
-
-
-            while (alcWeakRef1.IsAlive)
-            {
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-            }
-
-            Plugin.LoadBypath($"{pluginInfoEx1.Author}_{pluginInfoEx1.PluginId}", pluginInfoEx1.Path);
-            //((ITaskEditorOpenService)ServiceManager.Services!.GetService(typeof(ITaskEditorOpenService))!)!.Open();
-
-
-#endif
+// #if DEBUG
+//             Log.Debug("Debug加载测试插件");
+//
+//             var pluginInfoEx1 = Plugin.GetPluginInfoEx(
+//                 @"D:\WPF.net\uToolkitopia\PluginDemo\bin\Debug\net7.0-windows\PluginDemo.dll",
+//                 out var alcWeakRef1);
+//
+//
+//             while (alcWeakRef1.IsAlive)
+//             {
+//                 GC.Collect();
+//                 GC.WaitForPendingFinalizers();
+//             }
+//
+//             Plugin.LoadBypath($"{pluginInfoEx1.Author}_{pluginInfoEx1.PluginId}", pluginInfoEx1.Path);
+//             //((ITaskEditorOpenService)ServiceManager.Services!.GetService(typeof(ITaskEditorOpenService))!)!.Open();
+//
+//
+// #endif
             isInitialized = true;
         });
     }

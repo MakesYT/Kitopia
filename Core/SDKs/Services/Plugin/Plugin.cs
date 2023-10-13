@@ -165,6 +165,7 @@ public class Plugin
         _dll = _plugin.LoadFromAssemblyPath(path);
         var t = _dll.GetExportedTypes();
         Dictionary<string, (MethodInfo, object)> methodInfos = new();
+        List<Func<string, SearchViewItem?>> searchViews = new();
         foreach (var type in t)
         {
             if (type.GetInterface("IPlugin") != null)
@@ -183,9 +184,26 @@ public class Plugin
                     methodInfos.Add($"{type.FullName}_{methodInfo.Name}",
                         (methodInfo, GetPointItemByMethodInfo(methodInfo)));
                 }
+
+                if (methodInfo.GetCustomAttributes(typeof(SearchMethod)).Any()) //搜索的切入方法
+                {
+                    searchViews.Add(e =>
+                    {
+                        var invoke = methodInfo.Invoke(
+                            ServiceProvider!.GetService(methodInfo.DeclaringType!),
+                            new object?[] { e });
+                        if (invoke is null)
+                        {
+                            return null;
+                        }
+
+                        return ((SearchViewItem)invoke);
+                    });
+                }
             }
         }
 
+        PluginOverall.SearchActions.Add($"{PluginInfo.Author}_{PluginInfo.PluginId}", searchViews);
         PluginOverall.CustomScenarioNodeMethods.Add($"{PluginInfo.Author}_{PluginInfo.PluginId}", methodInfos);
     }
 
@@ -374,10 +392,12 @@ public class Plugin
             JsonConvert.SerializeObject(GetConfigJObject(), Formatting.Indented));
         _dll = null;
 
+        PluginOverall.SearchActions.Remove($"{PluginInfo.Author}_{PluginInfo.PluginId}");
+        PluginOverall.CustomScenarioNodeMethods.Remove($"{PluginInfo.Author}_{PluginInfo.PluginId}");
+        PluginInfo = new PluginInfo();
         ServiceProvider = null;
 
         _plugin.Unload();
-        _plugin = null;
         weakReference = new WeakReference(_plugin);
     }
 }

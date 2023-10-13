@@ -40,6 +40,7 @@ public class Class1 : IPlugin
         services.AddSingleton<Class1>();
         services.AddSingleton<Test1>();
         services.AddSingleton<Test>();
+        services.AddSingleton<SearchClass>();
         return services.BuildServiceProvider();
     }
 }

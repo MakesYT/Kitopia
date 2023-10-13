@@ -14,6 +14,7 @@ using Core.SDKs;
 using Core.SDKs.Everything;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
+using Core.SDKs.Services.Plugin;
 using Core.SDKs.Tools;
 using log4net;
 using Vanara.PInvoke;
@@ -338,6 +339,19 @@ public partial class SearchWindowViewModel : ObservableRecipient
             #endregion
 
             value = Search.ToLowerInvariant();
+            var pluginItem = 0;
+            foreach (var searchAction in PluginOverall.SearchActions)
+            {
+                foreach (var func in searchAction.Value)
+                {
+                    var searchViewItem = func.Invoke(value);
+                    if (searchViewItem != null)
+                    {
+                        pluginItem++;
+                        Items.Add(searchViewItem);
+                    }
+                }
+            }
 
             //检测路径
             if (value.Contains("\\") || value.Contains("/"))
@@ -555,7 +569,8 @@ public partial class SearchWindowViewModel : ObservableRecipient
             //Items.RaiseListChangedEvents = true;
 
 
-            if (Items.Count <= 0 && !(Path.HasExtension(value) && File.Exists(value)) && !Directory.Exists(value))
+            if (Items.Count <= pluginItem && !(Path.HasExtension(value) && File.Exists(value)) &&
+                !Directory.Exists(value))
             {
                 Log.Debug("无搜索项目,添加网页搜索");
 
@@ -699,6 +714,9 @@ public partial class SearchWindowViewModel : ObservableRecipient
                         case FileType.便签:
                             ((ILabelWindowService)ServiceManager.Services.GetService(typeof(ILabelWindowService))!)
                                 .Show(item.OnlyKey);
+                            break;
+                        case FileType.自定义:
+                            item.Action?.Invoke(item);
                             break;
                         default:
                             Shell32.ShellExecute(IntPtr.Zero, "open", item.OnlyKey, "", "",

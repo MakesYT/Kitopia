@@ -31,10 +31,10 @@ public partial class CustomScenarioManger
                 var json = File.ReadAllText(fileInfo.FullName);
                 try
                 {
-                    var deserializeObject = JsonConvert.DeserializeObject<SDKs.CustomScenario.CustomScenario>(json)!;
-                    foreach (var value in deserializeObject.AutoTriggerType)
+                    try
                     {
-                        if (value.IsUsed)
+                        var deserializeObject = JsonConvert.DeserializeObject<CustomScenario.CustomScenario>(json)!;
+                        foreach (var value in deserializeObject.AutoTriggerType.Where(value => value.IsUsed))
                         {
                             switch (value.AutoTriggerType)
                             {
@@ -64,12 +64,18 @@ public partial class CustomScenarioManger
 
                                     break;
                                 }
+                                default:
+                                    throw new ArgumentOutOfRangeException();
                             }
                         }
-                    }
 
-                    deserializeObject.IsRunning = false;
-                    CustomScenarios.Add(deserializeObject);
+                        deserializeObject.IsRunning = false;
+                        CustomScenarios.Add(deserializeObject);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
                 }
                 catch (Exception e1)
                 {

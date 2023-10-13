@@ -69,6 +69,8 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
         if (pluginInfoEx.IsEnabled)
         {
             //卸载插件
+            ConfigManger.Config.EnabledPluginInfos.Remove(pluginInfoEx.ToPluginInfo());
+            ConfigManger.Save();
             Plugin.UnloadByPluginInfo(pluginInfoEx, out var weakReference);
             while (weakReference.IsAlive)
             {
@@ -76,8 +78,6 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
                 GC.WaitForPendingFinalizers();
             }
 
-            ConfigManger.Config.EnabledPluginInfos.Remove(pluginInfoEx.ToPluginInfo());
-            ConfigManger.Save();
             pluginInfoEx.IsEnabled = false;
             Items.ResetBindings();
         }

@@ -1,15 +1,18 @@
 ﻿using System;
+using System.Windows;
 using Core.SDKs;
+using PluginCore.Attribute;
 
 namespace PluginDemo;
 
 public class SearchClass
 {
+    [SearchMethod]
     public SearchViewItem a1(string search)
     {
         var action = new Action<SearchViewItem>((e) =>
         {
-            Console.WriteLine(e.OnlyKey);
+            MessageBox.Show(e.OnlyKey);
         });
         return new SearchViewItem()
         {
