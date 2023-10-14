@@ -16,9 +16,9 @@ public class ToastService : IToastService
 {
     private static readonly ILog log = LogManager.GetLogger(nameof(ToastService));
 
-    public void show(string text)
+    public void Show(string text)
     {
-        log.Debug(nameof(ToastService) + "的接口" + nameof(show) + "被调用");
+        log.Debug(nameof(ToastService) + "的接口" + nameof(Show) + "被调用");
 
 
         new ToastContentBuilder()
@@ -26,12 +26,12 @@ public class ToastService : IToastService
             .Show();
     }
 
-    public void showMessageBox(string Title, string Content, Action? yesAction, Action? noAction) =>
+    public void ShowMessageBox(string title, string content, Action? yesAction, Action? noAction) =>
         Application.Current.Dispatcher.BeginInvoke(() =>
         {
             var msg = new MessageBox();
-            msg.Title = Title;
-            msg.Content = Content;
+            msg.Title = title;
+            msg.Content = content;
             msg.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             if (noAction is not null)
             {
@@ -61,25 +61,24 @@ public class ToastService : IToastService
             });
         });
 
-    public void showMessageBoxW(string title, object content, string CloseButtonText, string SecondaryButtonText,
-        string PrimaryButtonText, Action? yes, Action? no, Action? cancel) =>
+    public void ShowMessageBoxW(string title, object? content, ShowMessageContent showMessageContent) =>
         Application.Current.Dispatcher.BeginInvoke(() =>
         {
             var msg = new MessageBox();
             msg.Title = title;
             msg.Content = content;
             msg.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            if (no is not null)
+            if (showMessageContent.SecondaryButtonText is not null)
             {
-                msg.SecondaryButtonText = SecondaryButtonText;
+                msg.SecondaryButtonText = showMessageContent.SecondaryButtonText;
             }
 
-            if (cancel is not null)
+            if (showMessageContent.CloseButtonText is not null)
             {
-                msg.CloseButtonText = CloseButtonText;
+                msg.CloseButtonText = showMessageContent.CloseButtonText;
             }
 
-            msg.PrimaryButtonText = PrimaryButtonText;
+            msg.PrimaryButtonText = showMessageContent.PrimaryButtonText;
             msg.FontSize = 15;
             var task = msg.ShowDialogAsync().GetAwaiter();
 
@@ -90,17 +89,17 @@ public class ToastService : IToastService
             {
                 case MessageBoxResult.Primary:
                 {
-                    yes?.Invoke();
+                    showMessageContent.Yes?.Invoke();
                     break;
                 }
                 case MessageBoxResult.None:
                 {
-                    cancel?.Invoke();
+                    showMessageContent.Cancel?.Invoke();
                     break;
                 }
                 case MessageBoxResult.Secondary:
                 {
-                    no?.Invoke();
+                    showMessageContent.No?.Invoke();
                     break;
                 }
             }

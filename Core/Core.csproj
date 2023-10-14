@@ -59,6 +59,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\nodify\Nodify\Nodify.csproj"/>
+        <ProjectReference Include="..\..\wpfui\src\Wpf.Ui\Wpf.Ui.csproj"/>
         <ProjectReference Include="..\PluginCore\PluginCore.csproj"/>
     </ItemGroup>
 

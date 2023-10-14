@@ -61,7 +61,7 @@ public partial class AppTools
                     var 程序名称 = "noUAC.Everything";
                     if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + "noUAC\\" + 程序名称 + ".lnk"))
                     {
-                        ((IToastService)ServiceManager.Services!.GetService(typeof(IToastService))!).showMessageBox(
+                        ((IToastService)ServiceManager.Services!.GetService(typeof(IToastService))!).ShowMessageBox(
                             "Kitopia提示",
                             "Kitopia即将使用任务计划来创建绕过UAC启动Everything的快捷方式\n需要确认UAC权限\n按下取消则关闭自动启动功能\n路径:" +
                             AppDomain.CurrentDomain.BaseDirectory + "noUAC\\" + 程序名称 + ".lnk",
@@ -234,7 +234,7 @@ public partial class AppTools
             }
 
             log.Debug(c.ToString());
-            ((IToastService)ServiceManager.Services!.GetService(typeof(IToastService))!).showMessageBox("Kitopia建议",
+            ((IToastService)ServiceManager.Services!.GetService(typeof(IToastService))!).ShowMessageBox("Kitopia建议",
                 c.ToString(),
                 () =>
                 {

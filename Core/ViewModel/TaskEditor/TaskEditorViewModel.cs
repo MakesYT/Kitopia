@@ -279,9 +279,9 @@ public partial class TaskEditorViewModel : ObservableRecipient
         if (IsModified)
         {
             e.Cancel = true;
-            ((IToastService)ServiceManager.Services!.GetService(typeof(IToastService))!).showMessageBoxW(
-                "不保存退出?", "是否确定不保存退出", "取消", "不保存", "保存并退出",
-                () =>
+            ((IToastService)ServiceManager.Services!.GetService(typeof(IToastService))!).ShowMessageBoxW("不保存退出?",
+                "是否确定不保存退出",
+                new ShowMessageContent("取消", "不保存", "保存并退出", () =>
                 {
                     IsModified = false;
                     CustomScenarioManger.Save(Scenario);
@@ -294,8 +294,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 }, () =>
                 {
                     e.Cancel = true;
-                }
-            );
+                }));
         }
     }
 

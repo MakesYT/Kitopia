@@ -20,13 +20,8 @@ public class TypeJsonConverter : JsonConverter
             writer.WriteValue($"System {type.FullName}");
             return;
         }
-        else
-        {
-            writer.WriteValue($"{a} {type.FullName}");
-            return;
-        }
 
-        writer.WriteValue(type.AssemblyQualifiedName);
+        writer.WriteValue($"{a} {type.FullName}");
     }
 
     public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
@@ -51,14 +46,13 @@ public class TypeJsonConverter : JsonConverter
 
                 throw new CustomScenarioLoadFromJsonException(strings[0], strings[1]);
             }
-            else return type;
+
+            return type;
         }
-        else
+
+        if (PluginManager.EnablePlugin.TryGetValue(strings[0], out var value))
         {
-            if (PluginManager.EnablePlugin.TryGetValue(strings[0], out var value))
-            {
-                return value.GetType(strings[1]);
-            }
+            return value.GetType(strings[1]);
         }
 
         throw new CustomScenarioLoadFromJsonException(strings[0], strings[1]);

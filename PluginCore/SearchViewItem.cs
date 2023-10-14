@@ -89,6 +89,12 @@ public class SearchViewItem : ICloneable, IDisposable
         get;
     }
 
+    public Func<SearchViewItem, Icon>? GetIconAction
+    {
+        set;
+        get;
+    }
+
     public object Clone() =>
         new SearchViewItem()
         {
@@ -105,13 +111,17 @@ public class SearchViewItem : ICloneable, IDisposable
 
     public void Dispose()
     {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
         if (Icon != null)
         {
             Icon.Dispose();
             Icon = null;
         }
-
-        GC.SuppressFinalize(this);
     }
 }
 

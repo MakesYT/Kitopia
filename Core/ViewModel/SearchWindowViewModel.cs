@@ -184,10 +184,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     Items.Add(item);
                     if (item.Icon is null)
                     {
-                        ThreadPool.QueueUserWorkItem(_ =>
-                        {
-                            GetIconInItems(item);
-                        });
+                        GetIconInItems(item);
                     }
 
 
@@ -228,10 +225,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                         Items.Add(item);
                         if (item.Icon is null)
                         {
-                            ThreadPool.QueueUserWorkItem(_ =>
-                            {
-                                GetIconInItems(item);
-                            });
+                            GetIconInItems(item);
                         }
 
                         limit++;
@@ -246,62 +240,54 @@ public partial class SearchWindowViewModel : ObservableRecipient
         // GetItemsIcon();
     }
 
-    private void GetIconInItems(SearchViewItem t)
+    private async Task GetIconInItems(SearchViewItem t)
     {
+        await Task.Run(() =>
         {
-            try
+            switch (t.FileType)
             {
-                if (t.Icon != null)
-                {
-                    return;
-                }
-
-                switch (t.FileType)
-                {
-                    case FileType.文件夹:
-                        t.Icon = (Icon)((IconTools)ServiceManager.Services!.GetService(typeof(IconTools))!)
-                            .ExtractFromPath(t.DirectoryInfo!.FullName).Clone();
-                        break;
-                    case FileType.命令:
-                    case FileType.URL:
-                        if (t.FileInfo is not null)
-                        {
-                            t.Icon = (Icon)((IconTools)ServiceManager.Services!.GetService(typeof(IconTools))!)
-                                .GetIcon(t.FileInfo!.FullName).Clone();
-                        }
-
-                        break;
-                    case FileType.数学运算:
-                    case FileType.剪贴板图像:
-                    case FileType.None:
-                        break;
-                    case FileType.应用程序:
-                    case FileType.Word文档:
-                    case FileType.PPT文档:
-                    case FileType.Excel文档:
-                    case FileType.PDF文档:
-                    case FileType.图像:
-                    case FileType.文件:
-                    default:
-
-                        t.Icon = (Icon)((IconTools)ServiceManager.Services!.GetService(typeof(IconTools))!)
-                            .GetIcon(t.FileInfo!.FullName).Clone();
-                        break;
-                }
-            }
-            catch (Exception)
-            {
-                // ignored
-            }
-            finally
-            {
-                Task.Factory.StartNew(() =>
+                case FileType.文件夹:
+                    t.Icon = (Icon)((IconTools)ServiceManager.Services.GetService(typeof(IconTools))!)
+                        .ExtractFromPath(t.DirectoryInfo!.FullName).Clone();
+                    break;
+                case FileType.命令:
+                case FileType.URL:
+                    if (t.FileInfo is not null)
                     {
-                        Items.ResetBindings();
-                    }, CancellationToken.None, TaskCreationOptions.None, _scheduler)
-                    .Wait();
+                        t.Icon = (Icon)((IconTools)ServiceManager.Services.GetService(typeof(IconTools))!)
+                            .GetIcon(t.FileInfo!.FullName).Clone();
+                    }
+
+                    break;
+                case FileType.数学运算:
+                case FileType.剪贴板图像:
+                case FileType.None:
+                    break;
+                case FileType.自定义:
+                    if (t.GetIconAction != null)
+                    {
+                        var icon3 = t.GetIconAction(t);
+                        t.Icon = (Icon)icon3.Clone();
+                        icon3.Dispose();
+                    }
+
+                    break;
+                case FileType.应用程序:
+                case FileType.Word文档:
+                case FileType.PPT文档:
+                case FileType.Excel文档:
+                case FileType.PDF文档:
+                case FileType.图像:
+                case FileType.文件:
+                case FileType.UWP应用:
+                case FileType.自定义情景:
+                case FileType.便签:
+                default:
+                    t.Icon = (Icon)((IconTools)ServiceManager.Services.GetService(typeof(IconTools))!)
+                        .GetIcon(t.FileInfo!.FullName).Clone();
+                    break;
             }
-        }
+        });
     }
 
     private readonly DelayAction _searchDelayAction = new();
@@ -373,10 +359,9 @@ public partial class SearchWindowViewModel : ObservableRecipient
                         FileType = FileType.文件,
                         IsVisible = true
                     };
-                    ThreadPool.QueueUserWorkItem(_ =>
-                    {
-                        GetIconInItems(searchViewItem);
-                    });
+
+                    GetIconInItems(searchViewItem);
+
 
                     Items.Add(searchViewItem);
                 }
@@ -394,10 +379,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                         Icon = null,
                         IsVisible = true
                     };
-                    ThreadPool.QueueUserWorkItem(_ =>
-                    {
-                        GetIconInItems(searchViewItem);
-                    });
+                    GetIconInItems(searchViewItem);
                     Items.Add(searchViewItem);
                 }
             }
@@ -525,10 +507,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
                 if (searchViewItem.Icon is null)
                 {
-                    ThreadPool.QueueUserWorkItem(_ =>
-                    {
-                        GetIconInItems(searchViewItem);
-                    });
+                    GetIconInItems(searchViewItem);
                 }
 
                 count++;
@@ -556,10 +535,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
                     if (searchViewItem.Icon is null)
                     {
-                        ThreadPool.QueueUserWorkItem(_ =>
-                        {
-                            GetIconInItems(searchViewItem);
-                        });
+                        GetIconInItems(searchViewItem);
                     }
 
                     Items.Add(searchViewItem); // 添加元素
@@ -689,7 +665,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     if (string.IsNullOrEmpty(fileName))
                     {
                         Log.Error("剪贴板图片保存失败");
-                        ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).show("剪贴板图片保存失败");
+                        ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show("剪贴板图片保存失败");
                         return;
                     }
 
@@ -746,7 +722,6 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
                             break;
                         }
-                            ;
                     }
 
 

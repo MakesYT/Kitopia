@@ -2,11 +2,10 @@
 
 public interface IToastService
 {
-    public void show(string text);
+    public void Show(string text);
 
     [STAThread]
-    public void showMessageBox(string Title, string Content, Action? yesAction, Action? noAction);
+    public void ShowMessageBox(string title, string content, Action? yesAction, Action? noAction);
 
-    void showMessageBoxW(string title, object content, string CloseButtonText, string SecondaryButtonText,
-        string PrimaryButtonText, Action? yes, Action? no, Action? cancel);
+    void ShowMessageBoxW(string title, object content, ShowMessageContent showMessageContent);
 }

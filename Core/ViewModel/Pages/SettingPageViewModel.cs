@@ -178,13 +178,13 @@ public partial class SettingPageViewModel : ObservableRecipient
             try
             {
                 registry.SetValue("Kitopia", $"\"{strName}\""); //设置该子项的新的“键值对”
-                ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))).show("开机自启设置成功");
+                ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))).Show("开机自启设置成功");
             }
             catch (Exception exception)
             {
                 log.Error("开机自启设置失败");
                 log.Error(exception.StackTrace);
-                ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))).show("开机自启设置失败");
+                ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))).Show("开机自启设置失败");
             }
         }
         else

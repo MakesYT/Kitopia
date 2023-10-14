@@ -2,12 +2,21 @@
 
 public class CustomScenarioLoadFromJsonException : Exception
 {
-    public string PluginName;
-    public string MethodName;
-
-    public CustomScenarioLoadFromJsonException(string PluginName, string MethodName)
+    public string PluginName
     {
-        this.PluginName = PluginName;
-        this.MethodName = MethodName;
+        get;
+        set;
+    }
+
+    public string MethodName
+    {
+        get;
+        set;
+    }
+
+    public CustomScenarioLoadFromJsonException(string pluginName, string methodName)
+    {
+        this.PluginName = pluginName;
+        this.MethodName = methodName;
     }
 }

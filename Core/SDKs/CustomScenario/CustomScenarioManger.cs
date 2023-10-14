@@ -18,6 +18,7 @@ public partial class CustomScenarioManger
         {
             while (!PluginManager.isInitialized)
             {
+                Thread.Sleep(100);
             }
 
             if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "customScenarios"))
@@ -31,56 +32,66 @@ public partial class CustomScenarioManger
                 var json = File.ReadAllText(fileInfo.FullName);
                 try
                 {
-                    try
+                    var deserializeObject = JsonConvert.DeserializeObject<CustomScenario.CustomScenario>(json)!;
+                    foreach (var value in deserializeObject.AutoTriggerType.Where(value => value.IsUsed))
                     {
-                        var deserializeObject = JsonConvert.DeserializeObject<CustomScenario.CustomScenario>(json)!;
-                        foreach (var value in deserializeObject.AutoTriggerType.Where(value => value.IsUsed))
+                        switch (value.AutoTriggerType)
                         {
-                            switch (value.AutoTriggerType)
+                            case AutoTriggerType.系统关闭时:
                             {
-                                case AutoTriggerType.系统关闭时:
-                                {
-                                    CustomScenarioExecutorManager.SystemShutdown.AddCustomScenario(deserializeObject);
-                                    break;
-                                }
-                                case AutoTriggerType.软件关闭时:
-                                {
-                                    CustomScenarioExecutorManager.SoftwareShutdown.AddCustomScenario(deserializeObject);
-                                    break;
-                                }
-                                case AutoTriggerType.软件启动时:
-                                {
-                                    CustomScenarioExecutorManager.SoftwareStarted.AddCustomScenario(deserializeObject);
-                                    break;
-                                }
-                                case AutoTriggerType.Custom:
-                                {
-                                    if (CustomScenarioExecutorManager.CustomExecutors.ContainsKey(
-                                            value.AutoTriggerTypeFrom))
-                                    {
-                                        CustomScenarioExecutorManager.CustomExecutors[value.AutoTriggerTypeFrom]
-                                            .AddCustomScenario(deserializeObject);
-                                    }
-
-                                    break;
-                                }
-                                default:
-                                    throw new ArgumentOutOfRangeException();
+                                CustomScenarioExecutorManager.SystemShutdown.AddCustomScenario(deserializeObject);
+                                break;
                             }
-                        }
+                            case AutoTriggerType.软件关闭时:
+                            {
+                                CustomScenarioExecutorManager.SoftwareShutdown.AddCustomScenario(deserializeObject);
+                                break;
+                            }
+                            case AutoTriggerType.软件启动时:
+                            {
+                                CustomScenarioExecutorManager.SoftwareStarted.AddCustomScenario(deserializeObject);
+                                break;
+                            }
+                            case AutoTriggerType.Custom:
+                            {
+                                if (CustomScenarioExecutorManager.CustomExecutors.ContainsKey(
+                                        value.AutoTriggerTypeFrom))
+                                {
+                                    CustomScenarioExecutorManager.CustomExecutors[value.AutoTriggerTypeFrom]
+                                        .AddCustomScenario(deserializeObject);
+                                }
 
-                        deserializeObject.IsRunning = false;
-                        CustomScenarios.Add(deserializeObject);
+                                break;
+                            }
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
                     }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
+
+                    deserializeObject.IsRunning = false;
+                    CustomScenarios.Add(deserializeObject);
                 }
                 catch (Exception e1)
                 {
-                    Log.Error(e1);
-                    Log.Error("情景文件加载失败");
+                    // Log.Error(e1);
+                    Log.Error($"情景文件\"{fileInfo.FullName}\"加载失败");
+                    var pluginName = ((CustomScenarioLoadFromJsonException)e1).PluginName.Split("_");
+                    var deserializeObject = JsonConvert.DeserializeObject<CustomScenario.CustomScenario>(json,
+                        new JsonSerializerSettings()
+                        {
+                            Error = (sender, args) =>
+                            {
+                                // 忽略错误并继续反序列化
+                                args.ErrorContext.Handled = true;
+                            }
+                        })!;
+                    ((IToastService)ServiceManager.Services!.GetService(typeof(IToastService))!).ShowMessageBoxW(
+                        $"自定义情景\"{deserializeObject.Name}\"加载失败",
+                        $"对应文件\n{fileInfo.FullName}\n情景所需的插件不存在\n需要来自作者{pluginName[0]}的插件{pluginName[1]}", new
+                            ShowMessageContent("我知道了", null, "尝试在市场中自动安装", () =>
+                            {
+                                System.Windows.MessageBox.Show("未实现");
+                            }, null, null));
                 }
             }
         }).Start();
