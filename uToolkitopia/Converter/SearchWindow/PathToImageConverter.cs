@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 
 namespace Kitopia.Converter.SearchWindow;
 
-public class PathToImageConverter : IValueConverter
+public partial class PathToImageConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
@@ -23,26 +23,20 @@ public class PathToImageConverter : IValueConverter
         }
 
         var icon = value as Icon;
-        try
-        {
-            var hIcon = icon.Handle;
-            var source = Imaging.CreateBitmapSourceFromHIcon(
-                hIcon,
-                new Int32Rect(0, 0, icon.Width, icon.Height),
-                BitmapSizeOptions.FromEmptyOptions());
-            DeleteObject(hIcon); // 释放图标句柄
-            return source;
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            return null;
-        }
+
+        var hIcon = icon.Handle;
+        var source = Imaging.CreateBitmapSourceFromHIcon(
+            hIcon,
+            new Int32Rect(0, 0, icon.Width, icon.Height),
+            BitmapSizeOptions.FromEmptyOptions());
+        DeleteObject(hIcon); // 释放图标句柄
+        return source;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
         throw new NotImplementedException();
 
-    [DllImport("gdi32.dll")]
-    public static extern bool DeleteObject(IntPtr hObject);
+    [LibraryImport("gdi32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool DeleteObject(IntPtr hObject);
 }

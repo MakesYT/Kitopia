@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
 using Core.SDKs.Services.Config;
 using Core.SDKs.Tools;
 using Core.ViewModel.TaskEditor;
@@ -27,8 +28,35 @@ public class Plugin
         get;
     }
 
+    public string ToPlgString() => $"{PluginInfo.Author}_{PluginInfo.PluginId}";
+
+    public string ToMtdString(MethodInfo methodInfo)
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.Append("|");
+        foreach (var genericArgument in methodInfo.GetParameters())
+        {
+            var plugin = PluginManager.EnablePlugin
+                .FirstOrDefault((e) => e.Value._dll == genericArgument.ParameterType.Assembly).Value;
+            // type.Assembly.
+            // var a = PluginManager.GetPlugnNameByTypeName(type.FullName);
+            if (plugin is null)
+            {
+                sb.Append($"System {genericArgument.ParameterType.FullName}");
+                sb.Append("|");
+                continue;
+            }
+
+            sb.Append($"{plugin.ToPlgString()} {genericArgument.ParameterType.FullName}");
+            sb.Append("|");
+        }
+
+        sb.Remove(sb.Length - 1, 1);
+        return $"{PluginInfo.Author}_{PluginInfo.PluginId}/{methodInfo.DeclaringType!.FullName}/{methodInfo.Name}{sb}";
+    }
+
     private AssemblyLoadContextH? _plugin;
-    private Assembly? _dll;
+    public Assembly? _dll;
 
     public IServiceProvider? ServiceProvider;
 
@@ -181,7 +209,7 @@ public class Plugin
             {
                 if (methodInfo.GetCustomAttributes(typeof(PluginMethod)).Any()) //情景的可用节点
                 {
-                    methodInfos.Add($"{type.FullName}_{methodInfo.Name}",
+                    methodInfos.Add(ToMtdString(methodInfo),
                         (methodInfo, GetPointItemByMethodInfo(methodInfo)));
                 }
 
@@ -203,8 +231,8 @@ public class Plugin
             }
         }
 
-        PluginOverall.SearchActions.Add($"{PluginInfo.Author}_{PluginInfo.PluginId}", searchViews);
-        PluginOverall.CustomScenarioNodeMethods.Add($"{PluginInfo.Author}_{PluginInfo.PluginId}", methodInfos);
+        PluginOverall.SearchActions.Add(ToPlgString(), searchViews);
+        PluginOverall.CustomScenarioNodeMethods.Add(ToPlgString(), methodInfos);
     }
 
     private object GetPointItemByMethodInfo(MethodInfo methodInfo)
@@ -212,8 +240,8 @@ public class Plugin
         var customAttribute = (PluginMethod)methodInfo.GetCustomAttribute(typeof(PluginMethod));
         var pointItem = new PointItem()
         {
-            Plugin = $"{PluginInfo.Author}_{PluginInfo.PluginId}",
-            MerthodName = $"{methodInfo.DeclaringType.FullName}_{methodInfo.Name}",
+            Plugin = this.ToPlgString(),
+            MerthodName = ToMtdString(methodInfo),
             Title = $"{PluginInfo.Author}_{PluginInfo.PluginId}_{customAttribute.Name}"
         };
         ObservableCollection<ConnectorItem> inpItems = new();

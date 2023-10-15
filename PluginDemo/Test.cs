@@ -13,7 +13,7 @@ public class Test
     }
 
     [PluginMethod("测试代码4", $"{nameof(id)}=参数1", "return=返回参数")]
-    public void t2(string id2, Result id, int id3)
+    public void t(string id2, Result id, int id3)
     {
         MessageBox.Show(id.Name + " " + id.Id + " " + id3);
     }

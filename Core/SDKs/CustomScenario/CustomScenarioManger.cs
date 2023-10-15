@@ -68,6 +68,29 @@ public partial class CustomScenarioManger
                         }
                     }
 
+                    foreach (var node in deserializeObject.nodes)
+                    {
+                        var nodePlugin = node.Plugin;
+                        switch (nodePlugin)
+                        {
+                            case null:
+                            case "Kitopia":
+                                continue;
+                        }
+
+                        if (!PluginOverall.CustomScenarioNodeMethods.TryGetValue(nodePlugin, out var method))
+                        {
+                            throw new CustomScenarioLoadFromJsonException(nodePlugin, node.MerthodName);
+                        }
+
+                        if (method.ContainsKey(node.MerthodName))
+                        {
+                            continue;
+                        }
+
+                        throw new CustomScenarioLoadFromJsonException(nodePlugin, node.MerthodName);
+                    }
+
                     deserializeObject.IsRunning = false;
                     CustomScenarios.Add(deserializeObject);
                 }

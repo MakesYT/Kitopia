@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Windows;
@@ -114,21 +113,15 @@ public partial class MainWindow
             ApplicationThemeManager.Apply(ApplicationTheme.Dark);
         }
 
-        ServiceManager.Services.GetService<SearchWindow>().Visibility = Visibility.Hidden;
+        ServiceManager.Services.GetService<SearchWindow>()!.Visibility = Visibility.Hidden;
 
         NavigationView.Loaded += (_, _) =>
         {
-            var navigationService = ServiceManager.Services!.GetService<INavigationService>()!;
+            var navigationService = ServiceManager.Services.GetService<INavigationService>()!;
 
             navigationService.SetNavigationControl(NavigationView);
-            //NavigationView.Transition = ServiceManager.Services!.GetService<INavigationService>();
-            NavigationView.SetServiceProvider(ServiceManager.Services!);
+            NavigationView.SetServiceProvider(ServiceManager.Services);
         };
-        //NavigationView.OnApplyTemplate();
-
-
-        //TOD
-        //Close();
     }
 
     protected override void OnSourceInitialized(EventArgs e)
@@ -136,7 +129,6 @@ public partial class MainWindow
         base.OnSourceInitialized(e);
         // 获取窗体句柄
         m_Hwnd = new WindowInteropHelper(this).Handle;
-        //var hWndSource = HwndSource.FromHwnd(m_Hwnd);
         var hWndSource = HwndSource.FromHwnd(m_Hwnd);
 
         // 添加处理程序
@@ -147,12 +139,11 @@ public partial class MainWindow
 
         AppDomain.CurrentDomain.ProcessExit += (_, _) =>
         {
-            //CustomScenarioExecutor.Exit();
+            //TODO: 程序退出时触发器
         };
         log.Debug("注册热键");
         InitHotKey();
 
-        //NotifyIcon.HookWindow = hWndSource;
         ApplicationThemeManager.Changed += (theme, accent) =>
         {
             WindowBackdrop.ApplyBackdrop(m_Hwnd, WindowBackdropType.Acrylic);
@@ -166,10 +157,6 @@ public partial class MainWindow
     }
 
 
-    private void ThemeButton_OnClick(object sender, RoutedEventArgs e)
-    {
-    }
-
     public bool HotKeySet(HotKeyModel hotKeyModel)
     {
         if (HotKeyHelper.RegisterGlobalHotKey(new[] { hotKeyModel }, m_Hwnd, out m_HotKeySettings).Any())
@@ -180,7 +167,7 @@ public partial class MainWindow
         return true;
     }
 
-    public bool InitHotKey()
+    public void InitHotKey()
     {
         var list = ConfigManger.Config.hotKeys;
         var failList = HotKeyHelper.RegisterGlobalHotKey(list, m_Hwnd, out m_HotKeySettings);
@@ -188,7 +175,7 @@ public partial class MainWindow
 
         if (!failList.Any())
         {
-            return true;
+            return;
         }
 
         var fail = "";
@@ -233,24 +220,19 @@ public partial class MainWindow
         // 注册全局快捷键
 
         // 弹出热键设置窗体
-
-        return true;
     }
 
     private IntPtr WndProc(IntPtr hWnd, int msg, IntPtr wideParam, IntPtr longParam, ref bool handled)
     {
         var windowMessage = (User32.WindowMessage)msg;
-        //log.Debug(windowMessage);
         switch (windowMessage)
         {
             case User32.WindowMessage.WM_ACTIVATEAPP:
             {
-                // CustomScenarioExecutor.SystemClose();
                 break;
             }
             case User32.WindowMessage.WM_QUERYENDSESSION:
             {
-                // CustomScenarioExecutor.SystemClose();
                 break;
             }
             case User32.WindowMessage.WM_HOTKEY:
@@ -258,9 +240,6 @@ public partial class MainWindow
                 if (sid == m_HotKeySettings["Kitopia_显示搜索框"])
                 {
                     log.Debug("显示搜索框热键被触发");
-
-
-                    //Console.WriteLine(App.Current.Services.GetService<SearchView>().Visibility);
                     if (ServiceManager.Services.GetService<SearchWindow>()!.Visibility == Visibility.Visible)
                     {
                         ServiceManager.Services.GetService<SearchWindow>()!.Visibility = Visibility.Hidden;
@@ -269,39 +248,14 @@ public partial class MainWindow
                     {
                         ServiceManager.Services.GetService<SearchWindowViewModel>()!.CheckClipboard();
 
-
                         ServiceManager.Services.GetService<SearchWindow>()!.Show();
+
                         User32.SetForegroundWindow(
                             new WindowInteropHelper(ServiceManager.Services.GetService<SearchWindow>()!)
                                 .Handle);
                         ServiceManager.Services.GetService<SearchWindow>()!.tx.Focus();
-
-                        if (ConfigManger.Config.canReadClipboard)
-                        {
-                            try
-                            {
-                                var data = Clipboard.GetDataObject()!;
-                                if (data.GetDataPresent(DataFormats.Text))
-                                {
-                                    var text = (string)data.GetData(DataFormats.Text)!;
-                                    if (text.StartsWith("\""))
-                                    {
-                                        text = text.Replace("\"", "");
-                                    }
-
-                                    if (File.Exists(text) || Directory.Exists(text))
-                                    {
-                                        ServiceManager.Services.GetService<SearchWindowViewModel>()!.Search = text;
-                                    }
-                                }
-                            }
-                            catch
-                            {
-                            }
-                        }
-
                         ServiceManager.Services.GetService<SearchWindow>()!.tx.SelectAll();
-                        ThreadPool.QueueUserWorkItem(e =>
+                        ThreadPool.QueueUserWorkItem(_ =>
                         {
                             ServiceManager.Services.GetService<SearchWindowViewModel>()!.ReloadApps();
                         });

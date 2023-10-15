@@ -166,7 +166,7 @@ public partial class AppTools
         stopwatch.Start();
 
 
-        UwpTools.GetAll(collection).Wait();
+        UwpTools.GetAll(collection);
         stopwatch.Stop();
 
         log.Debug($"索引UWP软件耗时{stopwatch.ElapsedMilliseconds}ms");
@@ -177,10 +177,9 @@ public partial class AppTools
         List<string> filePaths = new();
 
 // 把桌面上的.lnk文件路径添加到集合中
-        filePaths.AddRange(Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-            "*.lnk"));
-        filePaths.AddRange(Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-            "*.url"));
+        filePaths.AddRange(Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)));
+        filePaths.AddRange(
+            Directory.EnumerateDirectories(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)));
 // 把开始菜单中的.lnk和.appref-ms文件路径添加到集合中
         filePaths.AddRange(Directory.EnumerateFiles(@"C:\ProgramData\Microsoft\Windows\Start Menu\Programs", "*.lnk",
             SearchOption.AllDirectories));
@@ -273,38 +272,216 @@ public partial class AppTools
         bool star = false, bool logging = false)
     {
         //log.Debug(Thread.CurrentThread.ManagedThreadId);
-        var localizedName = Shell32.SHCreateItemFromParsingName<Shell32.IShellItem>(file)
-            .GetDisplayName(Shell32.SIGDN.SIGDN_NORMALDISPLAY);
+        var localizedName = "";
 
-        if (star)
+        try
         {
-            log.Debug("索引为收藏项目:" + file);
+            localizedName = Shell32.SHCreateItemFromParsingName<Shell32.IShellItem>(file)
+                .GetDisplayName(Shell32.SIGDN.SIGDN_NORMALDISPLAY);
+        }
+        catch (Exception e)
+        {
+            localizedName = "f";
+        }
 
-
-            if (collection.ContainsKey(file))
+        if (Path.HasExtension(file))
+        {
+            var fileInfo = new FileInfo(file);
+            switch (fileInfo.Extension)
             {
-                log.Debug("重复跳过索引:" + file);
-
-
-                return;
-            }
-
-            if (Path.HasExtension(file) && File.Exists(file))
-            {
-                var keys = new HashSet<string>();
-                await NameSolver(keys, localizedName);
-                collection.TryAdd(file, new SearchViewItem()
+                case ".lnk":
                 {
-                    FileInfo = new FileInfo(file),
-                    FileName = "打开文件:" + localizedName + "?",
-                    FileType = FileType.文件,
-                    OnlyKey = file,
-                    Keys = keys,
-                    IsStared = true,
-                    IsVisible = true
-                });
+                    //var sb = new StringBuilder(260);
+                    // var shellLink = new ShellLink(file, LinkResolution.None);
+                    var link = new Shell32.IShellLinkW();
+                    ((IPersistFile)link).Load(file, (int)STGM.STGM_READ);
+                    var sb = new StringBuilder(260);
+                    var data = new WIN32_FIND_DATA();
+                    //((IShellLinkW)link).GetShowCmd
+                    ((Shell32.IShellLinkW)link).GetPath(sb, sb.Capacity, out data, 0);
+
+                    var targetPath = sb.ToString() ?? file;
+
+                    if (string.IsNullOrWhiteSpace(targetPath))
+                    {
+                        targetPath = file;
+                    }
+
+                    if (!File.Exists(targetPath))
+                    {
+                        if (File.Exists(targetPath.Replace("Program Files (x86)", "Program Files")))
+                        {
+                            targetPath = targetPath.Replace("Program Files (x86)", "Program Files");
+                            goto next;
+                        }
+
+                        if (File.Exists(targetPath.Replace("Program Files", "Program Files (x86)")))
+                        {
+                            targetPath = targetPath.Replace("Program Files", "Program Files (x86)");
+                            goto next;
+                        }
+
+                        if (File.Exists(targetPath.Replace("system32", "sysnative")))
+                        {
+                            targetPath = targetPath.Replace("system32", "sysnative");
+                            goto next;
+                        }
+                    }
+
+                    next:
+                    var refFileInfo = new FileInfo(targetPath);
+                    if (refFileInfo.Exists)
+                    {
+                        if (collection.ContainsKey(refFileInfo.FullName))
+                        {
+                            if (logging)
+                            {
+                                log.Debug("重复索引:" + file);
+                            }
+
+
+                            return;
+                        }
+
+                        if (ConfigManger.Config.ignoreItems.Contains(targetPath))
+                        {
+                            log.Debug("忽略索引:\n" + targetPath);
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        log.Debug("无效索引:\n" + file + "\n目标位置:" + refFileInfo.FullName);
+                        if (!ErrorLnkList.Contains(file) && !ConfigManger.Config.errorLnk.Contains(file))
+                        {
+                            ErrorLnkList.Add(file);
+                        }
+
+                        return;
+                    }
+
+
+                    var extension = refFileInfo.Extension;
+                    if (extension != ".url" && extension != ".txt" && extension != ".chm" &&
+                        !refFileInfo.Name.Contains("powershell.exe") && !refFileInfo.Name.Contains("cmd.exe") &&
+                        extension != ".pdf" && extension != ".bat" &&
+                        !fileInfo.Name.Contains("install") &&
+                        !fileInfo.Name.Contains("安装") && !fileInfo.Name.Contains("卸载"))
+                    {
+                        var keys = new HashSet<string>();
+
+                        //collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = fileInfo.Name.Replace(".lnk", ""), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
+                        var localName = localizedName;
+                        await NameSolver(keys, localName);
+                        //nameSolver(keys, fileInfo.Name.Replace(".lnk", ""));
+                        await NameSolver(keys, refFileInfo.Name.Replace(".exe", ""));
+
+                        {
+                            collection.TryAdd(refFileInfo.FullName, new SearchViewItem
+                            {
+                                Keys = keys, IsVisible = true, FileInfo = refFileInfo, FileName = localName,
+                                OnlyKey = refFileInfo.FullName, IsStared = star,
+                                FileType = FileType.应用程序, Icon = null
+                            });
+                        }
+
+                        log.Debug("完成索引:" + file);
+                    }
+                    else
+                    {
+                        if (file.Contains("Control.url"))
+                        {
+                        }
+
+                        log.Debug("不符合要求跳过索引:" + file);
+                    }
+
+                    break;
+                }
+                case ".url":
+                {
+                    var url = "";
+                    var relFile = "";
+                    var fileContent = File.ReadAllText(file); // read the file content
+                    var pattern = @"URL=(.*)"; // the regex pattern to match the url
+                    var match = Regex.Match(fileContent, pattern, RegexOptions.NonBacktracking); // match the pattern
+                    if (match.Success) // if a match is found
+                    {
+                        url = match.Groups[1].Value.Replace("\r", ""); // get the url from the first group
+                    }
+
+                    if (collection.ContainsKey(url))
+                    {
+                        if (logging)
+                        {
+                            log.Debug("重复索引:" + file);
+                        }
+
+                        return;
+                    }
+
+                    if (ConfigManger.Config.ignoreItems.Contains(url))
+                    {
+                        log.Debug("忽略索引:\n" + url);
+                        return;
+                    }
+
+                    var pattern2 = @"IconFile=(.*)"; // the regex pattern to match the url
+                    var match2 = Regex.Match(fileContent, pattern2, RegexOptions.NonBacktracking); // match the pattern
+                    if (match2.Success) // if a match is found
+                    {
+                        relFile = match2.Groups[1].Value.Replace("\r", ""); // get the url from the first group
+                    }
+
+                    if (string.IsNullOrWhiteSpace(relFile))
+                    {
+                        return;
+                    }
+
+                    var keys = new HashSet<string>();
+
+                    //collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = fileInfo.Name.Replace(".lnk", ""), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
+                    var localName = localizedName;
+                    await NameSolver(keys, localName);
+                    //nameSolver(keys, fileInfo.Name.Replace(".lnk", ""));
+                    await NameSolver(keys, fileInfo.Name.Replace(".url", ""));
+
+                    {
+                        collection.TryAdd(url, new SearchViewItem
+                        {
+                            Keys = keys, IsVisible = true, FileName = localName,
+                            OnlyKey = url, Url = url, FileInfo = new FileInfo(relFile), IsStared = star,
+                            FileType = FileType.URL, Icon = null
+                        });
+                    }
+
+                    log.Debug("完成索引:" + file);
+                    break;
+                }
+                default:
+                    if (File.Exists(file))
+                    {
+                        var keys = new HashSet<string>();
+                        await NameSolver(keys, localizedName);
+                        collection.TryAdd(file, new SearchViewItem()
+                        {
+                            FileInfo = new FileInfo(file),
+                            FileName = localizedName,
+                            FileType = FileType.文件,
+
+                            OnlyKey = file,
+                            Keys = keys,
+                            IsStared = star,
+                            IsVisible = true
+                        });
+                    }
+
+                    break;
             }
-            else if (Directory.Exists(file))
+        }
+        else
+        {
+            if (Directory.Exists(file))
             {
                 var keys = new HashSet<string>();
                 await NameSolver(keys, file.Split("\\").Last());
@@ -312,189 +489,15 @@ public partial class AppTools
                 collection.TryAdd(file, new SearchViewItem()
                 {
                     DirectoryInfo = new DirectoryInfo(file),
-                    FileName = "打开" + file.Split("\\").Last() + "?",
+                    FileName = file.Split("\\").Last(),
                     FileType = FileType.文件夹,
-                    IsStared = true,
+                    IsStared = star,
                     OnlyKey = file,
                     Keys = keys,
                     Icon = null,
                     IsVisible = true
                 });
             }
-
-
-            log.Debug("完成索引:" + file);
-
-
-            return;
-        }
-
-        var fileInfo = new FileInfo(file);
-        if (fileInfo.Extension != ".url")
-        {
-            //var sb = new StringBuilder(260);
-            // var shellLink = new ShellLink(file, LinkResolution.None);
-            var link = new Shell32.IShellLinkW();
-            ((IPersistFile)link).Load(file, (int)STGM.STGM_READ);
-            var sb = new StringBuilder(260);
-            var data = new WIN32_FIND_DATA();
-            //((IShellLinkW)link).GetShowCmd
-            ((Shell32.IShellLinkW)link).GetPath(sb, sb.Capacity, out data, 0);
-
-            var targetPath = sb.ToString() ?? file;
-
-            if (string.IsNullOrWhiteSpace(targetPath))
-            {
-                targetPath = file;
-            }
-
-            if (!File.Exists(targetPath))
-            {
-                if (File.Exists(targetPath.Replace("Program Files (x86)", "Program Files")))
-                {
-                    targetPath = targetPath.Replace("Program Files (x86)", "Program Files");
-                    goto next;
-                }
-
-                if (File.Exists(targetPath.Replace("Program Files", "Program Files (x86)")))
-                {
-                    targetPath = targetPath.Replace("Program Files", "Program Files (x86)");
-                    goto next;
-                }
-
-                if (File.Exists(targetPath.Replace("system32", "sysnative")))
-                {
-                    targetPath = targetPath.Replace("system32", "sysnative");
-                    goto next;
-                }
-            }
-
-            next:
-            var refFileInfo = new FileInfo(targetPath);
-            if (refFileInfo.Exists)
-            {
-                if (collection.ContainsKey(refFileInfo.FullName))
-                {
-                    if (logging)
-                    {
-                        log.Debug("重复索引:" + file);
-                    }
-
-
-                    return;
-                }
-
-                if (ConfigManger.Config.ignoreItems.Contains(targetPath))
-                {
-                    log.Debug("忽略索引:\n" + targetPath);
-                    return;
-                }
-            }
-            else
-            {
-                log.Debug("无效索引:\n" + file + "\n目标位置:" + refFileInfo.FullName);
-                if (!ErrorLnkList.Contains(file) && !ConfigManger.Config.errorLnk.Contains(file))
-                {
-                    ErrorLnkList.Add(file);
-                }
-
-                return;
-            }
-
-
-            var extension = refFileInfo.Extension;
-            if (extension != ".url" && extension != ".txt" && extension != ".chm" &&
-                !refFileInfo.Name.Contains("powershell.exe") && !refFileInfo.Name.Contains("cmd.exe") &&
-                extension != ".pdf" && extension != ".bat" &&
-                !fileInfo.Name.Contains("install") &&
-                !fileInfo.Name.Contains("安装") && !fileInfo.Name.Contains("卸载"))
-            {
-                var keys = new HashSet<string>();
-
-                //collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = fileInfo.Name.Replace(".lnk", ""), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
-                var localName = localizedName;
-                await NameSolver(keys, localName);
-                //nameSolver(keys, fileInfo.Name.Replace(".lnk", ""));
-                await NameSolver(keys, refFileInfo.Name.Replace(".exe", ""));
-
-                {
-                    collection.TryAdd(refFileInfo.FullName, new SearchViewItem
-                    {
-                        Keys = keys, IsVisible = true, FileInfo = refFileInfo, FileName = localName,
-                        OnlyKey = refFileInfo.FullName,
-                        FileType = FileType.应用程序, Icon = null
-                    });
-                }
-
-                log.Debug("完成索引:" + file);
-            }
-            else
-            {
-                if (file.Contains("Control.url"))
-                {
-                }
-
-                log.Debug("不符合要求跳过索引:" + file);
-            }
-        }
-        else
-        {
-            var url = "";
-            var relFile = "";
-            var fileContent = File.ReadAllText(file); // read the file content
-            var pattern = @"URL=(.*)"; // the regex pattern to match the url
-            var match = Regex.Match(fileContent, pattern, RegexOptions.NonBacktracking); // match the pattern
-            if (match.Success) // if a match is found
-            {
-                url = match.Groups[1].Value.Replace("\r", ""); // get the url from the first group
-            }
-
-            if (collection.ContainsKey(url))
-            {
-                if (logging)
-                {
-                    log.Debug("重复索引:" + file);
-                }
-
-                return;
-            }
-
-            if (ConfigManger.Config.ignoreItems.Contains(url))
-            {
-                log.Debug("忽略索引:\n" + url);
-                return;
-            }
-
-            var pattern2 = @"IconFile=(.*)"; // the regex pattern to match the url
-            var match2 = Regex.Match(fileContent, pattern2, RegexOptions.NonBacktracking); // match the pattern
-            if (match2.Success) // if a match is found
-            {
-                relFile = match2.Groups[1].Value.Replace("\r", ""); // get the url from the first group
-            }
-
-            if (string.IsNullOrWhiteSpace(relFile))
-            {
-                return;
-            }
-
-            var keys = new HashSet<string>();
-
-            //collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = fileInfo.Name.Replace(".lnk", ""), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
-            var localName = localizedName;
-            await NameSolver(keys, localName);
-            //nameSolver(keys, fileInfo.Name.Replace(".lnk", ""));
-            await NameSolver(keys, fileInfo.Name.Replace(".url", ""));
-
-            {
-                collection.TryAdd(url, new SearchViewItem
-                {
-                    Keys = keys, IsVisible = true, FileName = localName,
-                    OnlyKey = url, Url = url, FileInfo = new FileInfo(relFile),
-                    FileType = FileType.URL, Icon = null
-                });
-            }
-
-            log.Debug("完成索引:" + file);
         }
     }
 

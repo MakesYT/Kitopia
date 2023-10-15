@@ -5,6 +5,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Xml;
 using Core.SDKs.Services;
+using log4net;
 
 #endregion
 
@@ -12,22 +13,15 @@ namespace Core.SDKs.Tools;
 
 public class IconTools
 {
+    private static readonly ILog log = LogManager.GetLogger(nameof(IconTools));
     private const uint SHGFI_ICON = 0x100;
     private const uint SHGFI_LARGEICON = 0x0;
     private const uint SHGFI_SMALLICON = 0x000000001;
     private const uint SHGFI_USEFILEATTRIBUTES = 0x000000010;
     private const uint SHGFI_OPENICON = 0x000000002;
     private static readonly Dictionary<string, Icon> _icons = new(250);
+    private static Semaphore semaphore = new(3, 6);
 
-    public void ClearCache()
-    {
-        foreach (var iconsValue in _icons.Values)
-        {
-            iconsValue.Dispose();
-        }
-
-        _icons.Clear();
-    }
 
     [DllImport("User32.dll")]
     public static extern int PrivateExtractIcons(
@@ -48,41 +42,24 @@ public class IconTools
         IntPtr hIcon //A handle to the icon to be destroyed. The icon must not be in use.
     );
 
-    public Icon GetIcon(string path)
+    private static Icon? GetIconBase(string path, string cacheKey, bool mscFile = false)
     {
-        string cacheKey;
-        var mscFile = false;
-        switch (path.ToLower().Split(".").Last())
+        switch (Path.GetExtension(path))
         {
-            case "docx":
-            case "doc":
-            case "xls":
-            case "xlsx":
-            case "pdf":
-            case "ppt":
-            case "pptx":
+            case ".png":
+            case ".bmp":
+            case ".ico":
+            case ".jpg":
             {
-                cacheKey = path.Split(".").Last();
-                break;
-            }
-            case "msc":
-            {
-                cacheKey = path.Split("\\").Last();
-                mscFile = true;
-                break;
-            }
-            default:
-            {
-                cacheKey = path;
-                break;
+                using var bm = new Bitmap(path);
+                using var iconBm = new Bitmap(bm, new Size(64, 64));
+                //如果是windows调用，直接下面一行代码就可以了
+                //此代码不能在web程序中调用，会有安全异常抛出
+                var icon = Icon.FromHandle(iconBm.GetHicon());
+                return icon;
             }
         }
 
-        //缓存
-        if (_icons.TryGetValue(cacheKey, out var icon2))
-        {
-            return icon2;
-        }
 
         if (mscFile)
         {
@@ -118,14 +95,9 @@ public class IconTools
                     continue;
                 }
 
-                using (var icon = Icon.FromHandle(hIcons[i]))
-                {
-                    var independenceIcon = (Icon)icon.Clone();
-                    DestroyIcon(icon.Handle);
-                    _icons.TryAdd(cacheKey, independenceIcon);
+                var icon = Icon.FromHandle(hIcons[i]);
 
-                    return independenceIcon;
-                }
+                return icon;
             }
         }
 
@@ -151,14 +123,9 @@ public class IconTools
                     continue;
                 }
 
-                using (var icon = Icon.FromHandle(hIcons[i]))
-                {
-                    var independenceIcon = (Icon)icon.Clone();
-                    DestroyIcon(icon.Handle);
-                    _icons.TryAdd(cacheKey, independenceIcon);
+                var icon = Icon.FromHandle(hIcons[i]);
 
-                    return independenceIcon;
-                }
+                return icon;
             }
         }
 
@@ -170,20 +137,55 @@ public class IconTools
             path,
             0, ref shinfo, (uint)Marshal.SizeOf(shinfo),
             SHGFI_ICON | SHGFI_LARGEICON | SHGFI_USEFILEATTRIBUTES | SHGFI_OPENICON);
-        var independenceIcon12 = (Icon)Icon.FromHandle(shinfo.hIcon).Clone();
-        DestroyIcon(shinfo.hIcon);
-        _icons.TryAdd(cacheKey, independenceIcon12);
-        return independenceIcon12;
 
-        #region 32*32的Icon
 
-        var icon1 = Icon.ExtractAssociatedIcon((string)path);
-        var independenceIcon1 = (Icon)icon1!.Clone();
-        DestroyIcon(icon1.Handle);
-        _icons.TryAdd(cacheKey, independenceIcon1);
-        return independenceIcon1;
+        return (Icon)Icon.FromHandle(shinfo.hIcon);
+    }
 
-        #endregion
+    public static Icon GetIcon(string path)
+    {
+        semaphore.WaitOne();
+        var mscFile = false;
+        string cacheKey;
+        switch (path.ToLower().Split(".").Last())
+        {
+            case "docx":
+            case "doc":
+            case "xls":
+            case "xlsx":
+            case "pdf":
+            case "ppt":
+            case "pptx":
+            {
+                cacheKey = path.Split(".").Last();
+                break;
+            }
+            case "msc":
+            {
+                cacheKey = path.Split("\\").Last();
+                mscFile = true;
+                break;
+            }
+            default:
+            {
+                cacheKey = path;
+                break;
+            }
+        }
+
+        log.Debug(cacheKey);
+
+        //缓存
+        if (_icons.TryGetValue(cacheKey, out var icon2))
+        {
+            return icon2;
+        }
+
+        var iconBase = GetIconBase(path, cacheKey, mscFile);
+        var clone = (Icon)iconBase.Clone();
+        iconBase.Dispose();
+        semaphore.Release();
+        return clone;
     }
 
     public Icon? GetFormClipboard()
@@ -212,7 +214,7 @@ public class IconTools
     }
 
 
-    public Icon ExtractFromPath(string path)
+    public static Icon ExtractFromPath(string path)
     {
         if (_icons.TryGetValue(path, out var fromPath))
         {

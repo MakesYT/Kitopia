@@ -1,6 +1,5 @@
 ﻿#region
 
-using System.Drawing;
 using System.IO;
 using System.Xml;
 using Core.SDKs.Services.Config;
@@ -157,18 +156,13 @@ public static class UwpTools
         var pa = $"{path}\\{logoName}.scale-200.png";
         if (File.Exists(pa))
         {
-            using var bm = new Bitmap(pa);
-            using var iconBm = new Bitmap(bm, new Size(64, 64));
-            //如果是windows调用，直接下面一行代码就可以了
-            //此代码不能在web程序中调用，会有安全异常抛出
-            using var icon = Icon.FromHandle(iconBm.GetHicon());
             var searchViewItem = new SearchViewItem()
             {
                 FileName = fileName,
                 OnlyKey = $"{appContainer.appContainerName}!{id}",
                 FileType = FileType.UWP应用,
                 Keys = keys,
-                Icon = (Icon?)icon.Clone(),
+                IconPath = pa,
                 IsVisible = true
             };
 
@@ -184,18 +178,13 @@ public static class UwpTools
             {
                 if (enumerateFile.Name.StartsWith(logoName))
                 {
-                    using var bm = new Bitmap(enumerateFile.FullName);
-                    using var iconBm = new Bitmap(bm, new Size(64, 64));
-                    //如果是windows调用，直接下面一行代码就可以了
-                    //此代码不能在web程序中调用，会有安全异常抛出
-                    using var icon = Icon.FromHandle(iconBm.GetHicon());
                     var searchViewItem = new SearchViewItem()
                     {
                         FileName = fileName,
                         OnlyKey = $"{appContainer.appContainerName}!{id}",
                         FileType = FileType.UWP应用,
                         Keys = keys,
-                        Icon = (Icon?)icon.Clone(),
+                        IconPath = enumerateFile.FullName,
                         IsVisible = true
                     };
                     Log.Debug(

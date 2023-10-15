@@ -3,7 +3,6 @@
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -105,20 +104,44 @@ public partial class SearchWindowViewModel : ObservableRecipient
         }
     }
 
-    public void CheckClipboard()
+
+    public void CheckClipboard(bool loadLast = false)
     {
         if (!ConfigManger.Config.canReadClipboard)
         {
             Log.Debug("没有读取剪贴板授权");
-
-
-            if (Items.First().FileType == FileType.剪贴板图像)
-            {
-                Items.RemoveAt(0);
-            }
-
             return;
         }
+
+        if (Items.Count > 0 && (Items[0].FileType == FileType.剪贴板图像 || Items[0].FileName.StartsWith("打开")))
+        {
+            Items.RemoveAt(0);
+        }
+
+        var data = Clipboard.GetDataObject()!;
+        if (data.GetDataPresent(DataFormats.Text))
+        {
+            var text = (string)data.GetData(DataFormats.Text)!;
+            if (text.StartsWith("\""))
+            {
+                text = text.Replace("\"", "");
+            }
+
+            //检测路径
+            if (text.Contains("\\") || text.Contains("/"))
+            {
+                Log.Debug("检测路径");
+                Dictionary<string, SearchViewItem> a = new();
+                AppTools.AppSolverA(a, text).Wait();
+                foreach (var (key, value) in a)
+                {
+                    value.FileName = $"打开文件: {value.FileName} ?";
+                    Items.Insert(0, value);
+                    GetIconInItems(value);
+                }
+            }
+        }
+
 
         if (((IClipboardService)ServiceManager.Services!.GetService(typeof(IClipboardService))!).IsBitmap())
         {
@@ -166,6 +189,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
         }
 
         Items.Clear();
+        CheckClipboard();
         var limit = 0;
         //Items.RaiseListChangedEvents = false;
         if (ConfigManger.Config.alwayShows.Any())
@@ -235,7 +259,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
         }
 
         //Items.RaiseListChangedEvents = true;
-        CheckClipboard();
+
 
         // GetItemsIcon();
     }
@@ -244,18 +268,17 @@ public partial class SearchWindowViewModel : ObservableRecipient
     {
         await Task.Run(() =>
         {
+            //Log.Debug($"为{t.OnlyKey}生成Icon");
             switch (t.FileType)
             {
                 case FileType.文件夹:
-                    t.Icon = (Icon)((IconTools)ServiceManager.Services.GetService(typeof(IconTools))!)
-                        .ExtractFromPath(t.DirectoryInfo!.FullName).Clone();
+                    t.Icon = IconTools.ExtractFromPath(t.DirectoryInfo!.FullName);
                     break;
                 case FileType.命令:
                 case FileType.URL:
                     if (t.FileInfo is not null)
                     {
-                        t.Icon = (Icon)((IconTools)ServiceManager.Services.GetService(typeof(IconTools))!)
-                            .GetIcon(t.FileInfo!.FullName).Clone();
+                        t.Icon = IconTools.GetIcon(t.FileInfo!.FullName);
                     }
 
                     break;
@@ -267,10 +290,12 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     if (t.GetIconAction != null)
                     {
                         var icon3 = t.GetIconAction(t);
-                        t.Icon = (Icon)icon3.Clone();
-                        icon3.Dispose();
+                        t.Icon = icon3;
                     }
 
+                    break;
+                case FileType.UWP应用:
+                    t.Icon = IconTools.GetIcon(t.IconPath!);
                     break;
                 case FileType.应用程序:
                 case FileType.Word文档:
@@ -279,14 +304,15 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 case FileType.PDF文档:
                 case FileType.图像:
                 case FileType.文件:
-                case FileType.UWP应用:
+
                 case FileType.自定义情景:
                 case FileType.便签:
                 default:
-                    t.Icon = (Icon)((IconTools)ServiceManager.Services.GetService(typeof(IconTools))!)
-                        .GetIcon(t.FileInfo!.FullName).Clone();
+                    t.Icon = IconTools.GetIcon(t.FileInfo!.FullName);
                     break;
             }
+
+            OnPropertyChanged(nameof(Items));
         });
     }
 
@@ -339,50 +365,6 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 }
             }
 
-            //检测路径
-            if (value.Contains("\\") || value.Contains("/"))
-            {
-                Log.Debug("检测路径");
-
-
-                if (Path.HasExtension(value) && File.Exists(value))
-                {
-                    Log.Debug("检测到文件路径");
-
-
-                    var searchViewItem = new SearchViewItem()
-                    {
-                        FileInfo = new FileInfo(value),
-                        FileName = "打开文件:" + Shell32.SHCreateItemFromParsingName<Shell32.IShellItem>(value)
-                            .GetDisplayName(Shell32.SIGDN.SIGDN_NORMALDISPLAY) + "?",
-                        OnlyKey = value,
-                        FileType = FileType.文件,
-                        IsVisible = true
-                    };
-
-                    GetIconInItems(searchViewItem);
-
-
-                    Items.Add(searchViewItem);
-                }
-                else if (Directory.Exists(value))
-                {
-                    Log.Debug("检测到文件夹路径");
-
-
-                    var searchViewItem = new SearchViewItem()
-                    {
-                        DirectoryInfo = new DirectoryInfo(value),
-                        FileName = "打开" + value.Split("\\").Last() + "?",
-                        FileType = FileType.文件夹,
-                        OnlyKey = value,
-                        Icon = null,
-                        IsVisible = true
-                    };
-                    GetIconInItems(searchViewItem);
-                    Items.Add(searchViewItem);
-                }
-            }
 
             //自定义情景
             foreach (var customScenario in CustomScenarioManger.CustomScenarios)
@@ -650,11 +632,10 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
 
     [RelayCommand]
-    public async Task OpenFile(object searchViewItem) =>
+    public async Task OpenFile(SearchViewItem item) =>
         await Task.Run(() =>
         {
             WeakReferenceMessenger.Default.Send("a", "SearchWindowClose");
-            var item = (SearchViewItem)searchViewItem;
             Log.Debug("打开指定内容" + item.OnlyKey);
             switch (item.OnlyKey)
             {

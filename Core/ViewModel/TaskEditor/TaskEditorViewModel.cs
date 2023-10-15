@@ -378,7 +378,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
 
 public partial class PointItem : ObservableRecipient
 {
-    public string Plugin
+    public string? Plugin
     {
         get;
         set;

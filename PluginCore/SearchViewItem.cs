@@ -83,6 +83,12 @@ public class SearchViewItem : ICloneable, IDisposable
         get;
     }
 
+    public string? IconPath
+    {
+        set;
+        get;
+    }
+
     public Action<SearchViewItem>? Action
     {
         set;
@@ -105,7 +111,8 @@ public class SearchViewItem : ICloneable, IDisposable
             Action = Action,
             OnlyKey = OnlyKey,
             FileInfo = FileInfo != null ? new FileInfo(FileInfo.FullName) : null,
-            Icon = (Icon?)Icon?.Clone(),
+            Icon = Icon,
+            IconPath = IconPath,
             DirectoryInfo = DirectoryInfo != null ? new DirectoryInfo(DirectoryInfo.FullName) : null
         };
 
@@ -119,7 +126,6 @@ public class SearchViewItem : ICloneable, IDisposable
     {
         if (Icon != null)
         {
-            Icon.Dispose();
             Icon = null;
         }
     }

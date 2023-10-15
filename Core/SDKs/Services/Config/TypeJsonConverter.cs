@@ -14,14 +14,16 @@ public class TypeJsonConverter : JsonConverter
     public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
         var type = (Type)value;
-        var a = PluginManager.GetPlugnNameByTypeName(type.FullName);
-        if (a is null)
+        var plugin = PluginManager.EnablePlugin.FirstOrDefault((e) => e.Value._dll == type.Assembly).Value;
+        // type.Assembly.
+        // var a = PluginManager.GetPlugnNameByTypeName(type.FullName);
+        if (plugin is null)
         {
             writer.WriteValue($"System {type.FullName}");
             return;
         }
 
-        writer.WriteValue($"{a} {type.FullName}");
+        writer.WriteValue($"{plugin.ToPlgString()} {type.FullName}");
     }
 
     public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)

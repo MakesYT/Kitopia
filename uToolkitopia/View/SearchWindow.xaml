@@ -45,7 +45,7 @@
     </Window.Resources>
     <StackPanel Margin="10" MinHeight="150">
         <ui:TextBox VerticalContentAlignment="Center" VerticalAlignment="Center" IsTabStop="False"
-                    FocusVisualStyle="{x:Null}" ClearButtonEnabled="True"
+                    FocusVisualStyle="{x:Null}" ClearButtonEnabled="True" 
                     PlaceholderEnabled="True" PlaceholderText="搜索..." AcceptsReturn="False" PreviewKeyDown="tx_KeyDown"
                     x:Name="tx"
                     AcceptsTab="False" FontSize="32"
@@ -58,7 +58,7 @@
                     IsClosable="False" />
         <ListBox x:Name="dataGrid" MaxHeight="415"
                  ItemsSource="{Binding Items,UpdateSourceTrigger=PropertyChanged}"
-
+                 
                  Margin="0,0,0,0">
             <ListBox.ItemContainerStyle>
                 <Style TargetType="{x:Type ListBoxItem}">
@@ -73,16 +73,18 @@
                             </ControlTemplate>
                         </Setter.Value>
                     </Setter>
+                    <Setter Property="IsTabStop" Value="False" />
                 </Style>
             </ListBox.ItemContainerStyle>
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <ui:Button ToolTip="{Binding Path=. ,Converter={StaticResource SearchItemToInfo}}"
-
+                               IsTabStop="True"
                                Command="{Binding Path=DataContext.OpenFileCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:FluentWindow}}}"
                                CommandParameter="{Binding .}"
                                Background="Transparent"
-                               PreviewKeyDown="Button_PreviewKeyDown">
+                               PreviewKeyDown="Button_PreviewKeyDown"
+                               >
                         <ui:Button.Resources>
                             <services:BindingProxy x:Key="Command"
                                                    Data="{Binding Path=DataContext.IgnoreItemCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:FluentWindow}}}" />
@@ -113,7 +115,7 @@
                                                 CommandParameter="{Binding}" Padding="2" />
                             <Image Grid.Column="1" HorizontalAlignment="Left" Focusable="False" Width="48"
                                    Height="48"
-                                   Source="{Binding Icon, Converter={StaticResource PathToImageConverter}}" />
+                                   Source="{Binding Icon, Converter={StaticResource PathToImageConverter},NotifyOnSourceUpdated=True}" />
                             <ui:Button Grid.Column="1"
                                        Visibility="{Binding IconSymbol,Converter={StaticResource IfNullVisibilityHidden}}"
                                        Height="48" Width="48" FontSize="48" Margin="0" Padding="0"
