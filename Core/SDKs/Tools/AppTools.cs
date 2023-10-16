@@ -345,7 +345,7 @@ public partial class AppTools
 
                         if (ConfigManger.Config.ignoreItems.Contains(targetPath))
                         {
-                            log.Debug("忽略索引:\n" + targetPath);
+                            log.Debug("忽略索引:" + targetPath);
                             return;
                         }
                     }
@@ -422,7 +422,7 @@ public partial class AppTools
 
                     if (ConfigManger.Config.ignoreItems.Contains(url))
                     {
-                        log.Debug("忽略索引:\n" + url);
+                        log.Debug("忽略索引:" + url);
                         return;
                     }
 

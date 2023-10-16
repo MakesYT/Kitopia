@@ -9,7 +9,7 @@ using System.IO;
 
 namespace Core.SDKs;
 
-public class SearchViewItem : ICloneable, IDisposable
+public class SearchViewItem : IDisposable
 {
     public string? FileName
     {
@@ -101,20 +101,6 @@ public class SearchViewItem : ICloneable, IDisposable
         get;
     }
 
-    public object Clone() =>
-        new SearchViewItem()
-        {
-            FileName = FileName,
-            IsVisible = IsVisible,
-            FileType = FileType,
-            IsStared = IsStared,
-            Action = Action,
-            OnlyKey = OnlyKey,
-            FileInfo = FileInfo != null ? new FileInfo(FileInfo.FullName) : null,
-            Icon = Icon,
-            IconPath = IconPath,
-            DirectoryInfo = DirectoryInfo != null ? new DirectoryInfo(DirectoryInfo.FullName) : null
-        };
 
     public void Dispose()
     {
@@ -124,10 +110,6 @@ public class SearchViewItem : ICloneable, IDisposable
 
     protected virtual void Dispose(bool disposing)
     {
-        if (Icon != null)
-        {
-            Icon = null;
-        }
     }
 }
 

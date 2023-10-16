@@ -24,13 +24,21 @@ public partial class PathToImageConverter : IValueConverter
 
         var icon = value as Icon;
 
-        var hIcon = icon.Handle;
-        var source = Imaging.CreateBitmapSourceFromHIcon(
-            hIcon,
-            new Int32Rect(0, 0, icon.Width, icon.Height),
-            BitmapSizeOptions.FromEmptyOptions());
-        DeleteObject(hIcon); // 释放图标句柄
-        return source;
+        try
+        {
+            var hIcon = icon.Handle;
+            var source = Imaging.CreateBitmapSourceFromHIcon(
+                hIcon,
+                new Int32Rect(0, 0, icon.Width, icon.Height),
+                BitmapSizeOptions.FromEmptyOptions());
+
+            return source;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(1);
+            return null;
+        }
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>

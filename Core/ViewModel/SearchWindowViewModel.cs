@@ -137,7 +137,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 {
                     value.FileName = $"打开文件: {value.FileName} ?";
                     Items.Insert(0, value);
-                    GetIconInItems(value);
+                    GetIconInItemsAsync(value);
                 }
             }
         }
@@ -199,7 +199,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
             {
                 if (_collection.TryGetValue(configAlwayShow, out var searchViewItem))
                 {
-                    var item = (SearchViewItem)searchViewItem.Clone();
+                    var item = (SearchViewItem)searchViewItem;
 
                     Log.Debug("加载常驻:" + item.OnlyKey);
 
@@ -208,7 +208,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     Items.Add(item);
                     if (item.Icon is null)
                     {
-                        GetIconInItems(item);
+                        GetIconInItemsAsync(item);
                     }
 
 
@@ -239,7 +239,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                         break;
                     }
 
-                    var item = (SearchViewItem)item2.Clone();
+                    var item = (SearchViewItem)item2;
 
                     Log.Debug("加载历史:" + item.OnlyKey);
 
@@ -249,7 +249,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                         Items.Add(item);
                         if (item.Icon is null)
                         {
-                            GetIconInItems(item);
+                            GetIconInItemsAsync(item);
                         }
 
                         limit++;
@@ -264,56 +264,54 @@ public partial class SearchWindowViewModel : ObservableRecipient
         // GetItemsIcon();
     }
 
-    private async Task GetIconInItems(SearchViewItem t)
+    private void GetIconInItemsAsync(SearchViewItem t)
     {
-        await Task.Run(() =>
+        //Log.Debug($"为{t.OnlyKey}生成Icon");
+        switch (t.FileType)
         {
-            //Log.Debug($"为{t.OnlyKey}生成Icon");
-            switch (t.FileType)
-            {
-                case FileType.文件夹:
-                    t.Icon = IconTools.ExtractFromPath(t.DirectoryInfo!.FullName);
-                    break;
-                case FileType.命令:
-                case FileType.URL:
-                    if (t.FileInfo is not null)
-                    {
-                        t.Icon = IconTools.GetIcon(t.FileInfo!.FullName);
-                    }
+            case FileType.文件夹:
+                IconTools.ExtractFromPath(t.DirectoryInfo!.FullName, Items, t);
+                break;
+            case FileType.命令:
+            case FileType.URL:
+                if (t.FileInfo is not null)
+                {
+                    IconTools.GetIcon(t.FileInfo!.FullName, Items, t);
+                }
 
-                    break;
-                case FileType.数学运算:
-                case FileType.剪贴板图像:
-                case FileType.None:
-                    break;
-                case FileType.自定义:
-                    if (t.GetIconAction != null)
-                    {
-                        var icon3 = t.GetIconAction(t);
-                        t.Icon = icon3;
-                    }
+                break;
+            case FileType.数学运算:
+            case FileType.剪贴板图像:
+            case FileType.None:
+                break;
+            case FileType.自定义:
+                if (t.GetIconAction != null)
+                {
+                    var icon3 = t.GetIconAction(t);
+                    t.Icon = icon3;
+                }
 
-                    break;
-                case FileType.UWP应用:
-                    t.Icon = IconTools.GetIcon(t.IconPath!);
-                    break;
-                case FileType.应用程序:
-                case FileType.Word文档:
-                case FileType.PPT文档:
-                case FileType.Excel文档:
-                case FileType.PDF文档:
-                case FileType.图像:
-                case FileType.文件:
+                break;
+            case FileType.UWP应用:
+                IconTools.GetIcon(t.IconPath!, Items, t);
+                break;
+            case FileType.应用程序:
+            case FileType.Word文档:
+            case FileType.PPT文档:
+            case FileType.Excel文档:
+            case FileType.PDF文档:
+            case FileType.图像:
+            case FileType.文件:
 
-                case FileType.自定义情景:
-                case FileType.便签:
-                default:
-                    t.Icon = IconTools.GetIcon(t.FileInfo!.FullName);
-                    break;
-            }
+            case FileType.自定义情景:
+            case FileType.便签:
+            default:
+                IconTools.GetIcon(t.FileInfo!.FullName, Items, t);
+                break;
+        }
+        //Log.Debug(t.OnlyKey);
 
-            OnPropertyChanged(nameof(Items));
-        });
+        //
     }
 
     private readonly DelayAction _searchDelayAction = new();
@@ -471,7 +469,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
             {
                 if (ConfigManger.Config.lastOpens.TryGetValue(sorted[i].Item.OnlyKey, out var open))
                 {
-                    nowHasLastOpens.Add((SearchViewItem)sorted[i].Item.Clone(), open);
+                    nowHasLastOpens.Add((SearchViewItem)sorted[i].Item, open);
                     sorted.RemoveAt(i);
                 }
             }
@@ -489,7 +487,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
                 if (searchViewItem.Icon is null)
                 {
-                    GetIconInItems(searchViewItem);
+                    GetIconInItemsAsync(searchViewItem);
                 }
 
                 count++;
@@ -504,7 +502,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     break; // 跳出循环
                 }
 
-                var searchViewItem = (SearchViewItem)x.Item.Clone();
+                var searchViewItem = (SearchViewItem)x.Item;
                 {
                     Log.Debug("添加搜索结果" + x.Item.OnlyKey);
 
@@ -517,7 +515,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
                     if (searchViewItem.Icon is null)
                     {
-                        GetIconInItems(searchViewItem);
+                        GetIconInItemsAsync(searchViewItem);
                     }
 
                     Items.Add(searchViewItem); // 添加元素

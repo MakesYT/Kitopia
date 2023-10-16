@@ -141,6 +141,7 @@ public sealed partial class App : Application
             XmlConfigurator.Configure(logConfigStream);
 
             CheckAndDeleteLogFiles();
+
             AppDomain.CurrentDomain.ProcessExit += Application_ApplicationExit;
             ServiceManager.Services = ConfigureServices();
 
@@ -167,7 +168,6 @@ public sealed partial class App : Application
             ShowHelper(initWindow!);
             initWindow!.Hide();
             Current.MainWindow = initWindow;
-            //initWindow.Visibility = Visibility.Hidden;
             ServicePointManager.DefaultConnectionLimit = 10240;
 
             if (ConfigManger.Config.autoStart)
@@ -201,7 +201,6 @@ public sealed partial class App : Application
         User32.ShowWindow(new HandleRef(window,
             (IntPtr)type.GetProperty("CriticalHandle", BindingFlags.Instance | BindingFlags.NonPublic)!
                 .GetValue(window)!).Handle, ShowWindowCommand.SW_HIDE);
-        //UnsafeNativeMethods.ShowWindow(new HandleRef(this, CriticalHandle), nCmd);
         typeof(Window).GetMethod("SafeStyleSetter", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(window,
             null);
 
@@ -351,14 +350,10 @@ public sealed partial class App : Application
 
     private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
     {
-        // Current.Dispatcher.BeginInvoke(new Action(delegate
-        // {
-
         log.Error(e.ExceptionObject);
         var error = new ErrorDialog("", "（1）发生了一个错误！" + Environment.NewLine
                                                       + e.ExceptionObject);
         error.ShowDialog();
-        // }));
     }
 
     private void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
@@ -409,11 +404,6 @@ public sealed partial class App : Application
                                                                   + "（5）报错区域：" + e.Exception.InnerException
                                                                       .StackTrace);
                     error.ShowDialog();
-                    //MessageBox.Show("（1）发生了一个错误！" + Environment.NewLine
-                    //                    + "（2）错误源：" + e.Exception.InnerException.Source + Environment.NewLine
-                    //                    + "（3）错误信息：" + e.Exception.Message + Environment.NewLine
-                    //                    + "（4）详细信息：" + e.Exception.InnerException.Message + Environment.NewLine
-                    //                    + "（5）报错区域：" + e.Exception.InnerException.StackTrace);
                 }
             }
             catch (Exception e2)

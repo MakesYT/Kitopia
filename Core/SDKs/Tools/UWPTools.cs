@@ -58,7 +58,7 @@ public static class UwpTools
     {
         if (ConfigManger.Config.ignoreItems.Contains(appContainer.appContainerName))
         {
-            Log.Debug("忽略索引:\n" + appContainer.appContainerName);
+            Log.Debug("忽略索引:" + appContainer.appContainerName);
             return;
         }
 

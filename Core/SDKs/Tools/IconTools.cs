@@ -1,11 +1,14 @@
 ﻿#region
 
+using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Windows;
 using System.Xml;
 using Core.SDKs.Services;
 using log4net;
+using Size = System.Drawing.Size;
 
 #endregion
 
@@ -20,7 +23,6 @@ public class IconTools
     private const uint SHGFI_USEFILEATTRIBUTES = 0x000000010;
     private const uint SHGFI_OPENICON = 0x000000002;
     private static readonly Dictionary<string, Icon> _icons = new(250);
-    private static Semaphore semaphore = new(3, 6);
 
 
     [DllImport("User32.dll")]
@@ -55,8 +57,16 @@ public class IconTools
                 using var iconBm = new Bitmap(bm, new Size(64, 64));
                 //如果是windows调用，直接下面一行代码就可以了
                 //此代码不能在web程序中调用，会有安全异常抛出
-                var icon = Icon.FromHandle(iconBm.GetHicon());
-                return icon;
+                retry:
+                try
+                {
+                    var icon = Icon.FromHandle(iconBm.GetHicon());
+                    return icon;
+                }
+                catch (Exception e)
+                {
+                    goto retry;
+                }
             }
         }
 
@@ -139,12 +149,19 @@ public class IconTools
             SHGFI_ICON | SHGFI_LARGEICON | SHGFI_USEFILEATTRIBUTES | SHGFI_OPENICON);
 
 
-        return (Icon)Icon.FromHandle(shinfo.hIcon);
+        try
+        {
+            return (Icon)Icon.FromHandle(shinfo.hIcon);
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
     }
 
-    public static Icon GetIcon(string path)
+    public static void GetIcon(string path, BindingList<SearchViewItem> items, SearchViewItem item)
     {
-        semaphore.WaitOne();
+        //log.Debug(1);
         var mscFile = false;
         string cacheKey;
         switch (path.ToLower().Split(".").Last())
@@ -173,19 +190,30 @@ public class IconTools
             }
         }
 
-        log.Debug(cacheKey);
-
         //缓存
         if (_icons.TryGetValue(cacheKey, out var icon2))
         {
-            return icon2;
+            item.Icon = icon2;
         }
 
-        var iconBase = GetIconBase(path, cacheKey, mscFile);
-        var clone = (Icon)iconBase.Clone();
-        iconBase.Dispose();
-        semaphore.Release();
-        return clone;
+        Task.Run(() =>
+        {
+            retry:
+            var iconBase = GetIconBase(path, cacheKey, mscFile);
+            if (iconBase == null)
+            {
+                goto retry;
+            }
+
+            var clone = (Icon)iconBase.Clone();
+            _icons.TryAdd(cacheKey, clone);
+            iconBase.Dispose();
+            item.Icon = clone;
+            Application.Current.Dispatcher.BeginInvoke(() =>
+            {
+                items.ResetItem(items.IndexOf(item));
+            });
+        });
     }
 
     public Icon? GetFormClipboard()
@@ -214,22 +242,38 @@ public class IconTools
     }
 
 
-    public static Icon ExtractFromPath(string path)
+    public static void ExtractFromPath(string path, BindingList<SearchViewItem> items, SearchViewItem item)
     {
         if (_icons.TryGetValue(path, out var fromPath))
         {
-            return fromPath;
+            item.Icon = fromPath;
         }
 
-        var shinfo = new SHFILEINFO();
-        SHGetFileInfo(
-            path,
-            0, ref shinfo, (uint)Marshal.SizeOf(shinfo),
-            SHGFI_ICON | SHGFI_LARGEICON);
-        var independenceIcon12 = (Icon)Icon.FromHandle(shinfo.hIcon).Clone();
-        DestroyIcon(shinfo.hIcon);
-        _icons.TryAdd(path, independenceIcon12);
-        return independenceIcon12;
+        Task.Run(() =>
+        {
+            retry:
+            try
+            {
+                var shinfo = new SHFILEINFO();
+                SHGetFileInfo(
+                    path,
+                    0, ref shinfo, (uint)Marshal.SizeOf(shinfo),
+                    SHGFI_ICON | SHGFI_LARGEICON);
+                var independenceIcon12 = (Icon)Icon.FromHandle(shinfo.hIcon).Clone();
+                DestroyIcon(shinfo.hIcon);
+                _icons.TryAdd(path, independenceIcon12);
+                item.Icon = independenceIcon12;
+            }
+            catch (Exception e)
+            {
+                goto retry;
+            }
+
+            Application.Current.Dispatcher.BeginInvoke(() =>
+            {
+                items.ResetItem(items.IndexOf(item));
+            });
+        });
     }
 
     [DllImport("shell32.dll")]
