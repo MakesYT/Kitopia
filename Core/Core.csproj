@@ -29,7 +29,6 @@
 
     <ItemGroup>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1"/>
-        <PackageReference Include="CoreCLR-NCalc" Version="2.2.113"/>
         <PackageReference Include="log4net" Version="2.0.15"/>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
         <PackageReference Include="NPinyinPro" Version="0.3.3"/>

@@ -17,7 +17,6 @@ using Core.SDKs.Services.Plugin;
 using Core.SDKs.Tools;
 using log4net;
 using Vanara.PInvoke;
-using Expression = NCalc.Expression;
 
 #endregion
 
@@ -386,16 +385,17 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
             #region 数学运算
 
-            var operators = new[] { '*', '+', '-', '/' };
+            var operators = new[] { '*', '+', '-', '/', '^' };
             var pattern = @"[\u4e00-\u9fa5a-zA-Z]+";
-            if (!Regex.Match(value, pattern, RegexOptions.NonBacktracking).Success && value.IndexOfAny(operators) > 0)
+            if (Regex.Match(value, pattern, RegexOptions.NonBacktracking).Value == "" &&
+                value.IndexOfAny(operators) > -1)
             {
                 try
                 {
-                    var e = new Expression(value);
+                    var e = SDKs.Tools.Math.Evaluate(value);
                     Items.Add(new SearchViewItem()
                     {
-                        FileName = "=" + e.Evaluate(),
+                        FileName = "=" + e,
                         FileType = FileType.数学运算,
                         OnlyKey = value,
                         Icon = null,
