@@ -20,24 +20,29 @@ public class MyDataTemplateSelector : DataTemplateSelector
             // Check the type of the item and return the corresponding data template from the resources
             if (item is ConnectorItem pointItem && pointItem.IsSelf)
             {
-                if (pointItem.Type.FullName == "System.String")
+                if (pointItem.RealType.FullName == "System.String")
                 {
                     return element.FindResource("StringTemplate") as DataTemplate;
                 }
 
-                if (pointItem.Type.FullName == "System.Int32")
+                if (pointItem.RealType.FullName == "System.Int32")
                 {
                     return element.FindResource("IntTemplate") as DataTemplate;
                 }
 
-                if (pointItem.Type.FullName == "System.Double")
+                if (pointItem.RealType.FullName == "System.Double")
                 {
                     return element.FindResource("DoubleTemplate") as DataTemplate;
                 }
 
-                if (pointItem.Type.FullName == "System.Boolean")
+                if (pointItem.RealType.FullName == "System.Boolean")
                 {
                     return element.FindResource("BoolTemplate") as DataTemplate;
+                }
+
+                if (pointItem.RealType.FullName == "Core.SDKs.SearchViewItem")
+                {
+                    return element.FindResource("SearchItemTemplate") as DataTemplate;
                 }
             }
 

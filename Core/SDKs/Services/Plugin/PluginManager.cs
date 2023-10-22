@@ -4,6 +4,7 @@ using System.IO;
 using System.Windows;
 using Core.SDKs.Services.Config;
 using log4net;
+using PluginCore;
 
 #endregion
 
@@ -18,6 +19,7 @@ public class PluginManager
     {
         ThreadPool.QueueUserWorkItem((e) =>
         {
+            Kitopia.ISearchItemTool = (ISearchItemTool)ServiceManager.Services.GetService(typeof(ISearchItemTool))!;
             var pluginsDirectoryInfo = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "plugins");
             if (!pluginsDirectoryInfo.Exists)
             {
@@ -57,7 +59,7 @@ public class PluginManager
             Log.Debug("Debug加载测试插件");
 
             var pluginInfoEx1 = Plugin.GetPluginInfoEx(
-                @"D:\WPF.net\uToolkitopia\PluginDemo\bin\Debug\net7.0-windows\PluginDemo.dll",
+                @"D:\WPF.net\uToolkitopia\KitopiaEx\bin\Debug\net7.0-windows\KitopiaEx.dll",
                 out var alcWeakRef1);
 
 

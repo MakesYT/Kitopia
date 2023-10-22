@@ -2,6 +2,7 @@
 using System.IO;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.Services.Plugin;
+using Core.ViewModel;
 using log4net;
 using Newtonsoft.Json;
 
@@ -91,6 +92,9 @@ public partial class CustomScenarioManger
                         throw new CustomScenarioLoadFromJsonException(nodePlugin, node.MerthodName);
                     }
 
+                    //
+
+
                     deserializeObject.IsRunning = false;
                     CustomScenarios.Add(deserializeObject);
                 }
@@ -127,6 +131,30 @@ public partial class CustomScenarioManger
             var s = Guid.NewGuid().ToString();
             scenario.UUID = s;
             CustomScenarios.Add(scenario);
+        }
+
+        if (scenario.ExecutionManual)
+        {
+            if (scenario.Keys.Any())
+            {
+                var viewItem1 = new SearchViewItem()
+                {
+                    FileName = "执行自定义情景:" + scenario.Name,
+                    FileType = FileType.自定义情景,
+                    OnlyKey = $"CustomScenario:{scenario.UUID}",
+                    Keys = scenario.Keys.ToHashSet(),
+                    Icon = null,
+                    IconSymbol = 0xF78B,
+                    IsVisible = true
+                };
+                ((SearchWindowViewModel)ServiceManager.Services.GetService(typeof(SearchWindowViewModel))!)
+                    ._collection.TryAdd($"CustomScenario:{scenario.UUID}", viewItem1);
+            }
+            else
+            {
+                ((SearchWindowViewModel)ServiceManager.Services.GetService(typeof(SearchWindowViewModel))!)
+                    ._collection.Remove($"CustomScenario:{scenario.UUID}");
+            }
         }
 
         var configF = new FileInfo(AppDomain.CurrentDomain.BaseDirectory + $"customScenarios\\{scenario.UUID}.json");

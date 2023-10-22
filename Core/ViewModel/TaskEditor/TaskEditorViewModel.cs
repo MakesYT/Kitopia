@@ -40,10 +40,12 @@ public partial class TaskEditorViewModel : ObservableRecipient
     private void AddNodes(PointItem pointItem)
     {
         IsModified = true;
+
         var item = new PointItem()
         {
             Title = pointItem.Title,
             Plugin = pointItem.Plugin,
+            UUID = Guid.NewGuid().ToString(),
             MerthodName = pointItem.MerthodName,
             Location = new Point(pointItem.Location.X, pointItem.Location.Y)
         };
@@ -57,6 +59,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 TypeName = connectorItem.TypeName,
                 Title = connectorItem.Title,
                 Type = connectorItem.Type,
+                RealType = connectorItem.RealType,
                 InputObject = connectorItem.InputObject,
                 AutoUnboxIndex = connectorItem.AutoUnboxIndex,
                 IsConnected = connectorItem.IsConnected,
@@ -74,6 +77,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 Source = item,
                 Title = connectorItem.Title,
                 TypeName = connectorItem.TypeName,
+                RealType = connectorItem.RealType,
                 AutoUnboxIndex = connectorItem.AutoUnboxIndex,
                 Type = connectorItem.Type,
                 IsConnected = connectorItem.IsConnected,
@@ -96,7 +100,6 @@ public partial class TaskEditorViewModel : ObservableRecipient
         item.Input = input;
         item.Output = output;
         Scenario.nodes.Add(item);
-        //OnPropertyChanged(nameof(Nodes));
     }
 
     [ObservableProperty]
@@ -384,6 +387,12 @@ public partial class PointItem : ObservableRecipient
         set;
     }
 
+    public string UUID
+    {
+        get;
+        set;
+    }
+
     public string MerthodName
     {
         get;
@@ -416,6 +425,7 @@ public partial class ConnectorItem : ObservableRecipient
     [ObservableProperty] private bool _isSelf = false;
     [ObservableProperty] private object? _inputObject; //数据
 
+
     public int AutoUnboxIndex
     {
         get;
@@ -434,11 +444,25 @@ public partial class ConnectorItem : ObservableRecipient
         set;
     }
 
+    /// <summary>
+    /// 输出的类型
+    /// </summary>
     [JsonConverter(typeof(TypeJsonConverter))]
     public Type Type
     {
         get;
         set;
+    }
+
+    private Type? _realType;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public Type RealType
+    {
+        get => _realType ?? Type;
+        set => _realType = value;
     }
 
     public List<string>? Interfaces

@@ -17,6 +17,7 @@
                 <ResourceDictionary Source="Controls/MessageBoxControl/MessageBox.xaml" />
                 <ResourceDictionary Source="Controls/HotKeyShow.xaml" />
                 <ResourceDictionary Source="Controls/HotKeyShowItme.xaml" />
+                <ResourceDictionary Source="Controls/SearchItemShow.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Nodify;component/Themes/Light.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <crt:DoubleHalfConverter x:Key="doubleHalfConverter" />

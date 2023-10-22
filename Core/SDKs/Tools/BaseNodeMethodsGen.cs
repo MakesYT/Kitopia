@@ -16,7 +16,7 @@ public class BaseNodeMethodsGen
         { "字符串", typeof(string) },
         { "布尔", typeof(bool) },
         { "整型", typeof(int) },
-        { "双精度浮点数", typeof(double) }
+        { "双精度浮点数", typeof(double) },
     };
 
     public static Dictionary<string, string> _i18n = new()
@@ -26,7 +26,7 @@ public class BaseNodeMethodsGen
         { "System.Int32", "整数" },
         { "System.Double", "浮点" },
         { "System.Object", "任意" },
-        { "PluginCore.NodeConnectorClass", "节点" }
+        { "PluginCore.NodeConnectorClass", "节点" },
     };
 
     public static string GetI18N(string key)
@@ -78,6 +78,40 @@ public class BaseNodeMethodsGen
             nodes.Add(String);
         } //基本数值类型
 
+        //SearchItem
+        var point = new PointItem()
+        {
+            Plugin = "Kitopia",
+            MerthodName = "本地项目",
+            Title = "本地项目"
+        };
+        ObservableCollection<ConnectorItem> pointOutItems = new()
+        {
+            new ConnectorItem()
+            {
+                Source = point,
+                Type = typeof(string),
+                Title = "本地项目",
+                TypeName = "字符串",
+                IsOut = true
+            }
+        };
+        point.Output = pointOutItems;
+        ObservableCollection<ConnectorItem> pointInItems = new()
+        {
+            new ConnectorItem()
+            {
+                Source = point,
+                Type = typeof(string),
+                RealType = typeof(SearchViewItem),
+                InputObject = "",
+                Title = "本地项目",
+                TypeName = "字符串",
+                IsSelf = true
+            }
+        };
+        point.Input = pointInItems;
+        nodes.Add(point);
         //if
         {
             var String = new PointItem()

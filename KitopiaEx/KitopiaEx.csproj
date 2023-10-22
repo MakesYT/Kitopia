@@ -5,6 +5,8 @@
         <Nullable>enable</Nullable>
         <UseWPF>true</UseWPF>
         <EnableDynamicLoading>true</EnableDynamicLoading>
+        <AssemblyName>KitopiaEx</AssemblyName>
+        <RootNamespace>KitopiaEx</RootNamespace>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">

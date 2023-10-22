@@ -16,6 +16,7 @@ using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
 using Core.SDKs.Tools;
 using log4net;
+using PluginCore;
 using Vanara.PInvoke;
 
 #endregion
@@ -25,7 +26,7 @@ namespace Core.ViewModel;
 public partial class SearchWindowViewModel : ObservableRecipient
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(SearchWindowViewModel));
-    private readonly Dictionary<string, SearchViewItem> _collection = new(400); //存储本机所有软件
+    public readonly Dictionary<string, SearchViewItem> _collection = new(400); //存储本机所有软件
 
     [ObservableProperty] private bool? _everythingIsOk = true;
     private static readonly List<SearchViewItem> TempList = new(1000);
@@ -279,6 +280,8 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 }
 
                 break;
+            case FileType.自定义情景:
+            case FileType.便签:
             case FileType.数学运算:
             case FileType.剪贴板图像:
             case FileType.None:
@@ -302,8 +305,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
             case FileType.图像:
             case FileType.文件:
 
-            case FileType.自定义情景:
-            case FileType.便签:
+
             default:
                 IconTools.GetIcon(t.FileInfo!.FullName, Items, t);
                 break;
@@ -362,26 +364,6 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 }
             }
 
-
-            //自定义情景
-            foreach (var customScenario in CustomScenarioManger.CustomScenarios)
-            {
-                if (!customScenario.ExecutionManual || !customScenario.Keys.Contains(value))
-                {
-                    continue;
-                }
-
-                var viewItem1 = new SearchViewItem()
-                {
-                    FileName = "执行自定义情景:" + customScenario.Name,
-                    FileType = FileType.自定义情景,
-                    OnlyKey = customScenario.UUID,
-                    Icon = null,
-                    IconSymbol = 0xF78B,
-                    IsVisible = true
-                };
-                Items.Add(viewItem1);
-            }
 
             #region 数学运算
 
@@ -629,88 +611,32 @@ public partial class SearchWindowViewModel : ObservableRecipient
     }
 
 
+    private bool nowInSelectMode = false;
+    private Action<SearchViewItem> selectAction;
+
+    public void SetSelectMode(bool flag, Action<SearchViewItem> action)
+    {
+        nowInSelectMode = flag;
+        selectAction = action;
+    }
+
     [RelayCommand]
-    public async Task OpenFile(SearchViewItem item) =>
+    public async Task OpenFile(SearchViewItem item)
+    {
         await Task.Run(() =>
         {
-            WeakReferenceMessenger.Default.Send("a", "SearchWindowClose");
-            Log.Debug("打开指定内容" + item.OnlyKey);
-            switch (item.OnlyKey)
+            if (nowInSelectMode)
             {
-                case "ClipboardImageData":
-                {
-                    var fileName = ((IClipboardService)ServiceManager.Services!.GetService(typeof(IClipboardService))!)
-                        .saveBitmap();
-                    if (string.IsNullOrEmpty(fileName))
-                    {
-                        Log.Error("剪贴板图片保存失败");
-                        ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show("剪贴板图片保存失败");
-                        return;
-                    }
-
-                    Shell32.ShellExecute(IntPtr.Zero, "open", "explorer.exe", "/select," + fileName, "",
-                        ShowWindowCommand.SW_NORMAL);
-                    return;
-                }
-                case "Math": break;
-                default:
-                {
-                    switch (item.FileType)
-                    {
-                        case FileType.UWP应用:
-                            //explorer.exe shell:AppsFolder\Microsoft.WindowsMaps_8wekyb3d8bbwe!App
-                            Shell32.ShellExecute(IntPtr.Zero, "open", "explorer.exe",
-                                $"shell:AppsFolder\\{item.OnlyKey}", "",
-                                ShowWindowCommand.SW_NORMAL);
-                            break;
-                        case FileType.自定义情景:
-                            CustomScenarioManger.CustomScenarios.First((e) => e.UUID == item.OnlyKey).Run();
-                            break;
-                        case FileType.便签:
-                            ((ILabelWindowService)ServiceManager.Services.GetService(typeof(ILabelWindowService))!)
-                                .Show(item.OnlyKey);
-                            break;
-                        case FileType.自定义:
-                            item.Action?.Invoke(item);
-                            break;
-                        default:
-                            Shell32.ShellExecute(IntPtr.Zero, "open", item.OnlyKey, "", "",
-                                ShowWindowCommand.SW_NORMAL);
-                            break;
-                    }
-
-                    switch (item.FileType)
-                    {
-                        case FileType.文件夹:
-                        case FileType.应用程序:
-                        case FileType.Word文档:
-                        case FileType.PPT文档:
-                        case FileType.Excel文档:
-                        case FileType.PDF文档:
-                        case FileType.图像:
-                        case FileType.文件:
-                        {
-                            if (ConfigManger.Config.lastOpens.ContainsKey(item.OnlyKey))
-                            {
-                                ConfigManger.Config.lastOpens[item.OnlyKey]++;
-                            }
-                            else
-                            {
-                                ConfigManger.Config.lastOpens.Add(item.OnlyKey, 1);
-                            }
-
-                            break;
-                        }
-                    }
-
-
-                    //if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
-                    Search = "";
-                    ConfigManger.Save();
-                    return;
-                }
+                selectAction.Invoke(item);
+                nowInSelectMode = false;
+                WeakReferenceMessenger.Default.Send("a", "SearchWindowClose");
+                return;
             }
+
+            ((ISearchItemTool)ServiceManager.Services.GetService(typeof(ISearchItemTool))!).OpenSearchItem(item);
         });
+        Search = "";
+    }
 
     [RelayCommand]
     private async Task IgnoreItem(SearchViewItem searchViewItem)

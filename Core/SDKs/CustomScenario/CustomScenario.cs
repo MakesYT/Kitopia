@@ -129,6 +129,7 @@ public partial class CustomScenario : ObservableRecipient
         var firstNodes = connectionItem.Target.Source;
         try
         {
+            _tasks.Add(firstNodes, null);
             ParsePointItem(firstNodes, false, notRealTime);
         }
         catch (Exception e)
@@ -232,10 +233,11 @@ public partial class CustomScenario : ObservableRecipient
                         {
                             ParsePointItem(sourceSource, true, notRealTime);
                         });
-                        task.Start();
+
                         // Log.Debug(sourceSource.Title);
                         _tasks.Add(sourceSource, task);
                         sourceDataTask.Add(task);
+                        task.Start();
                     }
                 }
             }
@@ -262,7 +264,7 @@ public partial class CustomScenario : ObservableRecipient
             }
         }
 
-        //源数据全部生成
+
         if (!valid)
         {
             goto finnish;
@@ -489,8 +491,9 @@ public partial class CustomScenario : ObservableRecipient
                         {
                             ParsePointItem(nextPointItem, false, notRealTime);
                         });
-                        task.Start();
+
                         _tasks.Add(nextPointItem, task);
+                        task.Start();
                     }
                 }
             }

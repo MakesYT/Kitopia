@@ -3,7 +3,7 @@ using log4net;
 
 namespace Core.SDKs.Tools;
 
-public class Math
+public static class Math
 {
     private static readonly ILog log = LogManager.GetLogger(nameof(Math));
 

@@ -6,9 +6,15 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using Core.SDKs.CustomScenario;
+using Core.SDKs.Services;
+using Core.ViewModel;
 using Core.ViewModel.TaskEditor;
+using Kitopia.Controls;
+using Microsoft.Extensions.DependencyInjection;
+using Vanara.PInvoke;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
+using MouseButtonState = System.Windows.Input.MouseButtonState;
 
 #endregion
 
@@ -104,5 +110,22 @@ public partial class TaskEditor
             var parent = ((Control)sender).Parent as UIElement;
             parent.RaiseEvent(eventArg);
         }
+    }
+
+    private void SearchItemShow_OnClick(object sender, RoutedEventArgs e)
+    {
+        ServiceManager.Services.GetService<SearchWindowViewModel>()!.SetSelectMode(true, (item =>
+        {
+            Application.Current.Dispatcher.BeginInvoke(() =>
+            {
+                ((SearchItemShow)sender).OnlyKey = item.OnlyKey;
+            });
+        }));
+        ServiceManager.Services.GetService<SearchWindow>()!.Show();
+
+        User32.SetForegroundWindow(
+            new WindowInteropHelper(ServiceManager.Services.GetService<SearchWindow>()!)
+                .Handle);
+        ServiceManager.Services.GetService<SearchWindow>()!.tx.Focus();
     }
 }

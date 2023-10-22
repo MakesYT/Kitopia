@@ -1,6 +1,5 @@
 ﻿#region
 
-using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
@@ -162,17 +161,32 @@ public partial class AppTools
         bool logging = false)
     {
         log.Debug("索引全部软件及收藏项目");
-        Stopwatch stopwatch = new Stopwatch();
-        stopwatch.Start();
+        foreach (var customScenario in CustomScenarioManger.CustomScenarios)
+        {
+            if (customScenario.ExecutionManual)
+            {
+                if (customScenario.Keys.Any())
+                {
+                    var viewItem1 = new SearchViewItem()
+                    {
+                        FileName = "执行自定义情景:" + customScenario.Name,
+                        FileType = FileType.自定义情景,
+                        OnlyKey = $"CustomScenario:{customScenario.UUID}",
+                        Keys = customScenario.Keys.ToHashSet(),
+                        Icon = null,
+                        IconSymbol = 0xF78B,
+                        IsVisible = true
+                    };
+
+                    collection.TryAdd($"CustomScenario:{customScenario.UUID}", viewItem1);
+                }
+            }
+        }
 
 
         UwpTools.GetAll(collection);
-        stopwatch.Stop();
 
-        log.Debug($"索引UWP软件耗时{stopwatch.ElapsedMilliseconds}ms");
 
-        stopwatch.Reset();
-        stopwatch.Start();
         // 创建一个空的文件路径集合
         List<string> filePaths = new();
 
@@ -221,8 +235,7 @@ public partial class AppTools
         {
         }
 
-        stopwatch.Stop();
-        log.Debug($"索引软件耗时{stopwatch.ElapsedMilliseconds}ms");
+
         //AutoStartEverything(collection);
         if (ErrorLnkList.Any())
         {

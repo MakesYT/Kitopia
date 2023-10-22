@@ -38,7 +38,10 @@
                           PlaceholderText="浮点" />
         </DataTemplate>
         <DataTemplate x:Key="BoolTemplate" DataType="{x:Type taskEditor:ConnectorItem}">
-            <ui:ToggleSwitch Margin="10,5,10,5" MinWidth="40" IsChecked="{Binding InputObject}" />
+            <ui:ToggleSwitch Margin="10,5,10,5" MinWidth="40" IsChecked="{Binding InputObject, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        </DataTemplate>
+        <DataTemplate x:Key="SearchItemTemplate" DataType="{x:Type taskEditor:ConnectorItem}">
+            <controls:SearchItemShow ToolTip="{Binding RelativeSource={RelativeSource self},Path=OnlyKey}" Click="SearchItemShow_OnClick" OnlyKey="{Binding InputObject, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,NotifyOnSourceUpdated=True}" />
         </DataTemplate>
         <GeometryDrawing x:Key="SmallGridGeometry"
                          Geometry="M0,0 L0,1 0.03,1 0.03,0.03 1,0.03 1,0 Z"

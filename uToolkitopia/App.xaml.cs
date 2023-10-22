@@ -28,6 +28,7 @@ using log4net.Config;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Win32;
+using PluginCore;
 using Vanara.PInvoke;
 using Wpf.Ui;
 using ContentDialogService = Kitopia.Services.ContentDialogService;
@@ -308,6 +309,7 @@ public sealed partial class App : Application
         services.AddSingleton<IconTools>();
         services.AddTransient<IThemeChange, ThemeChange>();
         services.AddTransient<IToastService, ToastService>();
+        services.AddTransient<ISearchItemTool, SearchItemTool>();
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddTransient<INavigationPageService, NavigationPageService>();
         services.AddTransient<ILabelWindowService, LabelWindowService>();
