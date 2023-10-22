@@ -119,27 +119,33 @@ public partial class SearchWindowViewModel : ObservableRecipient
         }
 
         var data = Clipboard.GetDataObject()!;
-        if (data.GetDataPresent(DataFormats.Text))
+        try
         {
-            var text = (string)data.GetData(DataFormats.Text)!;
-            if (text.StartsWith("\""))
+            if (data.GetDataPresent(DataFormats.Text))
             {
-                text = text.Replace("\"", "");
-            }
-
-            //检测路径
-            if (text.Contains("\\") || text.Contains("/"))
-            {
-                Log.Debug("检测路径");
-                Dictionary<string, SearchViewItem> a = new();
-                AppTools.AppSolverA(a, text).Wait();
-                foreach (var (key, value) in a)
+                var text = (string)data.GetData(DataFormats.Text)!;
+                if (text.StartsWith("\""))
                 {
-                    value.FileName = $"打开文件: {value.FileName} ?";
-                    Items.Insert(0, value);
-                    GetIconInItemsAsync(value);
+                    text = text.Replace("\"", "");
+                }
+
+                //检测路径
+                if (text.Contains("\\") || text.Contains("/"))
+                {
+                    Log.Debug("检测路径");
+                    Dictionary<string, SearchViewItem> a = new();
+                    AppTools.AppSolverA(a, text).Wait();
+                    foreach (var (key, value) in a)
+                    {
+                        value.FileName = $"打开文件: {value.FileName} ?";
+                        Items.Insert(0, value);
+                        GetIconInItemsAsync(value);
+                    }
                 }
             }
+        }
+        catch (Exception e)
+        {
         }
 
 
@@ -456,7 +462,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 }
             }
 
-            var sortedDict = nowHasLastOpens.AsParallel().OrderByDescending(p => p.Value)
+            var sortedDict = nowHasLastOpens.OrderByDescending(p => p.Value)
                 .ToDictionary(p => p.Key, p => p.Value);
             foreach (var (searchViewItem, i) in sortedDict)
             {

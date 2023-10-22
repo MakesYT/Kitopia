@@ -73,6 +73,7 @@ public class SearchItemTool : ISearchItemTool
                     case FileType.PDF文档:
                     case FileType.图像:
                     case FileType.文件:
+                    case FileType.自定义情景:
                     {
                         if (ConfigManger.Config.lastOpens.ContainsKey(item.OnlyKey))
                         {
