@@ -20,20 +20,62 @@ namespace Core.ViewModel.TaskEditor;
 
 public partial class TaskEditorViewModel : ObservableRecipient
 {
+    private static readonly ILog Log = LogManager.GetLogger(nameof(TaskEditorViewModel));
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(SaveCustomScenarioCommand))]
+    [NotifyCanExecuteChangedFor(nameof(SaveAndQuitCustomScenarioCommand))]
+    public bool _isModified = false;
+
+    [ObservableProperty] private BindingList<BindingList<object>> _nodeMethods = new();
+
+    [ObservableProperty] private CustomScenario _scenario = new CustomScenario() { IsActive = true };
+
+
+    private Window _window;
+
+    public TaskEditorViewModel()
+    {
+        Scenario.PropertyChanged += (e, s) =>
+        {
+            if (s.PropertyName == "Name")
+            {
+                Scenario.nodes[0].Title = Scenario.Name;
+            }
+
+            IsModified = true;
+        };
+        PendingConnection = new PendingConnectionViewModel(this);
+        GetAllMethods();
+        var nodify2 = new PointItem()
+        {
+            Title = "任务1"
+        };
+        nodify2.Output = new ObservableCollection<ConnectorItem>
+        {
+            new()
+            {
+                IsOut = true,
+                Source = nodify2,
+                Type = typeof(NodeConnectorClass),
+                TypeName = BaseNodeMethodsGen.GetI18N(typeof(NodeConnectorClass).FullName),
+                Title = "开始"
+            }
+        };
+        Scenario.nodes.Add(nodify2);
+        //nodeMethods.Add("new PointItem(){Title = \"Test\"}");
+    }
+
     public object ContentPresenter
     {
         get;
         set;
     }
 
-    private static readonly ILog Log = LogManager.GetLogger(nameof(TaskEditorViewModel));
-
     public PendingConnectionViewModel PendingConnection
     {
         get;
     }
-
-    [ObservableProperty] private BindingList<BindingList<object>> _nodeMethods = new();
 
 
     [RelayCommand]
@@ -102,10 +144,52 @@ public partial class TaskEditorViewModel : ObservableRecipient
         Scenario.nodes.Add(item);
     }
 
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(SaveCustomScenarioCommand))]
-    [NotifyCanExecuteChangedFor(nameof(SaveAndQuitCustomScenarioCommand))]
-    public bool _isModified = false;
+    [RelayCommand]
+    private void DelNode(PointItem pointItem)
+    {
+        IsModified = true;
+        if (Scenario.nodes.IndexOf(pointItem) == 0)
+        {
+            return;
+        }
+
+        var connectionItems = Scenario.connections
+            .Where((e) => e.Source.Source == pointItem || e.Target.Source == pointItem).ToList();
+        foreach (var connectionItem in connectionItems)
+        {
+            Scenario.connections.Remove(connectionItem);
+            if (Scenario.connections.All(e => e.Source != connectionItem.Source))
+            {
+                connectionItem.Source.IsConnected = false;
+            }
+
+            if (Scenario.connections.All(e => e.Target != connectionItem.Target))
+            {
+                connectionItem.Target.IsConnected = false;
+            }
+        }
+
+        Scenario.nodes.Remove(pointItem);
+    }
+
+    [RelayCommand]
+    private void DelConnection(ConnectionItem connection)
+    {
+        IsModified = true;
+        Scenario.connections.Remove(connection);
+        if (Scenario.connections.All(e => e.Source != connection.Source))
+        {
+            connection.Source.IsConnected = false;
+        }
+
+        if (Scenario.connections.All(e => e.Target != connection.Target))
+        {
+            connection.Target.IsConnected = false;
+        }
+
+        IsModified = true;
+        ToFirstVerify();
+    }
 
 
     [RelayCommand(CanExecute = nameof(IsModified))]
@@ -155,7 +239,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
 
             if (!toRemove)
             {
-                return;
+                continue;
             }
 
             foreach (var connectorItem in Scenario.nodes[i].Output)
@@ -199,8 +283,6 @@ public partial class TaskEditorViewModel : ObservableRecipient
         ToFirstVerify();
     }
 
-    [ObservableProperty] private CustomScenario _scenario = new CustomScenario() { IsActive = true };
-
     private void GetAllMethods()
     {
         BaseNodeMethodsGen.GenBaseNodeMethods(NodeMethods);
@@ -215,38 +297,6 @@ public partial class TaskEditorViewModel : ObservableRecipient
 
             NodeMethods.Add(methods);
         }
-    }
-
-    public TaskEditorViewModel()
-    {
-        Scenario.PropertyChanged += (e, s) =>
-        {
-            if (s.PropertyName == "Name")
-            {
-                Scenario.nodes[0].Title = Scenario.Name;
-            }
-
-            IsModified = true;
-        };
-        PendingConnection = new PendingConnectionViewModel(this);
-        GetAllMethods();
-        var nodify2 = new PointItem()
-        {
-            Title = "任务1"
-        };
-        nodify2.Output = new ObservableCollection<ConnectorItem>
-        {
-            new()
-            {
-                IsOut = true,
-                Source = nodify2,
-                Type = typeof(NodeConnectorClass),
-                TypeName = BaseNodeMethodsGen.GetI18N(typeof(NodeConnectorClass).FullName),
-                Title = "开始"
-            }
-        };
-        Scenario.nodes.Add(nodify2);
-        //nodeMethods.Add("new PointItem(){Title = \"Test\"}");
     }
 
     public void Load(CustomScenario customScenario)
@@ -266,9 +316,6 @@ public partial class TaskEditorViewModel : ObservableRecipient
             IsModified = true;
         };
     }
-
-
-    private Window _window;
 
     [RelayCommand]
     private void Load(object window)
@@ -381,6 +428,13 @@ public partial class TaskEditorViewModel : ObservableRecipient
 
 public partial class PointItem : ObservableRecipient
 {
+    [ObservableProperty] private Point _location;
+
+    [ObservableProperty] private string _title;
+    [ObservableProperty] private ObservableCollection<ConnectorItem> input = new();
+    [ObservableProperty] private ObservableCollection<ConnectorItem> output = new();
+    [ObservableProperty] private s节点状态 status = s节点状态.未验证;
+
     public string? Plugin
     {
         get;
@@ -398,13 +452,6 @@ public partial class PointItem : ObservableRecipient
         get;
         set;
     }
-
-    [ObservableProperty] private Point _location;
-
-    [ObservableProperty] private string _title;
-    [ObservableProperty] private s节点状态 status = s节点状态.未验证;
-    [ObservableProperty] private ObservableCollection<ConnectorItem> input = new();
-    [ObservableProperty] private ObservableCollection<ConnectorItem> output = new();
 }
 
 public enum s节点状态
@@ -418,12 +465,14 @@ public enum s节点状态
 public partial class ConnectorItem : ObservableRecipient
 {
     [ObservableProperty] private Point _anchor;
+    [ObservableProperty] private object? _inputObject; //数据
 
     [ObservableProperty] private bool _isConnected;
     [ObservableProperty] private bool _isNotUsed = false;
     [ObservableProperty] private bool _isOut;
     [ObservableProperty] private bool _isSelf = false;
-    [ObservableProperty] private object? _inputObject; //数据
+
+    private Type? _realType;
 
 
     public int AutoUnboxIndex
@@ -453,8 +502,6 @@ public partial class ConnectorItem : ObservableRecipient
         get;
         set;
     }
-
-    private Type? _realType;
 
     /// <summary>
     /// 

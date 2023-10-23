@@ -15,11 +15,11 @@ public class SearchItemTool : ISearchItemTool
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(SearchItemTool));
 
-    public void OpenSearchItem(SearchViewItem item)
+    public void OpenSearchItem(SearchViewItem searchViewItem)
     {
         WeakReferenceMessenger.Default.Send("a", "SearchWindowClose");
-        Log.Debug("打开指定内容" + item.OnlyKey);
-        switch (item.OnlyKey)
+        Log.Debug("打开指定内容" + searchViewItem.OnlyKey);
+        switch (searchViewItem.OnlyKey)
         {
             case "ClipboardImageData":
             {
@@ -39,31 +39,31 @@ public class SearchItemTool : ISearchItemTool
             case "Math": break;
             default:
             {
-                switch (item.FileType)
+                switch (searchViewItem.FileType)
                 {
                     case FileType.UWP应用:
                         Shell32.ShellExecute(IntPtr.Zero, "open", "explorer.exe",
-                            $"shell:AppsFolder\\{item.OnlyKey}", "",
+                            $"shell:AppsFolder\\{searchViewItem.OnlyKey}", "",
                             ShowWindowCommand.SW_NORMAL);
                         break;
                     case FileType.自定义情景:
                         CustomScenarioManger.CustomScenarios
-                            .FirstOrDefault((e) => $"CustomScenario:{e.UUID}" == item.OnlyKey)?.Run();
+                            .FirstOrDefault((e) => $"CustomScenario:{e.UUID}" == searchViewItem.OnlyKey)?.Run();
                         break;
                     case FileType.便签:
                         ((ILabelWindowService)ServiceManager.Services.GetService(typeof(ILabelWindowService))!)
-                            .Show(item.OnlyKey);
+                            .Show(searchViewItem.OnlyKey);
                         break;
                     case FileType.自定义:
-                        item.Action?.Invoke(item);
+                        searchViewItem.Action?.Invoke(searchViewItem);
                         break;
                     default:
-                        Shell32.ShellExecute(IntPtr.Zero, "open", item.OnlyKey, "", "",
+                        Shell32.ShellExecute(IntPtr.Zero, "open", searchViewItem.OnlyKey, "", "",
                             ShowWindowCommand.SW_NORMAL);
                         break;
                 }
 
-                switch (item.FileType)
+                switch (searchViewItem.FileType)
                 {
                     case FileType.文件夹:
                     case FileType.应用程序:
@@ -75,21 +75,18 @@ public class SearchItemTool : ISearchItemTool
                     case FileType.文件:
                     case FileType.自定义情景:
                     {
-                        if (ConfigManger.Config.lastOpens.ContainsKey(item.OnlyKey))
+                        if (ConfigManger.Config.lastOpens.ContainsKey(searchViewItem.OnlyKey))
                         {
-                            ConfigManger.Config.lastOpens[item.OnlyKey]++;
+                            ConfigManger.Config.lastOpens[searchViewItem.OnlyKey]++;
                         }
                         else
                         {
-                            ConfigManger.Config.lastOpens.Add(item.OnlyKey, 1);
+                            ConfigManger.Config.lastOpens.Add(searchViewItem.OnlyKey, 1);
                         }
 
                         break;
                     }
                 }
-
-
-                //if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
 
                 ConfigManger.Save();
                 return;

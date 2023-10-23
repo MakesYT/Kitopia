@@ -10,7 +10,6 @@ public static class Math
     // 评估一个复杂数学表达式，返回一个decimal类型的值
     public static decimal Evaluate(string expression)
     {
-        //log.Debug($"计算{expression}");
         // 去掉空格
         expression = expression.Replace(" ", "");
         // 处理括号
