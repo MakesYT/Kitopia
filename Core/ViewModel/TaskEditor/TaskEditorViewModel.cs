@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
@@ -36,15 +37,70 @@ public partial class TaskEditorViewModel : ObservableRecipient
 
     public TaskEditorViewModel()
     {
-        Scenario.PropertyChanged += (e, s) =>
+        WeakReferenceMessenger.Default.Register<CustomScenarioChangeMsg>(this, (a, e) =>
         {
-            if (s.PropertyName == "Name")
+            IsModified = true;
+            if (e.Type == 1)
             {
-                Scenario.nodes[0].Title = Scenario.Name;
+                if (e.Name == "Name")
+                {
+                    e.CustomScenario.nodes[0].Title = e.CustomScenario.Name;
+                }
+
+                return;
             }
 
-            IsModified = true;
-        };
+            if (Scenario.nodes.Contains(e.PointItem) || _nodeMethods.Any(a => a.Contains(e.PointItem)))
+            {
+                if (e.ConnectorItem is not null)
+                {
+                    if (e.PointItem.MerthodName == "一对N" && e.ConnectorItem.IsSelf)
+                    {
+                        if (e.PointItem.Output.Count == Convert.ToInt32((double)e.ConnectorItem.InputObject))
+                        {
+                            return;
+                        }
+
+                        while (e.PointItem.Output.Count != Convert.ToInt32((double)e.ConnectorItem.InputObject))
+                        {
+                            if (e.PointItem.Output.Count > Convert.ToInt32((double)e.ConnectorItem.InputObject))
+                            {
+                                var connectorItem = e.PointItem.Output[^1];
+                                var connectionItems = Scenario.connections
+                                    .Where((connectionItem) => connectionItem.Source == connectorItem).ToList();
+                                foreach (var connectionItem in connectionItems)
+                                {
+                                    Scenario.connections.Remove(connectionItem);
+                                    if (Scenario.connections.All(item => item.Source != connectionItem.Source))
+                                    {
+                                        connectionItem.Source.IsConnected = false;
+                                    }
+
+                                    if (Scenario.connections.All(item => item.Target != connectionItem.Target))
+                                    {
+                                        connectionItem.Target.IsConnected = false;
+                                    }
+                                }
+
+                                e.PointItem.Output.Remove(connectorItem);
+                            }
+                            else
+                            {
+                                e.PointItem.Output.Add(new ConnectorItem()
+                                {
+                                    Source = e.PointItem,
+                                    Type = typeof(NodeConnectorClass),
+                                    Title = "流输出",
+                                    IsOut = true,
+                                    TypeName = "节点"
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
         PendingConnection = new PendingConnectionViewModel(this);
         GetAllMethods();
         var nodify2 = new PointItem()
@@ -87,7 +143,6 @@ public partial class TaskEditorViewModel : ObservableRecipient
         {
             Title = pointItem.Title,
             Plugin = pointItem.Plugin,
-            UUID = Guid.NewGuid().ToString(),
             MerthodName = pointItem.MerthodName,
             Location = new Point(pointItem.Location.X, pointItem.Location.Y)
         };
@@ -302,19 +357,6 @@ public partial class TaskEditorViewModel : ObservableRecipient
     public void Load(CustomScenario customScenario)
     {
         Scenario = customScenario;
-        Scenario.PropertyChanged += (e, s) =>
-        {
-            switch (s.PropertyName)
-            {
-                case "Name":
-                {
-                    Scenario.nodes[0].Title = Scenario.Name;
-                    break;
-                }
-            }
-
-            IsModified = true;
-        };
     }
 
     [RelayCommand]
@@ -441,11 +483,6 @@ public partial class PointItem : ObservableRecipient
         set;
     }
 
-    public string UUID
-    {
-        get;
-        set;
-    }
 
     public string MerthodName
     {
@@ -465,6 +502,7 @@ public enum s节点状态
 public partial class ConnectorItem : ObservableRecipient
 {
     [ObservableProperty] private Point _anchor;
+
     [ObservableProperty] private object? _inputObject; //数据
 
     [ObservableProperty] private bool _isConnected;
@@ -473,7 +511,6 @@ public partial class ConnectorItem : ObservableRecipient
     [ObservableProperty] private bool _isSelf = false;
 
     private Type? _realType;
-
 
     public int AutoUnboxIndex
     {
@@ -522,6 +559,11 @@ public partial class ConnectorItem : ObservableRecipient
     {
         get;
         set;
+    }
+
+    partial void OnInputObjectChanged(object? value)
+    {
+        WeakReferenceMessenger.Default.Send(new CustomScenarioChangeMsg() { PointItem = Source, ConnectorItem = this });
     }
 }
 

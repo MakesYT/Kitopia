@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.Services.Plugin;
 using Core.ViewModel.TaskEditor;
 using log4net;
@@ -20,17 +21,22 @@ public partial class CustomScenario : ObservableRecipient
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(CustomScenario));
 
-    [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
-    private bool _isRunning = false;
+    private readonly Dictionary<PointItem, Thread?> _tasks = new();
+
+    [JsonIgnore] [ObservableProperty] private List<CustomScenarioInvoke> _autoTriggerType = new();
+
+    [JsonIgnore] [ObservableProperty] private string _description = "";
+
+    [JsonIgnore] [ObservableProperty] private bool _isRunning = false;
+
+    [JsonIgnore] [ObservableProperty] private string _name = "任务";
 
     /// <summary>
     ///     手动执行
     /// </summary>
-    [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
-    private bool executionManual = true;
+    [JsonIgnore] [ObservableProperty] private bool executionManual = true;
 
-    [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
-    private ObservableCollection<string> keys = new();
+    [JsonIgnore] [ObservableProperty] private ObservableCollection<string> keys = new();
 
     public string? UUID
     {
@@ -50,16 +56,11 @@ public partial class CustomScenario : ObservableRecipient
         set;
     } = new();
 
-    [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
-    private string _name = "任务";
-
-    [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
-    private string _description = "";
-
-    [JsonIgnore] [ObservableProperty] [NotifyPropertyChangedRecipients]
-    private List<CustomScenarioInvoke> _autoTriggerType = new();
-
-    private readonly Dictionary<PointItem, Thread?> _tasks = new();
+    partial void OnNameChanged(string value)
+    {
+        WeakReferenceMessenger.Default.Send(new CustomScenarioChangeMsg()
+            { Type = 1, Name = "Name", CustomScenario = this });
+    }
 
     public void Run(bool realTime = false)
     {
@@ -302,6 +303,15 @@ public partial class CustomScenario : ObservableRecipient
                         {
                             nowPointItem.Output[0].InputObject = "流1";
                             nowPointItem.Output[1].InputObject = "流2";
+                            break;
+                        }
+                        case "一对N":
+                        {
+                            for (var i = 0; i < nowPointItem.Output.Count; i++)
+                            {
+                                nowPointItem.Output[i].InputObject = $"流{i + 1}";
+                            }
+
                             break;
                         }
                         case "相等":

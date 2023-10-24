@@ -74,6 +74,11 @@ public class BaseNodeMethodsGen
                     IsSelf = true
                 }
             };
+            if (value.FullName == "System.Int32")
+            {
+                StringinItems[0].InputObject = (double)0;
+            }
+
             String.Input = StringinItems;
             nodes.Add(String);
         } //基本数值类型
@@ -243,6 +248,56 @@ public class BaseNodeMethodsGen
                     Type = typeof(NodeConnectorClass),
                     Title = "流输入",
                     TypeName = "节点"
+                }
+            };
+            String.Input = StringinItems;
+            nodes.Add(String);
+        }
+        //1 to n
+        {
+            var String = new PointItem()
+            {
+                Plugin = "Kitopia",
+                MerthodName = "一对N",
+                Title = "一对N"
+            };
+            ObservableCollection<ConnectorItem> StringoutItems = new()
+            {
+                new ConnectorItem()
+                {
+                    Source = String,
+                    Type = typeof(NodeConnectorClass),
+                    Title = "流输出",
+                    IsOut = true,
+                    TypeName = "节点"
+                },
+                new ConnectorItem()
+                {
+                    Source = String,
+                    Type = typeof(NodeConnectorClass),
+                    IsOut = true,
+                    Title = "流输出",
+                    TypeName = "节点"
+                }
+            };
+            String.Output = StringoutItems;
+            ObservableCollection<ConnectorItem> StringinItems = new()
+            {
+                new ConnectorItem()
+                {
+                    Source = String,
+                    Type = typeof(NodeConnectorClass),
+                    Title = "流输入",
+                    TypeName = "节点"
+                },
+                new ConnectorItem()
+                {
+                    Source = String,
+                    Type = typeof(int),
+                    InputObject = (double)2,
+                    IsSelf = true,
+                    Title = "输出数量",
+                    TypeName = "整数"
                 }
             };
             String.Input = StringinItems;
