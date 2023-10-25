@@ -2,7 +2,7 @@
 
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using Core.ViewModel.TaskEditor;
+using Core.SDKs.CustomScenario;
 using PluginCore;
 
 #endregion

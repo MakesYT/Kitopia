@@ -5,9 +5,9 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Core.SDKs.CustomScenario;
 using Core.SDKs.Services.Config;
 using Core.SDKs.Tools;
-using Core.ViewModel.TaskEditor;
 using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -21,6 +21,59 @@ namespace Core.SDKs.Services.Plugin;
 public class Plugin
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(Plugin));
+    public Assembly? _dll;
+
+    private AssemblyLoadContextH? _plugin;
+
+    public IServiceProvider? ServiceProvider;
+
+    public Plugin(string path)
+    {
+        _plugin = new AssemblyLoadContextH(path, path.Split("\\").Last() + "_plugin");
+        _dll = _plugin.LoadFromAssemblyPath(path);
+        var t = _dll.GetExportedTypes();
+        Dictionary<string, (MethodInfo, object)> methodInfos = new();
+        List<Func<string, SearchViewItem?>> searchViews = new();
+        foreach (var type in t)
+        {
+            if (type.GetInterface("IPlugin") != null)
+            {
+                PluginInfo = (PluginInfo)type.GetField("PluginInfo").GetValue(null);
+                //var instance = Activator.CreateInstance(type);
+                ServiceProvider = (IServiceProvider)type.GetMethod("GetServiceProvider").Invoke(null, null);
+
+                ((IPlugin)ServiceProvider.GetService(type)).OnEnabled();
+            }
+
+            foreach (var methodInfo in type.GetMethods())
+            {
+                if (methodInfo.GetCustomAttributes(typeof(PluginMethod)).Any()) //情景的可用节点
+                {
+                    methodInfos.Add(ToMtdString(methodInfo),
+                        (methodInfo, GetPointItemByMethodInfo(methodInfo)));
+                }
+
+                if (methodInfo.GetCustomAttributes(typeof(SearchMethod)).Any()) //搜索的切入方法
+                {
+                    searchViews.Add(e =>
+                    {
+                        var invoke = methodInfo.Invoke(
+                            ServiceProvider!.GetService(methodInfo.DeclaringType!),
+                            new object?[] { e });
+                        if (invoke is null)
+                        {
+                            return null;
+                        }
+
+                        return ((SearchViewItem)invoke);
+                    });
+                }
+            }
+        }
+
+        PluginOverall.SearchActions.Add(ToPlgString(), searchViews);
+        PluginOverall.CustomScenarioNodeMethods.Add(ToPlgString(), methodInfos);
+    }
 
     public PluginInfo PluginInfo
     {
@@ -54,11 +107,6 @@ public class Plugin
         sb.Remove(sb.Length - 1, 1);
         return $"{PluginInfo.Author}_{PluginInfo.PluginId}/{methodInfo.DeclaringType!.FullName}/{methodInfo.Name}{sb}";
     }
-
-    private AssemblyLoadContextH? _plugin;
-    public Assembly? _dll;
-
-    public IServiceProvider? ServiceProvider;
 
     public bool IsMyType(string typeName)
     {
@@ -185,54 +233,6 @@ public class Plugin
         // right away, GC has to kick in later to collect all the stuff.
         alc.Unload();
         return pluginInfoEx;
-    }
-
-    public Plugin(string path)
-    {
-        _plugin = new AssemblyLoadContextH(path, path.Split("\\").Last() + "_plugin");
-        _dll = _plugin.LoadFromAssemblyPath(path);
-        var t = _dll.GetExportedTypes();
-        Dictionary<string, (MethodInfo, object)> methodInfos = new();
-        List<Func<string, SearchViewItem?>> searchViews = new();
-        foreach (var type in t)
-        {
-            if (type.GetInterface("IPlugin") != null)
-            {
-                PluginInfo = (PluginInfo)type.GetField("PluginInfo").GetValue(null);
-                //var instance = Activator.CreateInstance(type);
-                ServiceProvider = (IServiceProvider)type.GetMethod("GetServiceProvider").Invoke(null, null);
-
-                ((IPlugin)ServiceProvider.GetService(type)).OnEnabled();
-            }
-
-            foreach (var methodInfo in type.GetMethods())
-            {
-                if (methodInfo.GetCustomAttributes(typeof(PluginMethod)).Any()) //情景的可用节点
-                {
-                    methodInfos.Add(ToMtdString(methodInfo),
-                        (methodInfo, GetPointItemByMethodInfo(methodInfo)));
-                }
-
-                if (methodInfo.GetCustomAttributes(typeof(SearchMethod)).Any()) //搜索的切入方法
-                {
-                    searchViews.Add(e =>
-                    {
-                        var invoke = methodInfo.Invoke(
-                            ServiceProvider!.GetService(methodInfo.DeclaringType!),
-                            new object?[] { e });
-                        if (invoke is null)
-                        {
-                            return null;
-                        }
-
-                        return ((SearchViewItem)invoke);
-                    });
-                }
-            }
-        }
-
-        PluginOverall.SearchActions.Add(ToPlgString(), searchViews);
-        PluginOverall.CustomScenarioNodeMethods.Add(ToPlgString(), methodInfos);
     }
 
     private object GetPointItemByMethodInfo(MethodInfo methodInfo)

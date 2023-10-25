@@ -12,7 +12,6 @@ using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
 using Core.SDKs.Tools;
 using log4net;
-using Newtonsoft.Json;
 using PluginCore;
 
 #endregion
@@ -30,7 +29,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
 
     [ObservableProperty] private BindingList<BindingList<object>> _nodeMethods = new();
 
-    [ObservableProperty] private CustomScenario _scenario = new CustomScenario() { IsActive = true };
+    [ObservableProperty] private CustomScenario _scenario = new CustomScenario { IsActive = true };
 
 
     private Window _window;
@@ -67,7 +66,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                             {
                                 var connectorItem = e.PointItem.Output[^1];
                                 var connectionItems = Scenario.connections
-                                    .Where((connectionItem) => connectionItem.Source == connectorItem).ToList();
+                                    .Where(connectionItem => connectionItem.Source == connectorItem).ToList();
                                 foreach (var connectionItem in connectionItems)
                                 {
                                     Scenario.connections.Remove(connectionItem);
@@ -86,7 +85,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                             }
                             else
                             {
-                                e.PointItem.Output.Add(new ConnectorItem()
+                                e.PointItem.Output.Add(new ConnectorItem
                                 {
                                     Source = e.PointItem,
                                     Type = typeof(NodeConnectorClass),
@@ -103,7 +102,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
 
         PendingConnection = new PendingConnectionViewModel(this);
         GetAllMethods();
-        var nodify2 = new PointItem()
+        var nodify2 = new PointItem
         {
             Title = "任务1"
         };
@@ -133,13 +132,23 @@ public partial class TaskEditorViewModel : ObservableRecipient
         get;
     }
 
+    [RelayCommand]
+    private void VerifyNode()
+    {
+        Scenario.Run();
+    }
+
+    private void ToFirstVerify(bool notRealTime = false)
+    {
+        Scenario.Run(true);
+    }
 
     [RelayCommand]
     private void AddNodes(PointItem pointItem)
     {
         IsModified = true;
 
-        var item = new PointItem()
+        var item = new PointItem
         {
             Title = pointItem.Title,
             Plugin = pointItem.Plugin,
@@ -149,7 +158,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
         ObservableCollection<ConnectorItem> input = new();
         foreach (var connectorItem in pointItem.Input)
         {
-            input.Add(new ConnectorItem()
+            input.Add(new ConnectorItem
             {
                 Anchor = new Point(connectorItem.Anchor.X, connectorItem.Anchor.Y),
                 Source = item,
@@ -168,7 +177,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
         ObservableCollection<ConnectorItem> output = new();
         foreach (var connectorItem in pointItem.Output)
         {
-            var connectorItem1 = new ConnectorItem()
+            var connectorItem1 = new ConnectorItem
             {
                 Anchor = new Point(connectorItem.Anchor.X, connectorItem.Anchor.Y),
                 Source = item,
@@ -209,7 +218,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
         }
 
         var connectionItems = Scenario.connections
-            .Where((e) => e.Source.Source == pointItem || e.Target.Source == pointItem).ToList();
+            .Where(e => e.Source.Source == pointItem || e.Target.Source == pointItem).ToList();
         foreach (var connectionItem in connectionItems)
         {
             Scenario.connections.Remove(connectionItem);
@@ -317,7 +326,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
     [RelayCommand]
     private void DisconnectConnector(ConnectorItem connector)
     {
-        var connections = Scenario.connections.Where((e) => e.Source == connector || e.Target == connector).ToList();
+        var connections = Scenario.connections.Where(e => e.Source == connector || e.Target == connector).ToList();
         for (var i = connections.Count - 1; i >= 0; i--)
         {
             var connection = connections[i];
@@ -380,8 +389,8 @@ public partial class TaskEditorViewModel : ObservableRecipient
                     _window.Close();
                 }, () =>
                 {
-                    IsModified = false;
                     CustomScenarioManger.Reload(Scenario);
+                    IsModified = false;
                     _window.Close();
                 }, () =>
                 {
@@ -466,105 +475,6 @@ public partial class TaskEditorViewModel : ObservableRecipient
     }
 
     #endregion
-}
-
-public partial class PointItem : ObservableRecipient
-{
-    [ObservableProperty] private Point _location;
-
-    [ObservableProperty] private string _title;
-    [ObservableProperty] private ObservableCollection<ConnectorItem> input = new();
-    [ObservableProperty] private ObservableCollection<ConnectorItem> output = new();
-    [ObservableProperty] private s节点状态 status = s节点状态.未验证;
-
-    public string? Plugin
-    {
-        get;
-        set;
-    }
-
-
-    public string MerthodName
-    {
-        get;
-        set;
-    }
-}
-
-public enum s节点状态
-{
-    未验证,
-    已验证,
-    错误,
-    初步验证
-}
-
-public partial class ConnectorItem : ObservableRecipient
-{
-    [ObservableProperty] private Point _anchor;
-
-    [ObservableProperty] private object? _inputObject; //数据
-
-    [ObservableProperty] private bool _isConnected;
-    [ObservableProperty] private bool _isNotUsed = false;
-    [ObservableProperty] private bool _isOut;
-    [ObservableProperty] private bool _isSelf = false;
-
-    private Type? _realType;
-
-    public int AutoUnboxIndex
-    {
-        get;
-        set;
-    }
-
-    public string TypeName
-    {
-        get;
-        set;
-    }
-
-    public string Title
-    {
-        get;
-        set;
-    }
-
-    /// <summary>
-    /// 输出的类型
-    /// </summary>
-    [JsonConverter(typeof(TypeJsonConverter))]
-    public Type Type
-    {
-        get;
-        set;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public Type RealType
-    {
-        get => _realType ?? Type;
-        set => _realType = value;
-    }
-
-    public List<string>? Interfaces
-    {
-        get;
-        set;
-    }
-
-    public PointItem Source
-    {
-        get;
-        set;
-    }
-
-    partial void OnInputObjectChanged(object? value)
-    {
-        WeakReferenceMessenger.Default.Send(new CustomScenarioChangeMsg() { PointItem = Source, ConnectorItem = this });
-    }
 }
 
 public class ConnectionItem

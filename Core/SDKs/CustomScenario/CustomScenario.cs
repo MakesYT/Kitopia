@@ -184,6 +184,21 @@ public partial class CustomScenario : ObservableRecipient
         }
     }
 
+    private void MakeSourcePointState(ConnectorItem targetConnectorItem, PointItem pointItem)
+    {
+        foreach (var connectionItem in connections.Where(e => e.Target == targetConnectorItem))
+        {
+            if (connectionItem.Source.Source == pointItem)
+            {
+                connectionItem.Source.Source.Status = s节点状态.已验证;
+            }
+            else
+            {
+                connectionItem.Source.Source.Status = s节点状态.未验证;
+            }
+        }
+    }
+
     private void ParsePointItem(PointItem nowPointItem, bool onlyForward, bool notRealTime)
     {
         Log.Debug($"解析节点:{nowPointItem.Title}");
@@ -215,9 +230,7 @@ public partial class CustomScenario : ObservableRecipient
 
 
             //这是连接当前节点的节点
-            var connectionItem = connections.Where((e) => e.Target == connectorItem).ToList();
-
-            foreach (var sourceSource in connectionItem.Select(item => item.Source.Source))
+            foreach (var sourceSource in connectorItem.GetSourceOrNextPointItems(connections))
             {
                 lock (_tasks)
                 {
@@ -253,10 +266,7 @@ public partial class CustomScenario : ObservableRecipient
 
         foreach (var connectorItem in nowPointItem.Input)
         {
-            //这是连接当前节点的节点
-            var connectionItem = connections.Where((e) => e.Target == connectorItem).ToList();
-
-            foreach (var sourceSource in connectionItem.Select(item => item.Source.Source))
+            foreach (var sourceSource in connectorItem.GetSourceOrNextPointItems(connections))
             {
                 if (sourceSource.Status == s节点状态.错误)
                 {
@@ -330,11 +340,10 @@ public partial class CustomScenario : ObservableRecipient
                                     nowPointItem.Input[1].InputObject!.Equals(nowPointItem.Input[2].InputObject);
                             }
 
-                            var nextNode = connections.Where((e) => e.Source == nowPointItem.Output[0])
-                                .ToList();
-                            foreach (var item in nextNode)
+                            foreach (var item in nowPointItem.Output[0].GetSourceOrNextConnectorItems(connections))
                             {
-                                item.Target.InputObject = nowPointItem.Output[0].InputObject;
+                                item.InputObject = nowPointItem.Output[0].InputObject;
+                                MakeSourcePointState(item, nowPointItem);
                             }
 
                             break;
@@ -359,11 +368,10 @@ public partial class CustomScenario : ObservableRecipient
                             }
 
                             nowPointItem.Output[0].InputObject = userInputData;
-                            var nextNode = connections.Where((e) => e.Source == nowPointItem.Output[0])
-                                .ToList();
-                            foreach (var item in nextNode)
+                            foreach (var item in nowPointItem.Output[0].GetSourceOrNextConnectorItems(connections))
                             {
-                                item.Target.InputObject = userInputData;
+                                item.InputObject = userInputData;
+                                MakeSourcePointState(item, nowPointItem);
                             }
 
                             break;
@@ -446,11 +454,9 @@ public partial class CustomScenario : ObservableRecipient
                                 {
                                     var value = invoke.GetPropertyValue<object>(memberInfo.Name);
                                     connectorItem.InputObject = value;
-                                    var nextNode = connections.Where((e) => e.Source == connectorItem)
-                                        .ToList();
-                                    foreach (var item in nextNode)
+                                    foreach (var item in connectorItem.GetSourceOrNextConnectorItems(connections))
                                     {
-                                        item.Target.InputObject = value;
+                                        item.InputObject = value;
                                     }
 
                                     break;
@@ -463,11 +469,9 @@ public partial class CustomScenario : ObservableRecipient
                         if (nowPointItem.Output.Any())
                         {
                             nowPointItem.Output[0].InputObject = invoke;
-                            var nextNode = connections.Where((e) => e.Source == nowPointItem.Output[0])
-                                .ToList();
-                            foreach (var item in nextNode)
+                            foreach (var item in nowPointItem.Output[0].GetSourceOrNextConnectorItems(connections))
                             {
-                                item.Target.InputObject = invoke;
+                                item.InputObject = invoke;
                             }
                         }
                     }
@@ -485,9 +489,7 @@ public partial class CustomScenario : ObservableRecipient
         {
             foreach (var outputConnector in nowPointItem.Output)
             {
-                var thisToNextConnections = connections.Where((e) => e.Source == outputConnector).ToList();
-                foreach (var nextPointItem in thisToNextConnections
-                             .Select(thisToNextConnection => thisToNextConnection.Target.Source)
+                foreach (var nextPointItem in outputConnector.GetSourceOrNextPointItems(connections)
                              .Where(_ => !outputConnector.IsNotUsed))
                 {
                     lock (_tasks)

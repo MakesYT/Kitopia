@@ -2,7 +2,7 @@
 
 using System.Windows;
 using System.Windows.Controls;
-using Core.ViewModel.TaskEditor;
+using Core.SDKs.CustomScenario;
 
 #endregion
 
@@ -15,41 +15,27 @@ public class MyDataTemplateSelector : DataTemplateSelector
     {
         // Get the current framework element
         var element = container as FrameworkElement;
-        if (element != null && item != null)
+        if (element == null || item == null)
         {
-            // Check the type of the item and return the corresponding data template from the resources
-            if (item is ConnectorItem pointItem && pointItem.IsSelf)
-            {
-                if (pointItem.RealType.FullName == "System.String")
-                {
-                    return element.FindResource("StringTemplate") as DataTemplate;
-                }
+            return base.SelectTemplate(item, container);
+        }
 
-                if (pointItem.RealType.FullName == "System.Int32")
-                {
-                    return element.FindResource("IntTemplate") as DataTemplate;
-                }
-
-                if (pointItem.RealType.FullName == "System.Double")
-                {
-                    return element.FindResource("DoubleTemplate") as DataTemplate;
-                }
-
-                if (pointItem.RealType.FullName == "System.Boolean")
-                {
-                    return element.FindResource("BoolTemplate") as DataTemplate;
-                }
-
-                if (pointItem.RealType.FullName == "Core.SDKs.SearchViewItem")
-                {
-                    return element.FindResource("SearchItemTemplate") as DataTemplate;
-                }
-            }
-
+        // Check the type of the item and return the corresponding data template from the resources
+        if (item is not ConnectorItem pointItem || !pointItem.IsSelf)
+        {
             return element.FindResource("InputTemplate") as DataTemplate;
         }
 
+        return (pointItem.RealType.FullName! switch
+        {
+            "System.String" => element.FindResource("StringTemplate")! as DataTemplate,
+            "System.Int32" => element.FindResource("IntTemplate")! as DataTemplate,
+            "System.Double" => element.FindResource("DoubleTemplate")! as DataTemplate,
+            "System.Boolean" => element.FindResource("BoolTemplate")! as DataTemplate,
+            "Core.SDKs.SearchViewItem" => element.FindResource("SearchItemTemplate")! as DataTemplate,
+            _ => element.FindResource("InputTemplate")! as DataTemplate
+        })!;
+
         // Return the default data template if no match is found
-        return base.SelectTemplate(item, container);
     }
 }

@@ -12,6 +12,7 @@
     xmlns:controls="clr-namespace:Kitopia.Controls"
     xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=System.ComponentModel.TypeConverter"
     xmlns:services="clr-namespace:Kitopia.Services"
+    xmlns:customScenario="clr-namespace:Core.SDKs.CustomScenario;assembly=Core"
     x:Class="Kitopia.View.TaskEditor"
     WindowBackdropType="Acrylic"
     WindowCornerPreference="Round"
@@ -23,27 +24,27 @@
     <ui:FluentWindow.Resources>
         <services:BindingProxy x:Key="viewModel" Data="{Binding}" />
         <taskEditor1:IfNullVisibilityHidden x:Key="IfNullVisibilityHidden" />
-        <DataTemplate x:Key="StringTemplate" DataType="{x:Type taskEditor:ConnectorItem}">
+        <DataTemplate x:Key="StringTemplate" DataType="{x:Type customScenario:ConnectorItem}">
             <ui:TextBox Margin="10,5,10,5" MinWidth="40" Text="{Binding InputObject}" PlaceholderText="字符串" />
         </DataTemplate>
-        <DataTemplate x:Key="IntTemplate" DataType="{x:Type taskEditor:ConnectorItem}">
+        <DataTemplate x:Key="IntTemplate" DataType="{x:Type customScenario:ConnectorItem}">
             <ui:NumberBox MaxDecimalPlaces="0" Margin="10,5,10,5" MinWidth="40"
                           ValidationMode="InvalidInputOverwritten"
                           Maximum="2147483647" Minimum="-2147483648"
                           Value="{Binding InputObject, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           PlaceholderText="整型" />
         </DataTemplate>
-        <DataTemplate x:Key="DoubleTemplate" DataType="{x:Type taskEditor:ConnectorItem}">
+        <DataTemplate x:Key="DoubleTemplate" DataType="{x:Type customScenario:ConnectorItem}">
             <ui:NumberBox Margin="10,5,10,5" MinWidth="40"
                           ValidationMode="InvalidInputOverwritten"
                           Value="{Binding InputObject, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           PlaceholderText="浮点" />
         </DataTemplate>
-        <DataTemplate x:Key="BoolTemplate" DataType="{x:Type taskEditor:ConnectorItem}">
+        <DataTemplate x:Key="BoolTemplate" DataType="{x:Type customScenario:ConnectorItem}">
             <ui:ToggleSwitch Margin="10,5,10,5" MinWidth="40"
                              IsChecked="{Binding InputObject, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         </DataTemplate>
-        <DataTemplate x:Key="SearchItemTemplate" DataType="{x:Type taskEditor:ConnectorItem}">
+        <DataTemplate x:Key="SearchItemTemplate" DataType="{x:Type customScenario:ConnectorItem}">
             <controls:SearchItemShow ToolTip="{Binding RelativeSource={RelativeSource self},Path=OnlyKey}"
                                      Click="SearchItemShow_OnClick"
                                      OnlyKey="{Binding InputObject, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,NotifyOnSourceUpdated=True}" />
@@ -326,7 +327,7 @@
                                             <!-- Declare some data templates for different types of data -->
                                             <taskEditor1:InterfacesToString x:Key="InterfacesToString" />
                                             <DataTemplate x:Key="InputTemplate"
-                                                          DataType="{x:Type taskEditor:ConnectorItem}">
+                                                          DataType="{x:Type customScenario:ConnectorItem}">
 
                                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                                     <Border Background="Transparent">
@@ -379,7 +380,7 @@
 
                                         </ListBox.Resources>
                                         <ListBox.ItemTemplate>
-                                            <DataTemplate DataType="{x:Type taskEditor:PointItem}">
+                                            <DataTemplate DataType="{x:Type customScenario:PointItem}">
                                                 <DockPanel Panel.ZIndex="1">
                                                     <Grid DockPanel.Dock="Top">
                                                         <Rectangle
@@ -599,7 +600,7 @@
                         <SolidColorBrush Color="{DynamicResource ApplicationBackgroundColor}" Opacity="0.7" />
                     </nodify:NodifyEditor.Foreground>
                     <nodify:NodifyEditor.ItemContainerStyle>
-                        <Style d:DataContext="{d:DesignInstance taskEditor:PointItem}"
+                        <Style d:DataContext="{d:DesignInstance customScenario:PointItem}"
                                TargetType="{x:Type nodify:ItemContainer}"
                                BasedOn="{StaticResource {x:Type nodify:ItemContainer}}">
                             <Setter Property="BorderThickness" Value="2" />
@@ -684,7 +685,7 @@
                         </DataTemplate>
                     </nodify:NodifyEditor.PendingConnectionTemplate>
                     <nodify:NodifyEditor.ItemTemplate>
-                        <DataTemplate DataType="{x:Type taskEditor:PointItem}">
+                        <DataTemplate DataType="{x:Type customScenario:PointItem}">
                             <Grid>
                                 <Grid.Resources>
                                     <services:BindingProxy x:Key="runRecordList" Data="{Binding}" />
@@ -705,7 +706,7 @@
                                         
                                         <taskEditor1:InterfacesToString x:Key="InterfacesToString" />
                                         <DataTemplate x:Key="InputTemplate"
-                                                      DataType="{x:Type taskEditor:ConnectorItem}">
+                                                      DataType="{x:Type customScenario:ConnectorItem}">
                                             <nodify:NodeInput
                                                 ToolTip="{Binding InputObject}"
                                                 ToolTipService.InitialShowDelay="0"
@@ -815,7 +816,7 @@
                                     </nodify:Node.InputConnectorTemplate>
 
                                     <nodify:Node.OutputConnectorTemplate>
-                                        <DataTemplate DataType="{x:Type taskEditor:ConnectorItem}">
+                                        <DataTemplate DataType="{x:Type customScenario:ConnectorItem}">
                                             <nodify:NodeOutput
                                                 x:Name="NodeOutput"
                                                 ToolTip="{Binding InputObject}"

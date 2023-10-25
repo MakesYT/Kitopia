@@ -2,6 +2,7 @@
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Core.SDKs.CustomScenario;
 
 #endregion
 
@@ -10,15 +11,15 @@ namespace Core.ViewModel.TaskEditor;
 public partial class PendingConnectionViewModel : ObservableRecipient
 {
     private readonly TaskEditorViewModel _editor;
+
+    [ObservableProperty] private object? _previewTarget;
+    [ObservableProperty] private string _previewText;
     [ObservableProperty] private ConnectorItem _source;
 
     public PendingConnectionViewModel(TaskEditorViewModel editor)
     {
         _editor = editor;
     }
-
-    [ObservableProperty] private object? _previewTarget;
-    [ObservableProperty] private string _previewText;
 
     partial void OnPreviewTargetChanged(object? value)
     {
