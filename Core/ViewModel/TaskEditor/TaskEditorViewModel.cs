@@ -49,7 +49,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 return;
             }
 
-            if (Scenario.nodes.Contains(e.PointItem) || _nodeMethods.Any(a => a.Contains(e.PointItem)))
+            if (Scenario.nodes.Contains(e.PointItem) || NodeMethods.Any(a => a.Contains(e.PointItem)))
             {
                 if (e.ConnectorItem is not null)
                 {
@@ -168,7 +168,74 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 RealType = connectorItem.RealType,
                 InputObject = connectorItem.InputObject,
                 AutoUnboxIndex = connectorItem.AutoUnboxIndex,
+                IsSelf = connectorItem.IsSelf,
+                IsOut = connectorItem.IsOut
+            });
+        }
+
+        ObservableCollection<ConnectorItem> output = new();
+        foreach (var connectorItem in pointItem.Output)
+        {
+            var connectorItem1 = new ConnectorItem
+            {
+                Anchor = new Point(connectorItem.Anchor.X, connectorItem.Anchor.Y),
+                Source = item,
+                Title = connectorItem.Title,
+                TypeName = connectorItem.TypeName,
+                RealType = connectorItem.RealType,
+                AutoUnboxIndex = connectorItem.AutoUnboxIndex,
+                Type = connectorItem.Type,
                 IsConnected = connectorItem.IsConnected,
+                IsOut = connectorItem.IsOut
+            };
+            if (connectorItem.Interfaces is { Count: > 0 })
+            {
+                List<string> interfaces = new();
+                foreach (var connectorItemInterface in connectorItem.Interfaces)
+                {
+                    interfaces.Add(connectorItemInterface);
+                }
+
+                connectorItem1.Interfaces = interfaces;
+            }
+
+            output.Add(connectorItem1);
+        }
+
+        item.Input = input;
+        item.Output = output;
+        Scenario.nodes.Add(item);
+    }
+
+    [RelayCommand]
+    private void CopyNode(PointItem pointItem)
+    {
+        IsModified = true;
+        if (Scenario.nodes.IndexOf(pointItem) == 0)
+        {
+            return;
+        }
+
+        var item = new PointItem
+        {
+            Title = pointItem.Title,
+            Plugin = pointItem.Plugin,
+            MerthodName = pointItem.MerthodName,
+            Location = new Point(pointItem.Location.X + 40, pointItem.Location.Y + 40)
+        };
+        ObservableCollection<ConnectorItem> input = new();
+        foreach (var connectorItem in pointItem.Input)
+        {
+            input.Add(new ConnectorItem
+            {
+                Anchor = new Point(connectorItem.Anchor.X, connectorItem.Anchor.Y),
+                Source = item,
+                TypeName = connectorItem.TypeName,
+                Title = connectorItem.Title,
+                Type = connectorItem.Type,
+                RealType = connectorItem.RealType,
+                InputObject = connectorItem.InputObject,
+                AutoUnboxIndex = connectorItem.AutoUnboxIndex,
                 IsSelf = connectorItem.IsSelf,
                 IsOut = connectorItem.IsOut
             });

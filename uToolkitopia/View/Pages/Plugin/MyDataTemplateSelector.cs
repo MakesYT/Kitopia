@@ -21,7 +21,7 @@ public class MyDataTemplateSelector : DataTemplateSelector
         }
 
         // Check the type of the item and return the corresponding data template from the resources
-        if (item is not ConnectorItem pointItem || !pointItem.IsSelf)
+        if (item is not ConnectorItem { IsSelf: true } pointItem)
         {
             return element.FindResource("InputTemplate") as DataTemplate;
         }

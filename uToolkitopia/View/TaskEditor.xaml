@@ -698,8 +698,12 @@
                                     <nodify:Node.ContextMenu>
                                         <ContextMenu DataContext="{StaticResource viewModel}">
                                             <!-- ReSharper disable once Xaml.RedundantResource -->
+                                            <MenuItem Header="复制节点" Command="{Binding Data.CopyNodeCommand}"
+                                                      CommandParameter="{Binding Data,Source={StaticResource runRecordList}}" />
+                                            <!-- ReSharper disable once Xaml.RedundantResource -->
                                             <MenuItem Header="删除此节点" Command="{Binding Data.DelNodeCommand}"
                                                       CommandParameter="{Binding Data,Source={StaticResource runRecordList}}" />
+                                            
                                         </ContextMenu>
                                     </nodify:Node.ContextMenu>
                                     <nodify:Node.Resources>

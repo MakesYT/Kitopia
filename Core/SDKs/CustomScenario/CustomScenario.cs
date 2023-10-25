@@ -17,13 +17,14 @@ using Vanara.Extensions.Reflection;
 
 namespace Core.SDKs.CustomScenario;
 
-public partial class CustomScenario : ObservableRecipient
+public partial class CustomScenario : ObservableRecipient, IDisposable
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(CustomScenario));
 
     private readonly Dictionary<PointItem, Thread?> _tasks = new();
 
     [JsonIgnore] [ObservableProperty] private List<CustomScenarioInvoke> _autoTriggerType = new();
+    private CancellationTokenSource _cancellationTokenSource = new();
 
     [JsonIgnore] [ObservableProperty] private string _description = "";
 
@@ -56,6 +57,11 @@ public partial class CustomScenario : ObservableRecipient
         set;
     } = new();
 
+    public void Dispose()
+    {
+        _cancellationTokenSource.Dispose();
+    }
+
     partial void OnNameChanged(string value)
     {
         WeakReferenceMessenger.Default.Send(new CustomScenarioChangeMsg()
@@ -74,14 +80,19 @@ public partial class CustomScenario : ObservableRecipient
             return;
         }
 
+
         if (notRealTime)
         {
+            _cancellationTokenSource.Cancel();
+            _cancellationTokenSource.Dispose();
+            _cancellationTokenSource = new CancellationTokenSource();
             IsRunning = true;
         }
 
+
         foreach (var task in _tasks)
         {
-            task.Value?.Interrupt();
+            task.Value?.Join();
         }
 
         _tasks.Clear();
@@ -131,7 +142,7 @@ public partial class CustomScenario : ObservableRecipient
         try
         {
             _tasks.Add(firstNodes, null);
-            ParsePointItem(firstNodes, false, notRealTime);
+            ParsePointItem(firstNodes, false, notRealTime, _cancellationTokenSource.Token);
         }
         catch (Exception e)
         {
@@ -169,6 +180,7 @@ public partial class CustomScenario : ObservableRecipient
                     }
 
                     IsRunning = false;
+                    _cancellationTokenSource.Cancel();
                     Log.Debug($"场景运行完成:{Name}");
                     break;
                 }
@@ -199,7 +211,8 @@ public partial class CustomScenario : ObservableRecipient
         }
     }
 
-    private void ParsePointItem(PointItem nowPointItem, bool onlyForward, bool notRealTime)
+    private void ParsePointItem(PointItem nowPointItem, bool onlyForward, bool notRealTime,
+        CancellationToken cancellationToken)
     {
         Log.Debug($"解析节点:{nowPointItem.Title}");
         var valid = true;
@@ -245,7 +258,7 @@ public partial class CustomScenario : ObservableRecipient
                     {
                         var task = new Thread(() =>
                         {
-                            ParsePointItem(sourceSource, true, notRealTime);
+                            ParsePointItem(sourceSource, true, notRealTime, cancellationToken);
                         });
 
                         // Log.Debug(sourceSource.Title);
@@ -262,8 +275,9 @@ public partial class CustomScenario : ObservableRecipient
         {
             thread.Join();
         }
-        //这是连接当前节点的节点
 
+        //这是连接当前节点的节点
+        cancellationToken.ThrowIfCancellationRequested();
         foreach (var connectorItem in nowPointItem.Input)
         {
             foreach (var sourceSource in connectorItem.GetSourceOrNextPointItems(connections))
@@ -426,6 +440,12 @@ public partial class CustomScenario : ObservableRecipient
                             continue;
                         }
 
+                        if (index == nowPointItem.Input.Count)
+                        {
+                            list.Add(cancellationToken);
+                            break;
+                        }
+
                         var inputObject = nowPointItem.Input[index].InputObject;
                         if (inputObject != null)
                         {
@@ -501,7 +521,7 @@ public partial class CustomScenario : ObservableRecipient
 
                         var task = new Thread(() =>
                         {
-                            ParsePointItem(nextPointItem, false, notRealTime);
+                            ParsePointItem(nextPointItem, false, notRealTime, cancellationToken);
                         });
 
                         _tasks.Add(nextPointItem, task);

@@ -49,6 +49,11 @@ public class Plugin
             {
                 if (methodInfo.GetCustomAttributes(typeof(PluginMethod)).Any()) //情景的可用节点
                 {
+                    if (methodInfo.GetParameters()[^1].ParameterType.FullName != "System.Threading.CancellationToken")
+                    {
+                        continue;
+                    }
+
                     methodInfos.Add(ToMtdString(methodInfo),
                         (methodInfo, GetPointItemByMethodInfo(methodInfo)));
                 }
@@ -256,6 +261,11 @@ public class Plugin
         for (var index = 0; index < methodInfo.GetParameters().Length; index++)
         {
             var parameterInfo = methodInfo.GetParameters()[index];
+            if (parameterInfo.ParameterType.FullName == "System.Threading.CancellationToken")
+            {
+                continue;
+            }
+
             if (parameterInfo.ParameterType.GetCustomAttribute(typeof(AutoUnbox)) is not null)
             {
                 autoUnboxIndex++;
