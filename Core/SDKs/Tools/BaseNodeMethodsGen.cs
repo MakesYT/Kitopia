@@ -296,6 +296,7 @@ public class BaseNodeMethodsGen
                     Type = typeof(int),
                     InputObject = (double)2,
                     IsSelf = true,
+                    SelfInputAble = false,
                     Title = "输出数量",
                     TypeName = "整数"
                 }

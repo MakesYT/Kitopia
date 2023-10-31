@@ -42,9 +42,13 @@ public class Plugin
                 //var instance = Activator.CreateInstance(type);
                 ServiceProvider = (IServiceProvider)type.GetMethod("GetServiceProvider").Invoke(null, null);
 
-                ((IPlugin)ServiceProvider.GetService(type)).OnEnabled();
+                ((IPlugin)ServiceProvider.GetService(type)).OnEnabled(ServiceProvider);
+                break;
             }
+        }
 
+        foreach (var type in t)
+        {
             foreach (var methodInfo in type.GetMethods())
             {
                 if (methodInfo.GetCustomAttributes(typeof(PluginMethod)).Any()) //情景的可用节点
@@ -266,6 +270,8 @@ public class Plugin
                 continue;
             }
 
+            bool IsSelf = parameterInfo.GetCustomAttributes(typeof(SelfInput)).Any();
+
             if (parameterInfo.ParameterType.GetCustomAttribute(typeof(AutoUnbox)) is not null)
             {
                 autoUnboxIndex++;
@@ -287,6 +293,7 @@ public class Plugin
                     {
                         Source = pointItem,
                         Type = memberInfo.PropertyType,
+                        IsSelf = IsSelf,
                         AutoUnboxIndex = autoUnboxIndex,
                         Interfaces = interfaces,
                         Title = customAttribute.GetParameterName(memberInfo.Name),
@@ -300,6 +307,7 @@ public class Plugin
                 {
                     Source = pointItem,
                     Type = parameterInfo.ParameterType,
+                    IsSelf = IsSelf,
                     Title = customAttribute.GetParameterName(parameterInfo.Name),
                     TypeName = BaseNodeMethodsGen.GetI18N(parameterInfo.ParameterType.FullName)
                 });

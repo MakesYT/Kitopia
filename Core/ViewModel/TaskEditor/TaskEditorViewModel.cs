@@ -49,52 +49,66 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 return;
             }
 
-            if (Scenario.nodes.Contains(e.PointItem) || NodeMethods.Any(a => a.Contains(e.PointItem)))
+            if (!Scenario.nodes.Contains(e.PointItem) && !NodeMethods.Any(a => a.Contains(e.PointItem)))
             {
-                if (e.ConnectorItem is not null)
+                return;
+            }
+
+            if (e.ConnectorItem is not { InputObject: not null, SelfInputAble: false })
+            {
+                return;
+            }
+
+            if (e.PointItem.MerthodName == "一对N" && e.ConnectorItem.Title == "输出数量")
+            {
+                int? value = null;
+                if (e.ConnectorItem.InputObject is int inputObject)
                 {
-                    if (e.PointItem.MerthodName == "一对N" && e.ConnectorItem.IsSelf)
+                    value = inputObject;
+                }
+                else
+                {
+                    value = Convert.ToInt32((double)e.ConnectorItem.InputObject);
+                }
+
+                if (e.PointItem.Output.Count == value)
+                {
+                    return;
+                }
+
+                while (e.PointItem.Output.Count != value)
+                {
+                    if (e.PointItem.Output.Count > value)
                     {
-                        if (e.PointItem.Output.Count == Convert.ToInt32((double)e.ConnectorItem.InputObject))
+                        var connectorItem = e.PointItem.Output[^1];
+                        var connectionItems = Scenario.connections
+                            .Where(connectionItem => connectionItem.Source == connectorItem).ToList();
+                        foreach (var connectionItem in connectionItems)
                         {
-                            return;
-                        }
-
-                        while (e.PointItem.Output.Count != Convert.ToInt32((double)e.ConnectorItem.InputObject))
-                        {
-                            if (e.PointItem.Output.Count > Convert.ToInt32((double)e.ConnectorItem.InputObject))
+                            Scenario.connections.Remove(connectionItem);
+                            if (Scenario.connections.All(item => item.Source != connectionItem.Source))
                             {
-                                var connectorItem = e.PointItem.Output[^1];
-                                var connectionItems = Scenario.connections
-                                    .Where(connectionItem => connectionItem.Source == connectorItem).ToList();
-                                foreach (var connectionItem in connectionItems)
-                                {
-                                    Scenario.connections.Remove(connectionItem);
-                                    if (Scenario.connections.All(item => item.Source != connectionItem.Source))
-                                    {
-                                        connectionItem.Source.IsConnected = false;
-                                    }
-
-                                    if (Scenario.connections.All(item => item.Target != connectionItem.Target))
-                                    {
-                                        connectionItem.Target.IsConnected = false;
-                                    }
-                                }
-
-                                e.PointItem.Output.Remove(connectorItem);
+                                connectionItem.Source.IsConnected = false;
                             }
-                            else
+
+                            if (Scenario.connections.All(item => item.Target != connectionItem.Target))
                             {
-                                e.PointItem.Output.Add(new ConnectorItem
-                                {
-                                    Source = e.PointItem,
-                                    Type = typeof(NodeConnectorClass),
-                                    Title = "流输出",
-                                    IsOut = true,
-                                    TypeName = "节点"
-                                });
+                                connectionItem.Target.IsConnected = false;
                             }
                         }
+
+                        e.PointItem.Output.Remove(connectorItem);
+                    }
+                    else
+                    {
+                        e.PointItem.Output.Add(new ConnectorItem
+                        {
+                            Source = e.PointItem,
+                            Type = typeof(NodeConnectorClass),
+                            Title = "流输出",
+                            IsOut = true,
+                            TypeName = "节点"
+                        });
                     }
                 }
             }
@@ -118,6 +132,23 @@ public partial class TaskEditorViewModel : ObservableRecipient
             }
         };
         Scenario.nodes.Add(nodify2);
+        var nodify3 = new PointItem
+        {
+            Title = "Tick",
+            Location = new Point(0, 100)
+        };
+        nodify3.Output = new ObservableCollection<ConnectorItem>
+        {
+            new()
+            {
+                IsOut = true,
+                Source = nodify3,
+                Type = typeof(NodeConnectorClass),
+                TypeName = BaseNodeMethodsGen.GetI18N(typeof(NodeConnectorClass).FullName),
+                Title = "开始"
+            }
+        };
+        Scenario.nodes.Add(nodify3);
         //nodeMethods.Add("new PointItem(){Title = \"Test\"}");
     }
 
@@ -141,6 +172,39 @@ public partial class TaskEditorViewModel : ObservableRecipient
     private void ToFirstVerify(bool notRealTime = false)
     {
         Scenario.Run(true);
+    }
+
+    [RelayCommand]
+    private void SwitchConnector(ConnectorItem connector)
+    {
+        if (!connector.SelfInputAble)
+        {
+            return;
+        }
+
+        IsModified = true;
+
+        connector.IsSelf = !connector.IsSelf;
+        if (connector.IsSelf)
+        {
+            var connectionItems = Scenario.connections
+                .Where(e => e.Source == connector || e.Target == connector).ToList();
+            foreach (var connectionItem in connectionItems)
+            {
+                Scenario.connections.Remove(connectionItem);
+                if (Scenario.connections.All(e => e.Source != connectionItem.Source))
+                {
+                    connectionItem.Source.IsConnected = false;
+                }
+
+                if (Scenario.connections.All(e => e.Target != connectionItem.Target))
+                {
+                    connectionItem.Target.IsConnected = false;
+                }
+            }
+        }
+
+        Scenario.nodes.ResetBindings();
     }
 
     [RelayCommand]
@@ -169,6 +233,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 InputObject = connectorItem.InputObject,
                 AutoUnboxIndex = connectorItem.AutoUnboxIndex,
                 IsSelf = connectorItem.IsSelf,
+                SelfInputAble = connectorItem.SelfInputAble,
                 IsOut = connectorItem.IsOut
             });
         }
@@ -237,6 +302,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 InputObject = connectorItem.InputObject,
                 AutoUnboxIndex = connectorItem.AutoUnboxIndex,
                 IsSelf = connectorItem.IsSelf,
+                SelfInputAble = connectorItem.SelfInputAble,
                 IsOut = connectorItem.IsOut
             });
         }
@@ -279,7 +345,8 @@ public partial class TaskEditorViewModel : ObservableRecipient
     private void DelNode(PointItem pointItem)
     {
         IsModified = true;
-        if (Scenario.nodes.IndexOf(pointItem) == 0)
+        var indexOf = Scenario.nodes.IndexOf(pointItem);
+        if (indexOf is 0 or 1)
         {
             return;
         }
@@ -355,7 +422,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
     [RelayCommand]
     private void CleanUnusedNode()
     {
-        for (var i = Scenario.nodes.Count - 1; i >= 1; i--)
+        for (var i = Scenario.nodes.Count - 1; i >= 2; i--)
         {
             bool toRemove = true;
 

@@ -7,6 +7,7 @@ using System.Runtime.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.Services.Plugin;
+using Core.SDKs.Tools;
 using Core.ViewModel.TaskEditor;
 using log4net;
 using Newtonsoft.Json;
@@ -38,6 +39,10 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
     [JsonIgnore] [ObservableProperty] private bool executionManual = true;
 
     [JsonIgnore] [ObservableProperty] private ObservableCollection<string> keys = new();
+
+    private TickUtil? tick;
+    [JsonIgnore] [ObservableProperty] private int tickPerSecond = 20;
+    [JsonIgnore] [ObservableProperty] private Dictionary<string, object> values = new() { { "变量1", "2" } };
 
     public string? UUID
     {
@@ -179,8 +184,8 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
                         continue;
                     }
 
-                    IsRunning = false;
                     _cancellationTokenSource.Cancel();
+                    IsRunning = false;
                     Log.Debug($"场景运行完成:{Name}");
                     break;
                 }
@@ -190,10 +195,7 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
 
     public void Stop()
     {
-        foreach (var task in _tasks)
-        {
-            task.Value?.Interrupt();
-        }
+        _cancellationTokenSource.Cancel();
     }
 
     private void MakeSourcePointState(ConnectorItem targetConnectorItem, PointItem pointItem)

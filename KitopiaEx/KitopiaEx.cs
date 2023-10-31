@@ -16,9 +16,16 @@ public class KitopiaEx : IPlugin
         Version = "1.0.0"
     };
 
-    public void OnEnabled()
+    public static IServiceProvider ServiceProvider;
+
+    private IPlugin _pluginImplementation;
+
+    public void OnEnabled(IServiceProvider serviceProvider)
     {
         //MessageBox.Show("OnEnabled");
+        Kitopia._i18n.Add("System.Windows.Media.Imaging.BitmapSource", "图像BitmapSource");
+        ServiceProvider = serviceProvider;
+        serviceProvider.GetService<OcrEx>()!.InitOcr();
     }
 
     public void OnDisabled()
@@ -30,6 +37,9 @@ public class KitopiaEx : IPlugin
         var services = new ServiceCollection();
         services.AddSingleton<KitopiaEx>();
         services.AddSingleton<SearchItemEx>();
+        services.AddSingleton<ClipboardEx>();
+        services.AddSingleton<OcrEx>();
+        services.AddSingleton<ImageTools>();
         return services.BuildServiceProvider();
     }
 }

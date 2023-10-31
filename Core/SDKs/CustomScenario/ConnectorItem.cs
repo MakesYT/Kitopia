@@ -20,6 +20,12 @@ public partial class ConnectorItem : ObservableRecipient
     [ObservableProperty] private bool _isSelf = false;
     private Type? _realType;
 
+    public bool SelfInputAble
+    {
+        get;
+        set;
+    } = true;
+
     public int AutoUnboxIndex
     {
         get;

@@ -129,6 +129,10 @@ public sealed partial class App : Application
                 }, null, -1, false);
             }
 
+            var assembly = Assembly.GetExecutingAssembly();
+            var logConfigStream = assembly.GetManifestResourceStream("Kitopia.log4net.config")!;
+
+            XmlConfigurator.Configure(logConfigStream);
 #if !DEBUG
             log.Info("异常捕获");
             DispatcherUnhandledException += App_DispatcherUnhandledException;
@@ -136,10 +140,6 @@ public sealed partial class App : Application
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 #endif
 
-            var assembly = Assembly.GetExecutingAssembly();
-            var logConfigStream = assembly.GetManifestResourceStream("Kitopia.log4net.config")!;
-
-            XmlConfigurator.Configure(logConfigStream);
 
             CheckAndDeleteLogFiles();
 
