@@ -9,10 +9,10 @@ namespace Core.SDKs.Tools;
 
 public class DelayAction
 {
-    private readonly object _lock1 = new();
-    private Timer? _timerDbc;
     private static readonly ILog Log = LogManager.GetLogger(nameof(DelayAction));
+    private readonly object _lock1 = new();
     private bool _needDelay = false;
+    private Timer? _timerDbc;
 
     /// <summary>
     ///     延迟timesMs后执行。 在此期间如果再次调用，则重新计时
@@ -29,6 +29,11 @@ public class DelayAction
             {
                 Task.Factory.StartNew(action, CancellationToken.None, TaskCreationOptions.None, invoker);
                 //Log.Debug("完成"+timeMs);
+                if (timeMs == 0)
+                {
+                    return;
+                }
+
                 _timerDbc = new Timer(timeMs);
                 _timerDbc.AutoReset = false;
                 _needDelay = false;

@@ -26,10 +26,13 @@ namespace Core.ViewModel;
 public partial class SearchWindowViewModel : ObservableRecipient
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(SearchWindowViewModel));
+    private static readonly List<SearchViewItem> TempList = new(1000);
     public readonly Dictionary<string, SearchViewItem> _collection = new(400); //存储本机所有软件
+    private readonly TaskScheduler _scheduler = TaskScheduler.FromCurrentSynchronizationContext();
+
+    private readonly DelayAction _searchDelayAction = new();
 
     [ObservableProperty] private bool? _everythingIsOk = true;
-    private static readonly List<SearchViewItem> TempList = new(1000);
 
     [ObservableProperty] private BindingList<SearchViewItem> _items = new(TempList); //搜索界面显示的软件
 
@@ -38,6 +41,10 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
 
     [ObservableProperty] private int? _selectedIndex = -1;
+
+
+    private bool nowInSelectMode = false;
+    private Action<SearchViewItem> selectAction;
 
     public SearchWindowViewModel()
     {
@@ -273,6 +280,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
     private void GetIconInItemsAsync(SearchViewItem t)
     {
         //Log.Debug($"为{t.OnlyKey}生成Icon");
+
         switch (t.FileType)
         {
             case FileType.文件夹:
@@ -320,9 +328,6 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
         //
     }
-
-    private readonly DelayAction _searchDelayAction = new();
-    private readonly TaskScheduler _scheduler = TaskScheduler.FromCurrentSynchronizationContext();
 
     // ReSharper disable once RedundantAssignment
     partial void OnSearchChanged(string? value)
@@ -615,10 +620,6 @@ public partial class SearchWindowViewModel : ObservableRecipient
             }
         });
     }
-
-
-    private bool nowInSelectMode = false;
-    private Action<SearchViewItem> selectAction;
 
     public void SetSelectMode(bool flag, Action<SearchViewItem> action)
     {

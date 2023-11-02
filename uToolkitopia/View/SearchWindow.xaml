@@ -57,7 +57,8 @@
                     Visibility="{Binding EverythingIsOk, Converter={StaticResource reverseBoolToVisibilityConverter}}"
                     IsClosable="False" />
         <ListBox x:Name="dataGrid" MaxHeight="415"
-                 ItemsSource="{Binding Items,UpdateSourceTrigger=PropertyChanged}"
+                 ItemsSource="{Binding Items}"
+                 VirtualizingStackPanel.IsVirtualizing="True"
                  
                  Margin="0,0,0,0">
             <ListBox.ItemContainerStyle>

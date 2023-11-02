@@ -312,6 +312,27 @@ public partial class AppTools
                     var data = new WIN32_FIND_DATA();
                     //((IShellLinkW)link).GetShowCmd
                     ((Shell32.IShellLinkW)link).GetPath(sb, sb.Capacity, out data, 0);
+                    var argSb = new StringBuilder(260);
+                    link.GetArguments(argSb, argSb.Capacity);
+                    var arg = argSb.Length > 0 ? argSb.ToString() : null;
+                    if (arg != null && arg.Contains("%"))
+                    {
+                        Regex regex = new Regex("%(\\w+)%");
+
+                        // 替换后的字符串
+                        arg = regex.Replace(arg, match =>
+                        {
+                            // 获取匹配到的环境变量名称
+                            var variable = match.Groups[1].Value;
+
+                            // 获取环境变量值
+                            var value = Environment.GetEnvironmentVariable(variable);
+
+
+                            // 返回替换后的值
+                            return value;
+                        });
+                    }
 
                     var targetPath = sb.ToString() ?? file;
 
@@ -393,7 +414,7 @@ public partial class AppTools
                             collection.TryAdd(refFileInfo.FullName, new SearchViewItem
                             {
                                 Keys = keys, IsVisible = true, FileInfo = refFileInfo, FileName = localName,
-                                OnlyKey = refFileInfo.FullName, IsStared = star,
+                                OnlyKey = refFileInfo.FullName, IsStared = star, Arguments = arg,
                                 FileType = FileType.应用程序, Icon = null
                             });
                         }

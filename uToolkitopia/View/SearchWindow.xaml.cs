@@ -47,7 +47,10 @@ public partial class SearchWindow : FluentWindow
     }
 
 
-    private void w_Deactivated(object sender, EventArgs e) => Visibility = Visibility.Hidden;
+    private void w_Deactivated(object sender, EventArgs e)
+    {
+        Visibility = Visibility.Hidden;
+    }
 
     [DllImport("user32.dll", SetLastError = true)]
     private static extern IntPtr SetFocus(IntPtr hWnd);

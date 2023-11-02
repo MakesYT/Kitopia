@@ -53,6 +53,12 @@ public class SearchViewItem : IDisposable
         get;
     }
 
+    public string? Arguments
+    {
+        set;
+        get;
+    }
+
     public DirectoryInfo? DirectoryInfo
     {
         set;

@@ -58,8 +58,18 @@ public class SearchItemTool : ISearchItemTool
                         searchViewItem.Action?.Invoke(searchViewItem);
                         break;
                     default:
-                        Shell32.ShellExecute(IntPtr.Zero, "open", searchViewItem.OnlyKey, "", "",
-                            ShowWindowCommand.SW_NORMAL);
+                        if (searchViewItem.Arguments == null)
+                        {
+                            Shell32.ShellExecute(IntPtr.Zero, "open", searchViewItem.OnlyKey, "", "",
+                                ShowWindowCommand.SW_NORMAL);
+                        }
+                        else
+                        {
+                            Shell32.ShellExecute(IntPtr.Zero, "open", searchViewItem.OnlyKey, searchViewItem.Arguments,
+                                "",
+                                ShowWindowCommand.SW_SHOWNORMAL);
+                        }
+
                         break;
                 }
 
