@@ -216,6 +216,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
         {
             Title = pointItem.Title,
             Plugin = pointItem.Plugin,
+            ValueRef = pointItem.ValueRef,
             MerthodName = pointItem.MerthodName,
             Location = new Point(pointItem.Location.X, pointItem.Location.Y)
         };
@@ -285,6 +286,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
         {
             Title = pointItem.Title,
             Plugin = pointItem.Plugin,
+            ValueRef = pointItem.ValueRef,
             MerthodName = pointItem.MerthodName,
             Location = new Point(pointItem.Location.X + 40, pointItem.Location.Y + 40)
         };
@@ -605,6 +607,42 @@ public partial class TaskEditorViewModel : ObservableRecipient
 
         KeyValue = null;
         Scenario.Keys.Add(key);
+        IsModified = true;
+    }
+
+    #endregion
+
+    #region 变量
+
+    [NotifyPropertyChangedFor(nameof(valueCanAdd))]
+    [NotifyCanExecuteChangedFor(nameof(AddValueCommand))]
+    [ObservableProperty]
+    private string? _valueValue = String.Empty;
+
+    private bool valueCanAdd => !string.IsNullOrEmpty(ValueValue);
+
+    [RelayCommand(CanExecute = nameof(valueCanAdd))]
+    private void AddValue(string key)
+    {
+        if (Scenario.Values.ContainsKey(key))
+        {
+            return;
+        }
+
+        ValueValue = null;
+        Scenario.Values.Add(key, new object());
+        OnPropertyChanged(CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Values);
+        IsModified = true;
+    }
+
+    [RelayCommand]
+    private void DelValue(string key)
+    {
+        if (Scenario.Values.ContainsKey(key))
+        {
+            Scenario.Values.Remove(key);
+        }
+
         IsModified = true;
     }
 

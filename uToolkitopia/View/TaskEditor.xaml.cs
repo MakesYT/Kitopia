@@ -1,6 +1,8 @@
 ﻿#region
 
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -11,6 +13,7 @@ using Core.ViewModel;
 using Core.ViewModel.TaskEditor;
 using Kitopia.Controls;
 using Microsoft.Extensions.DependencyInjection;
+using PluginCore;
 using Vanara.PInvoke;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
@@ -47,15 +50,75 @@ public partial class TaskEditor
 
     private void ListBox_OnMouseMove(object sender, MouseEventArgs e)
     {
-        if (sender is ListBox listBox && e.LeftButton == MouseButtonState.Pressed && listBox.SelectedItem != null)
+        if (sender is ListBox listBox)
         {
-            try
+            if (e.LeftButton == MouseButtonState.Pressed && listBox.SelectedItem != null)
             {
-                DragDrop.DoDragDrop(listBox, listBox.SelectedItem, DragDropEffects.Copy);
+                try
+                {
+                    DragDrop.DoDragDrop(listBox, listBox.SelectedItem, DragDropEffects.Copy);
+                }
+                catch (Exception exception)
+                {
+                    Console.WriteLine(exception);
+                }
             }
-            catch (Exception exception)
+        }
+        else if (sender is Border border)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
             {
-                Console.WriteLine(exception);
+                try
+                {
+                    var keyValuePair = (KeyValuePair<string, object>)border.DataContext;
+                    var pointItem = new PointItem()
+                    {
+                        Title = $"变量:{keyValuePair.Key}",
+                        MerthodName = "valueSet",
+                        ValueRef = keyValuePair.Key,
+                        Plugin = "Kitopia"
+                    };
+                    if ((string)border.Tag == "Set")
+                    {
+                        ObservableCollection<ConnectorItem> inpItems = new();
+                        inpItems.Add(new ConnectorItem()
+                        {
+                            Source = pointItem,
+                            Type = typeof(NodeConnectorClass),
+                            Title = "流输入",
+                            TypeName = "节点"
+                        });
+                        inpItems.Add(new ConnectorItem()
+                        {
+                            Source = pointItem,
+                            Type = typeof(object),
+                            Title = "设置",
+                            TypeName = "变量"
+                        });
+                        pointItem.Input = inpItems;
+                    }
+                    else if ((string)border.Tag == "Get")
+                    {
+                        ObservableCollection<ConnectorItem> inpItems = new();
+                        inpItems.Add(new ConnectorItem()
+                        {
+                            Source = pointItem,
+                            Type = typeof(object),
+                            Title = "获取",
+                            IsOut = true,
+                            TypeName = "变量"
+                        });
+                        pointItem.MerthodName = "valueGet";
+                        pointItem.Output = inpItems;
+                    }
+
+
+                    DragDrop.DoDragDrop(border, pointItem, DragDropEffects.Copy);
+                }
+                catch (Exception exception)
+                {
+                    Console.WriteLine(exception);
+                }
             }
         }
     }

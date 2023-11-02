@@ -28,7 +28,13 @@ public partial class PointItem : ObservableRecipient
     }
 
 
-    public string MerthodName
+    public string? MerthodName
+    {
+        get;
+        set;
+    }
+
+    public string? ValueRef
     {
         get;
         set;

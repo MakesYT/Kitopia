@@ -13,7 +13,6 @@
     xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=System.ComponentModel.TypeConverter"
     xmlns:services="clr-namespace:Kitopia.Services"
     xmlns:customScenario="clr-namespace:Core.SDKs.CustomScenario;assembly=Core"
-    xmlns:system="clr-namespace:System;assembly=System.Runtime"
     x:Class="Kitopia.View.TaskEditor"
     WindowBackdropType="Acrylic"
     WindowCornerPreference="Round"
@@ -183,219 +182,294 @@
                     </Expander>
                     <Expander Header="变量" FontSize="15" IsExpanded="True" FontWeight="Medium">
                         <Expander.Content>
-                            <ListBox Margin="0,0,10,0" x:Name="values"
-                                     ItemsSource="{Binding Scenario.Values.Keys}">
-                                <ListBox.Resources>
-                                    <plugin:MyDataTemplateSelector x:Key="MyDataTemplateSelector" />
-                                </ListBox.Resources>
-                                <ListBox.ItemContainerStyle>
-                                    <Style TargetType="{x:Type ListBoxItem}"
-                                           BasedOn="{StaticResource {x:Type ListBoxItem}}">
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                                                    <Border
-                                                        x:Name="Border"
-                                                        Margin="0"
-                                                        Padding="0"
-                                                        Background="Transparent"
-                                                        BorderThickness="1"
-                                                        CornerRadius="{TemplateBinding Border.CornerRadius}">
-                                                        <ContentPresenter />
-                                                    </Border>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </ListBox.ItemContainerStyle>
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate DataType="{x:Type system:String}">
-                                        <Border Padding="9" BorderBrush="LightGray" BorderThickness="1"
-                                                CornerRadius="3">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="30" />
-                                                    <ColumnDefinition Width="*" />
-                                                </Grid.ColumnDefinitions>
-                                                <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="3">
-                                                    <DockPanel Panel.ZIndex="1">
-                                                        <Border DockPanel.Dock="Top" CornerRadius="3 3 0 0">
+                            <StackPanel>
+                                <ListBox Margin="0,0,10,0" x:Name="values"
+                                         ItemsSource="{Binding Scenario.Values,NotifyOnSourceUpdated=True }">
+                                    <ListBox.ItemContainerStyle>
+                                        <Style TargetType="{x:Type ListBoxItem}"
+                                               BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                                        <Border
+                                                            x:Name="Border"
+                                                            Margin="0"
+                                                            Padding="0"
+                                                            Background="Transparent"
+                                                            BorderThickness="1"
+                                                            CornerRadius="{TemplateBinding Border.CornerRadius}">
+                                                            <ContentPresenter />
+                                                        </Border>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ListBox.ItemContainerStyle>
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border BorderBrush="LightGray" BorderThickness="1"
+                                                    CornerRadius="3">
+                                                <Border.Resources>
+                                                    <services:BindingProxy x:Key="runRecordList" Data="{Binding}" />
+                                                </Border.Resources>
+                                                <Grid Margin="9">
+                                                    <Grid.ContextMenu>
+                                                        <ContextMenu DataContext="{StaticResource viewModel}">
+                                                            <!-- ReSharper disable once Xaml.RedundantResource -->
+                                                            <MenuItem Header="删除此变量"
+                                                                      Command="{Binding Data.DelValueCommand}"
+                                                                      CommandParameter="{Binding Data.Key,Source={StaticResource runRecordList}}" />
+                                                        </ContextMenu>
+                                                    </Grid.ContextMenu>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="30" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border Tag="Set" MouseMove="ListBox_OnMouseMove"
+                                                            BorderBrush="LightGray" BorderThickness="1"
+                                                            CornerRadius="3">
+                                                        <DockPanel Panel.ZIndex="1">
+                                                            <Border DockPanel.Dock="Top" CornerRadius="3 3 0 0">
 
-                                                            <Border Height="20"
+                                                                <Border Height="20"
 
-                                                                    CornerRadius="3 3 0 0">
-                                                                <Border.Background>
-                                                                    <SolidColorBrush Opacity="0.5"
-                                                                        Color="{DynamicResource SystemAccentColorSecondary}" />
-                                                                </Border.Background>
-                                                                <TextBlock HorizontalAlignment="Center"
-                                                                           Text="{Binding .}"
-                                                                           Foreground="White" />
+                                                                        CornerRadius="3 3 0 0">
+                                                                    <Border.Background>
+                                                                        <SolidColorBrush Opacity="0.5"
+                                                                            Color="{DynamicResource SystemAccentColorSecondary}" />
+                                                                    </Border.Background>
+                                                                    <TextBlock HorizontalAlignment="Center"
+                                                                               Text="{Binding Key  }"
+                                                                               Foreground="White" />
+                                                                </Border>
+
+                                                            </Border>
+                                                            <Border CornerRadius="0 0 3 3">
+                                                                <Grid>
+                                                                    <Rectangle>
+                                                                        <Rectangle.Fill>
+                                                                            <SolidColorBrush
+                                                                                Color="{DynamicResource ApplicationBackgroundColor}"
+                                                                                Opacity="0.2" />
+                                                                        </Rectangle.Fill>
+                                                                    </Rectangle>
+                                                                    <DockPanel>
+                                                                        <StackPanel Orientation="Vertical"
+                                                                            DockPanel.Dock="Left"
+                                                                            VerticalAlignment="Center">
+
+                                                                            <StackPanel Orientation="Horizontal"
+                                                                                VerticalAlignment="Center">
+                                                                                <Border Background="Transparent">
+                                                                                    <!-- Set the border color to red -->
+                                                                                    <Border.BorderBrush>
+                                                                                        <SolidColorBrush
+                                                                                            Color="{DynamicResource SystemAccentColorSecondary}"
+                                                                                            Opacity="0.5" />
+                                                                                    </Border.BorderBrush>
+                                                                                    <!-- Set the border thickness to 2 -->
+                                                                                    <Border.BorderThickness>2</Border.BorderThickness>
+                                                                                    <!-- Set the border corner radius to 10 -->
+                                                                                    <Border.CornerRadius>10</Border.CornerRadius>
+                                                                                    <!-- Set the padding to 10 -->
+                                                                                    <Border.Padding>5</Border.Padding>
+                                                                                    <!-- Set the margin to 20 -->
+                                                                                    <Border.Margin>5</Border.Margin>
+                                                                                </Border>
+                                                                                <!-- Declare a TextBlock element and give it a name -->
+
+                                                                                <TextBlock VerticalAlignment="Center"
+                                                                                    x:Name="textBlock"
+                                                                                    FontSize="12"
+
+                                                                                    Text="节点">
+                                                                                    <TextBlock.Background>
+                                                                                        <SolidColorBrush
+                                                                                            Color="{DynamicResource TextFillColorPrimary}"
+                                                                                            Opacity="0.6" />
+                                                                                    </TextBlock.Background>
+                                                                                    <TextBlock.Foreground>
+                                                                                        <SolidColorBrush
+                                                                                            Color="{DynamicResource ApplicationBackgroundColor}" />
+                                                                                    </TextBlock.Foreground>
+                                                                                </TextBlock>
+
+
+                                                                                <TextBlock VerticalAlignment="Center"
+                                                                                    Text="流节点">
+                                                                                    <TextBlock.Foreground>
+                                                                                        <SolidColorBrush
+                                                                                            Color="{DynamicResource TextFillColorPrimary}" />
+                                                                                    </TextBlock.Foreground>
+                                                                                </TextBlock>
+                                                                            </StackPanel>
+                                                                            <StackPanel Orientation="Horizontal"
+                                                                                VerticalAlignment="Center">
+                                                                                <Border Background="Transparent">
+                                                                                    <!-- Set the border color to red -->
+                                                                                    <Border.BorderBrush>
+                                                                                        <SolidColorBrush
+                                                                                            Color="{DynamicResource SystemAccentColorSecondary}"
+                                                                                            Opacity="0.5" />
+                                                                                    </Border.BorderBrush>
+                                                                                    <!-- Set the border thickness to 2 -->
+                                                                                    <Border.BorderThickness>2</Border.BorderThickness>
+                                                                                    <!-- Set the border corner radius to 10 -->
+                                                                                    <Border.CornerRadius>10</Border.CornerRadius>
+                                                                                    <!-- Set the padding to 10 -->
+                                                                                    <Border.Padding>5</Border.Padding>
+                                                                                    <!-- Set the margin to 20 -->
+                                                                                    <Border.Margin>5</Border.Margin>
+                                                                                </Border>
+                                                                                <!-- Declare a TextBlock element and give it a name -->
+
+                                                                                <TextBlock VerticalAlignment="Center"
+
+                                                                                    FontSize="12"
+
+                                                                                    Text="变量">
+                                                                                    <TextBlock.Background>
+                                                                                        <SolidColorBrush
+                                                                                            Color="{DynamicResource TextFillColorPrimary}"
+                                                                                            Opacity="0.6" />
+                                                                                    </TextBlock.Background>
+                                                                                    <TextBlock.Foreground>
+                                                                                        <SolidColorBrush
+                                                                                            Color="{DynamicResource ApplicationBackgroundColor}" />
+                                                                                    </TextBlock.Foreground>
+                                                                                </TextBlock>
+
+
+                                                                                <TextBlock VerticalAlignment="Center"
+                                                                                    Text="设置">
+                                                                                    <TextBlock.Foreground>
+                                                                                        <SolidColorBrush
+                                                                                            Color="{DynamicResource TextFillColorPrimary}" />
+                                                                                    </TextBlock.Foreground>
+                                                                                </TextBlock>
+                                                                            </StackPanel>
+                                                                        </StackPanel>
+
+
+                                                                    </DockPanel>
+                                                                </Grid>
                                                             </Border>
 
-                                                        </Border>
-                                                        <Border CornerRadius="0 0 3 3">
-                                                            <Grid>
-                                                                <Rectangle>
-                                                                    <Rectangle.Fill>
-                                                                        <SolidColorBrush
-                                                                            Color="{DynamicResource ApplicationBackgroundColor}"
-                                                                            Opacity="0.2" />
-                                                                    </Rectangle.Fill>
-                                                                </Rectangle>
-                                                                <DockPanel>
-                                                                    <StackPanel Orientation="Vertical"
-                                                                        DockPanel.Dock="Left"
-                                                                        VerticalAlignment="Center">
 
-                                                                        <StackPanel Orientation="Horizontal"
-                                                                            VerticalAlignment="Center">
-                                                                            <Border Background="Transparent">
-                                                                                <!-- Set the border color to red -->
-                                                                                <Border.BorderBrush>
-                                                                                    <SolidColorBrush
-                                                                                        Color="{DynamicResource SystemAccentColorSecondary}"
-                                                                                        Opacity="0.5" />
-                                                                                </Border.BorderBrush>
-                                                                                <!-- Set the border thickness to 2 -->
-                                                                                <Border.BorderThickness>2</Border.BorderThickness>
-                                                                                <!-- Set the border corner radius to 10 -->
-                                                                                <Border.CornerRadius>10</Border.CornerRadius>
-                                                                                <!-- Set the padding to 10 -->
-                                                                                <Border.Padding>5</Border.Padding>
-                                                                                <!-- Set the margin to 20 -->
-                                                                                <Border.Margin>5</Border.Margin>
-                                                                            </Border>
-                                                                            <!-- Declare a TextBlock element and give it a name -->
+                                                        </DockPanel>
+                                                    </Border>
+                                                    <Border Tag="Get" MouseMove="ListBox_OnMouseMove" Grid.Column="2"
+                                                            BorderBrush="LightGray" BorderThickness="1"
+                                                            CornerRadius="3">
+                                                        <DockPanel Panel.ZIndex="1">
+                                                            <Border DockPanel.Dock="Top" CornerRadius="3 3 0 0">
 
-                                                                            <TextBlock VerticalAlignment="Center"
-                                                                                x:Name="textBlock"
-                                                                                FontSize="12"
+                                                                <Border Height="20"
 
-                                                                                Text="{Binding TypeName}">
-                                                                                <TextBlock.Background>
-                                                                                    <SolidColorBrush
-                                                                                        Color="{DynamicResource TextFillColorPrimary}"
-                                                                                        Opacity="0.6" />
-                                                                                </TextBlock.Background>
-                                                                                <TextBlock.Foreground>
-                                                                                    <SolidColorBrush
-                                                                                        Color="{DynamicResource ApplicationBackgroundColor}" />
-                                                                                </TextBlock.Foreground>
-                                                                            </TextBlock>
+                                                                        CornerRadius="3 3 0 0">
+                                                                    <Border.Background>
+                                                                        <SolidColorBrush Opacity="0.5"
+                                                                            Color="{DynamicResource SystemAccentColorSecondary}" />
+                                                                    </Border.Background>
+                                                                    <TextBlock HorizontalAlignment="Center"
+                                                                               Text="{Binding Key}"
+                                                                               Foreground="White" />
+                                                                </Border>
 
+                                                            </Border>
+                                                            <Border CornerRadius="0 0 3 3">
+                                                                <Grid>
+                                                                    <Rectangle>
+                                                                        <Rectangle.Fill>
+                                                                            <SolidColorBrush
+                                                                                Color="{DynamicResource ApplicationBackgroundColor}"
+                                                                                Opacity="0.2" />
+                                                                        </Rectangle.Fill>
+                                                                    </Rectangle>
+                                                                    <StackPanel Orientation="Horizontal"
+                                                                        VerticalAlignment="Center"
+                                                                        HorizontalAlignment="Right">
 
-                                                                            <TextBlock VerticalAlignment="Center"
-                                                                                Text="设置">
-                                                                                <TextBlock.Foreground>
-                                                                                    <SolidColorBrush
-                                                                                        Color="{DynamicResource TextFillColorPrimary}" />
-                                                                                </TextBlock.Foreground>
-                                                                            </TextBlock>
-                                                                        </StackPanel>
+                                                                        <TextBlock
+                                                                            VerticalAlignment="Center"
+
+                                                                            Text="读取">
+                                                                            <TextBlock.Foreground>
+                                                                                <SolidColorBrush
+                                                                                    Color="{DynamicResource TextFillColorPrimary}" />
+                                                                            </TextBlock.Foreground>
+                                                                        </TextBlock>
+                                                                        <TextBlock
+                                                                            VerticalAlignment="Center"
+                                                                            FontSize="12"
+
+                                                                            Text="变量">
+                                                                            <TextBlock.Background>
+                                                                                <SolidColorBrush
+                                                                                    Color="{DynamicResource TextFillColorPrimary}"
+                                                                                    Opacity="0.6" />
+
+                                                                            </TextBlock.Background>
+                                                                            <TextBlock.Foreground>
+                                                                                <SolidColorBrush
+                                                                                    Color="{DynamicResource ApplicationBackgroundColor}" />
+                                                                            </TextBlock.Foreground>
+                                                                        </TextBlock>
+
+                                                                        <Border Background="Transparent">
+                                                                            <!-- Set the border color to red -->
+                                                                            <Border.BorderBrush>
+                                                                                <SolidColorBrush
+                                                                                    Color="{DynamicResource SystemAccentColorSecondary}"
+                                                                                    Opacity="0.5" />
+                                                                            </Border.BorderBrush>
+                                                                            <!-- Set the border thickness to 2 -->
+                                                                            <Border.BorderThickness>2</Border.BorderThickness>
+                                                                            <!-- Set the border corner radius to 10 -->
+                                                                            <Border.CornerRadius>10</Border.CornerRadius>
+                                                                            <!-- Set the padding to 10 -->
+                                                                            <Border.Padding>5</Border.Padding>
+                                                                            <!-- Set the margin to 20 -->
+                                                                            <Border.Margin>5</Border.Margin>
+                                                                        </Border>
+                                                                        <!-- Declare a TextBlock element and give it a name -->
 
                                                                     </StackPanel>
 
 
-                                                                </DockPanel>
-                                                            </Grid>
-                                                        </Border>
-
-
-                                                    </DockPanel>
-                                                </Border>
-                                                <Border Grid.Column="2" BorderBrush="LightGray" BorderThickness="1"
-                                                        CornerRadius="3">
-                                                    <DockPanel Panel.ZIndex="1">
-                                                        <Border DockPanel.Dock="Top" CornerRadius="3 3 0 0">
-
-                                                            <Border Height="20"
-
-                                                                    CornerRadius="3 3 0 0">
-                                                                <Border.Background>
-                                                                    <SolidColorBrush Opacity="0.5"
-                                                                        Color="{DynamicResource SystemAccentColorSecondary}" />
-                                                                </Border.Background>
-                                                                <TextBlock HorizontalAlignment="Center"
-                                                                           Text="{Binding .}"
-                                                                           Foreground="White" />
+                                                                </Grid>
                                                             </Border>
 
-                                                        </Border>
-                                                        <Border CornerRadius="0 0 3 3">
-                                                            <Grid>
-                                                                <Rectangle>
-                                                                    <Rectangle.Fill>
-                                                                        <SolidColorBrush
-                                                                            Color="{DynamicResource ApplicationBackgroundColor}"
-                                                                            Opacity="0.2" />
-                                                                    </Rectangle.Fill>
-                                                                </Rectangle>
-                                                                <StackPanel Orientation="Horizontal"
-                                                                            VerticalAlignment="Center"
-                                                                            HorizontalAlignment="Right">
 
-                                                                    <TextBlock
-                                                                        VerticalAlignment="Center"
-
-                                                                        Text="读取">
-                                                                        <TextBlock.Foreground>
-                                                                            <SolidColorBrush
-                                                                                Color="{DynamicResource TextFillColorPrimary}" />
-                                                                        </TextBlock.Foreground>
-                                                                    </TextBlock>
-                                                                    <TextBlock
-                                                                        VerticalAlignment="Center"
-                                                                        FontSize="12"
-
-                                                                        Text="{Binding TypeName}">
-                                                                        <TextBlock.Background>
-                                                                            <SolidColorBrush
-                                                                                Color="{DynamicResource TextFillColorPrimary}"
-                                                                                Opacity="0.6" />
-
-                                                                        </TextBlock.Background>
-                                                                        <TextBlock.Foreground>
-                                                                            <SolidColorBrush
-                                                                                Color="{DynamicResource ApplicationBackgroundColor}" />
-                                                                        </TextBlock.Foreground>
-                                                                    </TextBlock>
-
-                                                                    <Border Background="Transparent">
-                                                                        <!-- Set the border color to red -->
-                                                                        <Border.BorderBrush>
-                                                                            <SolidColorBrush
-                                                                                Color="{DynamicResource SystemAccentColorSecondary}"
-                                                                                Opacity="0.5" />
-                                                                        </Border.BorderBrush>
-                                                                        <!-- Set the border thickness to 2 -->
-                                                                        <Border.BorderThickness>2</Border.BorderThickness>
-                                                                        <!-- Set the border corner radius to 10 -->
-                                                                        <Border.CornerRadius>10</Border.CornerRadius>
-                                                                        <!-- Set the padding to 10 -->
-                                                                        <Border.Padding>5</Border.Padding>
-                                                                        <!-- Set the margin to 20 -->
-                                                                        <Border.Margin>5</Border.Margin>
-                                                                    </Border>
-                                                                    <!-- Declare a TextBlock element and give it a name -->
-
-                                                                </StackPanel>
+                                                        </DockPanel>
+                                                    </Border>
+                                                </Grid>
+                                            </Border>
 
 
-                                                            </Grid>
-                                                        </Border>
-
-
-                                                    </DockPanel>
-                                                </Border>
-                                            </Grid>
-                                        </Border>
-
-
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                                <Grid Margin="0,10,10,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="40" />
+                                    </Grid.ColumnDefinitions>
+                                    <ui:Button Command="{Binding AddValueCommand}"
+                                               CommandParameter="{Binding ValueValue}"
+                                               Grid.Column="1" Height="40" Width="40">
+                                        <ui:Button.Icon>
+                                            <ui:SymbolIcon Symbol="Add12" Foreground="GreenYellow"
+                                                           FontSize="25" />
+                                        </ui:Button.Icon>
+                                    </ui:Button>
+                                    <DockPanel Grid.Column="0" Margin="0,0,0,0" Height="40">
+                                        <ui:TextBox PlaceholderText="变量名称"
+                                                    Text="{Binding ValueValue,UpdateSourceTrigger=PropertyChanged}" />
+                                    </DockPanel>
+                                </Grid>
+                            </StackPanel>
 
 
                         </Expander.Content>

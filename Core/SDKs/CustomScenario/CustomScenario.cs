@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
+using Core.SDKs.CustomType;
 using Core.SDKs.Services.Plugin;
 using Core.SDKs.Tools;
 using Core.ViewModel.TaskEditor;
@@ -42,7 +43,7 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
 
     private TickUtil? tick;
     [JsonIgnore] [ObservableProperty] private int tickPerSecond = 20;
-    [JsonIgnore] [ObservableProperty] private Dictionary<string, object> values = new() { { "变量1", "2" } };
+    [JsonIgnore] [ObservableProperty] private ObservableDictionary<string, object> values = new() { { "1", "2" } };
 
     public string? UUID
     {
@@ -184,7 +185,11 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
                         continue;
                     }
 
-                    _cancellationTokenSource.Cancel();
+                    if (notRealTime)
+                    {
+                        _cancellationTokenSource.Cancel();
+                    }
+
                     IsRunning = false;
                     Log.Debug($"场景运行完成:{Name}");
                     break;
@@ -360,6 +365,29 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
                             {
                                 item.InputObject = nowPointItem.Output[0].InputObject;
                                 MakeSourcePointState(item, nowPointItem);
+                            }
+
+                            break;
+                        }
+                        case "valueSet":
+                        {
+                            if (Values.ContainsKey(nowPointItem.ValueRef!))
+                            {
+                                Values.SetValueWithoutNotify(nowPointItem.ValueRef!,
+                                    nowPointItem.Input[1].InputObject!);
+                            }
+
+                            break;
+                        }
+                        case "valueGet":
+                        {
+                            if (Values.ContainsKey(nowPointItem.ValueRef!))
+                            {
+                                foreach (var item in nowPointItem.Output[0].GetSourceOrNextConnectorItems(connections))
+                                {
+                                    item.InputObject = Values[nowPointItem.ValueRef!];
+                                    MakeSourcePointState(item, nowPointItem);
+                                }
                             }
 
                             break;
