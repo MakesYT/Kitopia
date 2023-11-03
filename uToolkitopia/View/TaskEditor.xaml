@@ -180,6 +180,22 @@
                             </StackPanel>
                         </Expander.Content>
                     </Expander>
+                    <Expander Header="Tick控制" FontSize="15" IsExpanded="True" FontWeight="Medium">
+                        <Expander.Content>
+                            <StackPanel>
+                                <controls:SettingItems Margin="0" Title="执行间隔(秒)" FontSize="20">
+                                    <ui:NumberBox
+                                        Minimum="0.1"
+                                        Value="{Binding Scenario.TickIntervalSecond,UpdateSourceTrigger=PropertyChanged,NotifyOnTargetUpdated=True,NotifyOnSourceUpdated=True}" />
+                                    <controls:SettingItems.Icon>
+                                        <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25" />
+                                    </controls:SettingItems.Icon>
+                                </controls:SettingItems>
+                            </StackPanel>
+
+
+                        </Expander.Content>
+                    </Expander>
                     <Expander Header="变量" FontSize="15" IsExpanded="True" FontWeight="Medium">
                         <Expander.Content>
                             <StackPanel>
@@ -595,7 +611,19 @@
                                         </StackPanel>
                                     </StackPanel>
                                 </Expander>
-
+                                <Expander IsExpanded="True"
+                                          Padding="0,0,10,0">
+                                    <Expander.Header>
+                                        <controls:SettingItems Margin="0" Title="快捷键触发" FontSize="20"
+                                                               BorderThickness="0">
+                                            <controls:SettingItems.Icon>
+                                                <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25" />
+                                            </controls:SettingItems.Icon>
+                                            
+                                        </controls:SettingItems>
+                                    </Expander.Header>
+                                    <StackPanel Margin="15,5,5,5" Orientation="Vertical" />
+                                </Expander>
                             </StackPanel>
                         </Expander.Content>
                     </Expander>

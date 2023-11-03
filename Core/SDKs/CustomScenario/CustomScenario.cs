@@ -45,7 +45,7 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
     [JsonIgnore] [ObservableProperty] private ObservableCollection<string> keys = new();
 
     private TickUtil? tick;
-    [JsonIgnore] [ObservableProperty] private int tickPerSecond = 20;
+    [JsonIgnore] [ObservableProperty] private double tickIntervalSecond = 5;
     [JsonIgnore] [ObservableProperty] private ObservableDictionary<string, object> values = new() { { "1", "2" } };
 
     public string? UUID
@@ -222,7 +222,7 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
                     Log.Debug($"场景进入Tick:{Name}");
                     try
                     {
-                        _tickUtil = new TickUtil(1000, 1000 * 1000, 1, TickMethod);
+                        _tickUtil = new TickUtil(1000, (uint)(tickIntervalSecond * 1000 * 1000), 1, TickMethod);
                         _tickUtil.Open();
                     }
                     catch (Exception e)
