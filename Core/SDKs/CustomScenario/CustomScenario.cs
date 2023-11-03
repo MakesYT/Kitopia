@@ -22,22 +22,25 @@ namespace Core.SDKs.CustomScenario;
 public partial class CustomScenario : ObservableRecipient, IDisposable
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(CustomScenario));
-
-    private readonly Dictionary<PointItem, Thread?> _tasks = new();
-
     [JsonIgnore] [ObservableProperty] private List<CustomScenarioInvoke> _autoTriggerType = new();
     private CancellationTokenSource _cancellationTokenSource = new();
 
     [JsonIgnore] [ObservableProperty] private string _description = "";
 
+    private Dictionary<PointItem, Thread?> _initTasks = new();
+
     [JsonIgnore] [ObservableProperty] private bool _isRunning = false;
 
     [JsonIgnore] [ObservableProperty] private string _name = "任务";
+    private Dictionary<PointItem, Thread?> _tickTasks = new();
+    private TickUtil? _tickUtil;
 
     /// <summary>
     ///     手动执行
     /// </summary>
     [JsonIgnore] [ObservableProperty] private bool executionManual = true;
+
+    private bool InTick = false;
 
     [JsonIgnore] [ObservableProperty] private ObservableCollection<string> keys = new();
 
@@ -86,22 +89,28 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
             return;
         }
 
+        _cancellationTokenSource.Cancel();
+        _cancellationTokenSource.Dispose();
+        _cancellationTokenSource = new CancellationTokenSource();
 
         if (notRealTime)
         {
-            _cancellationTokenSource.Cancel();
-            _cancellationTokenSource.Dispose();
-            _cancellationTokenSource = new CancellationTokenSource();
             IsRunning = true;
         }
 
 
-        foreach (var task in _tasks)
+        foreach (var task in _initTasks)
         {
             task.Value?.Join();
         }
 
-        _tasks.Clear();
+        foreach (var task in _tickTasks)
+        {
+            task.Value?.Join();
+        }
+
+        _initTasks.Clear();
+        _tickTasks.Clear();
         if (notRealTime)
         {
             foreach (var pointItem in nodes)
@@ -136,19 +145,25 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
             }
         }
 
-        _tasks.Add(nodes[0], null);
+        _initTasks.Add(nodes[0], null);
         nodes[0].Status = s节点状态.已验证;
         var connectionItem = connections.FirstOrDefault((e) => e.Source == nodes[0].Output[0]);
         if (connectionItem == null)
         {
+            if (notRealTime)
+            {
+                IsRunning = false;
+                Log.Debug($"场景运行完成:{Name}");
+            }
+
             return;
         }
 
         var firstNodes = connectionItem.Target.Source;
         try
         {
-            _tasks.Add(firstNodes, null);
-            ParsePointItem(firstNodes, false, notRealTime, _cancellationTokenSource.Token);
+            _initTasks.Add(firstNodes, null);
+            ParsePointItem(_initTasks, firstNodes, false, notRealTime, _cancellationTokenSource.Token);
         }
         catch (Exception e)
         {
@@ -164,7 +179,7 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
                 {
                     Thread.Sleep(100);
                     var f = true;
-                    foreach (var (_, value) in _tasks)
+                    foreach (var (_, value) in _initTasks)
                     {
                         if (value is null)
                         {
@@ -185,22 +200,121 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
                         continue;
                     }
 
-                    if (notRealTime)
+                    if (!notRealTime)
                     {
-                        _cancellationTokenSource.Cancel();
+                        return;
                     }
 
-                    IsRunning = false;
-                    Log.Debug($"场景运行完成:{Name}");
+                    var connectionItem = connections.FirstOrDefault((e) => e.Source == nodes[1].Output[0]);
+                    if (connectionItem == null)
+                    {
+                        //当没有tick时直接结束
+                        if (notRealTime)
+                        {
+                            _cancellationTokenSource.Cancel();
+                        }
+
+                        IsRunning = false;
+                        Log.Debug($"场景运行完成:{Name}");
+                        break;
+                    }
+
+                    Log.Debug($"场景进入Tick:{Name}");
+                    try
+                    {
+                        _tickUtil = new TickUtil(1000, 1000 * 1000, 1, TickMethod);
+                        _tickUtil.Open();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+
                     break;
                 }
             }).Start();
         }
     }
 
+    private void TickMethod(object sender, long JumpPeriod, long interval)
+    {
+        if (InTick)
+        {
+            return;
+        }
+
+        var connectionItem = connections.FirstOrDefault((e) => e.Source == nodes[1].Output[0]);
+        var firstNodes = connectionItem.Target.Source;
+        nodes[1].Status = s节点状态.已验证;
+        _tickTasks.Add(nodes[0], null);
+        _tickTasks.Add(nodes[1], null);
+        _tickTasks.Add(firstNodes, null);
+        ParsePointItem(_tickTasks, firstNodes, false, true, _cancellationTokenSource.Token);
+
+        while (true)
+        {
+            if (_cancellationTokenSource.Token.IsCancellationRequested)
+            {
+                InTick = false;
+                break;
+            }
+
+            Thread.Sleep(100);
+            var f = true;
+            foreach (var (_, value) in _tickTasks)
+            {
+                if (value is null)
+                {
+                    continue;
+                }
+
+                if (!value.IsAlive)
+                {
+                    continue;
+                }
+
+                f = false;
+                break;
+            }
+
+            if (!f)
+            {
+                continue;
+            }
+
+            //tick完成一次
+            InTick = false;
+            _tickTasks.Clear();
+            break;
+        }
+    }
+
     public void Stop()
     {
-        _cancellationTokenSource.Cancel();
+        _tickUtil?.Dispose();
+        try
+        {
+            _cancellationTokenSource.Cancel();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+
+        foreach (var task in _initTasks)
+        {
+            task.Value?.Join();
+        }
+
+        foreach (var task in _tickTasks)
+        {
+            task.Value?.Join();
+        }
+
+        _initTasks.Clear();
+        _tickTasks.Clear();
+        IsRunning = false;
+        Log.Debug($"场景运行完成:{Name}");
     }
 
     private void MakeSourcePointState(ConnectorItem targetConnectorItem, PointItem pointItem)
@@ -218,12 +332,18 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
         }
     }
 
-    private void ParsePointItem(PointItem nowPointItem, bool onlyForward, bool notRealTime,
+    private void ParsePointItem(Dictionary<PointItem, Thread?> threads, PointItem nowPointItem, bool onlyForward,
+        bool notRealTime,
         CancellationToken cancellationToken)
     {
         Log.Debug($"解析节点:{nowPointItem.Title}");
         var valid = true;
         List<Thread> sourceDataTask = new();
+        var indexOf = nodes.IndexOf(nowPointItem);
+        if (indexOf is 0 or 1)
+        {
+            goto finnish;
+        }
 
         foreach (var connectorItem in nowPointItem.Input)
         {
@@ -252,9 +372,9 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
             //这是连接当前节点的节点
             foreach (var sourceSource in connectorItem.GetSourceOrNextPointItems(connections))
             {
-                lock (_tasks)
+                lock (threads)
                 {
-                    if (_tasks.TryGetValue(sourceSource, out var task1))
+                    if (threads.TryGetValue(sourceSource, out var task1))
                     {
                         if (task1 is not null)
                         {
@@ -265,11 +385,11 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
                     {
                         var task = new Thread(() =>
                         {
-                            ParsePointItem(sourceSource, true, notRealTime, cancellationToken);
+                            ParsePointItem(threads, sourceSource, true, notRealTime, cancellationToken);
                         });
 
                         // Log.Debug(sourceSource.Title);
-                        _tasks.Add(sourceSource, task);
+                        threads.Add(sourceSource, task);
                         sourceDataTask.Add(task);
                         task.Start();
                     }
@@ -284,7 +404,11 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
         }
 
         //这是连接当前节点的节点
-        cancellationToken.ThrowIfCancellationRequested();
+        if (cancellationToken.IsCancellationRequested)
+        {
+            return;
+        }
+
         foreach (var connectorItem in nowPointItem.Input)
         {
             foreach (var sourceSource in connectorItem.GetSourceOrNextPointItems(connections))
@@ -529,10 +653,15 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
             }
             catch (Exception e)
             {
-                Log.Debug(e.ToString());
+                Log.Debug(e);
                 valid = false;
                 goto finnish;
             }
+        }
+
+        if (cancellationToken.IsCancellationRequested)
+        {
+            return;
         }
 
         if (!onlyForward)
@@ -542,19 +671,19 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
                 foreach (var nextPointItem in outputConnector.GetSourceOrNextPointItems(connections)
                              .Where(_ => !outputConnector.IsNotUsed))
                 {
-                    lock (_tasks)
+                    lock (threads)
                     {
-                        if (_tasks.ContainsKey(nextPointItem))
+                        if (threads.ContainsKey(nextPointItem))
                         {
                             return;
                         }
 
                         var task = new Thread(() =>
                         {
-                            ParsePointItem(nextPointItem, false, notRealTime, cancellationToken);
+                            ParsePointItem(threads, nextPointItem, false, notRealTime, cancellationToken);
                         });
 
-                        _tasks.Add(nextPointItem, task);
+                        threads.Add(nextPointItem, task);
                         task.Start();
                     }
                 }

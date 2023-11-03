@@ -46,10 +46,10 @@
         <Button FocusVisualStyle="{x:Null}" IsCancel="True"
                 HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="Hand"
                 FontFamily="/NchargeL;component/Resources/#SSZhiZunShuFaTi" FontSize="20" Content="确定"
-                Margin="0,0,16,16" Foreground="{DynamicResource BodyColor}" Click="Button_Click" />
+                Margin="0,0,16,16" Foreground="{DynamicResource SystemAccentColorSecondaryBrush}" Click="Button_Click" />
         <Button FocusVisualStyle="{x:Null}" IsCancel="True"
                 HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="Hand"
                 FontFamily="/NchargeL;component/Resources/#SSZhiZunShuFaTi" FontSize="20" Content="打开logs目录"
-                Margin="0,0,104,16" Foreground="{DynamicResource BodyColor}" Click="logs_Click" />
+                Margin="0,0,104,16" Foreground="{DynamicResource SystemAccentColorSecondaryBrush}" Click="logs_Click" />
     </Grid>
 </Window>

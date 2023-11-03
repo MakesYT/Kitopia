@@ -19,4 +19,10 @@ public partial class CustomScenariosManagerPageViewModel : ObservableRecipient
         ((ITaskEditorOpenService)ServiceManager.Services!.GetService(typeof(ITaskEditorOpenService))!).Open(
             scenario);
     }
+
+    [RelayCommand]
+    private void StopCustomScenario(CustomScenario scenario)
+    {
+        scenario.Stop();
+    }
 }

@@ -6,10 +6,10 @@
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:pages="clr-namespace:Core.ViewModel.Pages;assembly=Core"
       ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
-      ui:Design.Foreground="{DynamicResource BodyColor}"
+      ui:Design.Foreground="{DynamicResource SystemAccentColorSecondaryBrush}"
       d:DataContext="{d:DesignInstance pages:HomePageViewModel,
                                      IsDesignTimeCreatable=False}"
-      Foreground="{DynamicResource BodyColor}"
+      Foreground="{DynamicResource SystemAccentColorSecondaryBrush}"
       mc:Ignorable="d"
       xmlns:kitopia="clr-namespace:Kitopia.Controls"
       Title="HomePage" Height="450" Width="800">

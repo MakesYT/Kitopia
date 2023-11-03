@@ -315,7 +315,7 @@ public partial class AppTools
                     var argSb = new StringBuilder(260);
                     link.GetArguments(argSb, argSb.Capacity);
                     var arg = argSb.Length > 0 ? argSb.ToString() : null;
-                    if (arg != null && arg.Contains("%"))
+                    if (arg != null && arg.Contains('%'))
                     {
                         Regex regex = new Regex("%(\\w+)%");
 

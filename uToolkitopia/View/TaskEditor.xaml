@@ -1256,6 +1256,12 @@
                             <ui:SymbolIcon Symbol="Play20" />
                         </ui:Button.Icon>
                     </ui:Button>
+                    <ui:Button FontSize="25" ToolTip="停止测试" ToolTipService.InitialShowDelay="100"
+                               Command="{Binding StopCustomScenarioCommand}">
+                        <ui:Button.Icon>
+                            <ui:SymbolIcon Symbol="Stop20" />
+                        </ui:Button.Icon>
+                    </ui:Button>
                     <ui:Button FontSize="25" ToolTip="保存" ToolTipService.InitialShowDelay="100"
                                Command="{Binding SaveCustomScenarioCommand}">
                         <ui:Button.Icon>

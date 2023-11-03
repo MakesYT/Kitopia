@@ -7,11 +7,11 @@
       xmlns:pages="clr-namespace:Core.ViewModel.Pages;assembly=Core"
       xmlns:kitopia="clr-namespace:Kitopia.Controls"
       ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
-      ui:Design.Foreground="{DynamicResource BodyColor}"
+      ui:Design.Foreground="{DynamicResource SystemAccentColorSecondaryBrush}"
       d:DataContext="{d:DesignInstance pages:SettingPageViewModel,
                                      IsDesignTimeCreatable=False}"
 
-      Foreground="{DynamicResource BodyColor}"
+      Foreground="{DynamicResource SystemAccentColorSecondaryBrush}"
 
       mc:Ignorable="d"
       Title="HomePage">

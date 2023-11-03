@@ -8,10 +8,10 @@
       xmlns:config="clr-namespace:Core.SDKs.Services.Config;assembly=Core"
       mc:Ignorable="d"
       ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
-      ui:Design.Foreground="{DynamicResource BodyColor}"
+      ui:Design.Foreground="{DynamicResource SystemAccentColorSecondaryBrush}"
       d:DataContext="{d:DesignInstance customScenario1:CustomScenariosManagerPageViewModel,
                                      IsDesignTimeCreatable=False}"
-      Foreground="{DynamicResource BodyColor}"
+      Foreground="{DynamicResource SystemAccentColorSecondaryBrush}"
 
       Title="CustomScenariosManagerPage">
     <Page.Resources>
@@ -63,6 +63,7 @@
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="2*" />
                                 <ColumnDefinition Width="4*" />
+                                <ColumnDefinition Width="48" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <Image Grid.Column="0" HorizontalAlignment="Left" Focusable="False" Width="48"
@@ -86,7 +87,19 @@
                                               TextWrapping="Wrap"
                                               Text="{Binding Description}" />
                             </ui:DynamicScrollViewer>
-                            <ui:SymbolIcon Grid.Column="3" Symbol="ChevronRight20" FontSize="20"
+                            <ui:Button Grid.Column="3" FontSize="25" ToolTip="停止"
+                                       Background="OrangeRed"
+                                       Foreground="White"
+                                       ToolTipService.InitialShowDelay="100"
+                                       Visibility="{Binding IsRunning,Converter={StaticResource boolToVisibilityConverter}}"
+                                       Command="{Binding Path=DataContext.StopCustomScenarioCommand, 
+                                                    RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Page}}}"
+                                       CommandParameter="{Binding }">
+                                <ui:Button.Icon>
+                                    <ui:SymbolIcon Symbol="Stop20"  />
+                                </ui:Button.Icon>
+                            </ui:Button>
+                            <ui:SymbolIcon Grid.Column="4" Symbol="ChevronRight20" FontSize="20"
                                            Margin="0,0,10,0" />
                         </Grid>
 

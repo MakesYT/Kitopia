@@ -169,6 +169,12 @@ public partial class TaskEditorViewModel : ObservableRecipient
         Scenario.Run();
     }
 
+    [RelayCommand]
+    private void StopCustomScenario()
+    {
+        Scenario.Stop();
+    }
+
     private void ToFirstVerify(bool notRealTime = false)
     {
         Scenario.Run(true);
@@ -516,6 +522,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
         if (IsModified)
         {
             e.Cancel = true;
+            Scenario.Stop();
             ((IToastService)ServiceManager.Services!.GetService(typeof(IToastService))!).ShowMessageBoxW("不保存退出?",
                 "是否确定不保存退出",
                 new ShowMessageContent("取消", "不保存", "保存并退出", () =>

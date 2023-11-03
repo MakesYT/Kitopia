@@ -202,7 +202,5 @@ public class TickUtil
         _Dispose = true;
         // while (_BRunTimer)
         //     Application.DoEvents();//在工作未完成之前，允许处理消息队列，防止调用者挂起
-        if (_threadRumTimer != null)
-            _threadRumTimer.Abort();
     }
 }

@@ -5,10 +5,10 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
-      ui:Design.Foreground="{DynamicResource BodyColor}"
+      ui:Design.Foreground="{DynamicResource SystemAccentColorSecondaryBrush}"
       d:DataContext="{d:DesignInstance plugin:PluginManagerPageViewModel,
                                      IsDesignTimeCreatable=False}"
-      Foreground="{DynamicResource BodyColor}"
+      Foreground="{DynamicResource SystemAccentColorSecondaryBrush}"
       mc:Ignorable="d"
       xmlns:plugin="clr-namespace:Core.ViewModel.Pages.plugin;assembly=Core"
       xmlns:plugin1="clr-namespace:Kitopia.View.Pages.Plugin"
