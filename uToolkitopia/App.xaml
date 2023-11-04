@@ -28,8 +28,7 @@
             <crt:IntToIconSymbol x:Key="IntToIconSymbol" />
 
 
-            <crt:HotKeysToHotKeyShow x:Key="HotKeysToHotKeyShow" />
-            <crt:HotKeysToKeyName x:Key="HotKeysToKeyName" />
+           
         </ResourceDictionary>
 
     </Application.Resources>

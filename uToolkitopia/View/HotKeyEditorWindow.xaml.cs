@@ -16,8 +16,8 @@ namespace Kitopia.View;
 
 public partial class HotKeyEditorWindow : FluentWindow
 {
-    private bool isFinnish;
     private HotKeyModel? _hotKeyModel;
+    private bool isFinnish;
     private EKey? selectedKey;
     private bool setSuccess;
 
@@ -25,7 +25,7 @@ public partial class HotKeyEditorWindow : FluentWindow
     {
         InitializeComponent();
         _hotKeyModel = hotKeyModel;
-        Name.Text = $"快捷键:{hotKeyModel.MainName}_{hotKeyModel.Name}";
+        Name.Text = $"快捷键:{hotKeyModel.SignName}";
 
 
         if (hotKeyModel.IsSelectAlt)
@@ -181,7 +181,7 @@ public partial class HotKeyEditorWindow : FluentWindow
         }
 
         isFinnish = true;
-        WeakReferenceMessenger.Default.Send("hotKeyChanged", "hotkey");
+        WeakReferenceMessenger.Default.Send(_hotKeyModel.SignName, "hotkey");
         Close();
     }
 

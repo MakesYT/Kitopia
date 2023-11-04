@@ -37,11 +37,10 @@
                 <SolidColorBrush Color="{DynamicResource TextFillColorPrimary}" />
             </Setter.Value>
         </Setter>
-        <Setter Property="KeyName" Value="空格" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type controls:HotKeyShow}">
-                    <ui:Button Padding="10" Margin="0" Command="{TemplateBinding Command}">
+                    <ui:Button Padding="10" Margin="0" Command="{TemplateBinding Command}" CommandParameter="{TemplateBinding CommandParameter}">
                         <StackPanel Orientation="Horizontal" Height="{TemplateBinding Height}">
                             <controls:HotKeyShowItme x:Name="Ctrl" Appearance="Primary"
                                                      Foreground="{TemplateBinding Foreground}"

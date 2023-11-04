@@ -316,6 +316,7 @@ public sealed partial class App : Application
         services.AddTransient<IClipboardService, ClipboardService>();
         services.AddTransient<ITaskEditorOpenService, TaskEditorOpenService>();
         services.AddTransient<IContentDialog, ContentDialogService>();
+        services.AddTransient<IHotKeyEditor, HotKeyEditorService>();
         services.AddSingleton<SearchWindowViewModel>(e => new SearchWindowViewModel { IsActive = true });
         services.AddSingleton<SearchWindow>(sq => new SearchWindow
             { DataContext = sq.GetService<SearchWindowViewModel>() });

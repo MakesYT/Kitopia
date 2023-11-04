@@ -159,19 +159,39 @@ public partial class MainWindow
 
     public bool HotKeySet(HotKeyModel hotKeyModel)
     {
-        if (HotKeyHelper.RegisterGlobalHotKey(new[] { hotKeyModel }, m_Hwnd, out m_HotKeySettings).Any())
+        if (!HotKeyHelper.RegisterGlobalHotKey(new[] { hotKeyModel }, m_Hwnd, out var hotKeySettingsDic).Any())
         {
-            return false;
+            foreach (var (key, value) in hotKeySettingsDic)
+            {
+                if (m_HotKeySettings.ContainsKey(key))
+                {
+                    m_HotKeySettings[key] = value;
+                    continue;
+                }
+
+                m_HotKeySettings.Add(key, value);
+            }
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     public void InitHotKey()
     {
         var list = ConfigManger.Config.hotKeys;
-        var failList = HotKeyHelper.RegisterGlobalHotKey(list, m_Hwnd, out m_HotKeySettings);
+        var failList = HotKeyHelper.RegisterGlobalHotKey(list, m_Hwnd, out var hotKeySettingsDic);
+        foreach (var (key, value) in hotKeySettingsDic)
+        {
+            if (m_HotKeySettings.ContainsKey(key))
+            {
+                m_HotKeySettings[key] = value;
+                continue;
+            }
 
+            m_HotKeySettings.Add(key, value);
+        }
 
         if (!failList.Any())
         {
@@ -260,6 +280,8 @@ public partial class MainWindow
                             ServiceManager.Services.GetService<SearchWindowViewModel>()!.ReloadApps();
                         });
                     }
+
+                    break;
                 }
 
                 handled = true;

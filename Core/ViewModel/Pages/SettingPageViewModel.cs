@@ -3,11 +3,10 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.Messaging;
-using Core.SDKs.HotKey;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using log4net;
@@ -20,21 +19,20 @@ namespace Core.ViewModel.Pages;
 public partial class SettingPageViewModel : ObservableRecipient
 {
     private static readonly ILog log = LogManager.GetLogger("SettingPageViewModel");
-    private bool _isInitializing = false;
-
-    [ObservableProperty] private ObservableCollection<int> _maxHistoryOptions = new() { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-
-    [ObservableProperty] private ObservableCollection<string> _themeChoiceOptions = new() { "跟随系统", "深色", "浅色" };
 
     [ObservableProperty] private bool _autoStart = true;
     [ObservableProperty] private bool _autoStartEverything = true;
     [ObservableProperty] private bool _canReadClipboard = true;
-    [ObservableProperty] private int _inputSmoothingMilliseconds = 50;
-    [ObservableProperty] private int _maxHistory = 4;
-    [ObservableProperty] private string _themeChoice = "跟随系统";
-    [ObservableProperty] private bool _useEverything = true;
-    [ObservableProperty] private BindingList<HotKeyModel> _hotKeys;
     [ObservableProperty] private BindingList<string> _ignoreItems;
+    [ObservableProperty] private int _inputSmoothingMilliseconds = 50;
+    private bool _isInitializing = false;
+    [ObservableProperty] private int _maxHistory = 4;
+
+    [ObservableProperty] private ObservableCollection<int> _maxHistoryOptions = new() { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+    [ObservableProperty] private string _themeChoice = "跟随系统";
+
+    [ObservableProperty] private ObservableCollection<string> _themeChoiceOptions = new() { "跟随系统", "深色", "浅色" };
+    [ObservableProperty] private bool _useEverything = true;
 
     public SettingPageViewModel()
     {
@@ -47,13 +45,8 @@ public partial class SettingPageViewModel : ObservableRecipient
             MaxHistory = ConfigManger.Config.maxHistory;
             CanReadClipboard = ConfigManger.Config.canReadClipboard;
             IgnoreItems = new BindingList<string>(ConfigManger.Config.ignoreItems);
-            HotKeys = new BindingList<HotKeyModel>(ConfigManger.Config.hotKeys);
             InputSmoothingMilliseconds = ConfigManger.Config.inputSmoothingMilliseconds;
-            WeakReferenceMessenger.Default.Register<string, string>(this, "hotkey", (_, _) =>
-            {
-                //HotKeys = ConfigManger.Config.hotKeys;
-                OnPropertyChanged(nameof(HotKeys));
-            });
+
             _isInitializing = false;
         });
     }
@@ -89,6 +82,23 @@ public partial class SettingPageViewModel : ObservableRecipient
 
         ConfigManger.Config.themeChoice = value;
         ConfigManger.Save();
+    }
+
+    [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+    public static extern IntPtr GetForegroundWindow();
+
+    [RelayCommand]
+    private void EditHotKey(string name)
+    {
+        var hwndSource = System.Windows.Interop.HwndSource.FromHwnd(GetForegroundWindow());
+        if (hwndSource == null)
+        {
+            return;
+        }
+
+        var xx = (Window)hwndSource.RootVisual;
+
+        ((IHotKeyEditor)ServiceManager.Services.GetService(typeof(IHotKeyEditor))!).EditByName(name?.ToString(), xx);
     }
 
     [RelayCommand]

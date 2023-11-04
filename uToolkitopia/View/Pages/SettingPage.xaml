@@ -53,9 +53,9 @@
                 <StackPanel>
 
                     <kitopia:SettingItems Title="激活快捷键" Description="修改搜索框快捷键" Padding="14,10,14,10">
-                        <kitopia:HotKeyShow Tag="Kitopia_显示搜索框" Click="ButtonBase_OnClick"
-                                            KeyType="{Binding HotKeys,Converter={StaticResource HotKeysToHotKeyShow},ConverterParameter='Kitopia_显示搜索框',Mode=OneWay,NotifyOnSourceUpdated=True,UpdateSourceTrigger=PropertyChanged}"
-                                            KeyName="{Binding HotKeys,Converter={StaticResource HotKeysToKeyName},ConverterParameter='Kitopia_显示搜索框',Mode=OneWay,NotifyOnSourceUpdated=True,UpdateSourceTrigger=PropertyChanged}" />
+                        
+                        <kitopia:HotKeyShow Tag="Kitopia_显示搜索框" Command="{Binding EditHotKeyCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}"
+                                            HotKeyName="Kitopia_显示搜索框" />
                         <kitopia:SettingItems.Icon>
                             <ui:SymbolIcon Symbol="Keyboard20" FontSize="25" />
                         </kitopia:SettingItems.Icon>
