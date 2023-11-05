@@ -2,11 +2,13 @@
 
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Runtime.InteropServices;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.CustomScenario;
+using Core.SDKs.HotKey;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
@@ -149,6 +151,12 @@ public partial class TaskEditorViewModel : ObservableRecipient
             }
         };
         Scenario.nodes.Add(nodify3);
+        if (Scenario.UUID == null)
+        {
+            Scenario.UUID = Guid.NewGuid().ToString();
+        }
+
+
         //nodeMethods.Add("new PointItem(){Title = \"Test\"}");
     }
 
@@ -161,6 +169,61 @@ public partial class TaskEditorViewModel : ObservableRecipient
     public PendingConnectionViewModel PendingConnection
     {
         get;
+    }
+
+    [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+    public static extern IntPtr GetForegroundWindow();
+
+    [RelayCommand]
+    private void StartHotkeyEditor()
+    {
+        var hwndSource = System.Windows.Interop.HwndSource.FromHwnd(GetForegroundWindow());
+        if (hwndSource == null)
+        {
+            return;
+        }
+
+        var xx = (Window)hwndSource.RootVisual;
+
+        if (Scenario.StartHotKeyModel == null)
+        {
+            var hotKeyModel = new HotKeyModel()
+                { MainName = $"Kitopia情景", Name = $"{Scenario.UUID}_激活快捷键", IsUsable = true };
+            Scenario.StartHotKeyModel = hotKeyModel;
+            ((IHotKeyEditor)ServiceManager.Services.GetService(typeof(IHotKeyEditor))!).EditByHotKeyModel(hotKeyModel,
+                xx);
+        }
+        else
+        {
+            ((IHotKeyEditor)ServiceManager.Services.GetService(typeof(IHotKeyEditor))!).EditByHotKeyModel(
+                Scenario.StartHotKeyModel, xx);
+        }
+    }
+
+    [RelayCommand]
+    private void StopHotkeyEditor()
+    {
+        var hwndSource = System.Windows.Interop.HwndSource.FromHwnd(GetForegroundWindow());
+        if (hwndSource == null)
+        {
+            return;
+        }
+
+        var xx = (Window)hwndSource.RootVisual;
+
+        if (Scenario.StopHotKeyModel == null)
+        {
+            var hotKeyModel = new HotKeyModel()
+                { MainName = $"Kitopia情景", Name = $"{Scenario.UUID}_停止快捷键", IsUsable = true };
+            Scenario.StopHotKeyModel = hotKeyModel;
+            ((IHotKeyEditor)ServiceManager.Services.GetService(typeof(IHotKeyEditor))!).EditByHotKeyModel(hotKeyModel,
+                xx);
+        }
+        else
+        {
+            ((IHotKeyEditor)ServiceManager.Services.GetService(typeof(IHotKeyEditor))!).EditByHotKeyModel(
+                Scenario.StopHotKeyModel, xx);
+        }
     }
 
     [RelayCommand]

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Windows;
+using Core.SDKs.HotKey;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using Kitopia.View;
@@ -25,7 +26,12 @@ public class HotKeyEditorService : IHotKeyEditor
             return;
         }
 
-        var hotKeyEditor = new HotKeyEditorWindow(hotKeyModel);
+        EditByHotKeyModel(hotKeyModel, owner);
+    }
+
+    public void EditByHotKeyModel(HotKeyModel name, object? owner)
+    {
+        var hotKeyEditor = new HotKeyEditorWindow(name);
         hotKeyEditor.Height = ServiceManager.Services.GetService<MainWindow>().Height / 2;
         hotKeyEditor.Width = ServiceManager.Services.GetService<MainWindow>().Width / 2;
         if (owner is Window)

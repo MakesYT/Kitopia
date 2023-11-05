@@ -1,5 +1,6 @@
 ﻿#region
 
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using Windows.System;
@@ -164,6 +165,11 @@ public partial class HotKeyEditorWindow : FluentWindow
         }
 
         _hotKeyModel.SelectKey = selectedKey.Value;
+        if (ConfigManger.Config.hotKeys.All(e2 => e2.SignName != _hotKeyModel.SignName))
+        {
+            ConfigManger.Config.hotKeys.Add(_hotKeyModel);
+        }
+
         ConfigManger.Save();
         setSuccess = ((MainWindow)ServiceManager.Services.GetService(typeof(MainWindow))).HotKeySet(_hotKeyModel);
         if (!setSuccess)

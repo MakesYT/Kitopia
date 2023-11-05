@@ -623,10 +623,18 @@
                                         </controls:SettingItems>
                                     </Expander.Header>
                                     <StackPanel Margin="15,5,5,5" Orientation="Vertical">
-                                        <controls:SettingItems Title="激活快捷键" Description="修改搜索框快捷键" Padding="14,10,14,10">
+                                        <controls:SettingItems Title="激活快捷键" Description="修改激活快捷键" Padding="14,10,14,10">
                         
-                                            <controls:HotKeyShow Command="{Binding EditHotKeyCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}"
-                                                                HotKeyName="" />
+                                            <controls:HotKeyShow Command="{Binding StartHotkeyEditorCommand}"
+                                                                HotKeyModel="{Binding Scenario.StartHotKeyModel}" />
+                                            <controls:SettingItems.Icon>
+                                                <ui:SymbolIcon Symbol="Keyboard20" FontSize="25" />
+                                            </controls:SettingItems.Icon>
+                                        </controls:SettingItems>
+                                        <controls:SettingItems Title="停止快捷键" Description="修改停止快捷键" Padding="14,10,14,10">
+                        
+                                            <controls:HotKeyShow Command="{Binding StopHotkeyEditorCommand}"
+                                                                 HotKeyModel="{Binding Scenario.StopHotKeyModel}" />
                                             <controls:SettingItems.Icon>
                                                 <ui:SymbolIcon Symbol="Keyboard20" FontSize="25" />
                                             </controls:SettingItems.Icon>

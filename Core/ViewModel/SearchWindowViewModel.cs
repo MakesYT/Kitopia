@@ -342,7 +342,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
 
             Log.Debug("搜索变更:" + Search);
-
+            Items.RaiseListChangedEvents = false;
 
             #region 清除上次搜索结果
 
@@ -618,6 +618,9 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 };
                 Items.Add(item);
             }
+
+            Items.RaiseListChangedEvents = true;
+            Items.ResetBindings();
         });
     }
 

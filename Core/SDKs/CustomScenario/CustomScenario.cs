@@ -7,6 +7,8 @@ using System.Runtime.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.CustomType;
+using Core.SDKs.HotKey;
+using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
 using Core.SDKs.Tools;
 using Core.ViewModel.TaskEditor;
@@ -32,6 +34,9 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
     [JsonIgnore] [ObservableProperty] private bool _isRunning = false;
 
     [JsonIgnore] [ObservableProperty] private string _name = "任务";
+
+    [JsonIgnore] [ObservableProperty] private HotKeyModel? _startHotKeyModel;
+    [JsonIgnore] [ObservableProperty] private HotKeyModel? _stopHotKeyModel;
     private Dictionary<PointItem, Thread?> _tickTasks = new();
     private TickUtil? _tickUtil;
 
@@ -708,5 +713,16 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
     // ReSharper disable once UnusedParameter.Local
     private void OnDeserializing(StreamingContext context) //反序列化时hotkeys的默认值会被添加,需要先清空
     {
+    }
+
+    [OnDeserialized]
+    // ReSharper disable once UnusedMember.Local
+    // ReSharper disable once UnusedParameter.Local
+    private void OnDeserialized(StreamingContext context) //反序列化时hotkeys的默认值会被添加,需要先清空
+    {
+        StartHotKeyModel =
+            ConfigManger.Config.hotKeys.FirstOrDefault(e => e.SignName == $"Kitopia情景_{UUID}_激活快捷键");
+        StopHotKeyModel =
+            ConfigManger.Config.hotKeys.FirstOrDefault(e => e.SignName == $"Kitopia情景_{UUID}_停止快捷键");
     }
 }

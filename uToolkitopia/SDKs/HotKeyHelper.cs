@@ -15,8 +15,15 @@ namespace Kitopia.SDKs;
 /// </summary>
 public class HotKeyHelper
 {
-    private static readonly Dictionary<string, int> m_HotKeySettingsDic = new();
+    private static Dictionary<string, int> m_HotKeySettingsDic = new();
+
     private static readonly ILog log = LogManager.GetLogger(nameof(HotKeyHelper));
+
+    public static Dictionary<string, int> MHotKeySettingsDic
+    {
+        get => m_HotKeySettingsDic;
+        set => m_HotKeySettingsDic = value ?? throw new ArgumentNullException(nameof(value));
+    }
 
     /// <summary>
     ///     注册全局快捷键
@@ -53,31 +60,27 @@ public class HotKeyHelper
     {
         var fsModifierKey = new User32.HotKeyModifiers();
         var hotKeySetting = $"{hotKeyModel.MainName}_{hotKeyModel.Name}";
-
-        log.Debug("注册热键:" + hotKeySetting);
-
-
-        if (!m_HotKeySettingsDic.ContainsKey(hotKeySetting))
-        {
-            // 全局原子不会在应用程序终止时自动删除。每次调用GlobalAddAtom函数，必须相应的调用GlobalDeleteAtom函数删除原子。
-            if (!Kernel32.GlobalFindAtom(hotKeySetting).IsInvalid)
-            {
-                Kernel32.GlobalDeleteAtom(Kernel32.GlobalFindAtom(hotKeySetting));
-            }
-
-            // 获取唯一标识符
-            m_HotKeySettingsDic[hotKeySetting] = Kernel32.GlobalAddAtom(hotKeySetting).GetHashCode();
-        }
-        else
-        {
-            // 注销旧的热键
-            User32.UnregisterHotKey(hWnd, m_HotKeySettingsDic[hotKeySetting]);
-        }
-
         if (!hotKeyModel.IsUsable)
         {
             return true;
         }
+
+        log.Debug("注册热键:" + hotKeySetting);
+        if (!Kernel32.GlobalFindAtom(hotKeySetting).IsInvalid)
+        {
+            Kernel32.GlobalDeleteAtom(Kernel32.GlobalFindAtom(hotKeySetting));
+        }
+
+        // 获取唯一标识符
+        if (m_HotKeySettingsDic.ContainsKey(hotKeySetting))
+        {
+            m_HotKeySettingsDic[hotKeySetting] = Kernel32.GlobalAddAtom(hotKeySetting).GetHashCode();
+        }
+        else
+        {
+            m_HotKeySettingsDic.Add(hotKeySetting, Kernel32.GlobalAddAtom(hotKeySetting).GetHashCode());
+        }
+
 
         // 注册热键
         if (hotKeyModel.IsSelectShift)

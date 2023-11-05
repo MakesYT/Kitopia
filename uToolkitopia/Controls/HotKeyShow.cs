@@ -35,6 +35,10 @@ public class HotKeyShow : ButtonBase
         {
             ((HotKeyShow)o).HotKeyModel =
                 ConfigManger.Config.hotKeys.FirstOrDefault(e => ($"{e.MainName}_{e.Name}".Equals(args.NewValue)));
+            if (((HotKeyShow)o).HotKeyModel is null)
+            {
+                ((HotKeyShow)o).KeyType = KeyTypeE.None;
+            }
         }));
 
     public static readonly DependencyProperty HotKeyModelProperty = DependencyProperty.Register(nameof(HotKeyModel),
@@ -46,7 +50,7 @@ public class HotKeyShow : ButtonBase
 
     public static readonly DependencyProperty KeyTypeProperty = DependencyProperty.Register(nameof(KeyType),
         typeof(KeyTypeE), typeof(HotKeyShow),
-        new PropertyMetadata(KeyTypeE.Alt));
+        new PropertyMetadata(KeyTypeE.None));
 
     public static readonly DependencyProperty KeyNameProperty = DependencyProperty.Register(nameof(KeyName),
         typeof(string), typeof(HotKeyShow),

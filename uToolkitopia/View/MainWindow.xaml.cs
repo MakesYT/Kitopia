@@ -1,7 +1,6 @@
 ﻿#region
 
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -28,11 +27,6 @@ namespace Kitopia.View;
 public partial class MainWindow
 {
     private static readonly ILog log = LogManager.GetLogger(nameof(MainWindow));
-
-    /// <summary>
-    ///     记录快捷键注册项的唯一标识符
-    /// </summary>
-    private Dictionary<string, int> m_HotKeySettings = new();
 
     /// <summary>
     ///     当前窗口句柄
@@ -161,17 +155,6 @@ public partial class MainWindow
     {
         if (!HotKeyHelper.RegisterGlobalHotKey(new[] { hotKeyModel }, m_Hwnd, out var hotKeySettingsDic).Any())
         {
-            foreach (var (key, value) in hotKeySettingsDic)
-            {
-                if (m_HotKeySettings.ContainsKey(key))
-                {
-                    m_HotKeySettings[key] = value;
-                    continue;
-                }
-
-                m_HotKeySettings.Add(key, value);
-            }
-
             return true;
         }
 
@@ -182,17 +165,6 @@ public partial class MainWindow
     {
         var list = ConfigManger.Config.hotKeys;
         var failList = HotKeyHelper.RegisterGlobalHotKey(list, m_Hwnd, out var hotKeySettingsDic);
-        foreach (var (key, value) in hotKeySettingsDic)
-        {
-            if (m_HotKeySettings.ContainsKey(key))
-            {
-                m_HotKeySettings[key] = value;
-                continue;
-            }
-
-            m_HotKeySettings.Add(key, value);
-        }
-
         if (!failList.Any())
         {
             return;
@@ -257,31 +229,75 @@ public partial class MainWindow
             }
             case User32.WindowMessage.WM_HOTKEY:
                 var sid = wideParam.ToInt32();
-                if (sid == m_HotKeySettings["Kitopia_显示搜索框"])
+                if (!HotKeyHelper.MHotKeySettingsDic.ContainsValue(sid))
                 {
-                    log.Debug("显示搜索框热键被触发");
-                    if (ServiceManager.Services.GetService<SearchWindow>()!.Visibility == Visibility.Visible)
-                    {
-                        ServiceManager.Services.GetService<SearchWindow>()!.Visibility = Visibility.Hidden;
-                    }
-                    else
-                    {
-                        ServiceManager.Services.GetService<SearchWindowViewModel>()!.CheckClipboard();
+                    return IntPtr.Zero;
+                }
 
-                        ServiceManager.Services.GetService<SearchWindow>()!.Show();
-
-                        User32.SetForegroundWindow(
-                            new WindowInteropHelper(ServiceManager.Services.GetService<SearchWindow>()!)
-                                .Handle);
-                        ServiceManager.Services.GetService<SearchWindow>()!.tx.Focus();
-                        ServiceManager.Services.GetService<SearchWindow>()!.tx.SelectAll();
-                        ThreadPool.QueueUserWorkItem(_ =>
+                var key = HotKeyHelper.MHotKeySettingsDic.FirstOrDefault(e => e.Value == sid).Key.Split("_", 2);
+                switch (key[0])
+                {
+                    case "Kitopia":
+                    {
+                        switch (key[1])
                         {
-                            ServiceManager.Services.GetService<SearchWindowViewModel>()!.ReloadApps();
-                        });
-                    }
+                            case "显示搜索框":
+                            {
+                                log.Debug("显示搜索框热键被触发");
+                                if (ServiceManager.Services.GetService<SearchWindow>()!.Visibility ==
+                                    Visibility.Visible)
+                                {
+                                    ServiceManager.Services.GetService<SearchWindow>()!.Visibility = Visibility.Hidden;
+                                }
+                                else
+                                {
+                                    ServiceManager.Services.GetService<SearchWindowViewModel>()!.CheckClipboard();
 
-                    break;
+                                    ServiceManager.Services.GetService<SearchWindow>()!.Show();
+
+                                    User32.SetForegroundWindow(
+                                        new WindowInteropHelper(ServiceManager.Services.GetService<SearchWindow>()!)
+                                            .Handle);
+                                    ServiceManager.Services.GetService<SearchWindow>()!.tx.Focus();
+                                    ServiceManager.Services.GetService<SearchWindow>()!.tx.SelectAll();
+                                    ThreadPool.QueueUserWorkItem(_ =>
+                                    {
+                                        ServiceManager.Services.GetService<SearchWindowViewModel>()!.ReloadApps();
+                                    });
+                                }
+
+                                break;
+                            }
+                        }
+
+                        break;
+                    }
+                    case "Kitopia情景":
+                    {
+                        var strings = key[1].Split("_", 2);
+                        var firstOrDefault =
+                            CustomScenarioManger.CustomScenarios.FirstOrDefault(e => e.UUID == strings[0]);
+                        if (firstOrDefault == null)
+                        {
+                            return IntPtr.Zero;
+                        }
+
+                        switch (strings[1])
+                        {
+                            case "激活快捷键":
+                            {
+                                firstOrDefault.Run();
+                                break;
+                            }
+                            case "停止快捷键":
+                            {
+                                firstOrDefault.Stop();
+                                break;
+                            }
+                        }
+
+                        break;
+                    }
                 }
 
                 handled = true;

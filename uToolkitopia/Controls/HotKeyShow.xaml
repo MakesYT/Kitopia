@@ -61,10 +61,12 @@
                             <controls:HotKeyShowItme x:Name="KeyName" Appearance="Primary" FontSize="20"
                                                      Foreground="{TemplateBinding Foreground}"
                                                      Content="{TemplateBinding KeyName}" Margin="5,0,20,0" Height="40" />
+                            <ui:TextBlock Margin="10" x:Name="None" Text="未设置" VerticalAlignment="Center" HorizontalAlignment="Center" />
                             <ui:SymbolIcon
                                 x:Name="ControlChevronIcon"
                                 Foreground="{TemplateBinding Foreground}"
                                 Symbol="Edit20" />
+                            
                         </StackPanel>
 
                     </ui:Button>
@@ -75,66 +77,88 @@
                             <Setter TargetName="Win" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="Alt" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="Shift" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="KeyName" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="None" Property="Visibility" Value="Visible" />
                         </Trigger>
                         <Trigger Property="KeyType" Value="Ctrl">
                             <Setter TargetName="Ctrl" Property="Visibility" Value="Visible" />
                             <Setter TargetName="Win" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="Alt" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="Shift" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="KeyName" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="None" Property="Visibility" Value="Collapsed" />
                         </Trigger>
                         <Trigger Property="KeyType" Value="CtrlAlt">
                             <Setter TargetName="Ctrl" Property="Visibility" Value="Visible" />
                             <Setter TargetName="Win" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="Alt" Property="Visibility" Value="Visible" />
                             <Setter TargetName="Shift" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="KeyName" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="None" Property="Visibility" Value="Collapsed" />
                         </Trigger>
                         <Trigger Property="KeyType" Value="CtrlShift">
                             <Setter TargetName="Ctrl" Property="Visibility" Value="Visible" />
                             <Setter TargetName="Win" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="Alt" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="Shift" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="KeyName" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="None" Property="Visibility" Value="Collapsed" />
                         </Trigger>
                         <Trigger Property="KeyType" Value="CtrlShiftAlt">
                             <Setter TargetName="Ctrl" Property="Visibility" Value="Visible" />
                             <Setter TargetName="Win" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="Alt" Property="Visibility" Value="Visible" />
                             <Setter TargetName="Shift" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="KeyName" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="None" Property="Visibility" Value="Collapsed" />
                         </Trigger>
                         <Trigger Property="KeyType" Value="Alt">
                             <Setter TargetName="Ctrl" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="Win" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="Alt" Property="Visibility" Value="Visible" />
                             <Setter TargetName="Shift" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="KeyName" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="None" Property="Visibility" Value="Collapsed" />
                         </Trigger>
                         <Trigger Property="KeyType" Value="AltShift">
                             <Setter TargetName="Ctrl" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="Win" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="Alt" Property="Visibility" Value="Visible" />
                             <Setter TargetName="Shift" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="KeyName" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="None" Property="Visibility" Value="Collapsed" />
                         </Trigger>
                         <Trigger Property="KeyType" Value="Win">
                             <Setter TargetName="Ctrl" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="Win" Property="Visibility" Value="Visible" />
                             <Setter TargetName="Alt" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="Shift" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="KeyName" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="None" Property="Visibility" Value="Collapsed" />
                         </Trigger>
                         <Trigger Property="KeyType" Value="WinShift">
                             <Setter TargetName="Ctrl" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="Win" Property="Visibility" Value="Visible" />
                             <Setter TargetName="Alt" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="Shift" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="KeyName" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="None" Property="Visibility" Value="Collapsed" />
                         </Trigger>
                         <Trigger Property="KeyType" Value="WinAlt">
                             <Setter TargetName="Ctrl" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="Win" Property="Visibility" Value="Visible" />
                             <Setter TargetName="Alt" Property="Visibility" Value="Visible" />
                             <Setter TargetName="Shift" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="KeyName" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="None" Property="Visibility" Value="Collapsed" />
                         </Trigger>
                         <Trigger Property="KeyType" Value="Shift">
                             <Setter TargetName="Ctrl" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="Win" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="Alt" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="Shift" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="KeyName" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="None" Property="Visibility" Value="Collapsed" />
                         </Trigger>
 
 
