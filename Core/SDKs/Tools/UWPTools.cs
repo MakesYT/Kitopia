@@ -169,7 +169,7 @@ public static class UwpTools
             Log.Debug(
                 $"完成索引UWP应用{fileName},ID:{searchViewItem.OnlyKey}");
             //Console.WriteLine(searchViewItem);
-            items.TryAdd(appContainer.appContainerName, searchViewItem);
+            items.TryAdd(searchViewItem.OnlyKey, searchViewItem);
             return;
         }
 

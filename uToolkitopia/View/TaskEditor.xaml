@@ -185,8 +185,12 @@
                             <StackPanel>
                                 <controls:SettingItems Margin="0" Title="执行间隔(秒)" FontSize="20">
                                     <ui:NumberBox
+                                         
                                         Minimum="0.1"
+                                        ValidationMode="InvalidInputOverwritten"
+                                        Text="{Binding Scenario.TickIntervalSecond,UpdateSourceTrigger=PropertyChanged,NotifyOnTargetUpdated=True,NotifyOnSourceUpdated=True}"
                                         Value="{Binding Scenario.TickIntervalSecond,UpdateSourceTrigger=PropertyChanged,NotifyOnTargetUpdated=True,NotifyOnSourceUpdated=True}" />
+
                                     <controls:SettingItems.Icon>
                                         <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25" />
                                     </controls:SettingItems.Icon>
@@ -1020,7 +1024,7 @@
 
 
                     <nodify:NodifyEditor.ConnectionTemplate>
-                        <DataTemplate DataType="{x:Type taskEditor:ConnectionItem}">
+                        <DataTemplate DataType="{x:Type customScenario:ConnectionItem}">
                             <Grid>
                                 <Grid.Resources>
                                     <services:BindingProxy x:Key="runRecordList" Data="{Binding}" />

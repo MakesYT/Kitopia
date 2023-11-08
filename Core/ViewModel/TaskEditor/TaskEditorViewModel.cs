@@ -38,6 +38,46 @@ public partial class TaskEditorViewModel : ObservableRecipient
 
     public TaskEditorViewModel()
     {
+        PendingConnection = new PendingConnectionViewModel(this);
+        GetAllMethods();
+        var nodify2 = new PointItem
+        {
+            Title = "任务1"
+        };
+        nodify2.Output = new ObservableCollection<ConnectorItem>
+        {
+            new()
+            {
+                IsOut = true,
+                Source = nodify2,
+                Type = typeof(NodeConnectorClass),
+                TypeName = BaseNodeMethodsGen.GetI18N(typeof(NodeConnectorClass).FullName),
+                Title = "开始"
+            }
+        };
+        Scenario.nodes.Add(nodify2);
+        var nodify3 = new PointItem
+        {
+            Title = "Tick",
+            Location = new Point(0, 100)
+        };
+        nodify3.Output = new ObservableCollection<ConnectorItem>
+        {
+            new()
+            {
+                IsOut = true,
+                Source = nodify3,
+                Type = typeof(NodeConnectorClass),
+                TypeName = BaseNodeMethodsGen.GetI18N(typeof(NodeConnectorClass).FullName),
+                Title = "开始"
+            }
+        };
+        Scenario.nodes.Add(nodify3);
+        if (Scenario.UUID == null)
+        {
+            Scenario.UUID = Guid.NewGuid().ToString();
+        }
+
         WeakReferenceMessenger.Default.Register<CustomScenarioChangeMsg>(this, (a, e) =>
         {
             IsModified = true;
@@ -115,47 +155,6 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 }
             }
         });
-
-        PendingConnection = new PendingConnectionViewModel(this);
-        GetAllMethods();
-        var nodify2 = new PointItem
-        {
-            Title = "任务1"
-        };
-        nodify2.Output = new ObservableCollection<ConnectorItem>
-        {
-            new()
-            {
-                IsOut = true,
-                Source = nodify2,
-                Type = typeof(NodeConnectorClass),
-                TypeName = BaseNodeMethodsGen.GetI18N(typeof(NodeConnectorClass).FullName),
-                Title = "开始"
-            }
-        };
-        Scenario.nodes.Add(nodify2);
-        var nodify3 = new PointItem
-        {
-            Title = "Tick",
-            Location = new Point(0, 100)
-        };
-        nodify3.Output = new ObservableCollection<ConnectorItem>
-        {
-            new()
-            {
-                IsOut = true,
-                Source = nodify3,
-                Type = typeof(NodeConnectorClass),
-                TypeName = BaseNodeMethodsGen.GetI18N(typeof(NodeConnectorClass).FullName),
-                Title = "开始"
-            }
-        };
-        Scenario.nodes.Add(nodify3);
-        if (Scenario.UUID == null)
-        {
-            Scenario.UUID = Guid.NewGuid().ToString();
-        }
-
 
         //nodeMethods.Add("new PointItem(){Title = \"Test\"}");
     }
@@ -346,7 +345,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
     private void CopyNode(PointItem pointItem)
     {
         IsModified = true;
-        if (Scenario.nodes.IndexOf(pointItem) == 0)
+        if (Scenario.nodes.IndexOf(pointItem) is 0 or 1)
         {
             return;
         }
@@ -717,28 +716,4 @@ public partial class TaskEditorViewModel : ObservableRecipient
     }
 
     #endregion
-}
-
-public class ConnectionItem
-{
-    public ConnectionItem(ConnectorItem source, ConnectorItem target)
-    {
-        Source = source;
-        Target = target;
-
-        Source.IsConnected = true;
-        Target.IsConnected = true;
-    }
-
-    public ConnectorItem Source
-    {
-        get;
-        set;
-    }
-
-    public ConnectorItem Target
-    {
-        get;
-        set;
-    }
 }

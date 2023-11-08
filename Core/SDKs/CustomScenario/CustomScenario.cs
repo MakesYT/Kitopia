@@ -11,7 +11,6 @@ using Core.SDKs.HotKey;
 using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
 using Core.SDKs.Tools;
-using Core.ViewModel.TaskEditor;
 using log4net;
 using Newtonsoft.Json;
 using PluginCore.Attribute;
@@ -50,7 +49,8 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
     [JsonIgnore] [ObservableProperty] private ObservableCollection<string> keys = new();
 
     private TickUtil? tick;
-    [JsonIgnore] [ObservableProperty] private double tickIntervalSecond = 5;
+    [JsonIgnore] [ObservableProperty] private double? tickIntervalSecond = 5;
+
     [JsonIgnore] [ObservableProperty] private ObservableDictionary<string, object> values = new() { { "1", "2" } };
 
     public string? UUID
@@ -74,6 +74,14 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
     public void Dispose()
     {
         _cancellationTokenSource.Dispose();
+    }
+
+    partial void OnTickIntervalSecondChanged(double? oldValue)
+    {
+        if (oldValue is null)
+        {
+            TickIntervalSecond = 0.1;
+        }
     }
 
     partial void OnNameChanged(string value)
