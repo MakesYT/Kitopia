@@ -4,7 +4,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 using Core.SDKs.HotKey;
@@ -260,7 +260,7 @@ public partial class MainWindow
                                             .Handle);
                                     ServiceManager.Services.GetService<SearchWindow>()!.tx.Focus();
                                     ServiceManager.Services.GetService<SearchWindow>()!.tx.SelectAll();
-                                    ThreadPool.QueueUserWorkItem(_ =>
+                                    Task.Run(() =>
                                     {
                                         ServiceManager.Services.GetService<SearchWindowViewModel>()!.ReloadApps();
                                     });

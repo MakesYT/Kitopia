@@ -28,7 +28,7 @@
                                 <Grid>
                                     <Image HorizontalAlignment="Left" Focusable="False" Width="48"
                                            Height="48" Panel.ZIndex="1"
-                                           Source="{Binding  SearchViewItem.Icon ,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource PathToImageConverter}}" />
+                                           Source="{Binding  SearchViewItem ,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource PathToImageConverter}}" />
                                     <ui:Button 
                                                Visibility="{Binding SearchViewItem.IconSymbol,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IfNullVisibilityHidden}}"
                                                Height="48" Width="48" FontSize="48" Margin="0" Padding="0"

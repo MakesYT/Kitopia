@@ -116,7 +116,7 @@
                                                 CommandParameter="{Binding}" Padding="2" />
                             <Image Grid.Column="1" HorizontalAlignment="Left" Focusable="False" Width="48"
                                    Height="48"
-                                   Source="{Binding Icon, Converter={StaticResource PathToImageConverter},NotifyOnSourceUpdated=True}" />
+                                   Source="{Binding ., Converter={StaticResource PathToImageConverter},NotifyOnSourceUpdated=True}" />
                             <ui:Button Grid.Column="1"
                                        Visibility="{Binding IconSymbol,Converter={StaticResource IfNullVisibilityHidden}}"
                                        Height="48" Width="48" FontSize="48" Margin="0" Padding="0"
