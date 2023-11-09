@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Windows;
 using System.Xml;
 using Core.SDKs.Services;
 using log4net;
@@ -16,12 +15,12 @@ namespace Core.SDKs.Tools;
 
 public class IconTools
 {
-    private static readonly ILog log = LogManager.GetLogger(nameof(IconTools));
     private const uint SHGFI_ICON = 0x100;
     private const uint SHGFI_LARGEICON = 0x0;
     private const uint SHGFI_SMALLICON = 0x000000001;
     private const uint SHGFI_USEFILEATTRIBUTES = 0x000000010;
     private const uint SHGFI_OPENICON = 0x000000002;
+    private static readonly ILog log = LogManager.GetLogger(nameof(IconTools));
     private static readonly Dictionary<string, Icon> _icons = new(250);
 
 
@@ -209,10 +208,6 @@ public class IconTools
             _icons.TryAdd(cacheKey, clone);
             iconBase.Dispose();
             item.Icon = clone;
-            Application.Current.Dispatcher.BeginInvoke(() =>
-            {
-                items.ResetItem(items.IndexOf(item));
-            });
         });
     }
 
@@ -268,11 +263,6 @@ public class IconTools
             {
                 goto retry;
             }
-
-            Application.Current.Dispatcher.BeginInvoke(() =>
-            {
-                items.ResetItem(items.IndexOf(item));
-            });
         });
     }
 

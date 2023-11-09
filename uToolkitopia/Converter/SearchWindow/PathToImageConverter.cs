@@ -30,7 +30,7 @@ public partial class PathToImageConverter : IValueConverter
             //Console.WriteLine("开始获取2 "+DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond );
             SearchWindowViewModel.GetIconInItemsAsync(searchViewItem);
             //.WriteLine("完成获取2 "+DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond );
-            return null;
+            return new BitmapImage();
         }
 
         try
