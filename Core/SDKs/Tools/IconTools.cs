@@ -195,20 +195,18 @@ public class IconTools
             item.Icon = icon2;
         }
 
-        Task.Run(() =>
-        {
-            retry:
-            var iconBase = GetIconBase(path, cacheKey, mscFile);
-            if (iconBase == null)
-            {
-                goto retry;
-            }
 
-            var clone = (Icon)iconBase.Clone();
-            _icons.TryAdd(cacheKey, clone);
-            iconBase.Dispose();
-            item.Icon = clone;
-        });
+        retry:
+        var iconBase = GetIconBase(path, cacheKey, mscFile);
+        if (iconBase == null)
+        {
+            goto retry;
+        }
+
+        var clone = (Icon)iconBase.Clone();
+        _icons.TryAdd(cacheKey, clone);
+        iconBase.Dispose();
+        item.Icon = clone;
     }
 
     public Icon? GetFormClipboard()
@@ -244,7 +242,7 @@ public class IconTools
             item.Icon = fromPath;
         }
 
-        Task.Run(() =>
+
         {
             retry:
             try
@@ -263,7 +261,7 @@ public class IconTools
             {
                 goto retry;
             }
-        });
+        }
     }
 
     [DllImport("shell32.dll")]

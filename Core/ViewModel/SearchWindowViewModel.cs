@@ -273,7 +273,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
     public void GetIconInItemsAsync(SearchViewItem t)
     {
         //Log.Debug($"为{t.OnlyKey}生成Icon");
-        ThreadPool.QueueUserWorkItem((e) =>
+
         {
             switch (t.FileType)
             {
@@ -318,7 +318,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     IconTools.GetIcon(t.FileInfo!.FullName, Items, t);
                     break;
             }
-        });
+        }
 
         //Log.Debug(t.OnlyKey);
 
