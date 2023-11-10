@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Core.SDKs.HotKey;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using log4net;
@@ -97,8 +98,29 @@ public partial class SettingPageViewModel : ObservableRecipient
         }
 
         var xx = (Window)hwndSource.RootVisual;
+        var hotKeyModel = ConfigManger.Config.hotKeys.FirstOrDefault(e =>
+        {
+            if ($"{e.MainName}_{e.Name}".Equals(name))
+            {
+                return true;
+            }
 
-        ((IHotKeyEditor)ServiceManager.Services.GetService(typeof(IHotKeyEditor))!).EditByName(name?.ToString(), xx);
+            return false;
+        });
+        if (hotKeyModel is null)
+        {
+            var strings = name.Split("_", 2);
+            var hotKeyModel2 = new HotKeyModel()
+                { MainName = strings[0], Name = strings[1], IsUsable = true };
+            ConfigManger.Config.hotKeys.Add(hotKeyModel2);
+            ConfigManger.Save();
+            ((IHotKeyEditor)ServiceManager.Services.GetService(typeof(IHotKeyEditor))!).EditByName(name, xx);
+        }
+        else
+        {
+            ((IHotKeyEditor)ServiceManager.Services.GetService(typeof(IHotKeyEditor))!).EditByHotKeyModel(hotKeyModel,
+                xx);
+        }
     }
 
     [RelayCommand]

@@ -162,6 +162,11 @@ public partial class MainWindow
         return false;
     }
 
+    public void RemoveHotKey(HotKeyModel hotKeyModel)
+    {
+        HotKeyHelper.UnRegisterHotKey(hotKeyModel, m_Hwnd);
+    }
+
     public void InitHotKey()
     {
         var list = ConfigManger.Config.hotKeys;
