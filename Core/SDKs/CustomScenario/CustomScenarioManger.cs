@@ -126,10 +126,8 @@ public partial class CustomScenarioManger
 
     public static void Save(SDKs.CustomScenario.CustomScenario scenario)
     {
-        if (scenario.UUID is null)
+        if (!CustomScenarios.Contains(scenario))
         {
-            var s = Guid.NewGuid().ToString();
-            scenario.UUID = s;
             CustomScenarios.Add(scenario);
         }
 

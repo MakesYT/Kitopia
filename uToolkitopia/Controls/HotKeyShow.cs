@@ -49,7 +49,14 @@ public class HotKeyShow : ButtonBase
         typeof(HotKeyModel), typeof(HotKeyShow),
         new PropertyMetadata(null, (o, args) =>
         {
-            HotKeyModelChanged((HotKeyModel)args.NewValue, (HotKeyShow)o);
+            var argsNewValue = (HotKeyModel)args.NewValue;
+            if (argsNewValue is null)
+            {
+                return;
+            }
+
+            ((HotKeyShow)o).HotKeyName = argsNewValue.SignName;
+            HotKeyModelChanged(argsNewValue, (HotKeyShow)o);
         }));
 
     public static readonly DependencyProperty KeyTypeProperty = DependencyProperty.Register(nameof(KeyType),
