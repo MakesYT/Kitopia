@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using Core.SDKs.HotKey;
+using Core.SDKs.Services.Config;
 using log4net;
 using Vanara.PInvoke;
 
@@ -59,7 +60,7 @@ public class HotKeyHelper
     private static bool RegisterHotKey(HotKeyModel hotKeyModel, IntPtr hWnd)
     {
         var fsModifierKey = new User32.HotKeyModifiers();
-        var hotKeySetting = $"{hotKeyModel.MainName}_{hotKeyModel.Name}";
+        var hotKeySetting = hotKeyModel.SignName;
         if (!hotKeyModel.IsUsable)
         {
             return true;
@@ -107,5 +108,19 @@ public class HotKeyHelper
 
         return User32.RegisterHotKey(hWnd, m_HotKeySettingsDic[hotKeySetting], fsModifierKey,
             (uint)hotKeyModel.SelectKey);
+    }
+
+    public static void UnRegisterHotKey(HotKeyModel hotKeyModel, IntPtr hwnd)
+    {
+        log.Debug("注销热键:" + hotKeyModel.SignName);
+        User32.UnregisterHotKey(hwnd, m_HotKeySettingsDic[hotKeyModel.SignName]);
+        if (!Kernel32.GlobalFindAtom(hotKeyModel.SignName).IsInvalid)
+        {
+            Kernel32.GlobalDeleteAtom(Kernel32.GlobalFindAtom(hotKeyModel.SignName));
+        }
+
+        m_HotKeySettingsDic.Remove(hotKeyModel.SignName);
+        ConfigManger.Config.hotKeys.RemoveAll(e => e.SignName == hotKeyModel.SignName);
+        ConfigManger.Save();
     }
 }

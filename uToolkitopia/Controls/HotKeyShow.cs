@@ -4,9 +4,13 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
+using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.HotKey;
+using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
+using Kitopia.View;
 
 #endregion
 
@@ -56,15 +60,20 @@ public class HotKeyShow : ButtonBase
         typeof(string), typeof(HotKeyShow),
         new PropertyMetadata("空格"));
 
+    public static readonly DependencyProperty RemoveHotKeyProperty = DependencyProperty.Register(nameof(RemoveHotKey),
+        typeof(ICommand), typeof(HotKeyShow), new FrameworkPropertyMetadata(null));
+
     public HotKeyShow()
     {
         WeakReferenceMessenger.Default.Register<string, string>(this, "hotkey", (_, s) =>
         {
-            if (s == HotKeyModel.SignName)
+            HotKeyModel ??= ConfigManger.Config.hotKeys.FirstOrDefault(e => e.SignName == s);
+            if (HotKeyModel != null && s == HotKeyModel.SignName)
             {
                 HotKeyModelChanged(HotKeyModel, this);
             }
         });
+        SetValue(RemoveHotKeyProperty, new RelayCommand<HotKeyModel>(Remove));
     }
 
     [Bindable(true)]
@@ -99,6 +108,14 @@ public class HotKeyShow : ButtonBase
         private set => SetValue(KeyNameProperty, value);
     }
 
+    [Bindable(true)]
+    [Category("RemoveHotKey")]
+    public ICommand RemoveHotKey
+    {
+        get => (ICommand)GetValue(RemoveHotKeyProperty);
+        private set => SetValue(RemoveHotKeyProperty, value);
+    }
+
     private static void HotKeyModelChanged(HotKeyModel hotKeyModel, HotKeyShow hotKeyShow)
     {
         var type = 0000;
@@ -129,5 +146,15 @@ public class HotKeyShow : ButtonBase
 
         hotKeyShow.KeyType = (HotKeyShow.KeyTypeE)type;
         hotKeyShow.KeyName = hotKeyModel.SelectKey.ToString();
+    }
+
+    private void Remove(HotKeyModel? hotKeyModel)
+    {
+        if (hotKeyModel != null)
+        {
+            ((MainWindow)ServiceManager.Services.GetService(typeof(MainWindow))!).RemoveHotKey(hotKeyModel);
+            SetValue(HotKeyModelProperty, null);
+            SetValue(KeyTypeProperty, KeyTypeE.None);
+        }
     }
 }

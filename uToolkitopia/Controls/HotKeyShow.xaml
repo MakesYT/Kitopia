@@ -60,8 +60,13 @@
                                                      Height="40" />
                             <controls:HotKeyShowItme x:Name="KeyName" Appearance="Primary" FontSize="20"
                                                      Foreground="{TemplateBinding Foreground}"
-                                                     Content="{TemplateBinding KeyName}" Margin="5,0,20,0" Height="40" />
+                                                     Content="{TemplateBinding KeyName}" Margin="5,0,0,0" Height="40" />
                             <ui:TextBlock Margin="10" x:Name="None" Text="未设置" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                            <ui:Button Margin="5,0,5,0" Padding="0" Height="32" Width="32" FontSize="24" ToolTip="移除快捷键" Command="{TemplateBinding RemoveHotKey}" CommandParameter="{TemplateBinding HotKeyModel}">
+                                <ui:Button.Icon>
+                                    <ui:SymbolIcon FontSize="24" Symbol="Dismiss24" />
+                                </ui:Button.Icon>
+                            </ui:Button>
                             <ui:SymbolIcon
                                 x:Name="ControlChevronIcon"
                                 Foreground="{TemplateBinding Foreground}"
@@ -166,6 +171,7 @@
                 </ControlTemplate>
 
             </Setter.Value>
+            
         </Setter>
     </Style>
 
