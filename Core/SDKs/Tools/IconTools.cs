@@ -1,12 +1,11 @@
 ﻿#region
 
-using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Xml;
 using Core.SDKs.Services;
 using log4net;
+using Vanara.PInvoke;
 using Size = System.Drawing.Size;
 
 #endregion
@@ -70,46 +69,6 @@ public class IconTools
         }
 
 
-        if (mscFile)
-        {
-            var index = 0;
-            string dllPath;
-            var xd = new XmlDocument();
-            xd.Load(path); //加载xml文档
-            var rootNode = xd.SelectSingleNode("MMC_ConsoleFile"); //得到xml文档的根节点
-            var BinaryStorage = rootNode.SelectSingleNode("VisualAttributes").SelectSingleNode("Icon");
-            index = int.Parse(((XmlElement)BinaryStorage).GetAttribute("Index"));
-            dllPath = ((XmlElement)BinaryStorage).GetAttribute("File");
-
-            dllPath = Environment.SystemDirectory + "\\" + dllPath.Split("\\").Last();
-            path = dllPath;
-            if (cacheKey.Contains("taskschd.msc"))
-            {
-                index += 1;
-            }
-
-            var iconTotalCount = PrivateExtractIcons(dllPath, index, 0, 0, null!, null!, 0, 0);
-
-            //用于接收获取到的图标指针
-            var hIcons = new IntPtr[iconTotalCount];
-            //对应的图标id
-            var ids = new int[iconTotalCount];
-            //成功获取到的图标个数
-            var successCount = PrivateExtractIcons((string)dllPath, index, 48, 48, hIcons, ids, iconTotalCount, 0);
-            for (var i = 0; i < successCount; i++)
-            {
-                //指针为空，跳过
-                if (hIcons[i] == IntPtr.Zero)
-                {
-                    continue;
-                }
-
-                var icon = Icon.FromHandle(hIcons[i]);
-
-                return icon;
-            }
-        }
-
         #region 获取64*64的尺寸Icon
 
         {
@@ -141,16 +100,22 @@ public class IconTools
         #endregion
 
 
-        var shinfo = new SHFILEINFO();
-        SHGetFileInfo(
-            path,
-            0, ref shinfo, (uint)Marshal.SizeOf(shinfo),
-            SHGFI_ICON | SHGFI_LARGEICON | SHGFI_USEFILEATTRIBUTES | SHGFI_OPENICON);
+        var hres = Shell32.SHGetImageList(Shell32.SHIL.SHIL_EXTRALARGE, typeof(ComCtl32.IImageList2).GUID, out var iml);
+        if (hres.Failed) throw new System.ComponentModel.Win32Exception(hres.Code);
 
+        // Get the icon index for a file
+        var shfi = new Shell32.SHFILEINFO();
+        var hIcon = Shell32.SHGetFileInfo(path, 0, ref shfi, Shell32.SHFILEINFO.Size,
+            Shell32.SHGFI.SHGFI_ICONLOCATION | Shell32.SHGFI.SHGFI_SYSICONINDEX);
+        if (hIcon == IntPtr.Zero) throw new System.ComponentModel.Win32Exception();
+
+        // Get the icon from the image list
+        var safe = ((ComCtl32.IImageList2)iml).GetIcon(shfi.iIcon, ComCtl32.IMAGELISTDRAWFLAGS.ILD_TRANSPARENT);
+        if (safe == IntPtr.Zero) throw new System.ComponentModel.Win32Exception();
 
         try
         {
-            return (Icon)Icon.FromHandle(shinfo.hIcon);
+            return (Icon)Icon.FromHandle(safe);
         }
         catch (Exception e)
         {
@@ -158,10 +123,66 @@ public class IconTools
         }
     }
 
-    public static void GetIcon(string path, BindingList<SearchViewItem> items, SearchViewItem item)
+    public static void GetIconInItems(SearchViewItem t)
+    {
+        //Log.Debug($"为{t.OnlyKey}生成Icon");
+
+        {
+            switch (t.FileType)
+            {
+                case FileType.文件夹:
+                    IconTools.ExtractFromPath(t.DirectoryInfo!.FullName, t);
+                    break;
+                case FileType.URL:
+                    if (t.FileInfo is not null)
+                    {
+                        IconTools.GetIcon(t.FileInfo!.FullName, t);
+                    }
+
+                    break;
+                case FileType.自定义:
+                    if (t.GetIconAction != null)
+                    {
+                        var icon3 = t.GetIconAction(t);
+                        t.Icon = icon3;
+                    }
+
+                    break;
+                case FileType.UWP应用:
+                    IconTools.GetIcon(t.IconPath!, t);
+                    break;
+                case FileType.应用程序:
+                case FileType.Word文档:
+                case FileType.PPT文档:
+                case FileType.Excel文档:
+                case FileType.PDF文档:
+                case FileType.图像:
+                case FileType.文件:
+                    IconTools.GetIcon(t.FileInfo!.FullName, t);
+                    break;
+                case FileType.命令:
+                case FileType.自定义情景:
+                case FileType.便签:
+                case FileType.数学运算:
+                case FileType.剪贴板图像:
+                case FileType.None:
+                    break;
+
+                default:
+                    IconTools.GetIcon(t.FileInfo!.FullName, t);
+                    break;
+            }
+        }
+
+        //Log.Debug(t.OnlyKey);
+
+        //
+    }
+
+    public static void GetIcon(string path, SearchViewItem item)
     {
         //log.Debug(1);
-        var mscFile = false;
+
         string cacheKey;
         switch (path.ToLower().Split(".").Last())
         {
@@ -179,7 +200,6 @@ public class IconTools
             case "msc":
             {
                 cacheKey = path.Split("\\").Last();
-                mscFile = true;
                 break;
             }
             default:
@@ -187,6 +207,12 @@ public class IconTools
                 cacheKey = path;
                 break;
             }
+        }
+
+        if (cacheKey.EndsWith("mmc.exe"))
+        {
+            cacheKey = item.Arguments.Replace("\"", null);
+            path = cacheKey;
         }
 
         //缓存
@@ -197,7 +223,7 @@ public class IconTools
 
 
         retry:
-        var iconBase = GetIconBase(path, cacheKey, mscFile);
+        var iconBase = GetIconBase(path, cacheKey);
         if (iconBase == null)
         {
             goto retry;
@@ -235,7 +261,7 @@ public class IconTools
     }
 
 
-    public static void ExtractFromPath(string path, BindingList<SearchViewItem> items, SearchViewItem item)
+    public static void ExtractFromPath(string path, SearchViewItem item)
     {
         if (_icons.TryGetValue(path, out var fromPath))
         {

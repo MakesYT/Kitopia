@@ -4,6 +4,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
@@ -262,6 +263,7 @@ public partial class MainWindow
                                     ServiceManager.Services.GetService<SearchWindow>()!.tx.SelectAll();
                                     Task.Run(() =>
                                     {
+                                        Thread.CurrentThread.Priority = ThreadPriority.Lowest;
                                         ServiceManager.Services.GetService<SearchWindowViewModel>()!.ReloadApps();
                                     });
                                 }

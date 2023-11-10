@@ -270,61 +270,6 @@ public partial class SearchWindowViewModel : ObservableRecipient
         // GetItemsIcon();
     }
 
-    public void GetIconInItemsAsync(SearchViewItem t)
-    {
-        //Log.Debug($"为{t.OnlyKey}生成Icon");
-
-        {
-            switch (t.FileType)
-            {
-                case FileType.文件夹:
-                    IconTools.ExtractFromPath(t.DirectoryInfo!.FullName, Items, t);
-                    break;
-                case FileType.命令:
-                case FileType.URL:
-                    if (t.FileInfo is not null)
-                    {
-                        IconTools.GetIcon(t.FileInfo!.FullName, Items, t);
-                    }
-
-                    break;
-                case FileType.自定义情景:
-                case FileType.便签:
-                case FileType.数学运算:
-                case FileType.剪贴板图像:
-                case FileType.None:
-                    break;
-                case FileType.自定义:
-                    if (t.GetIconAction != null)
-                    {
-                        var icon3 = t.GetIconAction(t);
-                        t.Icon = icon3;
-                    }
-
-                    break;
-                case FileType.UWP应用:
-                    IconTools.GetIcon(t.IconPath!, Items, t);
-                    break;
-                case FileType.应用程序:
-                case FileType.Word文档:
-                case FileType.PPT文档:
-                case FileType.Excel文档:
-                case FileType.PDF文档:
-                case FileType.图像:
-                case FileType.文件:
-
-
-                default:
-                    IconTools.GetIcon(t.FileInfo!.FullName, Items, t);
-                    break;
-            }
-        }
-
-        //Log.Debug(t.OnlyKey);
-
-        //
-    }
-
     // ReSharper disable once RedundantAssignment
     partial void OnSearchChanged(string? value)
     {
