@@ -16,9 +16,13 @@ namespace Kitopia.Converter.SearchWindow;
 
 public partial class PathToImageConverter : IValueConverter
 {
-    public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    public object? Convert(object? value, Type targetType, object parameter, CultureInfo culture)
     {
         //Console.WriteLine("开始获取  "+DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond );
+        if (value is null)
+        {
+            return null;
+        }
 
         var searchViewItem = value as SearchViewItem;
 
