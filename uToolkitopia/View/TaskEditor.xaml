@@ -13,6 +13,7 @@
     xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=System.ComponentModel.TypeConverter"
     xmlns:services="clr-namespace:Kitopia.Services"
     xmlns:customScenario="clr-namespace:Core.SDKs.CustomScenario;assembly=Core"
+    xmlns:converter="clr-namespace:Kitopia.Converter"
     x:Class="Kitopia.View.TaskEditor"
     WindowBackdropType="Acrylic"
     WindowCornerPreference="Round"
@@ -23,6 +24,7 @@
     Title="TaskEditor" Height="450" Width="1800">
     <ui:FluentWindow.Resources>
         <services:BindingProxy x:Key="viewModel" Data="{Binding}" />
+        <converter:HotKeySignNameToolCTr x:Key="HotKeySignNameToolCTr"/> 
         <taskEditor1:IfNullVisibilityHidden x:Key="IfNullVisibilityHidden" />
         <DataTemplate x:Key="StringTemplate" DataType="{x:Type customScenario:ConnectorItem}">
             <StackPanel Margin="10,0,0,0" Orientation="Horizontal" VerticalAlignment="Center"
@@ -227,20 +229,23 @@
                                     </ListBox.ItemContainerStyle>
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
-                                            <Border BorderBrush="LightGray" BorderThickness="1"
-                                                    CornerRadius="3">
-                                                <Border.Resources>
+                                            
+                                            <Grid>
+                                                <Grid.Resources>
                                                     <services:BindingProxy x:Key="runRecordList" Data="{Binding}" />
-                                                </Border.Resources>
-                                                <Grid Margin="9">
-                                                    <Grid.ContextMenu>
-                                                        <ContextMenu DataContext="{StaticResource viewModel}">
-                                                            <!-- ReSharper disable once Xaml.RedundantResource -->
-                                                            <MenuItem Header="删除此变量"
-                                                                      Command="{Binding Data.DelValueCommand}"
-                                                                      CommandParameter="{Binding Data.Key,Source={StaticResource runRecordList}}" />
-                                                        </ContextMenu>
-                                                    </Grid.ContextMenu>
+                                                </Grid.Resources>
+                                                <Border BorderBrush="LightGray" BorderThickness="1"
+                                                    CornerRadius="3" Background="White">
+                                                <Border.ContextMenu>
+                                                    <ContextMenu DataContext="{StaticResource viewModel}">
+                                                        <!-- ReSharper disable once Xaml.RedundantResource -->
+                                                        <MenuItem Header="删除此变量"
+                                                                  Command="{Binding Data.DelValueCommand}"
+                                                                  CommandParameter="{Binding Data.Key,Source={StaticResource runRecordList}}" />
+                                                    </ContextMenu>
+                                                </Border.ContextMenu>
+                                               
+                                                <Grid Margin="9" >
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*" />
                                                         <ColumnDefinition Width="30" />
@@ -466,6 +471,8 @@
                                                     </Border>
                                                 </Grid>
                                             </Border>
+                                            </Grid>
+                                            
 
 
                                         </DataTemplate>
@@ -629,16 +636,34 @@
                                     <StackPanel Margin="15,5,5,5" Orientation="Vertical">
                                         <controls:SettingItems Title="激活快捷键" Description="修改激活快捷键" Padding="14,10,14,10">
                         
-                                            <controls:HotKeyShow Command="{Binding StartHotkeyEditorCommand}"
-                                                                HotKeyModel="{Binding Scenario.StartHotKeyModel}" />
+                                            <controls:HotKeyShow>
+                                                <controls:HotKeyShow.HotKeySignName>
+                                                    <MultiBinding Converter="{StaticResource HotKeySignNameToolCTr}">
+                                                        <MultiBinding.Bindings>
+                                                            <Binding Source="Kitopia情景" />
+                                                            <Binding Path="Scenario.UUID" />
+                                                            <Binding Source="激活快捷键" />
+                                                        </MultiBinding.Bindings>
+                                                    </MultiBinding>
+                                                </controls:HotKeyShow.HotKeySignName>
+                                            </controls:HotKeyShow>
                                             <controls:SettingItems.Icon>
                                                 <ui:SymbolIcon Symbol="Keyboard20" FontSize="25" />
                                             </controls:SettingItems.Icon>
                                         </controls:SettingItems>
                                         <controls:SettingItems Title="停止快捷键" Description="修改停止快捷键" Padding="14,10,14,10">
                         
-                                            <controls:HotKeyShow Command="{Binding StopHotkeyEditorCommand}"
-                                                                 HotKeyModel="{Binding Scenario.StopHotKeyModel}" />
+                                            <controls:HotKeyShow>
+                                                <controls:HotKeyShow.HotKeySignName>
+                                                    <MultiBinding Converter="{StaticResource HotKeySignNameToolCTr}">
+                                                        <MultiBinding.Bindings>
+                                                            <Binding Source="Kitopia情景" />
+                                                            <Binding Path="Scenario.UUID" />
+                                                            <Binding Source="停止快捷键" />
+                                                        </MultiBinding.Bindings>
+                                                    </MultiBinding>
+                                                </controls:HotKeyShow.HotKeySignName>
+                                            </controls:HotKeyShow>
                                             <controls:SettingItems.Icon>
                                                 <ui:SymbolIcon Symbol="Keyboard20" FontSize="25" />
                                             </controls:SettingItems.Icon>

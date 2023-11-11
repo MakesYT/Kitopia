@@ -1,7 +1,9 @@
 ﻿#region
 
+using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
@@ -33,7 +35,8 @@ public class HotKeyShow : ButtonBase
         Shift = 0100
     }
 
-    public static readonly DependencyProperty HotKeyNameProperty = DependencyProperty.Register(nameof(HotKeyName),
+    public static readonly DependencyProperty HotKeySignNameProperty = DependencyProperty.Register(
+        nameof(HotKeySignName),
         typeof(string), typeof(HotKeyShow),
         new PropertyMetadata(null, (o, args) =>
         {
@@ -55,7 +58,7 @@ public class HotKeyShow : ButtonBase
                 return;
             }
 
-            ((HotKeyShow)o).HotKeyName = argsNewValue.SignName;
+            ((HotKeyShow)o).HotKeySignName = argsNewValue.SignName;
             HotKeyModelChanged(argsNewValue, (HotKeyShow)o);
         }));
 
@@ -70,25 +73,29 @@ public class HotKeyShow : ButtonBase
     public static readonly DependencyProperty RemoveHotKeyProperty = DependencyProperty.Register(nameof(RemoveHotKey),
         typeof(ICommand), typeof(HotKeyShow), new FrameworkPropertyMetadata(null));
 
+    public static readonly DependencyProperty EditHotKeyProperty = DependencyProperty.Register(nameof(EditHotKey),
+        typeof(ICommand), typeof(HotKeyShow), new FrameworkPropertyMetadata(null));
+
     public HotKeyShow()
     {
         WeakReferenceMessenger.Default.Register<string, string>(this, "hotkey", (_, s) =>
         {
-            HotKeyModel ??= ConfigManger.Config.hotKeys.FirstOrDefault(e => e.SignName == HotKeyName);
+            HotKeyModel ??= ConfigManger.Config.hotKeys.FirstOrDefault(e => e.SignName == HotKeySignName);
             if (HotKeyModel != null && s == HotKeyModel.SignName)
             {
                 HotKeyModelChanged(HotKeyModel, this);
             }
         });
         SetValue(RemoveHotKeyProperty, new RelayCommand<HotKeyModel>(Remove));
+        SetValue(EditHotKeyProperty, new RelayCommand<string>(Edit));
     }
 
     [Bindable(true)]
     [Category("KeyName")]
-    public string HotKeyName
+    public string HotKeySignName
     {
-        get => (string)GetValue(HotKeyNameProperty);
-        set => SetValue(HotKeyNameProperty, value);
+        get => (string)GetValue(HotKeySignNameProperty);
+        set => SetValue(HotKeySignNameProperty, value);
     }
 
     [Bindable(true)]
@@ -96,7 +103,7 @@ public class HotKeyShow : ButtonBase
     public HotKeyModel? HotKeyModel
     {
         get => (HotKeyModel)GetValue(HotKeyModelProperty);
-        set => SetValue(HotKeyModelProperty, value);
+        private set => SetValue(HotKeyModelProperty, value);
     }
 
     [Bindable(true)]
@@ -121,6 +128,14 @@ public class HotKeyShow : ButtonBase
     {
         get => (ICommand)GetValue(RemoveHotKeyProperty);
         private set => SetValue(RemoveHotKeyProperty, value);
+    }
+
+    [Bindable(true)]
+    [Category("EditHotKey")]
+    public ICommand EditHotKey
+    {
+        get => (ICommand)GetValue(EditHotKeyProperty);
+        private set => SetValue(EditHotKeyProperty, value);
     }
 
     private static void HotKeyModelChanged(HotKeyModel hotKeyModel, HotKeyShow hotKeyShow)
@@ -163,5 +178,35 @@ public class HotKeyShow : ButtonBase
             SetValue(HotKeyModelProperty, null);
             SetValue(KeyTypeProperty, KeyTypeE.None);
         }
+    }
+
+    [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+    public static extern IntPtr GetForegroundWindow();
+
+    private void Edit(string? hotKeyModelSignName)
+    {
+        if (hotKeyModelSignName is null)
+        {
+            return;
+        }
+
+        var hwndSource = System.Windows.Interop.HwndSource.FromHwnd(GetForegroundWindow());
+        if (hwndSource == null)
+        {
+            return;
+        }
+
+        var xx = (Window)hwndSource.RootVisual;
+        var hotKeyModel =
+            ConfigManger.Config.hotKeys.FirstOrDefault(e => (hotKeyModelSignName.Equals(e.SignName)));
+        if (hotKeyModel is null)
+        {
+            var strings = hotKeyModelSignName.Split("_", 2);
+            hotKeyModel = new HotKeyModel()
+                { MainName = strings[0], Name = strings[1], IsUsable = true };
+        }
+
+        ((IHotKeyEditor)ServiceManager.Services.GetService(typeof(IHotKeyEditor))!).EditByHotKeyModel(hotKeyModel,
+            xx);
     }
 }

@@ -6,6 +6,7 @@
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:pages="clr-namespace:Core.ViewModel.Pages;assembly=Core"
       xmlns:kitopia="clr-namespace:Kitopia.Controls"
+      xmlns:converter="clr-namespace:Kitopia.Converter"
       ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
       ui:Design.Foreground="{DynamicResource SystemAccentColorSecondaryBrush}"
       d:DataContext="{d:DesignInstance pages:SettingPageViewModel,
@@ -17,7 +18,7 @@
       Title="HomePage">
 
     <Page.Resources>
-
+        <converter:HotKeySignNameToolCTr x:Key="HotKeySignNameToolCTr"/> 
     </Page.Resources>
 
     <StackPanel Margin="42">
@@ -53,9 +54,16 @@
                 <StackPanel>
 
                     <kitopia:SettingItems Title="激活快捷键" Description="修改搜索框快捷键" Padding="14,10,14,10">
-                        
-                        <kitopia:HotKeyShow Tag="Kitopia_显示搜索框" Command="{Binding EditHotKeyCommand}" CommandParameter="{Binding Tag, RelativeSource={RelativeSource Self}}"
-                                            HotKeyName="Kitopia_显示搜索框" />
+                        <kitopia:HotKeyShow>
+                            <kitopia:HotKeyShow.HotKeySignName>
+                                <MultiBinding Converter="{StaticResource HotKeySignNameToolCTr}">
+                                    <MultiBinding.Bindings>
+                                        <Binding Source="Kitopia" />
+                                        <Binding Source="显示搜索框" />
+                                    </MultiBinding.Bindings>
+                                </MultiBinding>
+                            </kitopia:HotKeyShow.HotKeySignName>
+                        </kitopia:HotKeyShow>
                         <kitopia:SettingItems.Icon>
                             <ui:SymbolIcon Symbol="Keyboard20" FontSize="25" />
                         </kitopia:SettingItems.Icon>
