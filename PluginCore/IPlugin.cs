@@ -10,5 +10,9 @@ public interface IPlugin
 {
     public void OnEnabled(IServiceProvider serviceProvider);
     public void OnDisabled();
-    public static abstract IServiceProvider GetServiceProvider();
+
+    public static IServiceProvider GetServiceProvider()
+    {
+        throw new NotImplementedException();
+    }
 }

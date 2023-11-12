@@ -15,6 +15,7 @@ using Core.ViewModel;
 using Kitopia.SDKs;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
+using PluginCore;
 using Vanara.PInvoke;
 using Wpf.Ui;
 using Wpf.Ui.Appearance;
@@ -294,11 +295,15 @@ public partial class MainWindow
                             case "激活快捷键":
                             {
                                 firstOrDefault.Run();
+                                ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show("情景",
+                                    $"情景{firstOrDefault.Name}运行");
                                 break;
                             }
                             case "停止快捷键":
                             {
                                 firstOrDefault.Stop();
+                                ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show("情景",
+                                    $"情景{firstOrDefault.Name}停止");
                                 break;
                             }
                         }

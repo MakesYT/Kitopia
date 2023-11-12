@@ -1,4 +1,6 @@
-﻿namespace Core.SDKs.HotKey;
+﻿using Newtonsoft.Json;
+
+namespace Core.SDKs.HotKey;
 
 /// <summary>
 ///     快捷键模型
@@ -79,5 +81,5 @@ public class HotKeyModel
     /// </summary>
     public static Array Keys => Enum.GetValues(typeof(EKey));
 
-    public string SignName => $"{this.MainName}_{this.Name}";
+    [JsonIgnore] public string SignName => $"{this.MainName}_{this.Name}";
 }

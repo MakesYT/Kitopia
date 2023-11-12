@@ -23,6 +23,7 @@ public class PluginManager
         ThreadPool.QueueUserWorkItem((e) =>
         {
             Kitopia.ISearchItemTool = (ISearchItemTool)ServiceManager.Services.GetService(typeof(ISearchItemTool))!;
+            Kitopia.IToastService = (IToastService)ServiceManager.Services.GetService(typeof(IToastService))!;
             Kitopia._i18n = BaseNodeMethodsGen._i18n;
             var pluginsDirectoryInfo = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "plugins");
             if (!pluginsDirectoryInfo.Exists)

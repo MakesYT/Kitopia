@@ -21,6 +21,11 @@ public class AssemblyLoadContextH : AssemblyLoadContext
         var assemblyPath = _resolver.ResolveAssemblyToPath(assemblyName);
         if (assemblyPath != null)
         {
+            if (assemblyPath.EndsWith("WinRT.Runtime.dll") || assemblyPath.EndsWith("Microsoft.Windows.SDK.NET.dll"))
+            {
+                return null;
+            }
+
             return LoadFromAssemblyPath(assemblyPath);
         }
 

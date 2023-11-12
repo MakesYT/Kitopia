@@ -7,10 +7,12 @@ using System.Runtime.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.CustomType;
+using Core.SDKs.Services;
 using Core.SDKs.Services.Plugin;
 using Core.SDKs.Tools;
 using log4net;
 using Newtonsoft.Json;
+using PluginCore;
 using PluginCore.Attribute;
 using Vanara.Extensions.Reflection;
 
@@ -167,7 +169,8 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
             if (notRealTime)
             {
                 IsRunning = false;
-                Log.Debug($"场景运行完成:{Name}");
+                ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show("情景", $"情景{Name}运行完成");
+                Log.Debug($"情景运行完成:{Name}");
             }
 
             return;
@@ -229,11 +232,15 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
                         }
 
                         IsRunning = false;
-                        Log.Debug($"场景运行完成:{Name}");
+                        ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show("情景",
+                            $"情景{Name}运行完成");
+                        Log.Debug($"情景运行完成:{Name}");
                         break;
                     }
 
-                    Log.Debug($"场景进入Tick:{Name}");
+                    ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show("情景",
+                        $"情景{Name}进入Tick");
+                    Log.Debug($"情景进入Tick:{Name}");
                     try
                     {
                         _tickUtil = new TickUtil(1000, (uint)(tickIntervalSecond * 1000 * 1000), 1, TickMethod);
@@ -328,7 +335,8 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
         _initTasks.Clear();
         _tickTasks.Clear();
         IsRunning = false;
-        Log.Debug($"场景运行完成:{Name}");
+        ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show("情景", $"情景{Name}被用户停止");
+        Log.Debug($"情景{Name}被用户停止");
     }
 
     private void MakeSourcePointState(ConnectorItem targetConnectorItem, PointItem pointItem)
@@ -668,6 +676,8 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
             catch (Exception e)
             {
                 Log.Debug(e);
+                ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show("情景",
+                    $"情景{Name}出现错误\n{e.Message}");
                 valid = false;
                 goto finnish;
             }

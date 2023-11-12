@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wpf.Ui.Tray", "..\wpfui\src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KitopiaEx", "KitopiaEx\KitopiaEx.csproj", "{FAC70F92-586D-49DD-A8B9-25EE2BF5AF79}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlugCleanTool", "PlugCleanTool\PlugCleanTool.csproj", "{D62693D6-F607-4981-9CA6-E70A5F09E0C9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -196,6 +198,26 @@ Global
 		{FAC70F92-586D-49DD-A8B9-25EE2BF5AF79}.Release|x64.Build.0 = Release|Any CPU
 		{FAC70F92-586D-49DD-A8B9-25EE2BF5AF79}.Release|x86.ActiveCfg = Release|Any CPU
 		{FAC70F92-586D-49DD-A8B9-25EE2BF5AF79}.Release|x86.Build.0 = Release|Any CPU
+		{D62693D6-F607-4981-9CA6-E70A5F09E0C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D62693D6-F607-4981-9CA6-E70A5F09E0C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D62693D6-F607-4981-9CA6-E70A5F09E0C9}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{D62693D6-F607-4981-9CA6-E70A5F09E0C9}.Debug|ARM.Build.0 = Debug|Any CPU
+		{D62693D6-F607-4981-9CA6-E70A5F09E0C9}.Debug|arm64.ActiveCfg = Debug|Any CPU
+		{D62693D6-F607-4981-9CA6-E70A5F09E0C9}.Debug|arm64.Build.0 = Debug|Any CPU
+		{D62693D6-F607-4981-9CA6-E70A5F09E0C9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D62693D6-F607-4981-9CA6-E70A5F09E0C9}.Debug|x64.Build.0 = Debug|Any CPU
+		{D62693D6-F607-4981-9CA6-E70A5F09E0C9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D62693D6-F607-4981-9CA6-E70A5F09E0C9}.Debug|x86.Build.0 = Debug|Any CPU
+		{D62693D6-F607-4981-9CA6-E70A5F09E0C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D62693D6-F607-4981-9CA6-E70A5F09E0C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D62693D6-F607-4981-9CA6-E70A5F09E0C9}.Release|ARM.ActiveCfg = Release|Any CPU
+		{D62693D6-F607-4981-9CA6-E70A5F09E0C9}.Release|ARM.Build.0 = Release|Any CPU
+		{D62693D6-F607-4981-9CA6-E70A5F09E0C9}.Release|arm64.ActiveCfg = Release|Any CPU
+		{D62693D6-F607-4981-9CA6-E70A5F09E0C9}.Release|arm64.Build.0 = Release|Any CPU
+		{D62693D6-F607-4981-9CA6-E70A5F09E0C9}.Release|x64.ActiveCfg = Release|Any CPU
+		{D62693D6-F607-4981-9CA6-E70A5F09E0C9}.Release|x64.Build.0 = Release|Any CPU
+		{D62693D6-F607-4981-9CA6-E70A5F09E0C9}.Release|x86.ActiveCfg = Release|Any CPU
+		{D62693D6-F607-4981-9CA6-E70A5F09E0C9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

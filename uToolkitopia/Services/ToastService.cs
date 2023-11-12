@@ -2,9 +2,9 @@
 
 using System;
 using System.Windows;
-using Core.SDKs.Services;
 using log4net;
 using Microsoft.Toolkit.Uwp.Notifications;
+using PluginCore;
 using MessageBox = Kitopia.Controls.MessageBoxControl.MessageBox;
 using MessageBoxResult = Kitopia.Controls.MessageBoxControl.MessageBoxResult;
 
@@ -16,12 +16,13 @@ public class ToastService : IToastService
 {
     private static readonly ILog log = LogManager.GetLogger(nameof(ToastService));
 
-    public void Show(string text)
+    public void Show(string header, string text)
     {
         log.Debug(nameof(ToastService) + "的接口" + nameof(Show) + "被调用");
 
 
         new ToastContentBuilder()
+            .AddHeader("Kitopia", header, "")
             .AddText(text)
             .Show();
     }

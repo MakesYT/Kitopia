@@ -10,6 +10,7 @@ using Core.SDKs.Services.Config;
 using IWshRuntimeLibrary;
 using log4net;
 using NPinyin;
+using PluginCore;
 using Vanara.PInvoke;
 using File = System.IO.File;
 

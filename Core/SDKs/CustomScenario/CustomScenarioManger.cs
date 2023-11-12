@@ -5,6 +5,7 @@ using Core.SDKs.Services.Plugin;
 using Core.ViewModel;
 using log4net;
 using Newtonsoft.Json;
+using PluginCore;
 
 namespace Core.SDKs.Services.Config;
 

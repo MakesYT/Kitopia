@@ -1,4 +1,6 @@
-﻿namespace Core.SDKs.Services;
+﻿using System;
+
+namespace PluginCore;
 
 public class ShowMessageContent
 {

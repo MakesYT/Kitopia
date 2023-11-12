@@ -26,7 +26,6 @@ using Kitopia.View.Pages.Plugin;
 using log4net;
 using log4net.Config;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Win32;
 using PluginCore;
 using Vanara.PInvoke;
@@ -253,17 +252,15 @@ public sealed partial class App : Application
                         try
                         {
                             registry.SetValue("Kitopia", $"\"{strName}\""); //设置该子项的新的“键值对”
-                            new ToastContentBuilder()
-                                .AddText("开机自启设置成功")
-                                .Show();
+                            ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show("开机自启",
+                                "开机自启设置成功");
                         }
                         catch (Exception exception)
                         {
                             log.Error("开机自启设置失败");
                             log.Error(exception.StackTrace);
-                            new ToastContentBuilder()
-                                .AddText("开机自启设置失败,请检查杀毒软件后重试")
-                                .Show();
+                            ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show("开机自启",
+                                "开机自启设置失败,请检查杀毒软件后重试");
                         }
 
                         break;
@@ -281,17 +278,14 @@ public sealed partial class App : Application
             try
             {
                 registry.SetValue("Kitopia", $"\"{strName}\""); //设置该子项的新的“键值对”
-                new ToastContentBuilder()
-                    .AddText("开机自启设置成功")
-                    .Show();
+                ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show("开机自启", "开机自启设置成功");
             }
             catch (Exception exception)
             {
                 log.Error("开机自启设置失败");
                 log.Error(exception.StackTrace);
-                new ToastContentBuilder()
-                    .AddText("开机自启设置失败,请检查杀毒软件后重试")
-                    .Show();
+                ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show("开机自启",
+                    "开机自启设置失败,请检查杀毒软件后重试");
             }
         }
         else
@@ -308,7 +302,7 @@ public sealed partial class App : Application
         var services = new ServiceCollection();
         services.AddSingleton<IconTools>();
         services.AddTransient<IThemeChange, ThemeChange>();
-        services.AddTransient<IToastService, ToastService>();
+        services.AddSingleton<IToastService, ToastService>();
         services.AddTransient<ISearchItemTool, SearchItemTool>();
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddTransient<INavigationPageService, NavigationPageService>();

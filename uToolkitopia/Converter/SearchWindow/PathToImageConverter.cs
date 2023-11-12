@@ -2,7 +2,6 @@
 
 using System;
 using System.Globalization;
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Interop;
@@ -83,8 +82,4 @@ public partial class PathToImageConverter : IValueConverter
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
         throw new NotImplementedException();
-
-    [LibraryImport("gdi32.dll")]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool DeleteObject(IntPtr hObject);
 }

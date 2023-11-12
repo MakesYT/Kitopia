@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Core.SDKs.HotKey;
 using Core.SDKs.Services.Config;
 using log4net;
@@ -37,14 +38,30 @@ public class HotKeyHelper
         out Dictionary<string, int> hotKeySettingsDic)
     {
         List<HotKeyModel> failList = new();
+        List<HotKeyModel> toRemove = new();
         foreach (var item in hotKeyModelList)
         {
+            if (item.MainName == "Kitopia情景")
+            {
+                if (CustomScenarioManger.CustomScenarios.All(e => e.UUID != item.Name!.Split("_")[0]))
+                {
+                    toRemove.Add(item);
+                    continue;
+                }
+            }
+
             if (!RegisterHotKey(item, hwnd))
             {
                 failList.Add(item);
 
                 log.Debug($"注册热键失败:{item.MainName}_{item.Name}");
             }
+        }
+
+        foreach (var hotKeyModel in toRemove)
+        {
+            ConfigManger.Config.hotKeys.Remove(hotKeyModel);
+            ConfigManger.Save();
         }
 
         hotKeySettingsDic = m_HotKeySettingsDic;

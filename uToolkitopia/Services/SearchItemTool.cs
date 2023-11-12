@@ -28,7 +28,8 @@ public class SearchItemTool : ISearchItemTool
                 if (string.IsNullOrEmpty(fileName))
                 {
                     Log.Error("剪贴板图片保存失败");
-                    ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show("剪贴板图片保存失败");
+                    ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!)
+                        .Show("剪贴板", "剪贴板图片保存失败");
                     return;
                 }
 
