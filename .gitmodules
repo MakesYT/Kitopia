@@ -1,3 +1,6 @@
 [submodule "PluginCore"]
 	path = PluginCore
 	url = https://github.com/MakesYT/PluginCore.git
+[submodule "PlugCleanTool"]
+	path = PlugCleanTool
+	url = https://github.com/MakesYT/PlugCleanTool.git
