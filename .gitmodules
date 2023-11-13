@@ -1,0 +1,3 @@
+[submodule "PluginCore"]
+	path = PluginCore
+	url = https://github.com/MakesYT/PluginCore.git
