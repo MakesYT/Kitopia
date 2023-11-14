@@ -5,6 +5,7 @@
 /// </summary>
 public enum EKey
 {
+    未设置 = -1,
     退格 = 8,
     制表 = 9,
     清空 = 12,

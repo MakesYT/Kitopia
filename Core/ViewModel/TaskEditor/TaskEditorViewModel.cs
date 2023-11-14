@@ -32,7 +32,6 @@ public partial class TaskEditorViewModel : ObservableRecipient
 
     [ObservableProperty] private CustomScenario _scenario = new CustomScenario { IsActive = true };
 
-
     private Window _window;
 
     public TaskEditorViewModel()
@@ -113,6 +112,12 @@ public partial class TaskEditorViewModel : ObservableRecipient
                     value = Convert.ToInt32((double)e.ConnectorItem.InputObject);
                 }
 
+                if (value > 10)
+                {
+                    value = 10;
+                    e.ConnectorItem.InputObject = (double)10;
+                }
+
                 if (e.PointItem.Output.Count == value)
                 {
                     return;
@@ -158,6 +163,8 @@ public partial class TaskEditorViewModel : ObservableRecipient
 
         //nodeMethods.Add("new PointItem(){Title = \"Test\"}");
     }
+
+    public bool IsSaveInLocal => CustomScenarioManger.CustomScenarios.Contains(Scenario);
 
     public object ContentPresenter
     {
@@ -415,6 +422,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
 
         IsModified = false;
         CustomScenarioManger.Save(Scenario);
+        OnPropertyChanged(nameof(IsSaveInLocal));
     }
 
     [RelayCommand(CanExecute = nameof(IsModified))]
@@ -427,6 +435,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
             {
                 IsModified = false;
                 CustomScenarioManger.Save(Scenario);
+                OnPropertyChanged(nameof(IsSaveInLocal));
                 Application.Current.Dispatcher.BeginInvoke(() =>
                 {
                     window.Close();

@@ -8,6 +8,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.HotKey;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
+using log4net;
 using Wpf.Ui.Controls;
 using MessageBox = Kitopia.Controls.MessageBoxControl.MessageBox;
 
@@ -17,6 +18,7 @@ namespace Kitopia.View;
 
 public partial class HotKeyEditorWindow : FluentWindow
 {
+    private static readonly ILog Log = LogManager.GetLogger(nameof(HotKeyEditorWindow));
     private HotKeyModel? _hotKeyModel;
     private bool isFinnish;
     private EKey? selectedKey;

@@ -64,6 +64,7 @@
                                 <ColumnDefinition Width="2*" />
                                 <ColumnDefinition Width="4*" />
                                 <ColumnDefinition Width="48" />
+                                <ColumnDefinition Width="48" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <Image Grid.Column="0" HorizontalAlignment="Left" Focusable="False" Width="48"
@@ -87,7 +88,18 @@
                                               TextWrapping="Wrap"
                                               Text="{Binding Description}" />
                             </ui:DynamicScrollViewer>
-                            <ui:Button Grid.Column="3" FontSize="25" ToolTip="停止"
+                            <ui:Button Grid.Column="3" FontSize="25" ToolTip="删除情景"
+                                       Background="White"
+                                       Foreground="OrangeRed"
+                                       ToolTipService.InitialShowDelay="100"
+                                       Command="{Binding Path=DataContext.RemoveCustomScenarioCommand, 
+                                                    RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Page}}}"
+                                       CommandParameter="{Binding }">
+                                <ui:Button.Icon>
+                                    <ui:SymbolIcon Symbol="Delete20"  />
+                                </ui:Button.Icon>
+                            </ui:Button>
+                            <ui:Button Grid.Column="4" FontSize="25" ToolTip="停止"
                                        Background="OrangeRed"
                                        Foreground="White"
                                        ToolTipService.InitialShowDelay="100"
@@ -99,7 +111,19 @@
                                     <ui:SymbolIcon Symbol="Stop20"  />
                                 </ui:Button.Icon>
                             </ui:Button>
-                            <ui:SymbolIcon Grid.Column="4" Symbol="ChevronRight20" FontSize="20"
+                            <ui:Button Grid.Column="4" FontSize="25" ToolTip="执行"
+                                       Background="White"
+                                       Foreground="GreenYellow"
+                                       ToolTipService.InitialShowDelay="100"
+                                       Visibility="{Binding IsRunning,Converter={StaticResource reverseBoolToVisibilityConverter}}"
+                                       Command="{Binding Path=DataContext.RunCustomScenarioCommand, 
+                                                    RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Page}}}"
+                                       CommandParameter="{Binding }">
+                                <ui:Button.Icon>
+                                    <ui:SymbolIcon Symbol="Play20"  />
+                                </ui:Button.Icon>
+                            </ui:Button>
+                            <ui:SymbolIcon Grid.Column="5" Symbol="ChevronRight20" FontSize="20"
                                            Margin="0,0,10,0" />
                         </Grid>
 

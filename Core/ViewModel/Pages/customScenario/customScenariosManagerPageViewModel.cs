@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.Services;
+using Core.SDKs.Services.Config;
 
 namespace Core.ViewModel.Pages.customScenario;
 
@@ -24,5 +25,17 @@ public partial class CustomScenariosManagerPageViewModel : ObservableRecipient
     private void StopCustomScenario(CustomScenario scenario)
     {
         scenario.Stop();
+    }
+
+    [RelayCommand]
+    private void RunCustomScenario(CustomScenario scenario)
+    {
+        scenario.Run();
+    }
+
+    [RelayCommand]
+    private void RemoveCustomScenario(CustomScenario scenario)
+    {
+        CustomScenarioManger.Remove(scenario);
     }
 }

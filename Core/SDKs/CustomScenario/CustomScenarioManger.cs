@@ -167,6 +167,16 @@ public partial class CustomScenarioManger
         File.WriteAllText(configF.FullName, JsonConvert.SerializeObject(scenario, setting));
     }
 
+    public static void Remove(SDKs.CustomScenario.CustomScenario scenario)
+    {
+        if (CustomScenarios.Contains(scenario))
+        {
+            CustomScenarios.Remove(scenario);
+            File.Delete(AppDomain.CurrentDomain.BaseDirectory + $"customScenarios\\{scenario.UUID}.json");
+            scenario.Dispose();
+        }
+    }
+
     public static void Reload(SDKs.CustomScenario.CustomScenario scenario)
     {
         CustomScenarios.Remove(scenario);

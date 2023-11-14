@@ -81,6 +81,7 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
 
     public void Dispose()
     {
+        _cancellationTokenSource.Cancel();
         _cancellationTokenSource.Dispose();
     }
 

@@ -85,6 +85,14 @@
                             <Setter TargetName="KeyName" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="None" Property="Visibility" Value="Visible" />
                         </Trigger>
+                        <Trigger Property="KeyType" Value="NoControlKey">
+                            <Setter TargetName="Ctrl" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="Win" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="Alt" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="Shift" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="KeyName" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="None" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
                         <Trigger Property="KeyType" Value="Ctrl">
                             <Setter TargetName="Ctrl" Property="Visibility" Value="Visible" />
                             <Setter TargetName="Win" Property="Visibility" Value="Collapsed" />

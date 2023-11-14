@@ -23,6 +23,7 @@ public class HotKeyShow : ButtonBase
     public enum KeyTypeE
     {
         None = 0000,
+        NoControlKey = 10000,
         CtrlAlt = 1010,
         Ctrl = 1000,
         CtrlShift = 1100,
@@ -68,7 +69,7 @@ public class HotKeyShow : ButtonBase
 
     public static readonly DependencyProperty KeyNameProperty = DependencyProperty.Register(nameof(KeyName),
         typeof(string), typeof(HotKeyShow),
-        new PropertyMetadata("空格"));
+        new PropertyMetadata("-1"));
 
     public static readonly DependencyProperty RemoveHotKeyProperty = DependencyProperty.Register(nameof(RemoveHotKey),
         typeof(ICommand), typeof(HotKeyShow), new FrameworkPropertyMetadata(null));
@@ -166,6 +167,11 @@ public class HotKeyShow : ButtonBase
             type += 1;
         }
 
+        if (type == 0000 && hotKeyModel.SelectKey != EKey.未设置)
+        {
+            type = 10000;
+        }
+
         hotKeyShow.KeyType = (HotKeyShow.KeyTypeE)type;
         hotKeyShow.KeyName = hotKeyModel.SelectKey.ToString();
     }
@@ -203,7 +209,7 @@ public class HotKeyShow : ButtonBase
         {
             var strings = hotKeyModelSignName.Split("_", 2);
             hotKeyModel = new HotKeyModel()
-                { MainName = strings[0], Name = strings[1], IsUsable = true };
+                { MainName = strings[0], Name = strings[1], IsUsable = true, SelectKey = EKey.未设置 };
         }
 
         ((IHotKeyEditor)ServiceManager.Services.GetService(typeof(IHotKeyEditor))!).EditByHotKeyModel(hotKeyModel,

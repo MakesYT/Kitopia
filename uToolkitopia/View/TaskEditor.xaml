@@ -636,7 +636,10 @@
                                     <StackPanel Margin="15,5,5,5" Orientation="Vertical">
                                         <controls:SettingItems Title="激活快捷键" Description="修改激活快捷键" Padding="14,10,14,10">
                         
-                                            <controls:HotKeyShow>
+                                            <controls:HotKeyShow IsEnabled="{Binding IsSaveInLocal}" 
+                                                                 ToolTipService.ShowOnDisabled="True"
+                                                                 ToolTip="需要先保存一次情景才可设置"
+                                                                 ToolTipService.IsEnabled="{Binding IsSaveInLocal,Converter={StaticResource ReverseBool}}">
                                                 <controls:HotKeyShow.HotKeySignName>
                                                     <MultiBinding Converter="{StaticResource HotKeySignNameToolCTr}">
                                                         <MultiBinding.Bindings>
@@ -653,7 +656,10 @@
                                         </controls:SettingItems>
                                         <controls:SettingItems Title="停止快捷键" Description="修改停止快捷键" Padding="14,10,14,10">
                         
-                                            <controls:HotKeyShow>
+                                            <controls:HotKeyShow IsEnabled="{Binding IsSaveInLocal}"
+                                                                 ToolTipService.ShowOnDisabled="True"
+                                                                 ToolTip="需要先保存一次情景才可设置"
+                                                                 ToolTipService.IsEnabled="{Binding IsSaveInLocal,Converter={StaticResource ReverseBool}}">
                                                 <controls:HotKeyShow.HotKeySignName>
                                                     <MultiBinding Converter="{StaticResource HotKeySignNameToolCTr}">
                                                         <MultiBinding.Bindings>
@@ -1325,12 +1331,17 @@
                         </ui:Button.Icon>
                     </ui:Button>
                     <ui:Button FontSize="25" ToolTip="运行测试" ToolTipService.InitialShowDelay="100"
+                               Visibility="{Binding Scenario.IsRunning,Converter={StaticResource reverseBoolToVisibilityConverter}}"
+                               Foreground="GreenYellow"
                                Command="{Binding VerifyNodeCommand}">
                         <ui:Button.Icon>
                             <ui:SymbolIcon Symbol="Play20" />
                         </ui:Button.Icon>
                     </ui:Button>
                     <ui:Button FontSize="25" ToolTip="停止测试" ToolTipService.InitialShowDelay="100"
+                               Visibility="{Binding Scenario.IsRunning,Converter={StaticResource boolToVisibilityConverter}}"
+                               Background="OrangeRed"
+                               Foreground="White"
                                Command="{Binding StopCustomScenarioCommand}">
                         <ui:Button.Icon>
                             <ui:SymbolIcon Symbol="Stop20" />
