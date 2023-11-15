@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using Core.SDKs.Services.Config;
 using Core.SDKs.Tools;
+using PluginCore;
 
 #endregion
 

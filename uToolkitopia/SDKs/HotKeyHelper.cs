@@ -137,7 +137,7 @@ public class HotKeyHelper
         }
 
         m_HotKeySettingsDic.Remove(hotKeyModel.SignName);
-        ConfigManger.Config.hotKeys.RemoveAll(e => e.SignName == hotKeyModel.SignName);
+        ConfigManger.Config.hotKeys.Remove(hotKeyModel);
         ConfigManger.Save();
     }
 }

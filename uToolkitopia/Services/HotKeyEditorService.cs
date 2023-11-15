@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Windows;
+using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.HotKey;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
@@ -42,5 +43,11 @@ public class HotKeyEditorService : IHotKeyEditor
         hotKeyEditor.WindowStartupLocation = WindowStartupLocation.CenterOwner;
         hotKeyEditor.Title = "修改快捷键";
         hotKeyEditor.ShowDialog();
+    }
+
+    public void RemoveByHotKeyModel(HotKeyModel hotKeyModel)
+    {
+        ((MainWindow)ServiceManager.Services.GetService(typeof(MainWindow))!).RemoveHotKey(hotKeyModel);
+        WeakReferenceMessenger.Default.Send(hotKeyModel.SignName, "hotkey");
     }
 }

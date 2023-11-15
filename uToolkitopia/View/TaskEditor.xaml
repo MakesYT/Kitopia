@@ -638,6 +638,7 @@
                         
                                             <controls:HotKeyShow IsEnabled="{Binding IsSaveInLocal}" 
                                                                  ToolTipService.ShowOnDisabled="True"
+                                                                 ToolTipService.InitialShowDelay="100"
                                                                  ToolTip="需要先保存一次情景才可设置"
                                                                  ToolTipService.IsEnabled="{Binding IsSaveInLocal,Converter={StaticResource ReverseBool}}">
                                                 <controls:HotKeyShow.HotKeySignName>
@@ -658,6 +659,7 @@
                         
                                             <controls:HotKeyShow IsEnabled="{Binding IsSaveInLocal}"
                                                                  ToolTipService.ShowOnDisabled="True"
+                                                                 ToolTipService.InitialShowDelay="100"
                                                                  ToolTip="需要先保存一次情景才可设置"
                                                                  ToolTipService.IsEnabled="{Binding IsSaveInLocal,Converter={StaticResource ReverseBool}}">
                                                 <controls:HotKeyShow.HotKeySignName>

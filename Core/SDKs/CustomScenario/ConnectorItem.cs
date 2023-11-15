@@ -3,7 +3,6 @@ using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.Services.Config;
-using Core.ViewModel.TaskEditor;
 using Newtonsoft.Json;
 
 namespace Core.SDKs.CustomScenario;

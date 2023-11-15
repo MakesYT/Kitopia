@@ -54,12 +54,6 @@ public class HotKeyShow : ButtonBase
         new PropertyMetadata(null, (o, args) =>
         {
             var argsNewValue = (HotKeyModel)args.NewValue;
-            if (argsNewValue is null)
-            {
-                return;
-            }
-
-            ((HotKeyShow)o).HotKeySignName = argsNewValue.SignName;
             HotKeyModelChanged(argsNewValue, (HotKeyShow)o);
         }));
 
@@ -77,16 +71,28 @@ public class HotKeyShow : ButtonBase
     public static readonly DependencyProperty EditHotKeyProperty = DependencyProperty.Register(nameof(EditHotKey),
         typeof(ICommand), typeof(HotKeyShow), new FrameworkPropertyMetadata(null));
 
+    private HotKeyShow Default;
+
     public HotKeyShow()
     {
+        Default = this;
         WeakReferenceMessenger.Default.Register<string, string>(this, "hotkey", (_, s) =>
         {
-            HotKeyModel ??= ConfigManger.Config.hotKeys.FirstOrDefault(e => e.SignName == HotKeySignName);
-            if (HotKeyModel != null && s == HotKeyModel.SignName)
+            if (s == HotKeySignName)
             {
+                HotKeyModel = ConfigManger.Config.hotKeys.FirstOrDefault(e => e.SignName == HotKeySignName);
+
+                if (HotKeyModel is null)
+                {
+                    Default.SetValue(HotKeyModelProperty, null);
+                    return;
+                }
+
                 HotKeyModelChanged(HotKeyModel, this);
             }
         });
+
+
         SetValue(RemoveHotKeyProperty, new RelayCommand<HotKeyModel>(Remove));
         SetValue(EditHotKeyProperty, new RelayCommand<string>(Edit));
     }
@@ -139,11 +145,12 @@ public class HotKeyShow : ButtonBase
         private set => SetValue(EditHotKeyProperty, value);
     }
 
-    private static void HotKeyModelChanged(HotKeyModel hotKeyModel, HotKeyShow hotKeyShow)
+    private static void HotKeyModelChanged(HotKeyModel? hotKeyModel, HotKeyShow hotKeyShow)
     {
         var type = 0000;
         if (hotKeyModel == null)
         {
+            hotKeyShow.KeyType = (HotKeyShow.KeyTypeE)type;
             return;
         }
 
@@ -181,8 +188,7 @@ public class HotKeyShow : ButtonBase
         if (hotKeyModel != null)
         {
             ((MainWindow)ServiceManager.Services.GetService(typeof(MainWindow))!).RemoveHotKey(hotKeyModel);
-            SetValue(HotKeyModelProperty, null);
-            SetValue(KeyTypeProperty, KeyTypeE.None);
+            WeakReferenceMessenger.Default.Send(hotKeyModel.SignName, "hotkey");
         }
     }
 

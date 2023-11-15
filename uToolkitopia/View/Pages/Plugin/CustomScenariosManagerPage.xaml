@@ -80,14 +80,11 @@
                                 <TextBlock VerticalAlignment="Top" Margin="0"
                                            Text="{Binding Description}" />
                             </StackPanel>
-                            <ui:DynamicScrollViewer IsHitTestVisible="False" Grid.Column="2" Height="60"
-                                                    VerticalAlignment="Center"
-                                                    HorizontalScrollBarVisibility="Hidden">
-                                <ui:TextBlock VerticalAlignment="Center"
-                                              MaxWidth="{Binding RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type ui:DynamicScrollViewer},AncestorLevel=1},Path=ActualWidth}"
+                            <DockPanel Grid.Column="2" Height="60">
+                                <ui:TextBlock DockPanel.Dock="Bottom" VerticalAlignment="Center"
                                               TextWrapping="Wrap"
-                                              Text="{Binding Description}" />
-                            </ui:DynamicScrollViewer>
+                                              Text="{Binding LastRun, StringFormat=上次执行时间:yyyy/MM/dd HH:mm:ss}" />
+                            </DockPanel>
                             <ui:Button Grid.Column="3" FontSize="25" ToolTip="删除情景"
                                        Background="White"
                                        Foreground="OrangeRed"

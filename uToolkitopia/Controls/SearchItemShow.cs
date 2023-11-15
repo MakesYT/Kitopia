@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel;
 using System.Windows;
-using Core.SDKs;
 using Core.SDKs.Services;
 using Core.ViewModel;
 using Microsoft.Extensions.DependencyInjection;
+using PluginCore;
 using Wpf.Ui.Controls;
 
 namespace Kitopia.Controls;
@@ -15,6 +15,15 @@ public class SearchItemShow : Button
         typeof(SearchViewItem), typeof(SearchItemShow),
         new PropertyMetadata(null));
 
+    public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register(nameof(IsSelected),
+        typeof(bool), typeof(SearchItemShow),
+        new PropertyMetadata(false));
+
+
+    public static readonly DependencyProperty OnlyKeyProperty = DependencyProperty.Register(nameof(OnlyKey),
+        typeof(string), typeof(SearchItemShow),
+        new PropertyMetadata("", OnOnlyKeyChanged));
+
     [Bindable(true)]
     [Category("SearchViewItem")]
     public SearchViewItem SearchViewItem
@@ -23,10 +32,6 @@ public class SearchItemShow : Button
         set => SetValue(SearchViewItemProperty, value);
     }
 
-    public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register(nameof(IsSelected),
-        typeof(bool), typeof(SearchItemShow),
-        new PropertyMetadata(false));
-
     [Bindable(true)]
     [Category("IsSelected")]
     public bool IsSelected
@@ -34,11 +39,6 @@ public class SearchItemShow : Button
         get => (bool)GetValue(IsSelectedProperty);
         set => SetValue(IsSelectedProperty, value);
     }
-
-
-    public static readonly DependencyProperty OnlyKeyProperty = DependencyProperty.Register(nameof(OnlyKey),
-        typeof(string), typeof(SearchItemShow),
-        new PropertyMetadata("", OnOnlyKeyChanged));
 
     [Bindable(true)]
     [Category("OnlyKey")]

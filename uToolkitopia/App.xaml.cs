@@ -336,6 +336,10 @@ public sealed partial class App : Application
         services.AddTransient<LabelWindowViewModel>(e => new LabelWindowViewModel());
         services.AddTransient<LabelWindow>(e => new LabelWindow()
             { DataContext = e.GetService<LabelWindowViewModel>() });
+
+        services.AddTransient<HotKeyManagerPageViewModel>(e => new HotKeyManagerPageViewModel());
+        services.AddTransient<HotKeyManagerPage>(e => new HotKeyManagerPage()
+            { DataContext = e.GetService<HotKeyManagerPageViewModel>() });
         return services.BuildServiceProvider();
     }
 

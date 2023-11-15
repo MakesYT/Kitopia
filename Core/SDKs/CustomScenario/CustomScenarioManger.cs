@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO;
 using Core.SDKs.CustomScenario;
+using Core.SDKs.HotKey;
 using Core.SDKs.Services.Plugin;
 using Core.ViewModel;
 using log4net;
@@ -172,6 +173,25 @@ public partial class CustomScenarioManger
         if (CustomScenarios.Contains(scenario))
         {
             CustomScenarios.Remove(scenario);
+            List<HotKeyModel> toRemove = new();
+            foreach (var item in ConfigManger.Config.hotKeys)
+            {
+                if (item.MainName == "Kitopia情景")
+                {
+                    if (CustomScenarios.All(e => e.UUID != item.Name!.Split("_")[0]))
+                    {
+                        toRemove.Add(item);
+                    }
+                }
+            }
+
+            foreach (var hotKeyModel in toRemove)
+            {
+                ((IHotKeyEditor)ServiceManager.Services.GetService(typeof(IHotKeyEditor))!).RemoveByHotKeyModel(
+                    hotKeyModel);
+            }
+
+            ConfigManger.Save();
             File.Delete(AppDomain.CurrentDomain.BaseDirectory + $"customScenarios\\{scenario.UUID}.json");
             scenario.Dispose();
         }

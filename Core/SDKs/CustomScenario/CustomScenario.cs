@@ -8,6 +8,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.CustomType;
 using Core.SDKs.Services;
+using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
 using Core.SDKs.Tools;
 using log4net;
@@ -27,10 +28,11 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
     private CancellationTokenSource _cancellationTokenSource = new();
 
     [JsonIgnore] [ObservableProperty] private string _description = "";
-
     private Dictionary<PointItem, Thread?> _initTasks = new();
 
     [JsonIgnore] [ObservableProperty] private bool _isRunning = false;
+
+    [JsonIgnore] [ObservableProperty] private DateTime _lastRun;
 
     [JsonIgnore] [ObservableProperty] private string _name = "任务";
 
@@ -43,11 +45,11 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
     /// </summary>
     [JsonIgnore] [ObservableProperty] private bool executionManual = true;
 
-    private bool InTick = false;
+    private bool InTick;
 
     [JsonIgnore] [ObservableProperty] private ObservableCollection<string> keys = new();
 
-    private TickUtil? tick;
+
     [JsonIgnore] [ObservableProperty] private double? tickIntervalSecond = 5;
 
     [JsonIgnore] [ObservableProperty] private ObservableDictionary<string, object> values = new();
@@ -113,6 +115,8 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
         if (notRealTime)
         {
             IsRunning = true;
+            LastRun = DateTime.Now;
+            CustomScenarioManger.Save(this);
         }
 
 

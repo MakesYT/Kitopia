@@ -6,10 +6,10 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using CommunityToolkit.Mvvm.Messaging;
-using Core.SDKs;
 using Core.SDKs.Services;
 using Core.ViewModel;
 using Microsoft.Extensions.DependencyInjection;
+using PluginCore;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 

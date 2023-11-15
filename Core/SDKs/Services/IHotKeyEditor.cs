@@ -6,4 +6,5 @@ public interface IHotKeyEditor
 {
     void EditByName(string name, object? owner);
     void EditByHotKeyModel(HotKeyModel name, object? owner);
+    void RemoveByHotKeyModel(HotKeyModel hotKeyModel);
 }

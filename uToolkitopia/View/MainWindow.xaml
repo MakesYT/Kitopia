@@ -14,8 +14,8 @@
                  ExtendsContentIntoTitleBar="True"
                  WindowBackdropType="Acrylic"
                  d:DataContext="{d:DesignInstance viewModel:MainWindowViewModel}"
-                 d:IsHidden="False"
                  Visibility="Hidden"
+                 d:IsHidden="False"
                  WindowCornerPreference="Round"
                  Title="Kitopia" Height="742" Width="1200">
     <Window.Resources>
@@ -58,10 +58,17 @@
                         <ui:SymbolIcon Symbol="Apps24" FontSize="25" />
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
-                <ui:NavigationViewItem Content="任务" FontSize="14" Cursor="Hand"
+                <ui:NavigationViewItem Content="情景" FontSize="14" Cursor="Hand"
                                        TargetPageType="plugin:CustomScenariosManagerPage">
                     <ui:NavigationViewItem.Icon>
                         <ui:SymbolIcon Symbol="TaskListLtr24" FontSize="25" />
+                    </ui:NavigationViewItem.Icon>
+
+                </ui:NavigationViewItem>
+                <ui:NavigationViewItem Content="快捷键" FontSize="14" Cursor="Hand"
+                       TargetPageType="plugin:HotKeyManagerPage">
+                    <ui:NavigationViewItem.Icon>
+                        <ui:SymbolIcon Symbol="Keyboard24" FontSize="25" />
                     </ui:NavigationViewItem.Icon>
 
                 </ui:NavigationViewItem>

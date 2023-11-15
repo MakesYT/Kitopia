@@ -1,8 +1,10 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Windows;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
+using PluginCore;
 
 namespace Core.ViewModel.Pages.customScenario;
 
@@ -36,6 +38,17 @@ public partial class CustomScenariosManagerPageViewModel : ObservableRecipient
     [RelayCommand]
     private void RemoveCustomScenario(CustomScenario scenario)
     {
-        CustomScenarioManger.Remove(scenario);
+        ((IToastService)ServiceManager.Services!.GetService(typeof(IToastService))!).ShowMessageBox(
+            $"删除{scenario.Name}?", "是否确定删除?\n他真的会丢失很久很久(不可恢复)",
+            () =>
+            {
+                Application.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    CustomScenarioManger.Remove(scenario);
+                });
+            }, () =>
+            {
+            }
+        );
     }
 }

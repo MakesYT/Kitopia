@@ -4,6 +4,7 @@ using System.IO;
 using System.Xml;
 using Core.SDKs.Services.Config;
 using log4net;
+using PluginCore;
 using Vanara.Extensions;
 using Vanara.PInvoke;
 using Vanara.Windows.Shell;

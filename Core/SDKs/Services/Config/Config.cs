@@ -1,5 +1,6 @@
 ﻿#region
 
+using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
 using Core.SDKs.HotKey;
 using Newtonsoft.Json;
@@ -11,24 +12,32 @@ namespace Core.SDKs.Services.Config;
 
 public record Config
 {
-    [JsonIgnore] public int verInt = 0;
-    [JsonIgnore] public string ver = "0.0.2";
-    public bool useEverything = true;
+    public List<string> alwayShows = new();
     public bool autoStart = true;
     public bool autoStartEverything = true;
-    public string everythingOnlyKey = "";
     public bool canReadClipboard = true;
-    public string themeChoice = "跟随系统";
-    public string themeColor = "#EC407A";
-    public int maxHistory = 4;
+    public List<string> customCollections = new();
+    public List<PluginInfo> EnabledPluginInfos = new();
+
+
+    public List<string> errorLnk = new();
+    public string everythingOnlyKey = "";
+    public List<string> ignoreItems = new();
     public int inputSmoothingMilliseconds = 50;
 
 
-    public List<string> alwayShows = new();
-    public List<string> ignoreItems = new();
-    public List<string> customCollections = new();
+    public Dictionary<string, int> lastOpens = new();
+    public int maxHistory = 4;
+    public string themeChoice = "跟随系统";
+    public string themeColor = "#EC407A";
+    public bool useEverything = true;
+    [JsonIgnore] public string ver = "0.0.2";
+    [JsonIgnore] public int verInt = 0;
 
-    public List<HotKeyModel> hotKeys = new()
+    public ObservableCollection<HotKeyModel> hotKeys
+    {
+        get;
+    } = new()
     {
         new HotKeyModel
         {
@@ -37,13 +46,6 @@ public record Config
             IsSelectShift = false, SelectKey = EKey.空格
         }
     };
-
-
-    public Dictionary<string, int> lastOpens = new();
-
-
-    public List<string> errorLnk = new();
-    public List<PluginInfo> EnabledPluginInfos = new();
 
     [OnDeserializing]
     // ReSharper disable once UnusedMember.Local

@@ -5,6 +5,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using Core.SDKs.Services;
 using log4net;
+using PluginCore;
 using Vanara.PInvoke;
 using Size = System.Drawing.Size;
 

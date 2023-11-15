@@ -32,7 +32,7 @@ public class MyDataTemplateSelector : DataTemplateSelector
             "System.Int32" => element.FindResource("IntTemplate")! as DataTemplate,
             "System.Double" => element.FindResource("DoubleTemplate")! as DataTemplate,
             "System.Boolean" => element.FindResource("BoolTemplate")! as DataTemplate,
-            "Core.SDKs.SearchViewItem" => element.FindResource("SearchItemTemplate")! as DataTemplate,
+            "PluginCore.SearchViewItem" => element.FindResource("SearchItemTemplate")! as DataTemplate,
             _ => element.FindResource("InputTemplate")! as DataTemplate
         })!;
 
