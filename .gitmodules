@@ -4,3 +4,6 @@
 [submodule "PlugCleanTool"]
 	path = PlugCleanTool
 	url = https://github.com/MakesYT/PlugCleanTool.git
+[submodule "KitopiaWeb"]
+	path = KitopiaWeb
+	url = https://github.com/MakesYT/KitopiaWeb
