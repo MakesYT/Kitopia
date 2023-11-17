@@ -10,6 +10,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Threading;
+using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
@@ -212,6 +213,7 @@ public sealed partial class App : Application
     private static void Application_ApplicationExit(object? sender, EventArgs e)
     {
         ConfigManger.Save();
+        WeakReferenceMessenger.Default.Send("Kitopia_SoftwareShutdown", "CustomScenarioTrigger");
         log.Info("程序退出");
     }
 

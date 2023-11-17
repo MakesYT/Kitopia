@@ -95,12 +95,12 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
     }
 
 
-    public void Run(bool realTime = false)
+    public void Run(bool realTime = false, bool onExit = false)
     {
-        StartRun(!realTime);
+        StartRun(!realTime, onExit);
     }
 
-    private void StartRun(bool notRealTime)
+    private void StartRun(bool notRealTime, bool onExit = false)
     {
         if (IsRunning)
         {
@@ -227,7 +227,7 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
                     }
 
                     var connectionItem = connections.FirstOrDefault((e) => e.Source == nodes[1].Output[0]);
-                    if (connectionItem == null)
+                    if (connectionItem == null || onExit)
                     {
                         //当没有tick时直接结束
                         if (notRealTime)

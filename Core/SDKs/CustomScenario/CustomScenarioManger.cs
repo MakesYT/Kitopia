@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO;
+using System.Text;
 using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.CustomType;
 using Core.SDKs.HotKey;
@@ -29,13 +30,32 @@ public static class CustomScenarioManger
     {
         WeakReferenceMessenger.Default.Register<string, string>("null", "CustomScenarioTrigger", (_, e) =>
         {
+            //设置当前线程最高优先级
+            Thread.CurrentThread.Priority = ThreadPriority.Highest;
+            StringBuilder sb = new();
+            sb.AppendLine($"触发器{e}被触发\n以下情景被执行:");
             foreach (var customScenario in CustomScenarios)
             {
                 if (customScenario.AutoTriggers.Contains(e))
                 {
-                    customScenario.Run();
+                    sb.AppendLine(customScenario.Name);
+                    if (e == "Kitopia_SoftwareShutdown")
+                    {
+                        ThreadPool.QueueUserWorkItem(o =>
+                        {
+                            customScenario.Run(onExit: true);
+                        });
+                    }
+                    else
+                    {
+                        customScenario.Run();
+                    }
                 }
             }
+
+            Log.Info(sb.ToString());
+            ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show("情景",
+                sb.ToString());
         });
         new Task(() =>
         {
