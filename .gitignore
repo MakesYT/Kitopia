@@ -367,3 +367,9 @@ FodyWeavers.xsd
 /uToolkitopia/Kitopia - Backup.csproj
 /.editorconfig
 /.vsconfig
+
+发布/
+uToolkitopia/obj/
+obj/
+PlugCleanTool/obj/
+PluginCore/obj/
