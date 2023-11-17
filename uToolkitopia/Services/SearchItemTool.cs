@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using CommunityToolkit.Mvvm.Messaging;
-using Core.SDKs;
+using Core.SDKs.CustomScenario;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using Core.ViewModel;

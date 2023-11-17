@@ -49,6 +49,15 @@ public class Plugin
 
         foreach (var type in t)
         {
+            if (typeof(CustomScenarioTrigger).IsAssignableFrom(type))
+            {
+                var fieldInfo = type.GetField("Name");
+                CustomScenarioManger.Triggers.Add($"{PluginInfo.ToPlgString()}_{type.Name}",
+                    fieldInfo is null
+                        ? $"{PluginInfo.ToPlgString()}_{type.Name}"
+                        : fieldInfo.GetValue(null)!.ToString()!);
+            }
+
             foreach (var methodInfo in type.GetMethods())
             {
                 if (methodInfo.GetCustomAttributes(typeof(PluginMethod)).Any()) //情景的可用节点

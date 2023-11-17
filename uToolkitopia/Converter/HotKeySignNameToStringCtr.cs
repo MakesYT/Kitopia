@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Linq;
 using System.Windows.Data;
-using Core.SDKs.Services.Config;
+using Core.SDKs.CustomScenario;
 
 namespace Kitopia.Converter;
 

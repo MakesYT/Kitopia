@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Text.RegularExpressions;
+using Core.SDKs.CustomScenario;
 using Core.SDKs.Everything;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;

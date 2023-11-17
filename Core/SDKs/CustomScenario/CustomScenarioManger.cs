@@ -1,22 +1,42 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO;
-using Core.SDKs.CustomScenario;
+using CommunityToolkit.Mvvm.Messaging;
+using Core.SDKs.CustomType;
 using Core.SDKs.HotKey;
+using Core.SDKs.Services;
+using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
 using Core.ViewModel;
 using log4net;
 using Newtonsoft.Json;
 using PluginCore;
 
-namespace Core.SDKs.Services.Config;
+namespace Core.SDKs.CustomScenario;
 
-public partial class CustomScenarioManger
+public static class CustomScenarioManger
 {
     public static ObservableCollection<SDKs.CustomScenario.CustomScenario> CustomScenarios = new();
+
+    public static ObservableDictionary<string, string> Triggers = new()
+    {
+        { "Kitopia_SoftwareStarted", "Kitopia程序启动时" },
+        { "Kitopia_SoftwareShutdown", "Kitopia程序关闭时" }
+    };
+
     private static readonly ILog Log = LogManager.GetLogger(nameof(CustomScenarioManger));
 
     public static void Init()
     {
+        WeakReferenceMessenger.Default.Register<string, string>("null", "CustomScenarioTrigger", (_, e) =>
+        {
+            foreach (var customScenario in CustomScenarios)
+            {
+                if (customScenario.AutoTriggers.Contains(e))
+                {
+                    customScenario.Run();
+                }
+            }
+        });
         new Task(() =>
         {
             while (!PluginManager.isInitialized)
@@ -35,41 +55,8 @@ public partial class CustomScenarioManger
                 var json = File.ReadAllText(fileInfo.FullName);
                 try
                 {
-                    var deserializeObject = JsonConvert.DeserializeObject<CustomScenario.CustomScenario>(json)!;
-                    foreach (var value in deserializeObject.AutoTriggerType.Where(value => value.IsUsed))
-                    {
-                        switch (value.AutoTriggerType)
-                        {
-                            case AutoTriggerType.系统关闭时:
-                            {
-                                CustomScenarioExecutorManager.SystemShutdown.AddCustomScenario(deserializeObject);
-                                break;
-                            }
-                            case AutoTriggerType.软件关闭时:
-                            {
-                                CustomScenarioExecutorManager.SoftwareShutdown.AddCustomScenario(deserializeObject);
-                                break;
-                            }
-                            case AutoTriggerType.软件启动时:
-                            {
-                                CustomScenarioExecutorManager.SoftwareStarted.AddCustomScenario(deserializeObject);
-                                break;
-                            }
-                            case AutoTriggerType.Custom:
-                            {
-                                if (CustomScenarioExecutorManager.CustomExecutors.ContainsKey(
-                                        value.AutoTriggerTypeFrom))
-                                {
-                                    CustomScenarioExecutorManager.CustomExecutors[value.AutoTriggerTypeFrom]
-                                        .AddCustomScenario(deserializeObject);
-                                }
+                    var deserializeObject = JsonConvert.DeserializeObject<SDKs.CustomScenario.CustomScenario>(json)!;
 
-                                break;
-                            }
-                            default:
-                                throw new ArgumentOutOfRangeException();
-                        }
-                    }
 
                     foreach (var node in deserializeObject.nodes)
                     {
@@ -105,7 +92,7 @@ public partial class CustomScenarioManger
                     // Log.Error(e1);
                     Log.Error($"情景文件\"{fileInfo.FullName}\"加载失败");
                     var pluginName = ((CustomScenarioLoadFromJsonException)e1).PluginName.Split("_");
-                    var deserializeObject = JsonConvert.DeserializeObject<CustomScenario.CustomScenario>(json,
+                    var deserializeObject = JsonConvert.DeserializeObject<SDKs.CustomScenario.CustomScenario>(json,
                         new JsonSerializerSettings()
                         {
                             Error = (sender, args) =>
@@ -123,6 +110,8 @@ public partial class CustomScenarioManger
                             }, null, null));
                 }
             }
+
+            WeakReferenceMessenger.Default.Send("Kitopia_SoftwareStarted", "CustomScenarioTrigger");
         }).Start();
     }
 

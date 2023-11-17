@@ -8,7 +8,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.CustomType;
 using Core.SDKs.Services;
-using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
 using Core.SDKs.Tools;
 using log4net;
@@ -24,7 +23,7 @@ namespace Core.SDKs.CustomScenario;
 public partial class CustomScenario : ObservableRecipient, IDisposable
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(CustomScenario));
-    [JsonIgnore] [ObservableProperty] private List<CustomScenarioInvoke> _autoTriggerType = new();
+    [JsonIgnore] [ObservableProperty] private ObservableCollection<string> _autoTriggers = new();
     private CancellationTokenSource _cancellationTokenSource = new();
 
     [JsonIgnore] [ObservableProperty] private string _description = "";
