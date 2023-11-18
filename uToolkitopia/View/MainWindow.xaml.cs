@@ -140,7 +140,7 @@ public partial class MainWindow
         };
         log.Debug("注册热键");
         InitHotKey();
-
+        //MouseHookHelper.InsertMouseHook();
         ApplicationThemeManager.Changed += (theme, accent) =>
         {
             WindowBackdrop.ApplyBackdrop(m_Hwnd, WindowBackdropType.Acrylic);

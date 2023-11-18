@@ -33,7 +33,7 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
 
     [JsonIgnore] [ObservableProperty] private DateTime _lastRun;
 
-    [JsonIgnore] [ObservableProperty] private string _name = "任务";
+    [JsonIgnore] [ObservableProperty] private string _name = "情景";
 
 
     private Dictionary<PointItem, Thread?> _tickTasks = new();

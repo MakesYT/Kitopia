@@ -51,11 +51,11 @@ public class Plugin
         {
             if (typeof(CustomScenarioTrigger).IsAssignableFrom(type))
             {
-                var fieldInfo = type.GetField("Name");
+                var fieldInfo = type.GetField("Info");
                 CustomScenarioManger.Triggers.Add($"{PluginInfo.ToPlgString()}_{type.Name}",
-                    fieldInfo is null
-                        ? $"{PluginInfo.ToPlgString()}_{type.Name}"
-                        : fieldInfo.GetValue(null)!.ToString()!);
+                    (CustomScenarioTriggerInfo)(fieldInfo is null
+                        ? new CustomScenarioTriggerInfo { Name = $"{PluginInfo.ToPlgString()}_{type.Name}" }
+                        : fieldInfo.GetValue(null)!));
             }
 
             foreach (var methodInfo in type.GetMethods())

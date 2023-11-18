@@ -343,6 +343,10 @@ public sealed partial class App : Application
         services.AddTransient<HotKeyManagerPageViewModel>(e => new HotKeyManagerPageViewModel());
         services.AddTransient<HotKeyManagerPage>(e => new HotKeyManagerPage()
             { DataContext = e.GetService<HotKeyManagerPageViewModel>() });
+
+        services.AddTransient<MouseQuickWindowViewModel>(e => new MouseQuickWindowViewModel());
+        services.AddTransient<MouseQuickWindow>(e => new MouseQuickWindow()
+            { DataContext = e.GetService<MouseQuickWindowViewModel>() });
         return services.BuildServiceProvider();
     }
 

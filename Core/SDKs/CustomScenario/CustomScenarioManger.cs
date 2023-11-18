@@ -18,10 +18,13 @@ public static class CustomScenarioManger
 {
     public static ObservableCollection<SDKs.CustomScenario.CustomScenario> CustomScenarios = new();
 
-    public static ObservableDictionary<string, string> Triggers = new()
+    public static ObservableDictionary<string, CustomScenarioTriggerInfo> Triggers = new()
     {
-        { "Kitopia_SoftwareStarted", "Kitopia程序启动时" },
-        { "Kitopia_SoftwareShutdown", "Kitopia程序关闭时" }
+        { "Kitopia_SoftwareStarted", new CustomScenarioTriggerInfo() { Name = "Kitopia程序启动时" } },
+        {
+            "Kitopia_SoftwareShutdown",
+            new CustomScenarioTriggerInfo() { Name = "Kitopia程序关闭时", Description = "注意该触发器不会进入Tick" }
+        },
     };
 
     private static readonly ILog Log = LogManager.GetLogger(nameof(CustomScenarioManger));

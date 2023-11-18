@@ -136,7 +136,7 @@
         <ContentPresenter Panel.ZIndex="100" Grid.Column="1" Grid.RowSpan="2" x:Name="ContentPresenter" />
 
 
-        <ui:TitleBar Title="任务编排" Grid.ColumnSpan="3" />
+        <ui:TitleBar Title="情景编排" Grid.ColumnSpan="3" />
         <ui:Button Visibility="Collapsed" x:Name="add" Content="添加" Command="{Binding AddNodesCommand}" />
         <!-- 左边部分 -->
         <Border x:Name="border" Grid.Row="1" Grid.Column="0" Padding="0,0,0,0" Margin="0">
@@ -169,14 +169,14 @@
                                     <TextBox
                                         Text="{Binding Scenario.Name,UpdateSourceTrigger=PropertyChanged,NotifyOnTargetUpdated=True,NotifyOnSourceUpdated=True}" />
                                     <controls:SettingItems.Icon>
-                                        <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25" />
+                                        <ui:SymbolIcon Symbol="Rename20" FontSize="25" />
                                     </controls:SettingItems.Icon>
                                 </controls:SettingItems>
                                 <controls:SettingItems Margin="0" Title="情景描述" FontSize="20">
                                     <TextBox TextWrapping="Wrap"
                                              Text="{Binding Scenario.Description,UpdateSourceTrigger=PropertyChanged}" />
                                     <controls:SettingItems.Icon>
-                                        <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25" />
+                                        <ui:SymbolIcon Symbol="Info20" FontSize="25" />
                                     </controls:SettingItems.Icon>
                                 </controls:SettingItems>
                             </StackPanel>
@@ -194,7 +194,7 @@
                                         Value="{Binding Scenario.TickIntervalSecond,UpdateSourceTrigger=PropertyChanged,NotifyOnTargetUpdated=True,NotifyOnSourceUpdated=True}" />
 
                                     <controls:SettingItems.Icon>
-                                        <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25" />
+                                        <ui:SymbolIcon Symbol="Timer20" FontSize="25" />
                                     </controls:SettingItems.Icon>
                                 </controls:SettingItems>
                             </StackPanel>
@@ -531,7 +531,7 @@
                                             </controls:ResetIsEnabled>
 
                                             <controls:SettingItems.Icon>
-                                                <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25" />
+                                                <ui:SymbolIcon Symbol="CalendarEmpty20" FontSize="25" />
                                             </controls:SettingItems.Icon>
 
 
@@ -541,7 +541,7 @@
                                         <controls:SettingItems Margin="0" Title="关键词" FontSize="20"
                                                                BorderThickness="0">
                                             <controls:SettingItems.Icon>
-                                                <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25" />
+                                                <ui:SymbolIcon Symbol="Key20" FontSize="25" />
                                             </controls:SettingItems.Icon>
                                         </controls:SettingItems>
                                         <Grid ColumnSpan="10" RowSpan="5" Margin="10">
@@ -595,7 +595,7 @@
 
 
                                             <controls:SettingItems.Icon>
-                                                <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25" />
+                                                <ui:SymbolIcon Symbol="CalendarAssistant20" FontSize="25" />
                                             </controls:SettingItems.Icon>
 
 
@@ -612,7 +612,11 @@
                                                     <CheckBox Validation.ErrorTemplate="{x:Null}" 
                                                               IsChecked="{Binding Source={StaticResource viewModel}, Path=Data.Scenario,Converter={StaticResource AutoTriggersCtr},
                                                               ConverterParameter={StaticResource key}}" />
-                                                    <ui:TextBlock VerticalAlignment="Center" Text="{Binding Value}" />
+                                                    <ui:TextBlock VerticalAlignment="Center" Text="{Binding Value.Name}" />
+                                                    <ui:SymbolIcon Symbol="Info24" Foreground="Coral" 
+                                                                   ToolTip="{Binding Value.Description}"
+                                                                   ToolTipService.InitialShowDelay="0"
+                                                                   Visibility="{Binding Value.Description, Converter={StaticResource IfNullVisibilityHidden}}" />
                                                 </StackPanel>
                                             </DataTemplate>
 
@@ -626,7 +630,7 @@
                                         <controls:SettingItems Margin="0" Title="快捷键触发" FontSize="20"
                                                                BorderThickness="0">
                                             <controls:SettingItems.Icon>
-                                                <ui:SymbolIcon Symbol="PaintBrush20" FontSize="25" />
+                                                <ui:SymbolIcon Symbol="Keyboard20" FontSize="25" />
                                             </controls:SettingItems.Icon>
 
                                         </controls:SettingItems>
