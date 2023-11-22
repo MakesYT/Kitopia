@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
 using Core.SDKs.Services;
@@ -67,15 +65,17 @@ public class MouseHookHelper
 
     public static bool InsertMouseHook(IntPtr m_hwnd)
     {
+        log.Debug("插入鼠标钩子");
         mouseHookProc = mouseHookCallback;
 
         _pMouseHook = User32.SetWindowsHookEx(User32.HookType.WH_MOUSE_LL,
-            mouseHookProc, Marshal.GetHINSTANCE(Assembly.GetExecutingAssembly().GetModules()[0]));
+            mouseHookProc);
 
         if (_pMouseHook == IntPtr.Zero)
         {
             //removeMouseHook();
             Debug.WriteLine("SetWindowsHookEx failed");
+            log.Error("插入鼠标钩子失败");
             return false;
         }
 
