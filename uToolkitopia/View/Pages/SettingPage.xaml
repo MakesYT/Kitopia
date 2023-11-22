@@ -49,6 +49,34 @@
                 </StackPanel>
             </Expander.Content>
         </Expander>
+        <Expander Header="鼠标快捷菜单" FontSize="25" IsExpanded="True">
+            <Expander.Content>
+                <StackPanel>
+                    <kitopia:SettingItems Title="激活按键" Description="修改鼠标快捷菜单激活按键" >
+                        <ComboBox ItemsSource="{Binding MouseKeyOptions}" SelectedValue="{Binding MouseKey}" />
+                        <kitopia:SettingItems.Icon>
+                            <ui:SymbolIcon Symbol="Keyboard20" FontSize="25" />
+                        </kitopia:SettingItems.Icon>
+                    </kitopia:SettingItems>
+                    <kitopia:SettingItems Title="激活所需时间" Description="按下按键指定时间后触发">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding MouseKeyInverval}" FontSize="14"
+                                       VerticalAlignment="Center" />
+                            <Slider Margin="10,0,0,0" TickFrequency="100" IsSnapToTickEnabled="True" Maximum="3000"
+                                    Minimum="500" Value="{Binding MouseKeyInverval}"
+                                    VerticalAlignment="Center"
+                                    ToolTip="{Binding Value, RelativeSource={RelativeSource Self}}"
+                                    AutoToolTipPlacement="TopLeft" />
+
+                        </StackPanel>
+                        <kitopia:SettingItems.Icon>
+                            <ui:SymbolIcon Symbol="TopSpeed20" FontSize="25" />
+                        </kitopia:SettingItems.Icon>
+                    </kitopia:SettingItems>
+                    
+                </StackPanel>
+            </Expander.Content>
+        </Expander>
         <Expander Header="搜索框" FontSize="25" IsExpanded="True">
             <Expander.Content>
                 <StackPanel>

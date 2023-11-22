@@ -16,6 +16,7 @@ using Core.ViewModel;
 using Kitopia.SDKs;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Win32;
 using PluginCore;
 using Vanara.PInvoke;
 using Wpf.Ui;
@@ -138,9 +139,12 @@ public partial class MainWindow
         {
             //TODO: 程序退出时触发器
         };
-        log.Debug("注册热键");
         InitHotKey();
-        //MouseHookHelper.InsertMouseHook();
+        SystemEvents.InvokeOnEventsThread(() =>
+        {
+            MouseHookHelper.InsertMouseHook(m_Hwnd);
+        });
+
         ApplicationThemeManager.Changed += (theme, accent) =>
         {
             WindowBackdrop.ApplyBackdrop(m_Hwnd, WindowBackdropType.Acrylic);
@@ -225,6 +229,7 @@ public partial class MainWindow
     private IntPtr WndProc(IntPtr hWnd, int msg, IntPtr wideParam, IntPtr longParam, ref bool handled)
     {
         var windowMessage = (User32.WindowMessage)msg;
+        //log.Debug( $"窗口消息: {windowMessage}");
         switch (windowMessage)
         {
             case User32.WindowMessage.WM_ACTIVATEAPP:

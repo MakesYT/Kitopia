@@ -24,6 +24,7 @@ public partial class SettingPageViewModel : ObservableRecipient
 
     [ObservableProperty] private bool _autoStart = true;
     [ObservableProperty] private bool _autoStartEverything = true;
+
     [ObservableProperty] private bool _canReadClipboard = true;
     [ObservableProperty] private BindingList<string> _ignoreItems;
     [ObservableProperty] private int _inputSmoothingMilliseconds = 50;
@@ -31,6 +32,13 @@ public partial class SettingPageViewModel : ObservableRecipient
     [ObservableProperty] private int _maxHistory = 4;
 
     [ObservableProperty] private ObservableCollection<int> _maxHistoryOptions = new() { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+    [ObservableProperty] private MouseHookType _mouseKey = MouseHookType.鼠标中键按下;
+
+    [ObservableProperty] private int _mouseKeyInverval = 1000;
+
+    [ObservableProperty] private ObservableCollection<MouseHookType> _mouseKeyOptions = new()
+        { MouseHookType.鼠标左键按下, MouseHookType.鼠标中键按下, MouseHookType.鼠标右键按下, MouseHookType.鼠标侧键1按下 };
+
     [ObservableProperty] private string _themeChoice = "跟随系统";
 
     [ObservableProperty] private ObservableCollection<string> _themeChoiceOptions = new() { "跟随系统", "深色", "浅色" };
@@ -48,9 +56,21 @@ public partial class SettingPageViewModel : ObservableRecipient
             CanReadClipboard = ConfigManger.Config.canReadClipboard;
             IgnoreItems = new BindingList<string>(ConfigManger.Config.ignoreItems);
             InputSmoothingMilliseconds = ConfigManger.Config.inputSmoothingMilliseconds;
-
+            MouseKey = ConfigManger.Config.mouseKey;
+            MouseKeyInverval = ConfigManger.Config.mouseKeyInverval;
             _isInitializing = false;
         });
+    }
+
+    partial void OnMouseKeyChanged(MouseHookType value)
+    {
+        if (_isInitializing)
+        {
+            return;
+        }
+
+        ConfigManger.Config.mouseKey = value;
+        ConfigManger.Save();
     }
 
 
@@ -90,41 +110,6 @@ public partial class SettingPageViewModel : ObservableRecipient
     public static extern IntPtr GetForegroundWindow();
 
     [RelayCommand]
-    private void EditHotKey(string name)
-    {
-        var hwndSource = System.Windows.Interop.HwndSource.FromHwnd(GetForegroundWindow());
-        if (hwndSource == null)
-        {
-            return;
-        }
-
-        var xx = (Window)hwndSource.RootVisual;
-        var hotKeyModel = ConfigManger.Config.hotKeys.FirstOrDefault(e =>
-        {
-            if ($"{e.MainName}_{e.Name}".Equals(name))
-            {
-                return true;
-            }
-
-            return false;
-        });
-        if (hotKeyModel is null)
-        {
-            var strings = name.Split("_", 2);
-            var hotKeyModel2 = new HotKeyModel()
-                { MainName = strings[0], Name = strings[1], IsUsable = true };
-            ConfigManger.Config.hotKeys.Add(hotKeyModel2);
-            ConfigManger.Save();
-            ((IHotKeyEditor)ServiceManager.Services.GetService(typeof(IHotKeyEditor))!).EditByName(name, xx);
-        }
-        else
-        {
-            ((IHotKeyEditor)ServiceManager.Services.GetService(typeof(IHotKeyEditor))!).EditByHotKeyModel(hotKeyModel,
-                xx);
-        }
-    }
-
-    [RelayCommand]
     private async Task DelKey(string key) =>
         await Application.Current.Dispatcher.BeginInvoke(() =>
         {
@@ -144,6 +129,17 @@ public partial class SettingPageViewModel : ObservableRecipient
         }
 
         ConfigManger.Config.inputSmoothingMilliseconds = value;
+        ConfigManger.Save();
+    }
+
+    partial void OnMouseKeyInvervalChanged(int value)
+    {
+        if (_isInitializing)
+        {
+            return;
+        }
+
+        ConfigManger.Config.mouseKeyInverval = value;
         ConfigManger.Save();
     }
 

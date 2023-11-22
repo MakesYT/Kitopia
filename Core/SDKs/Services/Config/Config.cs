@@ -28,10 +28,13 @@ public record Config
 
     public Dictionary<string, int> lastOpens = new();
     public int maxHistory = 4;
-    public MouseHookType mouseKey = MouseHookType.鼠标中键按下;
+
 
     //鼠标快捷键
+    public MouseHookType mouseKey = MouseHookType.鼠标中键按下;
     public int mouseKeyInverval = 1000;
+    public List<string> mouseQuickItems = new();
+
     public string themeChoice = "跟随系统";
     public string themeColor = "#EC407A";
     public bool useEverything = true;

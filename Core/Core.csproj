@@ -30,6 +30,7 @@
     <ItemGroup>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1"/>
         <PackageReference Include="log4net" Version="2.0.15"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0"/>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
         <PackageReference Include="NPinyinPro" Version="0.3.3"/>
         <PackageReference Include="System.Drawing.Common" Version="7.0.0"/>
@@ -60,6 +61,11 @@
         <ProjectReference Include="..\..\nodify\Nodify\Nodify.csproj"/>
         <ProjectReference Include="..\..\wpfui\src\Wpf.Ui\Wpf.Ui.csproj"/>
         <ProjectReference Include="..\PluginCore\PluginCore.csproj"/>
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions"/>
     </ItemGroup>
 
 </Project>

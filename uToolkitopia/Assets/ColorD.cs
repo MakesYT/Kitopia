@@ -20,6 +20,7 @@ public class ColorD : ResourceDictionary
         Instance = this;
         /*Add("SystemAccentColorSecondary", ColorConverter.ConvertFromString ("#EC407A"));*/
         Add("SystemAccentColorSecondary", ((SolidColorBrush)SystemParameters.WindowGlassBrush).Color);
+
         SystemEvents.UserPreferenceChanged += (s, e) =>
         {
             ReloadColor();

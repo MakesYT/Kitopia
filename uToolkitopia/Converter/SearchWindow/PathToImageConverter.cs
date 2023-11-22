@@ -53,6 +53,7 @@ public partial class PathToImageConverter : IValueConverter
             case FileType.图像:
             case FileType.文件:
             case FileType.URL:
+
             default:
                 break;
         }

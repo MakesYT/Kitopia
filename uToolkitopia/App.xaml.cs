@@ -154,6 +154,9 @@ public sealed partial class App : Application
             log.Info("插件管理器初始化完成");
             CustomScenarioManger.Init();
             log.Info("场景管理器初始化完成");
+            log.Debug("注册热键");
+
+
             var initWindow = ServiceManager.Services.GetService<MainWindow>();
             typeof(Window).GetMethod("VerifyContextAndObjectState", BindingFlags.NonPublic | BindingFlags.Instance)!
                 .Invoke(initWindow, null);
@@ -314,6 +317,7 @@ public sealed partial class App : Application
         services.AddTransient<ITaskEditorOpenService, TaskEditorOpenService>();
         services.AddTransient<IContentDialog, ContentDialogService>();
         services.AddTransient<IHotKeyEditor, HotKeyEditorService>();
+        services.AddTransient<ISearchItemChooseService, SearchItemChooseService>();
         services.AddSingleton<SearchWindowViewModel>(e => new SearchWindowViewModel { IsActive = true });
         services.AddSingleton<SearchWindow>(sq => new SearchWindow
             { DataContext = sq.GetService<SearchWindowViewModel>() });
