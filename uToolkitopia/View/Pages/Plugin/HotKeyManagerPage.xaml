@@ -25,7 +25,11 @@
                 <SolidColorBrush Color="{DynamicResource TextFillColorPrimary}" />
             </TextBlock.Foreground>
         </TextBlock>
-        
+        <TextBlock Margin="0" FontSize="15"  Text="注意:此页面只显示已设置的快捷键">
+            <TextBlock.Foreground>
+                <SolidColorBrush Color="{DynamicResource TextFillColorPrimary}" />
+            </TextBlock.Foreground>
+        </TextBlock>
         <ItemsControl
             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
             MaxHeight="385" HorizontalContentAlignment="Stretch"
