@@ -22,7 +22,10 @@
     </Page.Resources>
 
     <StackPanel Margin="42">
-        <Expander Header="个性化" FontSize="25" IsExpanded="True" FontWeight="Medium">
+        <Expander FontSize="25" IsExpanded="True" FontWeight="Medium">
+            <Expander.Header>
+                <TextBlock FontSize="16" Text="个性化" />
+            </Expander.Header>
             <Expander.Content>
 
                 <StackPanel>
@@ -35,7 +38,10 @@
                 </StackPanel>
             </Expander.Content>
         </Expander>
-        <Expander Header="通用" FontSize="25" IsExpanded="True">
+        <Expander FontSize="25" IsExpanded="True">
+            <Expander.Header>
+                <TextBlock FontSize="16" Text="通用" />
+            </Expander.Header>
             <Expander.Content>
                 <StackPanel>
                     <kitopia:SettingItems Title="开机自动启动" Description="可能被杀毒软件阻止">
@@ -49,7 +55,10 @@
                 </StackPanel>
             </Expander.Content>
         </Expander>
-        <Expander Header="鼠标快捷菜单" FontSize="25" IsExpanded="True">
+        <Expander FontSize="25" IsExpanded="True">
+            <Expander.Header>
+                <TextBlock FontSize="16" Text="鼠标快捷菜单" />
+            </Expander.Header>
             <Expander.Content>
                 <StackPanel>
                     <kitopia:SettingItems Title="激活按键" Description="修改鼠标快捷菜单激活按键" >
@@ -77,7 +86,10 @@
                 </StackPanel>
             </Expander.Content>
         </Expander>
-        <Expander Header="搜索框" FontSize="25" IsExpanded="True">
+        <Expander FontSize="25" IsExpanded="True">
+            <Expander.Header>
+                <TextBlock FontSize="16" Text="搜索框" />
+            </Expander.Header>
             <Expander.Content>
                 <StackPanel>
 
@@ -97,7 +109,7 @@
                         </kitopia:SettingItems.Icon>
                     </kitopia:SettingItems>
                     <kitopia:SettingItems Title="允许程序调用Everything索引文档" Description="索引文档依赖于此功能">
-                        <ui:ToggleSwitch Content="" IsChecked="{Binding UseEverything}" />
+                        <ui:ToggleSwitch IsChecked="{Binding UseEverything}" />
                         <kitopia:SettingItems.Icon>
                             <ui:SymbolIcon Symbol="DocumentSearch20" FontSize="25" />
                         </kitopia:SettingItems.Icon>
@@ -109,7 +121,7 @@
                         </kitopia:SettingItems.Icon>
                     </kitopia:SettingItems>
                     <kitopia:SettingItems Title="允许程序读取剪贴板内容" Description="自动读取剪贴板路径和剪贴板图像保存依赖于此权限">
-                        <ui:ToggleSwitch Content="" IsChecked="{Binding CanReadClipboard}" />
+                        <ui:ToggleSwitch IsChecked="{Binding CanReadClipboard}" />
                         <kitopia:SettingItems.Icon>
                             <ui:SymbolIcon Symbol="ClipboardSearch20" FontSize="25" />
                         </kitopia:SettingItems.Icon>

@@ -8,6 +8,7 @@
 
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Wpf.Ui;component/Resources/Accent.xaml" />
                 <ui:ThemesDictionary Theme="Light" />
                 <ui:ControlsDictionary />
                 <ResourceDictionary Source="Assets/ColorDr.xaml" />
@@ -19,6 +20,7 @@
                 <ResourceDictionary Source="Controls/HotKeyShowItme.xaml" />
                 <ResourceDictionary Source="Controls/SearchItemShow.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Nodify;component/Themes/Light.xaml" />
+                
             </ResourceDictionary.MergedDictionaries>
             <crt:DoubleHalfConverter x:Key="doubleHalfConverter" />
             <crt:DoubleQuarterConverter x:Key="doubleQuarterConverter" />

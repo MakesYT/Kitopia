@@ -64,7 +64,7 @@ public class PluginManager
             Log.Debug("Debug加载测试插件");
 
             var pluginInfoEx1 = Plugin.GetPluginInfoEx(
-                @"D:\WPF.net\uToolkitopia\KitopiaEx\bin\Debug\net7.0-windows10.0.19041.0\KitopiaEx.dll",
+                @"D:\WPF.net\uToolkitopia\KitopiaEx\bin\Debug\net8.0-windows10.0.19041.0\KitopiaEx.dll",
                 out var alcWeakRef1);
 
 

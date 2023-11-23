@@ -19,8 +19,8 @@ public class ColorD : ResourceDictionary
     {
         Instance = this;
         /*Add("SystemAccentColorSecondary", ColorConverter.ConvertFromString ("#EC407A"));*/
+        Add("SystemAccentColorPrimary", ((SolidColorBrush)SystemParameters.WindowGlassBrush).Color);
         Add("SystemAccentColorSecondary", ((SolidColorBrush)SystemParameters.WindowGlassBrush).Color);
-
         SystemEvents.UserPreferenceChanged += (s, e) =>
         {
             ReloadColor();
@@ -52,6 +52,8 @@ public class ColorD : ResourceDictionary
     public void ReloadColor()
     {
         Remove("SystemAccentColorSecondary");
+        Remove("SystemAccentColorPrimary");
+        Add("SystemAccentColorPrimary", ((SolidColorBrush)SystemParameters.WindowGlassBrush).Color);
         Add("SystemAccentColorSecondary", ((SolidColorBrush)SystemParameters.WindowGlassBrush).Color);
     }
 }
