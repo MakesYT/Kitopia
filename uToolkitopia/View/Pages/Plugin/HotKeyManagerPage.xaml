@@ -39,7 +39,7 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="4">
-                        <StackPanel  Margin="5,0,0,0">
+                        <StackPanel HorizontalAlignment="Center"  Margin="5,0,0,0">
                             <ui:TextBlock Margin="0,5,0,0" Foreground="{DynamicResource TextFillColorPrimaryBrush}" 
                                           Text="{Binding SignName,Converter={StaticResource HotKeySignNameToStringCtr}}" />
                             <controls:HotKeyShow Margin="0,5,0,0" HotKeySignName="{Binding SignName}" />
