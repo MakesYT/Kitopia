@@ -23,7 +23,7 @@ public class KitopiaEx : IPlugin
     public void OnEnabled(IServiceProvider serviceProvider)
     {
         //MessageBox.Show("OnEnabled");
-        Kitopia._i18n.Add("System.Windows.Media.Imaging.BitmapSource", "图像BitmapSource");
+        Kitopia._i18n.TryAdd("System.Windows.Media.Imaging.BitmapSource", "图像BitmapSource");
         ServiceProvider = serviceProvider;
         serviceProvider.GetService<OcrEx>()!.InitOcr();
     }
