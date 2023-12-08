@@ -16,23 +16,35 @@
                  WindowCornerPreference="Round"
                  MinWidth="300"
                  MinHeight="400"
+                 ShowInTaskbar="False"
                  Title="MouseQuickWindow" Height="410" Width="300" Deactivated="MouseQuickWindow_OnDeactivated">
     <ui:FluentWindow.Resources>
         <searchWindow:PathToImageConverter x:Key="PathToImageConverter" />
         <searchWindow:IfNullVisibilityHidden x:Key="IfNullVisibilityHidden" />
+        <converter:MouseQuickSelectedItem x:Key="MouseQuickSelectedItem" />
     </ui:FluentWindow.Resources>
-    <StackPanel>
-        <ItemsControl
-            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-            MaxHeight="385" HorizontalContentAlignment="Stretch"
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <ui:TextBlock Grid.Row="0" Text="{Binding SelectedItem,Converter={StaticResource MouseQuickSelectedItem}}" TextWrapping="Wrap" FontSize="20" Margin="0,0,0,10" />
+        <ItemsControl Grid.Row="1"
+             HorizontalContentAlignment="Stretch"
             ItemsSource="{Binding Items}"
-            Margin="20,10,10,10">
-
+            Margin="15,10,8,10">
+            <ItemsControl.Template>
+                <ControlTemplate TargetType="ItemsControl">
+                    <ScrollViewer x:Name="ScrollViewer" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                        <ItemsPresenter/>
+                    </ScrollViewer>
+                </ControlTemplate>
+            </ItemsControl.Template>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <ui:Button
                         Command="{Binding Path=DataContext.ExcuteCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ui:FluentWindow}}}"
-                        CommandParameter="{Binding .}" Width="80" Height="120" Padding="0" Margin="0"
+                        CommandParameter="{Binding .}" Width="80" Height="80" Padding="0" Margin="0"
                         Background="Transparent">
                         <ui:Button.Resources>
                             <services:BindingProxy x:Key="Command"
@@ -50,23 +62,23 @@
                             </ContextMenu>
 
                         </ui:Button.ContextMenu>
-                        <Grid Height="110" Width="76" Margin="2,5,2,1">
+                        <Grid Height="74" Width="76" Margin="2,5,2,1">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="48" />
+                                <RowDefinition Height="32" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
-                            <Image HorizontalAlignment="Center" Focusable="False" Width="48"
-                                   Height="48"
+                            <Image HorizontalAlignment="Center" Focusable="False" Width="32"
+                                   Height="32"
                                    Source="{Binding ., Converter={StaticResource PathToImageConverter},NotifyOnSourceUpdated=True}" />
                             
                             <ContentPresenter
                                 x:Name="ControlIcon"
                                 VerticalAlignment="Center"
                                 HorizontalAlignment="Center"
-                                TextElement.FontSize="48"
+                                TextElement.FontSize="32"
                                 Focusable="False">
                                 <ContentPresenter.Content>
-                                    <ui:SymbolIcon Height="48" Width="48" FontSize="48"
+                                    <ui:SymbolIcon Height="32" Width="32" FontSize="32"
                                                    Symbol="{Binding IconSymbol,Converter={StaticResource IntToIconSymbol},Mode=OneWay}" />
                                 </ContentPresenter.Content>
                             </ContentPresenter>
@@ -87,9 +99,12 @@
             </ItemsControl.ItemTemplate>
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
+                    
                     <ui:VirtualizingWrapPanel
+                        ScrollViewer.VerticalScrollBarVisibility="Visible"
+                        
                         IsItemsHost="True"
-                        ItemSize="90,130"
+                        ItemSize="85,90"
                         Orientation="Vertical"
                         SpacingMode="Uniform"
                         StretchItems="True" />
@@ -97,5 +112,5 @@
             </ItemsControl.ItemsPanel>
 
         </ItemsControl>
-    </StackPanel>
+    </Grid>
 </ui:FluentWindow>

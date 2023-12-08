@@ -9,9 +9,26 @@ using PluginCore;
 
 namespace Core.ViewModel;
 
+public struct SelectedItem
+{
+    public FileType type
+    {
+        get;
+        set;
+    }
+
+    public object obj
+    {
+        get;
+        set;
+    }
+}
+
 public partial class MouseQuickWindowViewModel : ObservableRecipient
 {
     [ObservableProperty] private ObservableCollection<SearchViewItem> _items = new();
+
+    [ObservableProperty] private SelectedItem selectedItem;
 
     public MouseQuickWindowViewModel()
     {
@@ -26,15 +43,18 @@ public partial class MouseQuickWindowViewModel : ObservableRecipient
 
         if (Items.Count() < 9)
         {
-            Items.Add(new SearchViewItem()
+            //for (var i = 0; i < 12; i++)
             {
-                FileName = "添加",
-                FileType = FileType.None,
-                IconSymbol = 0xF136,
-                OnlyKey = "Add",
-                Icon = null,
-                IsVisible = true
-            });
+                Items.Add(new SearchViewItem()
+                {
+                    FileName = "添加",
+                    FileType = FileType.None,
+                    IconSymbol = 0xF136,
+                    OnlyKey = "Add",
+                    Icon = null,
+                    IsVisible = true
+                });
+            }
         }
     }
 

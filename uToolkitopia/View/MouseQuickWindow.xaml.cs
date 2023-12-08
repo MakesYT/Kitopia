@@ -1,7 +1,14 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Interop;
+using Core.ViewModel;
+using log4net;
+using PluginCore;
 using Vanara.PInvoke;
+using WindowsInput;
+using WindowsInput.Native;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 
@@ -9,6 +16,7 @@ namespace Kitopia.View;
 
 public partial class MouseQuickWindow
 {
+    private static readonly ILog log = LogManager.GetLogger(nameof(MouseQuickWindow));
     IntPtr m_Hwnd = IntPtr.Zero;
 
     public MouseQuickWindow()
@@ -58,6 +66,45 @@ public partial class MouseQuickWindow
         {
             this.Top = pos.Y;
         }
+
+
+        /*var currentThreadId = Kernel32.GetCurrentThreadId();
+        var foregroundWindow = User32.GetForegroundWindow();
+        var pid = User32.GetWindowThreadProcessId(foregroundWindow, out var pid1);
+        User32.AttachThreadInput(pid,currentThreadId , true);
+        var sb = new StringBuilder(256);
+        var hWnd = User32.GetFocus();
+        User32.SendMessage(hWnd, User32.WindowMessage.WM_GETTEXT, sb.Capacity, sb);
+        User32.AttachThreadInput(pid,currentThreadId , false);
+
+        log.Info(sb.ToString());*/
+        // var data = Clipboard.GetDataObject();
+        string? text = null;
+        if (Clipboard.ContainsText())
+        {
+            text = Clipboard.GetText();
+        }
+
+        var keyboardSimulator = new InputSimulator().Keyboard;
+        keyboardSimulator.ModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_C).Sleep(200);
+
+        Application.Current.Dispatcher.BeginInvoke(() =>
+        {
+            Task.Delay(800);
+            var s = Clipboard.GetText();
+            if (s != text)
+            {
+                ((MouseQuickWindowViewModel)DataContext).SelectedItem = new SelectedItem()
+                    { type = FileType.文本, obj = Clipboard.GetText() };
+                //log.Info(Clipboard.GetText());
+            }
+
+            if (text != null)
+            {
+                Clipboard.SetText(text);
+            }
+        });
+
 
         User32.SetForegroundWindow(m_Hwnd);
     }
