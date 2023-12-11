@@ -70,15 +70,18 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
         if (pluginInfoEx.IsEnabled)
         {
             //卸载插件
-            ConfigManger.Config.EnabledPluginInfos.Remove(pluginInfoEx.ToPluginInfo());
-            ConfigManger.Save();
+
+
             Plugin.UnloadByPluginInfo(pluginInfoEx, out var weakReference);
+            PluginManager.EnablePlugin.Remove(pluginInfoEx.ToPlgString());
             while (weakReference.IsAlive)
             {
                 GC.Collect(2, GCCollectionMode.Aggressive);
                 GC.WaitForPendingFinalizers();
             }
 
+            ConfigManger.Config.EnabledPluginInfos.Remove(pluginInfoEx.ToPluginInfo());
+            ConfigManger.Save();
             pluginInfoEx.IsEnabled = false;
             Items.ResetBindings();
             CustomScenarioManger.LoadAll();
@@ -87,7 +90,7 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
         {
             //加载插件
             //Plugin.NewPlugin(pluginInfoEx.Path, out var weakReference);
-            PluginManager.EnablePlugin.Add($"{pluginInfoEx.Author}_{pluginInfoEx.PluginId}",
+            PluginManager.EnablePlugin.Add(pluginInfoEx.ToPlgString(),
                 new Plugin(pluginInfoEx.Path));
             ConfigManger.Config.EnabledPluginInfos.Add(pluginInfoEx.ToPluginInfo());
             ConfigManger.Save();

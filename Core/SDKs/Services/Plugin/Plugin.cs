@@ -30,6 +30,7 @@ public class Plugin
     public Plugin(string path)
     {
         _plugin = new AssemblyLoadContextH(path, path.Split("\\").Last() + "_plugin");
+        Log.Debug($"加载插件:{path}");
         _dll = _plugin.LoadFromAssemblyPath(path);
         var t = _dll.GetExportedTypes();
         Dictionary<string, (MethodInfo, object)> methodInfos = new();
@@ -39,6 +40,7 @@ public class Plugin
             if (type.GetInterface("IPlugin") != null)
             {
                 PluginInfo = (PluginInfo)type.GetField("PluginInfo").GetValue(null);
+                Log.Debug($"加载插件:{PluginInfo.ToPlgString()}");
                 //var instance = Activator.CreateInstance(type);
                 ServiceProvider = (IServiceProvider)type.GetMethod("GetServiceProvider").Invoke(null, null);
 
@@ -418,7 +420,7 @@ public class Plugin
         return jObject;
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    [MethodImpl(MethodImplOptions.NoOptimization)]
     public static void LoadBypath(string name, string path) =>
         PluginManager.EnablePlugin.Add(name,
             new Plugin(path));
@@ -426,13 +428,10 @@ public class Plugin
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void UnloadByPluginInfo(PluginInfoEx pluginInfoEx, out WeakReference weakReference)
     {
-        if (PluginManager.EnablePlugin.TryGetValue($"{pluginInfoEx.Author}_{pluginInfoEx.PluginId}",
+        if (PluginManager.EnablePlugin.TryGetValue(pluginInfoEx.ToPlgString(),
                 out var plugin))
         {
-            pluginInfoEx.IsEnabled = false;
-
             {
-                PluginManager.EnablePlugin.Remove($"{pluginInfoEx.Author}_{pluginInfoEx.PluginId}");
                 plugin.Unload(out weakReference);
 
                 return;
@@ -442,10 +441,19 @@ public class Plugin
         weakReference = new WeakReference(null);
     }
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static void Load(PluginInfoEx pluginInfoEx)
+    {
+        PluginManager.EnablePlugin.Add(pluginInfoEx.ToPlgString(),
+            new Plugin(pluginInfoEx.Path));
+    }
+
     public void Unload(out WeakReference weakReference)
     {
+        Log.Debug($"卸载插件:{PluginInfo.ToPlgString()}");
         var config1 = new FileInfo(AppDomain.CurrentDomain.BaseDirectory +
                                    $"configs\\{PluginInfo.ToPlgString()}.json");
+
         File.WriteAllText(config1.FullName,
             JsonConvert.SerializeObject(GetConfigJObject(), Formatting.Indented));
         _dll = null;

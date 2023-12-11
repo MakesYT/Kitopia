@@ -21,6 +21,7 @@ using Core.ViewModel.Pages;
 using Core.ViewModel.Pages.customScenario;
 using Core.ViewModel.Pages.plugin;
 using Core.ViewModel.TaskEditor;
+using Kitopia.SDKs;
 using Kitopia.Services;
 using Kitopia.View;
 using Kitopia.View.Pages;

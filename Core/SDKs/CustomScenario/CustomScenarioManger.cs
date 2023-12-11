@@ -50,26 +50,20 @@ public static class CustomScenarioManger
             ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show("情景",
                 sb.ToString());
         });
-        new Task(() =>
+
+
+        if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "customScenarios"))
         {
-            while (!PluginManager.isInitialized)
-            {
-                Thread.Sleep(100);
-            }
+            Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + "customScenarios");
+        }
 
-            if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "customScenarios"))
-            {
-                Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + "customScenarios");
-            }
+        var info = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "customScenarios");
+        foreach (var fileInfo in info.GetFiles())
+        {
+            Load(fileInfo);
+        }
 
-            var info = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "customScenarios");
-            foreach (var fileInfo in info.GetFiles())
-            {
-                Load(fileInfo);
-            }
-
-            WeakReferenceMessenger.Default.Send("Kitopia_SoftwareStarted", "CustomScenarioTrigger");
-        }).Start();
+        WeakReferenceMessenger.Default.Send("Kitopia_SoftwareStarted", "CustomScenarioTrigger");
     }
 
     public static void LoadAll()

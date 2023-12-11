@@ -93,7 +93,7 @@ public partial class CustomScenario : ObservableRecipient
         _tickTasks = null;
         _initTasks = null;
         nodes.Clear();
-        Log.Debug(Name + " Dispose");
+        //Log.Debug(Name + " Dispose");
     }
 
     partial void OnTickIntervalSecondChanged(double? oldValue)
