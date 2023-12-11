@@ -157,7 +157,7 @@ public sealed partial class App : Application
             log.Debug("注册热键");
             SystemEvents.InvokeOnEventsThread(() =>
             {
-                //MouseHookHelper.InsertMouseHook();
+                MouseHookHelper.InsertMouseHook();
             });
 
             var initWindow = ServiceManager.Services.GetService<MainWindow>();
