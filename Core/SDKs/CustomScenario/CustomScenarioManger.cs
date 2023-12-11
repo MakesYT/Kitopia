@@ -2,7 +2,6 @@
 using System.IO;
 using System.Text;
 using CommunityToolkit.Mvvm.Messaging;
-using Core.SDKs.CustomType;
 using Core.SDKs.HotKey;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
@@ -16,16 +15,7 @@ namespace Core.SDKs.CustomScenario;
 
 public static class CustomScenarioManger
 {
-    public static ObservableCollection<SDKs.CustomScenario.CustomScenario> CustomScenarios = new();
-
-    public static ObservableDictionary<string, CustomScenarioTriggerInfo> Triggers = new()
-    {
-        { "Kitopia_SoftwareStarted", new CustomScenarioTriggerInfo() { Name = "Kitopia程序启动时" } },
-        {
-            "Kitopia_SoftwareShutdown",
-            new CustomScenarioTriggerInfo() { Name = "Kitopia程序关闭时", Description = "注意该触发器不会进入Tick" }
-        },
-    };
+    public static ObservableCollection<CustomScenario> CustomScenarios = new();
 
     private static readonly ILog Log = LogManager.GetLogger(nameof(CustomScenarioManger));
 
@@ -75,70 +65,96 @@ public static class CustomScenarioManger
             var info = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "customScenarios");
             foreach (var fileInfo in info.GetFiles())
             {
-                var json = File.ReadAllText(fileInfo.FullName);
-                try
-                {
-                    var deserializeObject = JsonConvert.DeserializeObject<SDKs.CustomScenario.CustomScenario>(json)!;
-
-
-                    foreach (var node in deserializeObject.nodes)
-                    {
-                        var nodePlugin = node.Plugin;
-                        switch (nodePlugin)
-                        {
-                            case null:
-                            case "Kitopia":
-                                continue;
-                        }
-
-                        if (!PluginOverall.CustomScenarioNodeMethods.TryGetValue(nodePlugin, out var method))
-                        {
-                            throw new CustomScenarioLoadFromJsonException(nodePlugin, node.MerthodName);
-                        }
-
-                        if (method.ContainsKey(node.MerthodName))
-                        {
-                            continue;
-                        }
-
-                        throw new CustomScenarioLoadFromJsonException(nodePlugin, node.MerthodName);
-                    }
-
-                    //
-
-
-                    deserializeObject.IsRunning = false;
-                    CustomScenarios.Add(deserializeObject);
-                }
-                catch (Exception e1)
-                {
-                    // Log.Error(e1);
-                    Log.Error($"情景文件\"{fileInfo.FullName}\"加载失败");
-                    var pluginName = ((CustomScenarioLoadFromJsonException)e1).PluginName.Split("_");
-                    var deserializeObject = JsonConvert.DeserializeObject<SDKs.CustomScenario.CustomScenario>(json,
-                        new JsonSerializerSettings()
-                        {
-                            Error = (sender, args) =>
-                            {
-                                // 忽略错误并继续反序列化
-                                args.ErrorContext.Handled = true;
-                            }
-                        })!;
-                    ((IToastService)ServiceManager.Services!.GetService(typeof(IToastService))!).ShowMessageBoxW(
-                        $"自定义情景\"{deserializeObject.Name}\"加载失败",
-                        $"对应文件\n{fileInfo.FullName}\n情景所需的插件不存在\n需要来自作者{pluginName[0]}的插件{pluginName[1]}", new
-                            ShowMessageContent("我知道了", null, "尝试在市场中自动安装", () =>
-                            {
-                                System.Windows.MessageBox.Show("未实现");
-                            }, null, null));
-                }
+                Load(fileInfo);
             }
 
             WeakReferenceMessenger.Default.Send("Kitopia_SoftwareStarted", "CustomScenarioTrigger");
         }).Start();
     }
 
-    public static void Save(SDKs.CustomScenario.CustomScenario scenario)
+    public static void LoadAll()
+    {
+        var info = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "customScenarios");
+        foreach (var fileInfo in info.GetFiles())
+        {
+            Load(fileInfo);
+        }
+    }
+
+    public static void Load(FileInfo fileInfo)
+    {
+        var fileInfoName = fileInfo.Name.Replace(".json", "");
+        if (CustomScenarios.Any((e => e.UUID == fileInfoName)))
+        {
+            return;
+        }
+
+        var json = File.ReadAllText(fileInfo.FullName);
+        try
+        {
+            var deserializeObject = JsonConvert.DeserializeObject<CustomScenario>(json)!;
+
+
+            foreach (var node in deserializeObject.nodes)
+            {
+                var nodePlugin = node.Plugin;
+                switch (nodePlugin)
+                {
+                    case null:
+                    case "Kitopia":
+                        continue;
+                }
+
+                if (!PluginOverall.CustomScenarioNodeMethods.TryGetValue(nodePlugin, out var method))
+                {
+                    throw new CustomScenarioLoadFromJsonException(nodePlugin, node.MerthodName);
+                }
+
+                if (method.ContainsKey(node.MerthodName))
+                {
+                    continue;
+                }
+
+                throw new CustomScenarioLoadFromJsonException(nodePlugin, node.MerthodName);
+            }
+
+            //
+
+            deserializeObject.HasInit = true;
+            deserializeObject.IsRunning = false;
+            CustomScenarios.Add(deserializeObject);
+        }
+        catch (Exception e1)
+        {
+            // Log.Error(e1);
+            Log.Error($"情景文件\"{fileInfo.FullName}\"加载失败");
+            var pluginName = ((CustomScenarioLoadFromJsonException)e1).PluginName.Split("_");
+            var deserializeObject = JsonConvert.DeserializeObject<CustomScenario>(json,
+                new JsonSerializerSettings()
+                {
+                    Error = (sender, args) =>
+                    {
+                        // 忽略错误并继续反序列化
+                        args.ErrorContext.Handled = true;
+                    }
+                })!;
+            deserializeObject.HasInit = false;
+            deserializeObject.IsRunning = false;
+
+            var content = $"对应文件\n{fileInfo.FullName}\n情景所需的插件不存在\n需要来自作者{pluginName[0]}的插件{pluginName[1]}";
+            deserializeObject.InitError = content;
+            CustomScenarios.Add(deserializeObject);
+            ((IToastService)ServiceManager.Services!.GetService(typeof(IToastService))!).ShowMessageBoxW(
+                $"自定义情景\"{deserializeObject.Name}\"加载失败",
+                content, new
+                    ShowMessageContent("我知道了", null, "尝试在市场中自动安装", () =>
+                    {
+                        System.Windows.MessageBox.Show("未实现");
+                    }, null, null));
+        }
+    }
+
+    public static void Save(CustomScenario scenario)
     {
         if (!CustomScenarios.Contains(scenario))
         {
@@ -180,50 +196,98 @@ public static class CustomScenarioManger
         File.WriteAllText(configF.FullName, JsonConvert.SerializeObject(scenario, setting));
     }
 
-    public static void Remove(SDKs.CustomScenario.CustomScenario scenario)
+    public static void Remove(CustomScenario scenario, bool deleteFile = true)
     {
         if (CustomScenarios.Contains(scenario))
         {
             CustomScenarios.Remove(scenario);
-            List<HotKeyModel> toRemove = new();
-            foreach (var item in ConfigManger.Config.hotKeys)
+        }
+
+        List<HotKeyModel> toRemove = new();
+        foreach (var item in ConfigManger.Config.hotKeys)
+        {
+            if (item.MainName == "Kitopia情景")
             {
-                if (item.MainName == "Kitopia情景")
+                if (CustomScenarios.All(e => e.UUID != item.Name!.Split("_")[0]))
                 {
-                    if (CustomScenarios.All(e => e.UUID != item.Name!.Split("_")[0]))
-                    {
-                        toRemove.Add(item);
-                    }
+                    toRemove.Add(item);
                 }
             }
+        }
 
-            foreach (var hotKeyModel in toRemove)
-            {
-                ((IHotKeyEditor)ServiceManager.Services.GetService(typeof(IHotKeyEditor))!).RemoveByHotKeyModel(
-                    hotKeyModel);
-            }
+        foreach (var hotKeyModel in toRemove)
+        {
+            ((IHotKeyEditor)ServiceManager.Services.GetService(typeof(IHotKeyEditor))!).RemoveByHotKeyModel(
+                hotKeyModel);
+        }
 
-            ConfigManger.Save();
+        toRemove = null;
+        ((SearchWindowViewModel)ServiceManager.Services.GetService(typeof(SearchWindowViewModel))!)
+            ._collection.Remove($"CustomScenario:{scenario.UUID}");
+        ConfigManger.Save();
+        if (deleteFile)
+        {
             File.Delete(AppDomain.CurrentDomain.BaseDirectory + $"customScenarios\\{scenario.UUID}.json");
-            scenario.Dispose();
+        }
+
+        scenario.Dispose();
+    }
+
+    public static void UnloadByPlugStr(string plugStr)
+    {
+        for (int i = CustomScenarios.Count - 1; i >= 0; i--)
+        {
+            if (CustomScenarios[i]._plugs.ContainsKey(plugStr))
+            {
+                var customScenario = CustomScenarios[i];
+                CustomScenarios.RemoveAt(i);
+                Remove(customScenario, false);
+                customScenario = null;
+            }
         }
     }
 
-    public static void Reload(SDKs.CustomScenario.CustomScenario scenario)
+    public static void Reload(CustomScenario scenario)
     {
-        CustomScenarios.Remove(scenario);
+        Remove(scenario, false);
         var configF = new FileInfo(AppDomain.CurrentDomain.BaseDirectory + $"customScenarios\\{scenario.UUID}.json");
         if (configF.Exists)
         {
-            var json = File.ReadAllText(configF.FullName);
-            try
+            Load(configF);
+        }
+    }
+
+    public static void ReCheck(bool onlyError = true)
+    {
+        var toRemove = new List<CustomScenario>();
+        if (onlyError)
+        {
+            foreach (var customScenario in CustomScenarios.Where(e => e.HasInit == false))
             {
-                CustomScenarios.Add(JsonConvert.DeserializeObject<SDKs.CustomScenario.CustomScenario>(json)!);
+                toRemove.Add(customScenario);
             }
-            catch (Exception e)
+        }
+        else
+        {
+            foreach (var customScenario in CustomScenarios)
             {
-                Log.Error(e);
-                Log.Error("情景文件加载失败");
+                toRemove.Add(customScenario);
+            }
+        }
+
+        foreach (var customScenario in toRemove)
+        {
+            if (customScenario.IsRunning)
+            {
+                customScenario.Stop();
+            }
+
+            Remove(customScenario, false);
+            var configF = new FileInfo(AppDomain.CurrentDomain.BaseDirectory +
+                                       $"customScenarios\\{customScenario.UUID}.json");
+            if (configF.Exists)
+            {
+                Load(configF);
             }
         }
     }

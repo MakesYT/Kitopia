@@ -28,7 +28,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <ui:TextBlock Grid.Row="0" Text="{Binding SelectedItem,Converter={StaticResource MouseQuickSelectedItem}}" TextWrapping="Wrap" FontSize="20" Margin="0,0,0,10" />
+        <ui:TextBlock Grid.Row="0" Text="{Binding SelectedItem,Converter={StaticResource MouseQuickSelectedItem}}" TextWrapping="Wrap" FontSize="20" Margin="10,10,10,10" />
         <ItemsControl Grid.Row="1"
              HorizontalContentAlignment="Stretch"
             ItemsSource="{Binding Items}"

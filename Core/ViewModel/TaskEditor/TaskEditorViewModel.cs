@@ -9,9 +9,9 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.Services;
-using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
 using Core.SDKs.Tools;
+using Core.SDKs.Tools.Ex;
 using log4net;
 using PluginCore;
 
@@ -243,6 +243,11 @@ public partial class TaskEditorViewModel : ObservableRecipient
             MerthodName = pointItem.MerthodName,
             Location = new Point(pointItem.Location.X, pointItem.Location.Y)
         };
+        if (pointItem.Plugin != "Kitopia")
+        {
+            Scenario._plugs!.AddOrIncrease(pointItem.Plugin);
+        }
+
         ObservableCollection<ConnectorItem> input = new();
         foreach (var connectorItem in pointItem.Input)
         {
@@ -260,6 +265,19 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 SelfInputAble = connectorItem.SelfInputAble,
                 IsOut = connectorItem.IsOut
             });
+            var plugin = PluginManager.EnablePlugin.FirstOrDefault((e) => e.Value._dll == connectorItem.Type.Assembly)
+                .Value;
+            if (plugin is not null)
+            {
+                Scenario._plugs.AddOrIncrease(plugin.ToPlgString());
+            }
+
+            var plugin2 = PluginManager.EnablePlugin
+                .FirstOrDefault((e) => e.Value._dll == connectorItem.RealType.Assembly).Value;
+            if (plugin2 is not null)
+            {
+                Scenario._plugs.AddOrIncrease(plugin2.ToPlgString());
+            }
         }
 
         ObservableCollection<ConnectorItem> output = new();
@@ -286,6 +304,20 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 }
 
                 connectorItem1.Interfaces = interfaces;
+            }
+
+            var plugin = PluginManager.EnablePlugin.FirstOrDefault((e) => e.Value._dll == connectorItem.Type.Assembly)
+                .Value;
+            if (plugin is not null)
+            {
+                Scenario._plugs.AddOrIncrease(plugin.ToPlgString());
+            }
+
+            var plugin2 = PluginManager.EnablePlugin
+                .FirstOrDefault((e) => e.Value._dll == connectorItem.RealType.Assembly).Value;
+            if (plugin2 is not null)
+            {
+                Scenario._plugs.AddOrIncrease(plugin2.ToPlgString());
             }
 
             output.Add(connectorItem1);
@@ -392,6 +424,41 @@ public partial class TaskEditorViewModel : ObservableRecipient
             }
         }
 
+        Scenario._plugs.DelOrDecrease(pointItem.Plugin);
+        foreach (var connectorItem in pointItem.Input)
+        {
+            var plugin = PluginManager.EnablePlugin.FirstOrDefault((e) => e.Value._dll == connectorItem.Type.Assembly)
+                .Value;
+            if (plugin is not null)
+            {
+                Scenario._plugs.DelOrDecrease(plugin.ToPlgString());
+            }
+
+            var plugin2 = PluginManager.EnablePlugin
+                .FirstOrDefault((e) => e.Value._dll == connectorItem.RealType.Assembly).Value;
+            if (plugin2 is not null)
+            {
+                Scenario._plugs.DelOrDecrease(plugin2.ToPlgString());
+            }
+        }
+
+        foreach (var connectorItem in pointItem.Output)
+        {
+            var plugin = PluginManager.EnablePlugin.FirstOrDefault((e) => e.Value._dll == connectorItem.Type.Assembly)
+                .Value;
+            if (plugin is not null)
+            {
+                Scenario._plugs.DelOrDecrease(plugin.ToPlgString());
+            }
+
+            var plugin2 = PluginManager.EnablePlugin
+                .FirstOrDefault((e) => e.Value._dll == connectorItem.RealType.Assembly).Value;
+            if (plugin2 is not null)
+            {
+                Scenario._plugs.DelOrDecrease(plugin2.ToPlgString());
+            }
+        }
+
         Scenario.nodes.Remove(pointItem);
     }
 
@@ -479,7 +546,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
             if (toRemove)
             {
                 IsModified = true;
-                Scenario.nodes.Remove(Scenario.nodes[i]);
+                DelNode(Scenario.nodes[i]);
             }
         }
     }

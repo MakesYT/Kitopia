@@ -17,7 +17,8 @@ public partial class ConnectorItem : ObservableRecipient
     [ObservableProperty] private bool _isNotUsed = false;
     [ObservableProperty] private bool _isOut;
     [ObservableProperty] private bool _isSelf = false;
-    private Type? _realType;
+
+    [JsonIgnore] private Type? _realType;
 
     public bool SelfInputAble
     {
@@ -56,6 +57,8 @@ public partial class ConnectorItem : ObservableRecipient
     /// <summary>
     /// 
     /// </summary>
+    ///
+    [JsonConverter(typeof(TypeJsonConverter))]
     public Type RealType
     {
         get => _realType ?? Type;

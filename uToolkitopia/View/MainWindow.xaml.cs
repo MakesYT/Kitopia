@@ -16,7 +16,6 @@ using Core.ViewModel;
 using Kitopia.SDKs;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Win32;
 using PluginCore;
 using Vanara.PInvoke;
 using Wpf.Ui;
@@ -140,10 +139,7 @@ public partial class MainWindow
             //TODO: 程序退出时触发器
         };
         InitHotKey();
-        SystemEvents.InvokeOnEventsThread(() =>
-        {
-            MouseHookHelper.InsertMouseHook(m_Hwnd);
-        });
+
 
         ApplicationThemeManager.Changed += (theme, accent) =>
         {

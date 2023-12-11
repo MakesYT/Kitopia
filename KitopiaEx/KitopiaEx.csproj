@@ -9,7 +9,11 @@
         <AssemblyName>KitopiaEx</AssemblyName>
         <RootNamespace>KitopiaEx</RootNamespace>
     </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+        <AppendTargetFrameworkToOutputPath>output</AppendTargetFrameworkToOutputPath>
+        <OutputPath>D:\WPF.net\uToolkitopia\uToolkitopia\bin\Debug\net8.0-windows10.0.19041.0\plugins\KitopiaEx</OutputPath>
 
+    </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
         <DebugType>none</DebugType>
         <GenerateDocumentationFile>false</GenerateDocumentationFile>

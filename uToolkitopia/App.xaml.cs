@@ -155,7 +155,10 @@ public sealed partial class App : Application
             CustomScenarioManger.Init();
             log.Info("场景管理器初始化完成");
             log.Debug("注册热键");
-
+            SystemEvents.InvokeOnEventsThread(() =>
+            {
+                //MouseHookHelper.InsertMouseHook();
+            });
 
             var initWindow = ServiceManager.Services.GetService<MainWindow>();
             typeof(Window).GetMethod("VerifyContextAndObjectState", BindingFlags.NonPublic | BindingFlags.Instance)!

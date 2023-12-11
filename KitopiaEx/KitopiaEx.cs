@@ -40,6 +40,7 @@ public class KitopiaEx : IPlugin
         services.AddSingleton<ClipboardEx>();
         services.AddSingleton<OcrEx>();
         services.AddSingleton<ImageTools>();
+        services.AddSingleton<Test1>();
         return services.BuildServiceProvider();
     }
 }

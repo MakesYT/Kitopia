@@ -52,10 +52,12 @@ public class Plugin
             if (typeof(CustomScenarioTrigger).IsAssignableFrom(type))
             {
                 var fieldInfo = type.GetField("Info");
-                CustomScenarioManger.Triggers.Add($"{PluginInfo.ToPlgString()}_{type.Name}",
-                    (CustomScenarioTriggerInfo)(fieldInfo is null
-                        ? new CustomScenarioTriggerInfo { Name = $"{PluginInfo.ToPlgString()}_{type.Name}" }
-                        : fieldInfo.GetValue(null)!));
+                var customScenarioTriggerInfo = (CustomScenarioTriggerInfo)(fieldInfo is null
+                    ? new CustomScenarioTriggerInfo { Name = $"{PluginInfo.ToPlgString()}_{type.Name}" }
+                    : fieldInfo.GetValue(null)!);
+                customScenarioTriggerInfo.PluginInfo = PluginInfo.ToPlgString();
+                CustomScenarioGloble.Triggers.Add($"{PluginInfo.ToPlgString()}_{type.Name}",
+                    customScenarioTriggerInfo);
             }
 
             foreach (var methodInfo in type.GetMethods())
@@ -432,6 +434,7 @@ public class Plugin
             {
                 PluginManager.EnablePlugin.Remove($"{pluginInfoEx.Author}_{pluginInfoEx.PluginId}");
                 plugin.Unload(out weakReference);
+
                 return;
             }
         }
@@ -442,13 +445,24 @@ public class Plugin
     public void Unload(out WeakReference weakReference)
     {
         var config1 = new FileInfo(AppDomain.CurrentDomain.BaseDirectory +
-                                   $"configs\\{PluginInfo.Author}_{PluginInfo.PluginId}.json");
+                                   $"configs\\{PluginInfo.ToPlgString()}.json");
         File.WriteAllText(config1.FullName,
             JsonConvert.SerializeObject(GetConfigJObject(), Formatting.Indented));
         _dll = null;
 
-        PluginOverall.SearchActions.Remove($"{PluginInfo.Author}_{PluginInfo.PluginId}");
-        PluginOverall.CustomScenarioNodeMethods.Remove($"{PluginInfo.Author}_{PluginInfo.PluginId}");
+        PluginOverall.SearchActions.Remove($"{PluginInfo.ToPlgString()}");
+        PluginOverall.CustomScenarioNodeMethods.Remove($"{PluginInfo.ToPlgString()}");
+        var keyValuePairs = CustomScenarioGloble.Triggers.Where(e => e.Value.PluginInfo == PluginInfo.ToPlgString());
+        foreach (var keyValuePair in keyValuePairs)
+        {
+            CustomScenarioGloble.Triggers.Remove(keyValuePair.Key);
+        }
+
+        keyValuePairs = null;
+
+
+        CustomScenarioManger.UnloadByPlugStr(PluginInfo.ToPlgString());
+
         PluginInfo = new PluginInfo();
         ServiceProvider = null;
 

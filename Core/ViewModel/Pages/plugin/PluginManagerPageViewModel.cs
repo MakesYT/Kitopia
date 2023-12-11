@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Core.SDKs.CustomScenario;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
@@ -16,8 +17,8 @@ namespace Core.ViewModel.Pages.plugin;
 public partial class PluginManagerPageViewModel : ObservableRecipient
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(PluginManagerPageViewModel));
-    [ObservableProperty] private BindingList<PluginInfoEx> _items = new();
     private readonly TaskScheduler _scheduler = TaskScheduler.FromCurrentSynchronizationContext();
+    [ObservableProperty] private BindingList<PluginInfoEx> _items = new();
 
     public PluginManagerPageViewModel()
     {
@@ -38,7 +39,7 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
         {
             if (File.Exists($"{directoryInfo.FullName}\\{directoryInfo.Name}.dll"))
             {
-                Log.Debug($"加载插件:{directoryInfo.Name}.dll");
+                Log.Debug($"加载插件Info:{directoryInfo.Name}.dll");
                 var pluginInfoEx = Plugin.GetPluginInfoEx($"{directoryInfo.FullName}\\{directoryInfo.Name}.dll",
                     out var alcWeakRef);
                 if (pluginInfoEx.Version != "error")
@@ -74,12 +75,13 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
             Plugin.UnloadByPluginInfo(pluginInfoEx, out var weakReference);
             while (weakReference.IsAlive)
             {
-                GC.Collect();
+                GC.Collect(2, GCCollectionMode.Aggressive);
                 GC.WaitForPendingFinalizers();
             }
 
             pluginInfoEx.IsEnabled = false;
             Items.ResetBindings();
+            CustomScenarioManger.LoadAll();
         }
         else
         {
@@ -91,6 +93,7 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
             ConfigManger.Save();
             pluginInfoEx.IsEnabled = true;
             Items.ResetBindings();
+            CustomScenarioManger.ReCheck(true);
         }
     }
 

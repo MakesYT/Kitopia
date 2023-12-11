@@ -63,7 +63,7 @@ public class MouseHookHelper
     }
 
 
-    public static bool InsertMouseHook(IntPtr m_hwnd)
+    public static bool InsertMouseHook()
     {
         log.Debug("插入鼠标钩子");
         mouseHookProc = mouseHookCallback;

@@ -2,8 +2,8 @@
 
 using System.IO;
 using System.Windows;
+using Core.SDKs.CustomScenario;
 using Core.SDKs.Services.Config;
-using Core.SDKs.Tools;
 using log4net;
 using PluginCore;
 
@@ -24,7 +24,7 @@ public class PluginManager
         {
             Kitopia.ISearchItemTool = (ISearchItemTool)ServiceManager.Services.GetService(typeof(ISearchItemTool))!;
             Kitopia.IToastService = (IToastService)ServiceManager.Services.GetService(typeof(IToastService))!;
-            Kitopia._i18n = BaseNodeMethodsGen._i18n;
+            Kitopia._i18n = CustomScenarioGloble._i18n;
             var pluginsDirectoryInfo = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "plugins");
             if (!pluginsDirectoryInfo.Exists)
             {
@@ -61,21 +61,6 @@ public class PluginManager
             }
 
 #if DEBUG
-            Log.Debug("Debug加载测试插件");
-
-            var pluginInfoEx1 = Plugin.GetPluginInfoEx(
-                @"D:\WPF.net\uToolkitopia\KitopiaEx\bin\Debug\net8.0-windows10.0.19041.0\KitopiaEx.dll",
-                out var alcWeakRef1);
-
-
-            while (alcWeakRef1.IsAlive)
-            {
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-            }
-
-            Plugin.LoadBypath($"{pluginInfoEx1.Author}_{pluginInfoEx1.PluginId}", pluginInfoEx1.Path);
-            //((ITaskEditorOpenService)ServiceManager.Services!.GetService(typeof(ITaskEditorOpenService))!)!.Open();
 
 
 #endif

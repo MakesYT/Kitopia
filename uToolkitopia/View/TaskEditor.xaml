@@ -23,7 +23,7 @@
     d:DataContext="{d:DesignInstance {x:Type taskEditor:TaskEditorViewModel}}"
     Title="TaskEditor" Height="450" Width="1800">
     <ui:FluentWindow.Resources>
-        <services:BindingProxy x:Key="viewModel" Data="{Binding}" />
+        <services:BindingProxy x:Key="ViewModel" Data="{Binding}" />
         <converter:HotKeySignNameToolCTr x:Key="HotKeySignNameToolCTr" />
         <taskEditor1:IfNullVisibilityHidden x:Key="IfNullVisibilityHidden" />
         <DataTemplate x:Key="StringTemplate" DataType="{x:Type customScenario:ConnectorItem}">
@@ -136,8 +136,9 @@
         <ContentPresenter Panel.ZIndex="100" Grid.Column="1" Grid.RowSpan="2" x:Name="ContentPresenter" />
 
 
-        <ui:TitleBar Title="情景编排" Grid.ColumnSpan="3" />
-        <ui:Button Visibility="Collapsed" x:Name="add" Content="添加" Command="{Binding AddNodesCommand}" />
+        <ui:TitleBar Title="情景编排" Grid.Row="0" Grid.ColumnSpan="3" Grid.Column="0" />
+        <ui:Button Grid.Row="0" Grid.Column="0" Visibility="Collapsed" x:Name="add" Content="添加"
+                   Command="{Binding AddNodesCommand}" />
         <!-- 左边部分 -->
         <Border x:Name="border" Grid.Row="1" Grid.Column="0" Padding="0,0,0,0" Margin="0">
             <ScrollViewer Margin="0" ScrollViewer.VerticalScrollBarVisibility="Auto">
@@ -182,6 +183,42 @@
                             </StackPanel>
                         </Expander.Content>
                     </Expander>
+                    <Expander Header="入参" FontSize="15" IsExpanded="True" FontWeight="Medium">
+                        <Expander.Content>
+                            <Expander x:Name="CardExpander2" IsExpanded="True"
+                                      IsEnabled="{Binding Scenario.IsHaveInputValue,Mode=OneWay}"
+                                      Padding="0,0,10,0">
+                                <Expander.Header>
+                                    <controls:SettingItems Margin="0" Title="含有入参" FontSize="20"
+                                                           BorderThickness="0">
+                                        <controls:ResetIsEnabled>
+                                            <ui:ToggleSwitch
+                                                IsChecked="{Binding Scenario.IsHaveInputValue,Mode=TwoWay}">
+                                                <b:Interaction.Triggers>
+                                                    <b:DataTrigger
+                                                        Binding="{Binding ElementName=CardExpander2,Path=IsEnabled}"
+                                                        Value="False">
+                                                        <b:ChangePropertyAction
+                                                            TargetObject="{Binding ElementName=CardExpander2}"
+                                                            PropertyName="IsExpanded" Value="False" />
+                                                    </b:DataTrigger>
+                                                </b:Interaction.Triggers>
+                                            </ui:ToggleSwitch>
+                                        </controls:ResetIsEnabled>
+
+                                        <controls:SettingItems.Icon>
+                                            <ui:SymbolIcon Symbol="CalendarEmpty20" FontSize="25" />
+                                        </controls:SettingItems.Icon>
+
+
+                                    </controls:SettingItems>
+                                </Expander.Header>
+                                <StackPanel />
+
+                            </Expander>
+                        </Expander.Content>
+                    </Expander>
+                    
                     <Expander Header="Tick控制" FontSize="15" IsExpanded="True" FontWeight="Medium">
                         <Expander.Content>
                             <StackPanel>
@@ -202,6 +239,7 @@
 
                         </Expander.Content>
                     </Expander>
+
                     <Expander Header="变量" FontSize="15" IsExpanded="True" FontWeight="Medium">
                         <Expander.Content>
                             <StackPanel>
@@ -237,7 +275,7 @@
                                                 <Border BorderBrush="LightGray" BorderThickness="1"
                                                         CornerRadius="3" Background="White">
                                                     <Border.ContextMenu>
-                                                        <ContextMenu DataContext="{StaticResource viewModel}">
+                                                        <ContextMenu DataContext="{StaticResource ViewModel}">
                                                             <!-- ReSharper disable once Xaml.RedundantResource -->
                                                             <MenuItem Header="删除此变量"
                                                                       Command="{Binding Data.DelValueCommand}"
@@ -584,7 +622,6 @@
 
                                 </Expander>
                                 <Expander x:Name="CardExpander4" IsExpanded="True"
-                                          IsEnabled="{Binding Scenario.ExecutionManual,Mode=OneWay}"
                                           Padding="0,0,10,0">
                                     <Expander.Resources>
                                         <taskEditor1:AutoTriggersCtr x:Key="AutoTriggersCtr" />
@@ -602,18 +639,19 @@
                                         </controls:SettingItems>
                                     </Expander.Header>
                                     <ItemsControl Margin="15,0,0,0"
-                                        ItemsSource="{Binding Source={x:Static customScenario:CustomScenarioManger.Triggers}}">
+                                                  ItemsSource="{Binding Source={x:Static customScenario:CustomScenarioGloble.Triggers}}">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
                                                 <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                                                     <StackPanel.Resources>
                                                         <services:BindingProxy x:Key="key" Data="{Binding .,Path=Key}" />
                                                     </StackPanel.Resources>
-                                                    <CheckBox Validation.ErrorTemplate="{x:Null}" 
-                                                              IsChecked="{Binding Source={StaticResource viewModel}, Path=Data.Scenario,Converter={StaticResource AutoTriggersCtr},
+                                                    <CheckBox Validation.ErrorTemplate="{x:Null}"
+                                                              IsChecked="{Binding Source={StaticResource ViewModel}, Path=Data.Scenario,Converter={StaticResource AutoTriggersCtr},
                                                               ConverterParameter={StaticResource key}}" />
-                                                    <ui:TextBlock VerticalAlignment="Center" Text="{Binding Value.Name}" />
-                                                    <ui:SymbolIcon Symbol="Info24" Foreground="Coral" 
+                                                    <ui:TextBlock VerticalAlignment="Center"
+                                                                  Text="{Binding Value.Name}" />
+                                                    <ui:SymbolIcon Symbol="Info24" Foreground="Coral"
                                                                    ToolTip="{Binding Value.Description}"
                                                                    ToolTipService.InitialShowDelay="0"
                                                                    Visibility="{Binding Value.Description, Converter={StaticResource IfNullVisibilityHidden}}" />
@@ -1069,7 +1107,7 @@
                                 <nodify:Connection Source="{Binding Source.Anchor}" Focusable="True"
                                                    Target="{Binding Target.Anchor}">
                                     <nodify:Connection.ContextMenu>
-                                        <ContextMenu DataContext="{StaticResource viewModel}">
+                                        <ContextMenu DataContext="{StaticResource ViewModel}">
                                             <!-- ReSharper disable once Xaml.RedundantResource -->
                                             <MenuItem Header="删除此连接" Command="{Binding Data.DelConnectionCommand}"
                                                       CommandParameter="{Binding Data,Source={StaticResource runRecordList}}" />
@@ -1118,7 +1156,7 @@
                                     VerticalAlignment="Center"
                                     Output="{Binding Output}">
                                     <nodify:Node.ContextMenu>
-                                        <ContextMenu DataContext="{StaticResource viewModel}">
+                                        <ContextMenu DataContext="{StaticResource ViewModel}">
                                             <!-- ReSharper disable once Xaml.RedundantResource -->
                                             <MenuItem Header="复制节点" Command="{Binding Data.CopyNodeCommand}"
                                                       CommandParameter="{Binding Data,Source={StaticResource runRecordList}}" />
@@ -1246,7 +1284,7 @@
                                                 <ContentControl Content="{Binding}" VerticalAlignment="Center"
                                                                 ContentTemplateSelector="{StaticResource MyDataTemplateSelector}">
                                                     <ContentControl.ContextMenu>
-                                                        <ContextMenu DataContext="{StaticResource viewModel}">
+                                                        <ContextMenu DataContext="{StaticResource ViewModel}">
                                                             <!-- ReSharper disable once Xaml.RedundantResource -->
                                                             <MenuItem Header="切换自输入/连接器"
                                                                       Command="{Binding Data.SwitchConnectorCommand}"

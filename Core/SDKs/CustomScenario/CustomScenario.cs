@@ -20,9 +20,10 @@ using Vanara.Extensions.Reflection;
 
 namespace Core.SDKs.CustomScenario;
 
-public partial class CustomScenario : ObservableRecipient, IDisposable
+public partial class CustomScenario : ObservableRecipient
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(CustomScenario));
+
     [JsonIgnore] [ObservableProperty] private ObservableCollection<string> _autoTriggers = new();
     private CancellationTokenSource _cancellationTokenSource = new();
 
@@ -34,8 +35,7 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
     [JsonIgnore] [ObservableProperty] private DateTime _lastRun;
 
     [JsonIgnore] [ObservableProperty] private string _name = "情景";
-
-
+    public Dictionary<string, int> _plugs = new();
     private Dictionary<PointItem, Thread?> _tickTasks = new();
     private TickUtil? _tickUtil;
 
@@ -44,7 +44,13 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
     /// </summary>
     [JsonIgnore] [ObservableProperty] private bool executionManual = true;
 
+    [JsonIgnore] [ObservableProperty] private bool hasInit = true;
+    [JsonIgnore] [ObservableProperty] private string? initError;
+    [JsonIgnore] [ObservableProperty] private object? inputValue = null;
+
     private bool InTick;
+
+    [JsonIgnore] [ObservableProperty] private bool isHaveInputValue = false;
 
     [JsonIgnore] [ObservableProperty] private ObservableCollection<string> keys = new();
 
@@ -62,7 +68,7 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
         };
     }
 
-    public string? UUID
+    public string UUID
     {
         get;
         set;
@@ -84,6 +90,10 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
     {
         _cancellationTokenSource.Cancel();
         _cancellationTokenSource.Dispose();
+        _tickTasks = null;
+        _initTasks = null;
+        nodes.Clear();
+        Log.Debug(Name + " Dispose");
     }
 
     partial void OnTickIntervalSecondChanged(double? oldValue)
@@ -102,7 +112,7 @@ public partial class CustomScenario : ObservableRecipient, IDisposable
 
     private void StartRun(bool notRealTime, bool onExit = false)
     {
-        if (IsRunning)
+        if (IsRunning || !HasInit)
         {
             return;
         }

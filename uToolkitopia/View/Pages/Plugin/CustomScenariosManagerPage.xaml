@@ -52,6 +52,9 @@
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <ui:Button HorizontalAlignment="Stretch" x:Name="Button"
+                               IsEnabled="{Binding HasInit}"
+                               ToolTip="{Binding InitError}"
+                               ToolTipService.ShowOnDisabled="True"
                                Command="{Binding Path=DataContext.ToTaskEditPageCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Page}}}"
                                CommandParameter="{Binding }"
                                Background="Transparent"
