@@ -21,7 +21,6 @@ namespace Core.SDKs.Services.Plugin;
 public class Plugin
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(Plugin));
-    public Assembly? _dll;
 
     private AssemblyLoadContextH? _plugin;
 
@@ -31,7 +30,6 @@ public class Plugin
     {
         _plugin = new AssemblyLoadContextH(path, path.Split("\\").Last() + "_plugin");
         Log.Debug($"加载插件:{path}");
-        _dll = _plugin.LoadFromAssemblyPath(path);
         var t = _dll.GetExportedTypes();
         Dictionary<string, (MethodInfo, object)> methodInfos = new();
         List<Func<string, SearchViewItem?>> searchViews = new();
@@ -96,6 +94,8 @@ public class Plugin
         PluginOverall.SearchActions.Add(ToPlgString(), searchViews);
         PluginOverall.CustomScenarioNodeMethods.Add(ToPlgString(), methodInfos);
     }
+
+    public Assembly? _dll => _plugin.Assembly;
 
     public PluginInfo PluginInfo
     {
@@ -391,27 +391,6 @@ public class Plugin
         return pointItem;
     }
 
-    public List<FieldInfo> GetFieldInfos()
-    {
-        var _fieldInfos = new List<FieldInfo>();
-        var t = _dll.GetExportedTypes();
-        foreach (var type in t)
-        {
-            foreach (var fieldInfo in type.GetFields())
-            {
-                if (!fieldInfo.GetCustomAttributes(typeof(ConfigField)).Any())
-                {
-                    continue;
-                }
-
-                Log.Debug($"找到属性{fieldInfo.Name}");
-                _fieldInfos.Add(fieldInfo);
-            }
-        }
-
-        return _fieldInfos;
-    }
-
     public JObject GetConfigJObject()
     {
         var jObject = new JObject();
@@ -456,7 +435,6 @@ public class Plugin
 
         File.WriteAllText(config1.FullName,
             JsonConvert.SerializeObject(GetConfigJObject(), Formatting.Indented));
-        _dll = null;
 
         PluginOverall.SearchActions.Remove($"{PluginInfo.ToPlgString()}");
         PluginOverall.CustomScenarioNodeMethods.Remove($"{PluginInfo.ToPlgString()}");

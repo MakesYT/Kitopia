@@ -10,11 +10,19 @@ namespace Core.SDKs.Services.Plugin;
 public class AssemblyLoadContextH : AssemblyLoadContext
 {
     private readonly AssemblyDependencyResolver _resolver;
+    private Assembly _assembly;
 
     public AssemblyLoadContextH(string pluginPath, string name) : base(isCollectible: true, name: name)
     {
         _resolver = new AssemblyDependencyResolver(pluginPath);
+        _assembly = this.LoadFromAssemblyPath(pluginPath);
+        Unloading += (sender) =>
+        {
+            _assembly = null;
+        };
     }
+
+    public Assembly Assembly => _assembly;
 
     protected override Assembly Load(AssemblyName assemblyName)
     {

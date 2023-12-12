@@ -1,6 +1,7 @@
 ﻿#region
 
 using System.IO;
+using System.Runtime.CompilerServices;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.Services.Config;
 using log4net;
@@ -16,6 +17,7 @@ public class PluginManager
 
     public static Dictionary<string, Plugin> EnablePlugin = new();
 
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public static void Init()
     {
         Kitopia.ISearchItemTool = (ISearchItemTool)ServiceManager.Services.GetService(typeof(ISearchItemTool))!;
@@ -33,7 +35,7 @@ public class PluginManager
             if (File.Exists($"{directoryInfo.FullName}\\{directoryInfo.Name}.dll"))
             {
                 Log.Debug($"加载插件:{directoryInfo.Name}.dll");
-                var pluginInfoEx = Plugin.GetPluginInfoEx($"{directoryInfo.FullName}\\{directoryInfo.Name}.dll",
+                var pluginInfoEx = PluginExTool.GetPluginInfoEx($"{directoryInfo.FullName}\\{directoryInfo.Name}.dll",
                     out var alcWeakRef);
 
 
@@ -47,13 +49,16 @@ public class PluginManager
                 {
                     if (ConfigManger.Config.EnabledPluginInfos.Contains(pluginInfoEx.ToPluginInfo()))
                     {
-                        Task.Run(() =>
-                        {
-                            Plugin.Load(pluginInfoEx);
-                        }).Wait();
+                        LoadPlugin(pluginInfoEx.ToPlgString(), pluginInfoEx.Path);
                     }
                 }
             }
         }
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void LoadPlugin(string name, string path)
+    {
+        PluginManager.EnablePlugin.Add(name, new Plugin(path));
     }
 }

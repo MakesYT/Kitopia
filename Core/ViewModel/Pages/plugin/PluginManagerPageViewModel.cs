@@ -40,7 +40,7 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
             if (File.Exists($"{directoryInfo.FullName}\\{directoryInfo.Name}.dll"))
             {
                 Log.Debug($"加载插件Info:{directoryInfo.Name}.dll");
-                var pluginInfoEx = Plugin.GetPluginInfoEx($"{directoryInfo.FullName}\\{directoryInfo.Name}.dll",
+                var pluginInfoEx = PluginExTool.GetPluginInfoEx($"{directoryInfo.FullName}\\{directoryInfo.Name}.dll",
                     out var alcWeakRef);
                 if (pluginInfoEx.Version != "error")
                 {

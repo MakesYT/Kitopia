@@ -21,7 +21,6 @@ using Core.ViewModel.Pages;
 using Core.ViewModel.Pages.customScenario;
 using Core.ViewModel.Pages.plugin;
 using Core.ViewModel.TaskEditor;
-using Kitopia.SDKs;
 using Kitopia.Services;
 using Kitopia.View;
 using Kitopia.View.Pages;
@@ -147,7 +146,6 @@ public sealed partial class App : Application
 
             AppDomain.CurrentDomain.ProcessExit += Application_ApplicationExit;
             ServiceManager.Services = ConfigureServices();
-
             log.Info("Ioc初始化完成");
             ConfigManger.Init();
             log.Info("配置文件初始化完成");
@@ -158,7 +156,7 @@ public sealed partial class App : Application
             log.Debug("注册热键");
             SystemEvents.InvokeOnEventsThread(() =>
             {
-                MouseHookHelper.InsertMouseHook();
+                // MouseHookHelper.InsertMouseHook();
             });
 
             var initWindow = ServiceManager.Services.GetService<MainWindow>();
