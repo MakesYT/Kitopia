@@ -5,7 +5,7 @@ namespace Core.SDKs.Services.Plugin;
 
 public static class PluginExTool
 {
-    public static PluginInfoEx GetPluginInfoEx(string assemblyPath, out WeakReference alcWeakRef)
+    public static PluginInfo GetPluginInfoEx(string assemblyPath, out WeakReference alcWeakRef)
     {
         var alc = new AssemblyLoadContextH(assemblyPath, "pluginInfo");
 
@@ -19,7 +19,7 @@ public static class PluginExTool
 
         // Get the plugin interface by calling the PluginClass.GetInterface method via reflection.
         var t = a.GetExportedTypes();
-        var pluginInfoEx = new PluginInfoEx() { Version = "error" };
+        var pluginInfoEx = new PluginInfo() { Version = "error" };
         foreach (var type in t)
         {
             if (type.GetInterface("IPlugin") != null)
@@ -28,7 +28,7 @@ public static class PluginExTool
 
                 if (ConfigManger.Config.EnabledPluginInfos.Contains(pluginInfo))
                 {
-                    pluginInfoEx = new PluginInfoEx()
+                    pluginInfoEx = new PluginInfo()
                     {
                         Author = pluginInfo.Author,
                         Error = "",
@@ -62,7 +62,7 @@ public static class PluginExTool
                              return false;
                          })) //有这个插件但是版本不对
                 {
-                    pluginInfoEx = new PluginInfoEx()
+                    pluginInfoEx = new PluginInfo()
                     {
                         Author = pluginInfo.Author,
                         Error = "插件版本不一致",
@@ -78,7 +78,7 @@ public static class PluginExTool
                 }
                 else
                 {
-                    pluginInfoEx = new PluginInfoEx()
+                    pluginInfoEx = new PluginInfo()
                     {
                         Author = pluginInfo.Author,
                         Error = "",
