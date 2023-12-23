@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Core.SDKs.CustomScenario;
-using Core.SDKs.Services.Config;
 using Core.SDKs.Tools;
 using log4net;
 using Newtonsoft.Json;
@@ -37,7 +36,9 @@ public class Plugin
         {
             if (type.GetInterface("IPlugin") != null)
             {
-                PluginInfo = (PluginInfo)type.GetField("PluginInfo").GetValue(null);
+                var PluginInfo = (PluginInfo)type.GetField("PluginInfo").GetValue(null);
+                PluginInfo.Path = path;
+                this.PluginInfo = PluginInfo;
                 Log.Debug($"加载插件:{PluginInfo.ToPlgString()}");
                 //var instance = Activator.CreateInstance(type);
                 ServiceProvider = (IServiceProvider)type.GetMethod("GetServiceProvider").Invoke(null, null);
@@ -130,20 +131,6 @@ public class Plugin
         return $"{PluginInfo.Author}_{PluginInfo.PluginId}/{methodInfo.DeclaringType!.FullName}/{methodInfo.Name}{sb}";
     }
 
-    public bool IsMyType(string typeName)
-    {
-        foreach (var type in _dll.GetTypes())
-        {
-            if (type.FullName == typeName)
-            {
-                return true;
-            }
-        }
-
-        return false;
-        return _dll.GetTypes().Any(t => t.FullName == typeName);
-    }
-
     public Type GetType(string typeName)
     {
         foreach (var type in _dll.GetTypes())
@@ -155,106 +142,6 @@ public class Plugin
         }
 
         return null;
-    }
-
-    // private Dictionary<Type, object>? _instance = new();
-    public static PluginInfoEx GetPluginInfoEx(string assemblyPath, out WeakReference alcWeakRef)
-    {
-        var alc = new AssemblyLoadContextH(assemblyPath, "pluginInfo");
-
-        // Create a weak reference to the AssemblyLoadContext that will allow us to detect
-        // when the unload completes.
-        alcWeakRef = new WeakReference(alc);
-
-        // Load the plugin assembly into the HostAssemblyLoadContext.
-        // NOTE: the assemblyPath must be an absolute path.
-        var a = alc.LoadFromAssemblyPath(assemblyPath);
-
-        // Get the plugin interface by calling the PluginClass.GetInterface method via reflection.
-        var t = a.GetExportedTypes();
-        var pluginInfoEx = new PluginInfoEx() { Version = "error" };
-        foreach (var type in t)
-        {
-            if (type.GetInterface("IPlugin") != null)
-            {
-                var pluginInfo = (PluginInfo)type.GetField("PluginInfo").GetValue(null);
-
-                if (ConfigManger.Config.EnabledPluginInfos.Contains(pluginInfo))
-                {
-                    pluginInfoEx = new PluginInfoEx()
-                    {
-                        Author = pluginInfo.Author,
-                        Error = "",
-                        IsEnabled = false,
-                        Path = assemblyPath,
-                        PluginId = pluginInfo.PluginId,
-                        PluginName = pluginInfo.PluginName,
-                        Description = pluginInfo.Description,
-                        Version = pluginInfo.Version,
-                        VersionInt = pluginInfo.VersionInt
-                    };
-                    break;
-                }
-                else if (ConfigManger.Config.EnabledPluginInfos.Exists(e =>
-                         {
-                             if (e.PluginName != pluginInfo.PluginName)
-                             {
-                                 return false;
-                             }
-
-                             if (e.Author != pluginInfo.Author)
-                             {
-                                 return false;
-                             }
-
-                             if (e.VersionInt != pluginInfo.VersionInt)
-                             {
-                                 return true;
-                             }
-
-                             return false;
-                         })) //有这个插件但是版本不对
-                {
-                    pluginInfoEx = new PluginInfoEx()
-                    {
-                        Author = pluginInfo.Author,
-                        Error = "插件版本不一致",
-                        IsEnabled = false,
-                        Path = assemblyPath,
-                        PluginId = pluginInfo.PluginId,
-                        PluginName = pluginInfo.PluginName,
-                        Description = pluginInfo.Description,
-                        Version = pluginInfo.Version,
-                        VersionInt = pluginInfo.VersionInt
-                    };
-                    break;
-                }
-                else
-                {
-                    pluginInfoEx = new PluginInfoEx()
-                    {
-                        Author = pluginInfo.Author,
-                        Error = "",
-                        IsEnabled = false,
-                        Path = assemblyPath,
-                        PluginId = pluginInfo.PluginId,
-                        PluginName = pluginInfo.PluginName,
-                        Description = pluginInfo.Description,
-                        Version = pluginInfo.Version,
-                        VersionInt = pluginInfo.VersionInt
-                    };
-                    break;
-                }
-            }
-        }
-
-        //Console.WriteLine($"Response from the plugin: GetVersion(): {pluginInfoEx.PluginId}");
-
-
-        // This initiates the unload of the HostAssemblyLoadContext. The actual unloading doesn't happen
-        // right away, GC has to kick in later to collect all the stuff.
-        alc.Unload();
-        return pluginInfoEx;
     }
 
     private object GetPointItemByMethodInfo(MethodInfo methodInfo)
@@ -399,19 +286,13 @@ public class Plugin
         return jObject;
     }
 
-    [MethodImpl(MethodImplOptions.NoOptimization)]
-    public static void LoadBypath(string name, string path) =>
-        PluginManager.EnablePlugin.Add(name,
-            new Plugin(path));
-
     [MethodImpl(MethodImplOptions.NoInlining)]
-    public static void UnloadByPluginInfo(PluginInfoEx pluginInfoEx, out WeakReference weakReference)
+    public static void UnloadByPluginInfo(string pluginInfoEx, out WeakReference weakReference)
     {
-        if (PluginManager.EnablePlugin.TryGetValue(pluginInfoEx.ToPlgString(),
-                out var plugin))
+        if (PluginManager.EnablePlugin.ContainsKey(pluginInfoEx))
         {
             {
-                plugin.Unload(out weakReference);
+                PluginManager.EnablePlugin[pluginInfoEx].Unload(out weakReference);
 
                 return;
             }
@@ -421,7 +302,7 @@ public class Plugin
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    public static void Load(PluginInfoEx pluginInfoEx)
+    public static void Load(PluginInfo pluginInfoEx)
     {
         PluginManager.EnablePlugin.Add(pluginInfoEx.ToPlgString(),
             new Plugin(pluginInfoEx.Path));

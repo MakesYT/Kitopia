@@ -9,6 +9,7 @@ using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
 using log4net;
+using PluginCore;
 
 #endregion
 
@@ -18,7 +19,7 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(PluginManagerPageViewModel));
     private readonly TaskScheduler _scheduler = TaskScheduler.FromCurrentSynchronizationContext();
-    [ObservableProperty] private BindingList<PluginInfoEx> _items = new();
+    [ObservableProperty] private BindingList<PluginInfo> _items = new();
 
     public PluginManagerPageViewModel()
     {
@@ -39,8 +40,7 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
         {
             if (File.Exists($"{directoryInfo.FullName}\\{directoryInfo.Name}.dll"))
             {
-                Log.Debug($"加载插件Info:{directoryInfo.Name}.dll");
-                var pluginInfoEx = PluginExTool.GetPluginInfoEx($"{directoryInfo.FullName}\\{directoryInfo.Name}.dll",
+                var pluginInfoEx = PluginInfoTool.GetPluginInfoEx($"{directoryInfo.FullName}\\{directoryInfo.Name}.dll",
                     out var alcWeakRef);
                 if (pluginInfoEx.Version != "error")
                 {
@@ -65,14 +65,13 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    public void Switch(PluginInfoEx pluginInfoEx)
+    public void Switch(PluginInfo pluginInfoEx)
     {
         if (pluginInfoEx.IsEnabled)
         {
             //卸载插件
 
-
-            Plugin.UnloadByPluginInfo(pluginInfoEx, out var weakReference);
+            Plugin.UnloadByPluginInfo(pluginInfoEx.ToPlgString(), out var weakReference);
             PluginManager.EnablePlugin.Remove(pluginInfoEx.ToPlgString());
             while (weakReference.IsAlive)
             {
@@ -80,7 +79,9 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
                 GC.WaitForPendingFinalizers();
             }
 
-            ConfigManger.Config.EnabledPluginInfos.Remove(pluginInfoEx.ToPluginInfo());
+            ConfigManger.Config.EnabledPluginInfos.RemoveAll(e =>
+                e.PluginId == pluginInfoEx.PluginId && e.Author == pluginInfoEx.Author &&
+                e.VersionInt == pluginInfoEx.VersionInt);
             ConfigManger.Save();
             pluginInfoEx.IsEnabled = false;
             Items.ResetBindings();
@@ -92,7 +93,7 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
             //Plugin.NewPlugin(pluginInfoEx.Path, out var weakReference);
             PluginManager.EnablePlugin.Add(pluginInfoEx.ToPlgString(),
                 new Plugin(pluginInfoEx.Path));
-            ConfigManger.Config.EnabledPluginInfos.Add(pluginInfoEx.ToPluginInfo());
+            ConfigManger.Config.EnabledPluginInfos.Add(pluginInfoEx);
             ConfigManger.Save();
             pluginInfoEx.IsEnabled = true;
             Items.ResetBindings();
@@ -101,7 +102,7 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    public void ToPluginSettingPage(PluginInfoEx pluginInfoEx)
+    public void ToPluginSettingPage(PluginInfo pluginInfoEx)
     {
         if (!pluginInfoEx.IsEnabled)
         {

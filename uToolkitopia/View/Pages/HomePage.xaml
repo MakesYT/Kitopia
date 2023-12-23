@@ -18,5 +18,8 @@
     </Page.Resources>
     <StackPanel>
         <kitopia:HotKeyShow Command="{Binding ClickCommand}" />
+        <ui:Button Content="加载插件" HorizontalAlignment="Stretch" Click="Button_OnClick"/>
+        <ui:Button Content="卸载插件" HorizontalAlignment="Stretch" Click="Button_OnClick2"/>
+        <ui:Button Content="GC" HorizontalAlignment="Stretch" Click="Button_OnClick3"/>
     </StackPanel>
 </Page>

@@ -3,7 +3,7 @@
 using System;
 using System.Globalization;
 using System.Windows.Data;
-using Core.SDKs.Services.Plugin;
+using PluginCore;
 
 #endregion
 
@@ -13,12 +13,12 @@ public class PluginInfoToInfo : IValueConverter
 {
     public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        if (value is not PluginInfoEx)
+        if (value is not PluginInfo)
         {
             return null;
         }
 
-        var item = (PluginInfoEx)value;
+        var item = (PluginInfo)value;
         return $"ID:{item.PluginId},作者:{item.Author},版本:{item.Version}";
     }
 
