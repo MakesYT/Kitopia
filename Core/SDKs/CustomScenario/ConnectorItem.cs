@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel;
-using System.Windows;
+using Avalonia;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.Services.Config;

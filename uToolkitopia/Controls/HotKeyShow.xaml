@@ -181,7 +181,7 @@
             </Setter.Value>
             
         </Setter>
-    </Style>
+    </Style>No
 
     <Style BasedOn="{StaticResource DefaultHotKeyShowStyle}" TargetType="{x:Type controls:HotKeyShow}" />
 </ResourceDictionary>

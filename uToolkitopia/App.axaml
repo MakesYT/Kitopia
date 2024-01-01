@@ -1,0 +1,32 @@
+﻿<Application x:Class="Kitopia.App"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:crt="clr-namespace:Kitopia.Converter"
+             xmlns:c="clr-namespace:Kitopia.Assets">
+    <Application.Resources>
+
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <MergeResourceInclude Source="Assets/ColorDr.xaml" />
+                <c:ColorD />
+                <MergeResourceInclude Source="Controls/SettingItems.xaml" />
+                <MergeResourceInclude Source="Controls/PinButton.xaml" />
+                <MergeResourceInclude Source="Controls/MessageBoxControl/MessageBox.xaml" />
+                <MergeResourceInclude Source="Controls/HotKeyShow.xaml" />
+                <MergeResourceInclude Source="Controls/HotKeyShowItme.xaml" />
+                <MergeResourceInclude Source="Controls/SearchItemShow.xaml" />
+                
+            </ResourceDictionary.MergedDictionaries>
+            <crt:DoubleHalfConverter x:Key="doubleHalfConverter" />
+            <crt:DoubleQuarterConverter x:Key="doubleQuarterConverter" />
+            <crt:ReverseBoolToVisibilityConverter x:Key="reverseBoolToVisibilityConverter" />
+            <crt:BoolToVisibilityConverter x:Key="boolToVisibilityConverter" />
+            <crt:ReverseBool x:Key="ReverseBool" />
+            <crt:IntToIconSymbol x:Key="IntToIconSymbol" />
+
+
+           
+        </ResourceDictionary>
+
+    </Application.Resources>
+</Application>

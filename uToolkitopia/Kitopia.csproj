@@ -4,7 +4,6 @@
         <OutputType>WinExe</OutputType>
         <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
         <Nullable>enable</Nullable>
-        <UseWPF>true</UseWPF>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
@@ -18,84 +17,25 @@
         <DebugType>none</DebugType>
     </PropertyGroup>
 
-    <ItemGroup>
-        <None Remove="log4net.config"/>
-        <None Remove="bin\Debug\net7.0-windows10.0.19041.0\**"/>
-    </ItemGroup>
 
     <ItemGroup>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\CommunityToolkit.Mvvm.dll"/>
         <Content Include="bin\Debug\net8.0-windows10.0.19041.0\configs\config.json"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\configs\Kitopia_KitopiaEx.json"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\configs\_.json"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Core.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Core.pdb"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Everything32.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Everything64.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Interop.IWshRuntimeLibrary.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Kitopia.deps.json"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Kitopia.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Kitopia.exe"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Kitopia.pdb"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Kitopia.runtimeconfig.json"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\log4net.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\logs\20231223.log"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\logs\20231223.log.1"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\logs\20231223.log.2"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Microsoft.Extensions.DependencyInjection.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Microsoft.Toolkit.Uwp.Notifications.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Microsoft.Windows.SDK.NET.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Microsoft.Xaml.Behaviors.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Newtonsoft.Json.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Nodify.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Nodify.pdb"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\noUAC\noUAC.Everything.lnk"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\NPinyinPro.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\PluginCore.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\PluginCore.pdb"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\plugins\KitopiaEx\KitopiaEx.deps.json"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\plugins\KitopiaEx\KitopiaEx.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\plugins\KitopiaEx\KitopiaEx.pdb"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\plugins\KitopiaEx\KitopiaEx.runtimeconfig.json"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\plugins\KitopiaEx\Microsoft.Extensions.DependencyInjection.Abstractions.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\plugins\KitopiaEx\Microsoft.Extensions.DependencyInjection.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\plugins\KitopiaEx\Microsoft.Windows.SDK.NET.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\plugins\KitopiaEx\WinRT.Runtime.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\runtimes\win\lib\net8.0\System.Management.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\System.Management.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Vanara.Core.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Vanara.PInvoke.ComCtl32.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Vanara.PInvoke.Cryptography.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Vanara.PInvoke.FirewallApi.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Vanara.PInvoke.Gdi32.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Vanara.PInvoke.Kernel32.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Vanara.PInvoke.NetApi32.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Vanara.PInvoke.NetListMgr.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Vanara.PInvoke.Ole.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Vanara.PInvoke.Rpc.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Vanara.PInvoke.SearchApi.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Vanara.PInvoke.Security.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Vanara.PInvoke.Shared.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Vanara.PInvoke.Shell32.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Vanara.PInvoke.ShlwApi.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Vanara.PInvoke.User32.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Vanara.PInvoke.Ws2_32.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Vanara.Windows.Shell.Common.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Vanara.Windows.Shell.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\WindowsInput.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\WinRT.Runtime.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Wpf.Ui.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Wpf.Ui.pdb"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Wpf.Ui.Tray.dll"/>
-        <Content Include="bin\Debug\net8.0-windows10.0.19041.0\Wpf.Ui.Tray.pdb"/>
+
         <EmbeddedResource Include="log4net.config">
             <CopyToOutputDirectory>Never</CopyToOutputDirectory>
         </EmbeddedResource>
-        <EmbeddedResource Remove="bin\Debug\net7.0-windows10.0.19041.0\**"/>
+
+        <EmbeddedResource Remove="bin\Debug\net8.0-windows10.0.19041.0\runtimes\**"/>
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Avalonia" Version="11.0.6"/>
+        <PackageReference Include="Avalonia.Desktop" Version="11.0.6"/>
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.6"/>
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.6"/>
+        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.6"/>
+        <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.6"/>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2"/>
         <PackageReference Include="log4net" Version="2.0.15"/>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0"/>
@@ -107,14 +47,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\nodify\Nodify\Nodify.csproj"/>
-        <ProjectReference Include="..\..\wpfui\src\Wpf.Ui.Tray\Wpf.Ui.Tray.csproj"/>
-        <ProjectReference Include="..\..\wpfui\src\Wpf.Ui\Wpf.Ui.csproj"/>
         <ProjectReference Include="..\Core\Core.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="bin\Debug\net8.0-windows10.0.19041.0\customScenarios\"/>
         <Folder Include="bin\Debug\net8.0-windows10.0.19041.0\runtimes\win\lib\net7.0\"/>
         <Folder Include="Style\"/>
     </ItemGroup>
@@ -196,6 +132,15 @@
 
     <ItemGroup>
         <Compile Remove="bin\Debug\net7.0-windows10.0.19041.0\**"/>
+        <Compile Remove="bin\Debug\net8.0-windows10.0.19041.0\customScenarios\**"/>
+        <Compile Remove="bin\Debug\net8.0-windows10.0.19041.0\logs\**"/>
+        <Compile Remove="bin\Debug\net8.0-windows10.0.19041.0\noUAC\**"/>
+        <Compile Remove="bin\Debug\net8.0-windows10.0.19041.0\plugins\**"/>
+        <Compile Remove="bin\Debug\net8.0-windows10.0.19041.0\runtimes\**"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Remove="bin\Debug\net8.0-windows10.0.19041.0\runtimes\**"/>
     </ItemGroup>
 
 </Project>

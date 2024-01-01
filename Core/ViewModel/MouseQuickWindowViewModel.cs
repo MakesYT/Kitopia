@@ -1,5 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using System.Windows;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Core.SDKs.Services;
@@ -65,7 +65,7 @@ public partial class MouseQuickWindowViewModel : ObservableRecipient
         {
             ServiceManager.Services.GetService<ISearchItemChooseService>()!.Choose((item) =>
             {
-                Application.Current.Dispatcher.BeginInvoke(() =>
+                Dispatcher.UIThread.InvokeAsync(() =>
                 {
                     Items.Add(item);
                 });

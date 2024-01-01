@@ -3,18 +3,15 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Threading;
 using System.Windows;
-using System.Windows.Interop;
+using System.Windows.Navigation;
 using System.Windows.Threading;
+using Avalonia.Markup.Xaml;
 using CommunityToolkit.Mvvm.Messaging;
-using Core.SDKs.CustomScenario;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
-using Core.SDKs.Services.Plugin;
 using Core.SDKs.Tools;
 using Core.ViewModel;
 using Core.ViewModel.Pages;
@@ -26,15 +23,11 @@ using Kitopia.View;
 using Kitopia.View.Pages;
 using Kitopia.View.Pages.Plugin;
 using log4net;
-using log4net.Config;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Win32;
 using PluginCore;
 using Vanara.PInvoke;
-using Wpf.Ui;
+using Application = Avalonia.Application;
 using ContentDialogService = Kitopia.Services.ContentDialogService;
-using MessageBox = Kitopia.Controls.MessageBoxControl.MessageBox;
-using MessageBoxResult = Kitopia.Controls.MessageBoxControl.MessageBoxResult;
 
 #endregion
 
@@ -76,116 +69,14 @@ public sealed partial class App : Application
         }
     }
 
-
-    protected override void OnStartup(StartupEventArgs e)
+    public override void Initialize()
     {
-        var eventWaitHandle = new EventWaitHandle(false, EventResetMode.AutoReset, "Kitopia", out var createNew);
-        if (!createNew)
-        {
-            var msg = new MessageBox();
-            msg.Title = "Kitopia";
-            msg.Content = "不能同时开启两个应用        ";
-            msg.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            msg.CloseButtonText = "确定";
-            msg.FontSize = 15;
-            msg.ShowDialogAsync().Wait();
-            eventWaitHandle.Set();
-            Environment.Exit(0);
-        }
-        else
-        {
-            log.Info("程序启动");
-            ThreadPool.RegisterWaitForSingleObject(eventWaitHandle, (_, _) =>
-            {
-                Dispatcher.Invoke(() =>
-                {
-                    ServiceManager.Services.GetService<SearchWindow>()!.Show();
-                    User32.SetForegroundWindow(
-                        new WindowInteropHelper(ServiceManager.Services.GetService<SearchWindow>()!)
-                            .Handle);
-
-                    ServiceManager.Services.GetService<SearchWindow>()!.tx.Focus();
-                });
-            }, null, -1, false);
-            log.Info("注册EventWaitHandle");
-            var appReloadEventWaitHandle =
-                new EventWaitHandle(false, EventResetMode.AutoReset, "Kitopia_appReload", out var appReload);
-            if (!appReload)
-            {
-                var msg = new MessageBox();
-                msg.Title = "Kitopia";
-                msg.Content = "右键菜单捕获出现异常,\n请关闭软件重试,将会导致部分功能异常        ";
-                msg.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-                msg.CloseButtonText = "确定";
-                msg.FontSize = 15;
-                var task = msg.ShowDialogAsync();
-                // 使用ContinueWith来在任务完成后执行一个回调函数
-                task.Wait();
-            }
-            else
-            {
-                ThreadPool.RegisterWaitForSingleObject(appReloadEventWaitHandle, (_, _) =>
-                {
-                    ServiceManager.Services.GetService<SearchWindowViewModel>()!.ReloadApps();
-                }, null, -1, false);
-            }
-
-            var assembly = Assembly.GetExecutingAssembly();
-            var logConfigStream = assembly.GetManifestResourceStream("Kitopia.log4net.config")!;
-
-            XmlConfigurator.Configure(logConfigStream);
-#if !DEBUG
-            log.Info("异常捕获");
-            DispatcherUnhandledException += App_DispatcherUnhandledException;
-            Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-#endif
-
-
-            CheckAndDeleteLogFiles();
-
-            AppDomain.CurrentDomain.ProcessExit += Application_ApplicationExit;
-            ServiceManager.Services = ConfigureServices();
-            log.Info("Ioc初始化完成");
-            ConfigManger.Init();
-            log.Info("配置文件初始化完成");
-            PluginManager.Init();
-            log.Info("插件管理器初始化完成");
-            CustomScenarioManger.Init();
-            log.Info("场景管理器初始化完成");
-            log.Debug("注册热键");
-            SystemEvents.InvokeOnEventsThread(() =>
-            {
-                // MouseHookHelper.InsertMouseHook();
-            });
-
-            var initWindow = ServiceManager.Services.GetService<MainWindow>();
-            typeof(Window).GetMethod("VerifyContextAndObjectState", BindingFlags.NonPublic | BindingFlags.Instance)!
-                .Invoke(initWindow, null);
-            typeof(Window).GetMethod("VerifyCanShow", BindingFlags.NonPublic | BindingFlags.Instance)!
-                .Invoke(initWindow, null);
-            typeof(Window).GetMethod("VerifyNotClosing", BindingFlags.NonPublic | BindingFlags.Instance)!
-                .Invoke(initWindow, null);
-            typeof(Window).GetMethod("VerifyConsistencyWithAllowsTransparency",
-                    BindingFlags.NonPublic | BindingFlags.Instance,
-                    null, new Type[] { }, null)!
-                .Invoke(initWindow, null);
-            typeof(Window).GetMethod("UpdateVisibilityProperty", BindingFlags.NonPublic | BindingFlags.Instance)!
-                .Invoke(initWindow, new object?[] { Visibility.Visible });
-            ShowHelper(initWindow!);
-            initWindow!.Hide();
-            Current.MainWindow = initWindow;
-            ServicePointManager.DefaultConnectionLimit = 10240;
-
-            if (ConfigManger.Config.autoStart)
-            {
-                log.Info("设置开机自启");
-                SetAutoStartup();
-            }
-
-            base.OnStartup(e);
-        }
+        OnStartup();
+        AvaloniaXamlLoader.Load(this);
+        base.Initialize();
+        DataContext = new MainViewModel();
     }
+
 
     private object? ShowHelper(Window window)
     {
@@ -222,85 +113,6 @@ public sealed partial class App : Application
         log.Info("程序退出");
     }
 
-    private void SetAutoStartup()
-    {
-        var strName = AppDomain.CurrentDomain.BaseDirectory + "Kitopia.exe"; //获取要自动运行的应用程序名
-        if (!File.Exists(strName)) //判断要自动运行的应用程序文件是否存在
-        {
-            return;
-        }
-
-        var registry =
-            Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run", true); //检索指定的子项
-        if (registry == null) //若指定的子项不存在
-        {
-            registry = Registry.CurrentUser.CreateSubKey(
-                "Software\\Microsoft\\Windows\\CurrentVersion\\Run"); //则创建指定的子项
-        }
-
-        if (registry.GetValue("Kitopia") is null)
-        {
-            var msg = new MessageBox();
-            msg.Title = "Kitopia";
-            msg.Content = "是否设置开机自启?\n可能被杀毒软件阻止      ";
-            msg.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            msg.CloseButtonText = "取消";
-            msg.PrimaryButtonText = "确定";
-            msg.FontSize = 15;
-            var task = msg.ShowDialogAsync();
-            // 使用ContinueWith来在任务完成后执行一个回调函数
-            task.ContinueWith(e =>
-            {
-                var result = e.Result;
-                switch (result)
-                {
-                    case MessageBoxResult.Primary:
-                    {
-                        log.Info("用户确认启用开机自启");
-                        try
-                        {
-                            registry.SetValue("Kitopia", $"\"{strName}\""); //设置该子项的新的“键值对”
-                            ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show("开机自启",
-                                "开机自启设置成功");
-                        }
-                        catch (Exception exception)
-                        {
-                            log.Error("开机自启设置失败");
-                            log.Error(exception.StackTrace);
-                            ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show("开机自启",
-                                "开机自启设置失败,请检查杀毒软件后重试");
-                        }
-
-                        break;
-                    }
-                    case MessageBoxResult.None:
-                    {
-                        log.Info("用户取消启用开机自启");
-                        break;
-                    }
-                }
-            });
-        }
-        else if (!registry.GetValue("Kitopia").Equals($"\"{strName}\""))
-        {
-            try
-            {
-                registry.SetValue("Kitopia", $"\"{strName}\""); //设置该子项的新的“键值对”
-                ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show("开机自启", "开机自启设置成功");
-            }
-            catch (Exception exception)
-            {
-                log.Error("开机自启设置失败");
-                log.Error(exception.StackTrace);
-                ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show("开机自启",
-                    "开机自启设置失败,请检查杀毒软件后重试");
-            }
-        }
-        else
-        {
-            log.Debug("程序自启已存在");
-        }
-    }
 
     /// <summary>
     ///     Configures the services for the application.

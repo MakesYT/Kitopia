@@ -1,0 +1,131 @@
+﻿<windowing:AppWindow xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:windowing="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
+        xmlns:controls="clr-namespace:KitopiaAvalonia.Controls"
+        xmlns:controls1="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="KitopiaAvalonia.Windows.HotKeyEditorWindow"
+        KeyDown="HotKeyEditorWindow_OnKeyDown"
+        KeyUp="HotKeyEditorWindow_OnKeyUp"
+        Title="HotKeyEditorWindow">
+    <Grid>
+        <Grid Focusable="False">
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Offset="0.0" Color="#CF202020" />
+                    <GradientStop Offset="1.0" Color="#8F202020" />
+                </LinearGradientBrush>
+            </Grid.Background>
+
+            <Border
+                Focusable="False"
+                Opacity="1">
+                <Border.Background>
+                    <SolidColorBrush Color="{DynamicResource SystemFillColorSolidNeutralBackground}" />
+                </Border.Background>
+                <Border.Effect>
+                    <DropShadowEffect
+                        BlurRadius="30"
+                        Opacity="0.4"
+                        Color="#202020" />
+                </Border.Effect>
+
+                <Grid Focusable="False">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid
+                        Grid.Row="0"
+                        Margin="24,10"
+                        Focusable="False">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock
+                                Margin="0,10,0,0"
+                                TextWrapping="WrapWithOverflow"
+                                Text="修改快捷键"
+                                FontSize="20"
+                                FontWeight="SemiBold" />
+                            <TextBlock
+                                x:Name="Name"
+                                Margin="0,10,0,0"
+                                TextWrapping="WrapWithOverflow"
+                                Text="快捷键"
+                                FontSize="15" />
+                            <TextBlock
+                                Margin="0,10,0,0"
+                                TextWrapping="WrapWithOverflow"
+                                Text="按下快捷键以修改"
+                                FontSize="15" />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center"
+                                    VerticalAlignment="Center">
+
+
+                            <controls:HotKeyShowItme x:Name="Ctrl" IsVisible="False"
+                                                     FontSize="20" Content="Ctrl" Margin="0" Height="64" />
+                            <controls:HotKeyShowItme x:Name="Win" Height="64"
+                                                     IsVisible="False"
+                                                     Margin="5,0,0,0">
+                                <controls:HotKeyShowItme.Icon>
+                                    <controls1:IconSourceElement IconSource="{StaticResource WinImageIcon}" Width="26"
+                                                                 Height="26" />
+                                </controls:HotKeyShowItme.Icon>
+                            </controls:HotKeyShowItme>
+                            <controls:HotKeyShowItme x:Name="Shift" FontSize="20"
+                                                     IsVisible="False"
+                                                     Content="Shift" Margin="5,0,0,0" Height="64" />
+                            <controls:HotKeyShowItme x:Name="Alt"  FontSize="20" Content="Alt"
+                                                     Margin="5,0,0,0" IsVisible="False"
+                                                     Height="64" />
+                            <controls:HotKeyShowItme x:Name="KeyName" FontSize="20"
+                                                     Margin="5,0,20,0" Height="64" />
+
+
+                        </StackPanel>
+
+
+                    </Grid>
+
+                    <Border
+                        Grid.Row="1"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Bottom"
+                        Focusable="False">
+
+                        <Border.Background>
+                            <SolidColorBrush Color="{DynamicResource ControlFillColorDefault}" />
+                        </Border.Background>
+                        <StackPanel>
+                            <Grid Margin="20"  ColumnDefinitions="*,*,*" ColumnSpan="8">
+                                <Button
+                                    Grid.Column="2"
+                                    HorizontalAlignment="Stretch"
+                                    Classes="accent"
+                                    Content="确认"
+                                    Click="ButtonBase_OnClick" />
+
+                                <Button
+                                    Grid.Column="0"
+                                    HorizontalAlignment="Stretch"
+                                    Content="取消"
+                                    Click="ButtonCancle_OnClick"
+                                    IsCancel="True" />
+
+                            </Grid>
+                        </StackPanel>
+
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</windowing:AppWindow>

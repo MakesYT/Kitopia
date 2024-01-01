@@ -4,7 +4,6 @@
         <TargetFramework>net8.0-windows</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <UseWPF>true</UseWPF>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -28,6 +27,12 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Avalonia" Version="11.0.6"/>
+        <PackageReference Include="Avalonia.Desktop" Version="11.0.6"/>
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.6"/>
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.6"/>
+        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.6"/>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2"/>
         <PackageReference Include="InputSimulator" Version="1.0.4"/>
         <PackageReference Include="log4net" Version="2.0.15"/>
@@ -59,8 +64,6 @@
 
 
     <ItemGroup>
-        <ProjectReference Include="..\..\nodify\Nodify\Nodify.csproj"/>
-        <ProjectReference Include="..\..\wpfui\src\Wpf.Ui\Wpf.Ui.csproj"/>
         <ProjectReference Include="..\PluginCore\PluginCore.csproj"/>
     </ItemGroup>
 

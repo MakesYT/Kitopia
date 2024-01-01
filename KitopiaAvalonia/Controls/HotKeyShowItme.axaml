@@ -1,0 +1,58 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:KitopiaAvalonia.Controls"
+        xmlns:controls1="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia">
+    <Design.PreviewWith>
+        <controls:HotKeyShowItme Content="Ctrl" />
+    </Design.PreviewWith>
+
+    <Style Selector="controls|HotKeyShowItme">
+        <!-- Set Defaults -->
+        <Setter Property="Template">
+            <ControlTemplate>
+                <controls1:FABorder Background="{DynamicResource AccentButtonBackground}"
+                             BorderBrush="{DynamicResource AccentButtonBorderBrush}"
+                             BorderThickness="{DynamicResource ButtonBorderThemeThickness}"
+                             CornerRadius="{DynamicResource ControlCornerRadius}"
+                             Name="Root">
+                    <Border
+                        x:Name="ContentBorder"
+                        Width="{TemplateBinding Width}"
+                        Height="{TemplateBinding Height}"
+                        MinWidth="{TemplateBinding MinWidth}"
+                        MinHeight="{TemplateBinding MinHeight}"
+                        Padding="{StaticResource ButtonPadding}"
+                        HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                        VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                        CornerRadius="{TemplateBinding Border.CornerRadius}">
+                        
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <ContentPresenter
+                                    x:Name="ControlIcon"
+                                    Grid.Column="0"
+                                    VerticalAlignment="Center"
+                                    Content="{TemplateBinding Icon}"
+                                    Foreground="{DynamicResource AccentButtonForeground}"
+                                    Focusable="False" />
+
+                                <ContentPresenter
+                                    x:Name="ContentPresenter"
+                                    Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    Content="{TemplateBinding Content}"
+                                    Foreground="{DynamicResource AccentButtonForeground}" />
+                            </Grid>
+                        
+                    </Border>
+                </controls1:FABorder>
+                    
+                
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>

@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.IO;
 using System.Text;
 using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.HotKey;
@@ -138,13 +137,18 @@ public static class CustomScenarioManger
             var content = $"对应文件\n{fileInfo.FullName}\n情景所需的插件不存在\n需要来自作者{pluginName[0]}的插件{pluginName[1]}";
             deserializeObject.InitError = content;
             CustomScenarios.Add(deserializeObject);
-            ((IToastService)ServiceManager.Services!.GetService(typeof(IToastService))!).ShowMessageBoxW(
-                $"自定义情景\"{deserializeObject.Name}\"加载失败",
-                content, new
-                    ShowMessageContent("我知道了", null, "尝试在市场中自动安装", () =>
-                    {
-                        System.Windows.MessageBox.Show("未实现");
-                    }, null, null));
+            var dialog = new DialogContent()
+            {
+                Title = $"自定义情景\"{deserializeObject.Name}\"加载失败",
+                Content = content,
+                PrimaryButtonText = "尝试在市场中自动安装",
+                CloseButtonText = "我知道了",
+                PrimaryAction = () =>
+                {
+                }
+            };
+            ((IContentDialog)ServiceManager.Services!.GetService(typeof(IContentDialog))!).ShowDialogAsync(null,
+                dialog);
         }
     }
 

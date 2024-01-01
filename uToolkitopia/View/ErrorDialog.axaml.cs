@@ -2,8 +2,7 @@
 
 using System.Diagnostics;
 using System.IO;
-using System.Windows;
-using System.Windows.Media.Animation;
+using Avalonia.Controls;
 using log4net;
 
 #endregion

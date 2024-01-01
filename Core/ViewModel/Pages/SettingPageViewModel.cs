@@ -2,15 +2,15 @@
 
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
 using System.Runtime.InteropServices;
-using System.Windows;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Core.SDKs.HotKey;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using log4net;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using PluginCore;
 
@@ -22,49 +22,47 @@ public partial class SettingPageViewModel : ObservableRecipient
 {
     private static readonly ILog log = LogManager.GetLogger("SettingPageViewModel");
 
-    [ObservableProperty] private bool _autoStart = true;
-    [ObservableProperty] private bool _autoStartEverything = true;
+    [ObservableProperty] private bool _autoStart;
+    [ObservableProperty] private bool _autoStartEverything;
 
-    [ObservableProperty] private bool _canReadClipboard = true;
+    [ObservableProperty] private bool _canReadClipboard;
     [ObservableProperty] private BindingList<string> _ignoreItems;
-    [ObservableProperty] private int _inputSmoothingMilliseconds = 50;
-    private bool _isInitializing = false;
-    [ObservableProperty] private int _maxHistory = 4;
+    [ObservableProperty] private int _inputSmoothingMilliseconds;
+
+    private bool _isInitializin = true;
+    [ObservableProperty] private int _maxHistory;
 
     [ObservableProperty] private ObservableCollection<int> _maxHistoryOptions = new() { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-    [ObservableProperty] private MouseHookType _mouseKey = MouseHookType.鼠标中键按下;
+    [ObservableProperty] private MouseHookType _mouseKey;
 
-    [ObservableProperty] private int _mouseKeyInverval = 1000;
+    [ObservableProperty] private int _mouseKeyInverval;
 
     [ObservableProperty] private ObservableCollection<MouseHookType> _mouseKeyOptions = new()
         { MouseHookType.鼠标左键按下, MouseHookType.鼠标中键按下, MouseHookType.鼠标右键按下, MouseHookType.鼠标侧键1按下 };
 
-    [ObservableProperty] private string _themeChoice = "跟随系统";
+    [ObservableProperty] private string _themeChoice;
 
     [ObservableProperty] private ObservableCollection<string> _themeChoiceOptions = new() { "跟随系统", "深色", "浅色" };
-    [ObservableProperty] private bool _useEverything = true;
+    [ObservableProperty] private bool _useEverything;
 
     public SettingPageViewModel()
     {
-        Application.Current.Dispatcher.BeginInvoke(() =>
-        {
-            ThemeChoice = ConfigManger.Config.themeChoice;
-            AutoStart = ConfigManger.Config.autoStart;
-            AutoStartEverything = ConfigManger.Config.autoStartEverything;
-            UseEverything = ConfigManger.Config.useEverything;
-            MaxHistory = ConfigManger.Config.maxHistory;
-            CanReadClipboard = ConfigManger.Config.canReadClipboard;
-            IgnoreItems = new BindingList<string>(ConfigManger.Config.ignoreItems);
-            InputSmoothingMilliseconds = ConfigManger.Config.inputSmoothingMilliseconds;
-            MouseKey = ConfigManger.Config.mouseKey;
-            MouseKeyInverval = ConfigManger.Config.mouseKeyInverval;
-            _isInitializing = false;
-        });
+        _themeChoice = ConfigManger.Config.themeChoice;
+        _autoStart = ConfigManger.Config.autoStart;
+        _autoStartEverything = ConfigManger.Config.autoStartEverything;
+        _useEverything = ConfigManger.Config.useEverything;
+        _maxHistory = ConfigManger.Config.maxHistory;
+        _canReadClipboard = ConfigManger.Config.canReadClipboard;
+        _ignoreItems = new BindingList<string>(ConfigManger.Config.ignoreItems);
+        _inputSmoothingMilliseconds = ConfigManger.Config.inputSmoothingMilliseconds;
+        _mouseKey = ConfigManger.Config.mouseKey;
+        _mouseKeyInverval = ConfigManger.Config.mouseKeyInverval;
+        _isInitializin = false;
     }
 
     partial void OnMouseKeyChanged(MouseHookType value)
     {
-        if (_isInitializing)
+        if (_isInitializin)
         {
             return;
         }
@@ -76,7 +74,7 @@ public partial class SettingPageViewModel : ObservableRecipient
 
     partial void OnThemeChoiceChanged(string value)
     {
-        if (_isInitializing)
+        if (_isInitializin)
         {
             return;
         }
@@ -85,19 +83,19 @@ public partial class SettingPageViewModel : ObservableRecipient
         {
             case "跟随系统":
             {
-                ((IThemeChange)ServiceManager.Services.GetService(typeof(IThemeChange))).followSys(true);
+                ServiceManager.Services.GetService<IThemeChange>().followSys(true);
                 break;
             }
             case "深色":
             {
-                ((IThemeChange)ServiceManager.Services.GetService(typeof(IThemeChange))).followSys(false);
-                ((IThemeChange)ServiceManager.Services.GetService(typeof(IThemeChange))).changeTo("theme_dark");
+                ServiceManager.Services.GetService<IThemeChange>().followSys(false);
+                ServiceManager.Services.GetService<IThemeChange>().changeTo("theme_dark");
                 break;
             }
             case "浅色":
             {
-                ((IThemeChange)ServiceManager.Services.GetService(typeof(IThemeChange))).followSys(false);
-                ((IThemeChange)ServiceManager.Services.GetService(typeof(IThemeChange))).changeTo("theme_light");
+                ServiceManager.Services.GetService<IThemeChange>().followSys(false);
+                ServiceManager.Services.GetService<IThemeChange>().changeTo("theme_light");
                 break;
             }
         }
@@ -111,7 +109,7 @@ public partial class SettingPageViewModel : ObservableRecipient
 
     [RelayCommand]
     private async Task DelKey(string key) =>
-        await Application.Current.Dispatcher.BeginInvoke(() =>
+        await Dispatcher.UIThread.InvokeAsync(() =>
         {
             IgnoreItems.Remove(key);
             // IgnoreItems.ResetBindings();
@@ -123,7 +121,7 @@ public partial class SettingPageViewModel : ObservableRecipient
 
     partial void OnInputSmoothingMillisecondsChanged(int value)
     {
-        if (_isInitializing)
+        if (_isInitializin)
         {
             return;
         }
@@ -134,7 +132,7 @@ public partial class SettingPageViewModel : ObservableRecipient
 
     partial void OnMouseKeyInvervalChanged(int value)
     {
-        if (_isInitializing)
+        if (_isInitializin)
         {
             return;
         }
@@ -146,7 +144,7 @@ public partial class SettingPageViewModel : ObservableRecipient
 
     partial void OnMaxHistoryChanged(int value)
     {
-        if (_isInitializing)
+        if (_isInitializin)
         {
             return;
         }
@@ -157,7 +155,7 @@ public partial class SettingPageViewModel : ObservableRecipient
 
     partial void OnCanReadClipboardChanged(bool value)
     {
-        if (_isInitializing)
+        if (_isInitializin)
         {
             return;
         }
@@ -168,7 +166,7 @@ public partial class SettingPageViewModel : ObservableRecipient
 
     partial void OnAutoStartEverythingChanged(bool value)
     {
-        if (_isInitializing)
+        if (_isInitializin)
         {
             return;
         }
@@ -180,7 +178,7 @@ public partial class SettingPageViewModel : ObservableRecipient
 
     partial void OnAutoStartChanged(bool value)
     {
-        if (_isInitializing)
+        if (_isInitializin)
         {
             return;
         }
@@ -233,7 +231,7 @@ public partial class SettingPageViewModel : ObservableRecipient
 
     partial void OnUseEverythingChanged(bool value)
     {
-        if (_isInitializing)
+        if (_isInitializin)
         {
             return;
         }

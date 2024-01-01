@@ -2,8 +2,8 @@
 
 using System;
 using System.Windows.Controls;
+using Core.SDKs;
 using Core.SDKs.Services;
-using Wpf.Ui.Controls;
 
 #endregion
 
@@ -11,6 +11,39 @@ namespace Kitopia.Services;
 
 public class ContentDialogService : IContentDialog
 {
+    public void ShowDialog(object contentPresenter, DialogContent dialogContent)
+    {
+        var dialog = new ContentDialog((ContentPresenter)contentPresenter)
+        {
+            Title = dialogContent.Title,
+            Content = dialogContent.Content,
+            CloseButtonText = dialogContent.CloseButtonText,
+            SecondaryButtonText = dialogContent.SecondaryButtonText,
+            PrimaryButtonText = dialogContent.PrimaryButtonText
+        };
+        dialog.ShowAsync().ContinueWith(e =>
+        {
+            switch (e.Result)
+            {
+                case ContentDialogResult.Primary:
+                {
+                    dialogContent.Yes.Invoke();
+                    break;
+                }
+                case ContentDialogResult.None:
+                {
+                    dialogContent.Cancel.Invoke();
+                    break;
+                }
+                case ContentDialogResult.Secondary:
+                {
+                    dialogContent.No.Invoke();
+                    break;
+                }
+            }
+        });
+    }
+
     public void ShowDialogAsync(object contentPresenter, string title, object content, Action? yes, Action? no)
     {
         var dialog = new ContentDialog((ContentPresenter)contentPresenter)
@@ -30,40 +63,6 @@ public class ContentDialogService : IContentDialog
                     break;
                 }
                 case ContentDialogResult.None:
-                {
-                    no.Invoke();
-                    break;
-                }
-            }
-        });
-    }
-
-    public void ShowDialog(object contentPresenter, string title, object content, string CloseButtonText,
-        string SecondaryButtonText, string PrimaryButtonText, Action? yes, Action? no, Action? cancel)
-    {
-        var dialog = new ContentDialog((ContentPresenter)contentPresenter)
-        {
-            Title = title,
-            Content = content,
-            CloseButtonText = CloseButtonText,
-            SecondaryButtonText = SecondaryButtonText,
-            PrimaryButtonText = PrimaryButtonText
-        };
-        dialog.ShowAsync().ContinueWith(e =>
-        {
-            switch (e.Result)
-            {
-                case ContentDialogResult.Primary:
-                {
-                    yes.Invoke();
-                    break;
-                }
-                case ContentDialogResult.None:
-                {
-                    cancel.Invoke();
-                    break;
-                }
-                case ContentDialogResult.Secondary:
                 {
                     no.Invoke();
                     break;

@@ -3,19 +3,18 @@
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Text.RegularExpressions;
-using System.Windows;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using Core.SDKs;
 using Core.SDKs.Everything;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
 using Core.SDKs.Tools;
 using log4net;
+using Microsoft.Extensions.DependencyInjection;
 using PluginCore;
 using Vanara.PInvoke;
 
@@ -44,7 +43,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
 
     private bool nowInSelectMode = false;
-    private Action<SearchViewItem> selectAction;
+    private Action<SearchViewItem>? selectAction;
 
     public SearchWindowViewModel()
     {
@@ -125,12 +124,12 @@ public partial class SearchWindowViewModel : ObservableRecipient
             Items.RemoveAt(0);
         }
 
-        var data = Clipboard.GetDataObject()!;
+        var data = ServiceManager.Services.GetService<IClipboardService>().IsText();
         try
         {
-            if (data.GetDataPresent(DataFormats.Text))
+            if (data)
             {
-                var text = (string)data.GetData(DataFormats.Text)!;
+                var text = ServiceManager.Services.GetService<IClipboardService>().GetText();
                 if (text.StartsWith("\""))
                 {
                     text = text.Replace("\"", "");
@@ -586,7 +585,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
             ConfigManger.Config.ignoreItems.Add(searchViewItem.OnlyKey);
             ConfigManger.Save();
             _collection.Remove(searchViewItem.OnlyKey);
-            Application.Current.Dispatcher.Invoke(() =>
+            Dispatcher.UIThread.Invoke(() =>
             {
                 Items.Remove(searchViewItem);
             });

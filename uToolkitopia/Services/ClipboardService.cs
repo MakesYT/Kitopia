@@ -31,6 +31,8 @@ public class ClipboardService : IClipboardService
         }
     }
 
+    public bool IsText() => throw new NotImplementedException();
+
     public Bitmap? GetBitmap()
     {
         log.Debug(nameof(ClipboardService) + "的接口" + nameof(GetBitmap) + "被调用");
@@ -51,6 +53,8 @@ public class ClipboardService : IClipboardService
 
         return null;
     }
+
+    public string GetText() => throw new NotImplementedException();
 
     [STAThread]
     public string saveBitmap()

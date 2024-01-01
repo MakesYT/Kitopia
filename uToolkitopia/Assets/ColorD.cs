@@ -1,11 +1,10 @@
 ﻿#region
 
 using System.Windows;
-using System.Windows.Media;
-using Core.SDKs.Services.Config;
+using Avalonia.Media;
 using log4net;
 using Microsoft.Win32;
-using Wpf.Ui.Appearance;
+using ResourceDictionary = Avalonia.Controls.ResourceDictionary;
 
 #endregion
 
@@ -19,13 +18,13 @@ public class ColorD : ResourceDictionary
     {
         Instance = this;
         /*Add("SystemAccentColorSecondary", ColorConverter.ConvertFromString ("#EC407A"));*/
-        Add("SystemAccentColorPrimary", ((SolidColorBrush)SystemParameters.WindowGlassBrush).Color);
-        Add("SystemAccentColorSecondary", ((SolidColorBrush)SystemParameters.WindowGlassBrush).Color);
+
+        Add("SystemAccentColorPrimary", SolidColorBrush.Parse((SystemParameters.WindowGlassBrush).ToString()));
         SystemEvents.UserPreferenceChanged += (s, e) =>
         {
             ReloadColor();
-            SystemThemeManager.UpdateSystemThemeCache();
-            var currentTheme = ApplicationThemeManager.GetAppTheme();
+
+            /*var currentTheme = ApplicationThemeManager.GetAppTheme();
             var b = ApplicationThemeManager.IsAppMatchesSystem();
             log.Debug("系统主题改变,当前主题为" + currentTheme + "当前系统主题为" + ApplicationThemeManager.GetSystemTheme());
 
@@ -39,7 +38,7 @@ public class ColorD : ResourceDictionary
                         ? ApplicationTheme.Dark
                         : ApplicationTheme.Light);
                 });
-            }
+            }*/
         };
     }
 
@@ -53,7 +52,6 @@ public class ColorD : ResourceDictionary
     {
         Remove("SystemAccentColorSecondary");
         Remove("SystemAccentColorPrimary");
-        Add("SystemAccentColorPrimary", ((SolidColorBrush)SystemParameters.WindowGlassBrush).Color);
-        Add("SystemAccentColorSecondary", ((SolidColorBrush)SystemParameters.WindowGlassBrush).Color);
+        Add("SystemAccentColorPrimary", SolidColorBrush.Parse((SystemParameters.WindowGlassBrush).ToString()));
     }
 }

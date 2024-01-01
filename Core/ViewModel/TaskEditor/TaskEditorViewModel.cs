@@ -3,10 +3,13 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using System.Windows;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using Core.SDKs;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Plugin;
@@ -496,21 +499,25 @@ public partial class TaskEditorViewModel : ObservableRecipient
     private void SaveAndQuitCustomScenario(Window window)
     {
         CleanUnusedNode();
-        ((IContentDialog)ServiceManager.Services!.GetService(typeof(IContentDialog))!).ShowDialogAsync(ContentPresenter,
-            "保存并退出?", "是否确定保存并退出",
-            () =>
+        var dialog = new DialogContent()
+        {
+            Content = "是否确定保存并退出",
+            Title = "保存并退出?",
+            PrimaryButtonText = "确定",
+            SecondaryButtonText = "取消",
+            PrimaryAction = () =>
             {
                 IsModified = false;
                 CustomScenarioManger.Save(Scenario);
                 OnPropertyChanged(nameof(IsSaveInLocal));
-                Application.Current.Dispatcher.BeginInvoke(() =>
+                Dispatcher.UIThread.InvokeAsync(() =>
                 {
                     window.Close();
                 });
-            }, () =>
-            {
             }
-        );
+        };
+        ((IContentDialog)ServiceManager.Services!.GetService(typeof(IContentDialog))!).ShowDialogAsync(ContentPresenter,
+            dialog);
     }
 
     [RelayCommand]
@@ -609,22 +616,32 @@ public partial class TaskEditorViewModel : ObservableRecipient
         {
             e.Cancel = true;
             Scenario.Stop();
-            ((IToastService)ServiceManager.Services!.GetService(typeof(IToastService))!).ShowMessageBoxW("不保存退出?",
-                "是否确定不保存退出",
-                new ShowMessageContent("取消", "不保存", "保存并退出", () =>
+            var dialog = new DialogContent()
+            {
+                Content = "是否确定不保存退出",
+                Title = "不保存退出?",
+                PrimaryButtonText = "保存并退出",
+                SecondaryButtonText = "不保存",
+                CloseButtonText = "取消",
+                PrimaryAction = () =>
                 {
                     IsModified = false;
                     CustomScenarioManger.Save(Scenario);
                     _window.Close();
-                }, () =>
+                },
+                SecondaryAction = () =>
                 {
                     CustomScenarioManger.Reload(Scenario);
                     IsModified = false;
                     _window.Close();
-                }, () =>
+                },
+                CloseAction = () =>
                 {
                     e.Cancel = true;
-                }));
+                }
+            };
+            ((IContentDialog)ServiceManager.Services!.GetService(typeof(IContentDialog))!)
+                .ShowDialogAsync(null, dialog);
         }
     }
 

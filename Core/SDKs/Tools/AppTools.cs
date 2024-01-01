@@ -1,6 +1,5 @@
 ﻿#region
 
-using System.IO;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -62,11 +61,14 @@ public partial class AppTools
                     var 程序名称 = "noUAC.Everything";
                     if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + "noUAC\\" + 程序名称 + ".lnk"))
                     {
-                        ((IToastService)ServiceManager.Services!.GetService(typeof(IToastService))!).ShowMessageBox(
-                            "Kitopia提示",
-                            "Kitopia即将使用任务计划来创建绕过UAC启动Everything的快捷方式\n需要确认UAC权限\n按下取消则关闭自动启动功能\n路径:" +
-                            AppDomain.CurrentDomain.BaseDirectory + "noUAC\\" + 程序名称 + ".lnk",
-                            () =>
+                        var dialog = new DialogContent()
+                        {
+                            Title = $"Kitopia提示",
+                            Content = "Kitopia即将使用任务计划来创建绕过UAC启动Everything的快捷方式\n需要确认UAC权限\n按下取消则关闭自动启动功能\n路径:" +
+                                      AppDomain.CurrentDomain.BaseDirectory + "noUAC\\" + 程序名称 + ".lnk",
+                            PrimaryButtonText = "确定",
+                            CloseButtonText = "取消",
+                            PrimaryAction = () =>
                             {
                                 Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + "noUAC");
                                 var TempFileName = AppDomain.CurrentDomain.BaseDirectory + "noUAC\\" + 程序名称 + ".xml";
@@ -100,12 +102,17 @@ public partial class AppTools
                                     AppDomain.CurrentDomain.BaseDirectory + "noUAC\\" + 程序名称 + ".lnk", "", "",
                                     ShowWindowCommand.SW_HIDE);
                                 action.Invoke();
-                            }, () =>
+                            },
+                            CloseAction = () =>
                             {
                                 log.Debug("关闭自动启动Everything功能");
                                 ConfigManger.Config.autoStartEverything = false;
                                 ConfigManger.Save();
-                            });
+                            }
+                        };
+                        ((IContentDialog)ServiceManager.Services!.GetService(typeof(IContentDialog))!).ShowDialogAsync(
+                            null,
+                            dialog);
                     }
                     else
 
@@ -248,9 +255,13 @@ public partial class AppTools
             }
 
             log.Debug(c.ToString());
-            ((IToastService)ServiceManager.Services!.GetService(typeof(IToastService))!).ShowMessageBox("Kitopia建议",
-                c.ToString(),
-                () =>
+            var dialog = new DialogContent()
+            {
+                Title = $"Kitopia建议",
+                Content = c.ToString(),
+                PrimaryButtonText = "确定",
+                SecondaryButtonText = "取消",
+                PrimaryAction = () =>
                 {
                     foreach (var s in ErrorLnkList)
                     {
@@ -268,7 +279,8 @@ public partial class AppTools
                     }
 
                     ErrorLnkList.Clear();
-                }, () =>
+                },
+                SecondaryAction = () =>
                 {
                     foreach (var s in ErrorLnkList)
                     {
@@ -279,7 +291,10 @@ public partial class AppTools
 
                     log.Debug("取消删除无效快捷方式");
                     ErrorLnkList.Clear();
-                });
+                }
+            };
+            ((IContentDialog)ServiceManager.Services!.GetService(typeof(IContentDialog))!).ShowDialogAsync(null,
+                dialog);
         }
     }
 

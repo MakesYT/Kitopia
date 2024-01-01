@@ -2,8 +2,7 @@
 
 public interface IContentDialog
 {
-    void ShowDialogAsync(object contentPresenter, string title, object content, Action? yes, Action? no);
+    void ShowDialogAsync(object? contentPresenter, DialogContent dialogContent);
 
-    void ShowDialog(object contentPresenter, string title, object content, string CloseButtonText,
-        string SecondaryButtonText, string PrimaryButtonText, Action? yes, Action? no, Action? cancel);
+    void ShowDialog(object? contentPresenter, DialogContent dialogContent);
 }
