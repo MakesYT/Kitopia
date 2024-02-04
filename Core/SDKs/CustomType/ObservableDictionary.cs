@@ -1,9 +1,10 @@
 ﻿using System.Collections.Specialized;
 using System.ComponentModel;
+using Avalonia.Collections;
 
 namespace Core.SDKs.CustomType;
 
-public class ObservableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, INotifyCollectionChanged,
+public class ObservableDictionary<TKey, TValue> : Dictionary<TKey, TValue>,IAvaloniaDictionary<TKey, TValue>, INotifyCollectionChanged,
     INotifyPropertyChanged
 {
     private int _index;

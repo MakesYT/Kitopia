@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.Services;
 using Core.ViewModel;
 using Microsoft.Extensions.DependencyInjection;
 using PluginCore;
-using Window = Avalonia.Controls.Window;
+using Vanara.PInvoke;
 
 namespace KitopiaAvalonia.Windows;
 
@@ -17,6 +19,7 @@ public partial class SearchWindow : Window
     public SearchWindow()
     {
         InitializeComponent();
+       
         WeakReferenceMessenger.Default.Register<string, string>(this, "SearchWindowClose", (_, _) =>
         {
             Dispatcher.UIThread.InvokeAsync(() =>
@@ -25,23 +28,18 @@ public partial class SearchWindow : Window
             });
         });
     }
-
-    private void w_Deactivated(object sender, EventArgs e)
+    private void w_Deactivated(object? sender, EventArgs eventArgs)
     {
-        IsVisible = false;
+         IsVisible = false;
     }
 
-    [DllImport("user32.dll", SetLastError = true)]
-    private static extern IntPtr SetFocus(IntPtr hWnd);
-
-    [DllImport("user32.dll")]
-    private static extern bool SetForegroundWindow(IntPtr hWnd);
+    
 
     private void w_Activated(object sender, EventArgs e)
     {
         var hwnd = TryGetPlatformHandle().Handle;
-        SetForegroundWindow(hwnd);
-        SetFocus(hwnd);
+        User32.SetForegroundWindow(hwnd);
+        User32.SetFocus(hwnd);
     }
 
     private void Button_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -67,7 +65,7 @@ public partial class SearchWindow : Window
         }
     }
 
-    private void tx_KeyDown(object sender, KeyEventArgs e)
+    private void tx_KeyDown(object? sender, KeyEventArgs e)
     {
         if (e.Key == Key.Enter)
         {

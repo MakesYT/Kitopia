@@ -1,4 +1,5 @@
-﻿using Avalonia.Threading;
+﻿using System.Collections.ObjectModel;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Core.SDKs;
@@ -9,6 +10,14 @@ namespace Core.ViewModel.Pages.customScenario;
 
 public partial class CustomScenariosManagerPageViewModel : ObservableRecipient
 {
+    public ObservableCollection<CustomScenario> CustomScenarios
+    {
+        get
+        {
+            return CustomScenarioManger.CustomScenarios;
+        }
+    }
+
     [RelayCommand]
     public void NewCustomScenarios()
     {

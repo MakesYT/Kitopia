@@ -31,7 +31,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
     [NotifyCanExecuteChangedFor(nameof(SaveAndQuitCustomScenarioCommand))]
     public bool _isModified = false;
 
-    [ObservableProperty] private BindingList<BindingList<object>> _nodeMethods = new();
+    [ObservableProperty] private ObservableCollection<ObservableCollection<object>> _nodeMethods = new();
 
     [ObservableProperty] private CustomScenario _scenario = new CustomScenario { IsActive = true };
 
@@ -230,7 +230,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
             }
         }
 
-        Scenario.nodes.ResetBindings();
+        // Scenario.nodes.ResetBindings();
     }
 
     [RelayCommand]
@@ -588,7 +588,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
 
         foreach (var customScenarioNodeMethod in PluginOverall.CustomScenarioNodeMethods)
         {
-            var methods = new BindingList<object>();
+            var methods = new ObservableCollection<object>();
             foreach (var keyValuePair in customScenarioNodeMethod.Value)
             {
                 methods.Add(keyValuePair.Value.Item2);

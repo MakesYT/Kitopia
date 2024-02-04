@@ -17,12 +17,7 @@
                 <MergeResourceInclude Source="Controls/SearchItemShow.xaml" />
                 
             </ResourceDictionary.MergedDictionaries>
-            <crt:DoubleHalfConverter x:Key="doubleHalfConverter" />
-            <crt:DoubleQuarterConverter x:Key="doubleQuarterConverter" />
-            <crt:ReverseBoolToVisibilityConverter x:Key="reverseBoolToVisibilityConverter" />
-            <crt:BoolToVisibilityConverter x:Key="boolToVisibilityConverter" />
-            <crt:ReverseBool x:Key="ReverseBool" />
-            <crt:IntToIconSymbol x:Key="IntToIconSymbol" />
+            
 
 
            

@@ -1,0 +1,92 @@
+<windowing:AppWindow xmlns="https://github.com/avaloniaui"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                     xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+                     xmlns:windowing="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
+                     mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+                     x:Class="KitopiaAvalonia.MainWindow"
+                     Closing="Window_OnClosing"
+                     TransparencyLevelHint="AcrylicBlur"
+                     xmlns:sty="using:FluentAvalonia.Styling"
+                     Title="Avalonia">
+
+    <windowing:AppWindow.Background>
+        <SolidColorBrush Color="{DynamicResource SolidBackgroundFillColorBase}" Opacity="0.65"></SolidColorBrush>
+        
+    </windowing:AppWindow.Background>
+    <Grid RowDefinitions="Auto,*">
+        <Grid Name="TitleBarHost"
+              ColumnDefinitions="Auto,Auto,*,Auto"
+              Background="Transparent">
+            <Image Margin="12 4"
+                   IsHitTestVisible="False"
+
+                   Width="18" Height="18"
+                   DockPanel.Dock="Left"
+                   Name="WindowIcon"
+                   RenderOptions.BitmapInterpolationMode="HighQuality">
+                <Image.IsVisible>
+                    <OnPlatform Default="False">
+                        <On Options="Windows" Content="True" />
+                    </OnPlatform>
+                </Image.IsVisible>
+            </Image>
+
+            <TextBlock Text="{Binding Title, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                       FontSize="12"
+                       IsHitTestVisible="False"
+                       VerticalAlignment="Center"
+                       Grid.Column="1">
+                <TextBlock.IsVisible>
+                    <OnPlatform Default="False">
+                        <On Options="Windows" Content="True" />
+                    </OnPlatform>
+                </TextBlock.IsVisible>
+            </TextBlock>
+
+            <Border Grid.Column="2" Padding="6">
+                <AutoCompleteBox Name="SearchBox"
+                                 MaxWidth="500"
+                                 Watermark="Search"
+                                 Classes="SampleApp">
+                    <!--wnd:AppWindow.AllowInteractionInTitleBar="True"-->
+                    <AutoCompleteBox.ItemTemplate>
+
+                    </AutoCompleteBox.ItemTemplate>
+                </AutoCompleteBox>
+            </Border>
+        </Grid>
+
+
+        <ui:NavigationView Name="NavView" PaneDisplayMode="Left" Grid.RowSpan="2" CompactPaneLength="48"
+                           ItemInvoked="NavView_OnItemInvoked" Classes="SampleAppNav"
+                           
+                           IsBackEnabled="{Binding #FrameView.CanGoBack}" AlwaysShowHeader="False"
+                           BackRequested="NavView_OnBackRequested"
+                           IsSettingsVisible="False">
+
+            <ui:Frame Name="FrameView" Navigated="FrameView_OnNavigated" />
+            <ui:NavigationView.MenuItems>
+                <ui:NavigationViewItem Classes="SampleAppNav" Content="主页" FontSize="30" Cursor="Hand" Tag="HomePage" />
+                <ui:NavigationViewItem Classes="SampleAppNav" Content="插件" FontSize="30" Cursor="Hand"
+                                       Tag="PluginManagerPage" />
+                <ui:NavigationViewItem Classes="SampleAppNav" Content="情景" FontSize="30" Cursor="Hand"
+                                       Tag="CustomScenariosManagerPage" />
+                <ui:NavigationViewItem Classes="SampleAppNav" Content="快捷键" FontSize="30" Cursor="Hand"
+                                       Tag="HotKeyManagerPage" />
+            </ui:NavigationView.MenuItems>
+            <ui:NavigationView.FooterMenuItems>
+                <ui:NavigationViewItem Classes="SampleAppNav" Content="设置" FontSize="30" Cursor="Hand"
+                                       Tag="SettingPage" />
+            </ui:NavigationView.FooterMenuItems>
+        </ui:NavigationView>
+        <Panel Name="OverlayHost"
+               Grid.Row="1">
+
+        </Panel>
+
+    </Grid>
+
+
+</windowing:AppWindow>

@@ -36,10 +36,13 @@
                    </Expander.Header>
                    <Expander.Content>
                        <StackPanel>
-                           <controls:SettingsExpander Header="开机自动启动" Description="可能被杀毒软件阻止" IconSource="FlashAuto20">
+                           <controls:SettingsExpander Header="开机自动启动" Description="可能被杀毒软件阻止">
                                <controls:SettingsExpander.Footer>
                                    <ToggleSwitch IsChecked="{Binding AutoStart}" FlowDirection="RightToLeft" OffContent="关" OnContent="开"/>
                                </controls:SettingsExpander.Footer>
+                               <controls:SettingsExpander.IconSource>
+                                   <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xE61C;"  />
+                               </controls:SettingsExpander.IconSource>
                                
                            </controls:SettingsExpander>
                            
@@ -52,13 +55,15 @@
                    </Expander.Header>
                    <Expander.Content>
                        <StackPanel>
-                           <controls:SettingsExpander Header="激活按键" Description="修改鼠标快捷菜单激活按键" IconSource="Keyboard20">
+                           <controls:SettingsExpander Header="激活按键" Description="修改鼠标快捷菜单激活按键">
                                <controls:SettingsExpander.Footer>
                                    <ComboBox ItemsSource="{Binding MouseKeyOptions}" SelectedValue="{Binding MouseKey}" />
                                </controls:SettingsExpander.Footer>
-                               
+                               <controls:SettingsExpander.IconSource>
+                                   <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xF4B8;" />
+                               </controls:SettingsExpander.IconSource>
                            </controls:SettingsExpander>
-                           <controls:SettingsExpander Header="激活所需时间" Description="按下按键指定时间后触发" IconSource="TopSpeed20">
+                           <controls:SettingsExpander Header="激活所需时间" Description="按下按键指定时间后触发" >
                                <controls:SettingsExpander.Footer>
                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                        <TextBlock Text="{Binding MouseKeyInverval}" FontSize="14"
@@ -72,7 +77,9 @@
        
                                    </StackPanel>
                                </controls:SettingsExpander.Footer>
-                               
+                               <controls:SettingsExpander.IconSource>
+                                   <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xED9B;" />
+                               </controls:SettingsExpander.IconSource>
                            </controls:SettingsExpander>
                            
                        </StackPanel>
@@ -84,7 +91,7 @@
                    </Expander.Header>
                    <Expander.Content>
                        <StackPanel>
-                           <controls:SettingsExpander Header="激活快捷键" Description="修改搜索框快捷键" IconSource="Keyboard20">
+                           <controls:SettingsExpander Header="激活快捷键" Description="修改搜索框快捷键">
                                <controls:SettingsExpander.Footer>
                                    <controls1:HotKeyShow>
                                        <controls1:HotKeyShow.HotKeySignName>
@@ -97,34 +104,44 @@
                                        </controls1:HotKeyShow.HotKeySignName>
                                    </controls1:HotKeyShow>
                                </controls:SettingsExpander.Footer>
-                               
+                               <controls:SettingsExpander.IconSource>
+                                   <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xF4B8;"  />
+                               </controls:SettingsExpander.IconSource>
                            </controls:SettingsExpander>
-                           <controls:SettingsExpander Header="允许程序调用Everything索引文档" Description="索引文档依赖于此功能" IconSource="DocumentSearch20">
+                           <controls:SettingsExpander Header="允许程序调用Everything索引文档" Description="索引文档依赖于此功能">
                                <controls:SettingsExpander.Footer>
                                    <ToggleSwitch IsChecked="{Binding UseEverything}" FlowDirection="RightToLeft" OffContent="关" OnContent="开"/>
                                </controls:SettingsExpander.Footer>
-                               
+                               <controls:SettingsExpander.IconSource>
+                                   <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xF3AE;"  />
+                               </controls:SettingsExpander.IconSource>
                            </controls:SettingsExpander>
-                           <controls:SettingsExpander Header="自动启动Everything" Description="在Everything未启动时自动启动" IconSource="FlashAuto20">
+                           <controls:SettingsExpander Header="自动启动Everything" Description="在Everything未启动时自动启动" >
                                <controls:SettingsExpander.Footer>
                                    <ToggleSwitch IsChecked="{Binding AutoStartEverything}" FlowDirection="RightToLeft" OffContent="关" OnContent="开"/>
                                </controls:SettingsExpander.Footer>
-                               
+                               <controls:SettingsExpander.IconSource>
+                                   <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xE61C;"  />
+                               </controls:SettingsExpander.IconSource>
                            </controls:SettingsExpander>
-                           <controls:SettingsExpander Header="允许程序读取剪贴板内容" Description="自动读取剪贴板路径和剪贴板图像保存依赖于此权限" IconSource="ClipboardSearch20">
+                           <controls:SettingsExpander Header="允许程序读取剪贴板内容" Description="自动读取剪贴板路径和剪贴板图像保存依赖于此权限" >
                                <controls:SettingsExpander.Footer>
                                    <ToggleSwitch IsChecked="{Binding CanReadClipboard}"  FlowDirection="RightToLeft" OffContent="关" OnContent="开"/>
                                </controls:SettingsExpander.Footer>
-                               
+                               <controls:SettingsExpander.IconSource>
+                                   <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xF2D7;"  />
+                               </controls:SettingsExpander.IconSource>
                            </controls:SettingsExpander>
                            
-                           <controls:SettingsExpander Header="最大历史数量" Description="决定在搜索框无搜索内容时显示最近打开软件的数量" IconSource="History20">
+                           <controls:SettingsExpander Header="最大历史数量" Description="决定在搜索框无搜索内容时显示最近打开软件的数量" >
                                <controls:SettingsExpander.Footer>
                                    <ComboBox ItemsSource="{Binding MaxHistoryOptions}" SelectedValue="{Binding MaxHistory}" />
                                </controls:SettingsExpander.Footer>
-                               
+                               <controls:SettingsExpander.IconSource>
+                                   <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xF47E;"  />
+                               </controls:SettingsExpander.IconSource>
                            </controls:SettingsExpander>
-                           <controls:SettingsExpander Header="输入平滑延时" Description="在指定时间内不处理数据以减轻性能消耗" IconSource="TopSpeed20">
+                           <controls:SettingsExpander Header="输入平滑延时" Description="在指定时间内不处理数据以减轻性能消耗">
                                <controls:SettingsExpander.Footer>
                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                        <TextBlock Text="{Binding InputSmoothingMilliseconds}" FontSize="14"
@@ -139,9 +156,11 @@
        
                                    </StackPanel>
                                </controls:SettingsExpander.Footer>
-                               
+                               <controls:SettingsExpander.IconSource>
+                                   <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xED9B;"  />
+                               </controls:SettingsExpander.IconSource>
                            </controls:SettingsExpander>
-                           <controls:SettingsExpander Header="忽略的项目" Description="指定哪些项目忽略检索" IconSource="PaintBrush20">
+                           <controls:SettingsExpander Header="忽略的项目" Description="指定哪些项目忽略检索" >
                                
                                <DataGrid IsReadOnly="True" AutoGenerateColumns="False"
                                          Margin="0,0,10,0" x:Name="keys" SelectedIndex="-1" MaxHeight="400"
@@ -159,6 +178,9 @@
                                        </DataGridTemplateColumn>
                                    </DataGrid.Columns>
                                </DataGrid>
+                               <controls:SettingsExpander.IconSource>
+                                   <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xF592;"  />
+                               </controls:SettingsExpander.IconSource>
                            </controls:SettingsExpander>
                        </StackPanel>
                    </Expander.Content>

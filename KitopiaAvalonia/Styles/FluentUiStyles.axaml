@@ -1,0 +1,7 @@
+﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Add Resources Here -->
+    <x:Double x:Key="SettingsExpanderItemAdaptiveWidthTrigger">210</x:Double>
+    <Thickness x:Key="NavigationViewContentMargin">0,48,0,0</Thickness> 
+    
+</ResourceDictionary>

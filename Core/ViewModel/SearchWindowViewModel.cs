@@ -1,6 +1,7 @@
 ﻿#region
 
 using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
@@ -33,7 +34,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
     [ObservableProperty] private bool? _everythingIsOk = true;
 
-    [ObservableProperty] private BindingList<SearchViewItem> _items = new(TempList); //搜索界面显示的软件
+    [ObservableProperty] private ObservableCollection<SearchViewItem> _items = new(TempList); //搜索界面显示的软件
 
 
     [ObservableProperty] private string? _search;
@@ -282,7 +283,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
 
             Log.Debug("搜索变更:" + Search);
-            Items.RaiseListChangedEvents = false;
+            // Items.RaiseListChangedEvents = false;
 
             #region 清除上次搜索结果
 
@@ -548,8 +549,8 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 Items.Add(item);
             }
 
-            Items.RaiseListChangedEvents = true;
-            Items.ResetBindings();
+            // Items.RaiseListChangedEvents = true;
+            // Items.ResetBindings();
         });
     }
 
@@ -560,9 +561,9 @@ public partial class SearchWindowViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    public async Task OpenFile(SearchViewItem item)
+    public void OpenFile(SearchViewItem item)
     {
-        await Task.Run(() =>
+        Task.Run(() =>
         {
             if (nowInSelectMode)
             {
@@ -578,9 +579,9 @@ public partial class SearchWindowViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    private async Task IgnoreItem(SearchViewItem searchViewItem)
-    {
-        await Task.Run(() =>
+    private void IgnoreItem(SearchViewItem searchViewItem)
+    { 
+        Task.Run(() =>
         {
             ConfigManger.Config.ignoreItems.Add(searchViewItem.OnlyKey);
             ConfigManger.Save();
@@ -593,8 +594,8 @@ public partial class SearchWindowViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    private async Task OpenFolder(object searchViewItem) =>
-        await Task.Run(() =>
+    private void OpenFolder(object searchViewItem) => 
+        Task.Run(() =>
         {
             WeakReferenceMessenger.Default.Send("a", "SearchWindowClose");
             var item = (SearchViewItem)searchViewItem;
@@ -633,8 +634,8 @@ public partial class SearchWindowViewModel : ObservableRecipient
         });
 
     [RelayCommand]
-    private async Task RunAsAdmin(object searchViewItem) =>
-        await Task.Run(() =>
+    private void RunAsAdmin(object searchViewItem) =>
+        Task.Run(() =>
         {
             WeakReferenceMessenger.Default.Send("a", "SearchWindowClose");
             var item = (SearchViewItem)searchViewItem;
@@ -690,7 +691,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
         // Items[index].IsStared = !Items[index].IsStared;
         // Items.ResetItem(index);
         item.IsStared = !item.IsStared;
-        Items.ResetBindings();
+        // Items.ResetBindings();
         if (item.FileInfo is not null)
         {
             if (ConfigManger.Config.customCollections.Contains(item.FileInfo.FullName))
@@ -764,8 +765,8 @@ public partial class SearchWindowViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    private async Task OpenFolderInTerminal(object searchViewItem) =>
-        await Task.Run(() =>
+    private void OpenFolderInTerminal(object searchViewItem) =>
+        Task.Run(() =>
         {
             WeakReferenceMessenger.Default.Send("a", "SearchWindowClose");
             var item = (SearchViewItem)searchViewItem;

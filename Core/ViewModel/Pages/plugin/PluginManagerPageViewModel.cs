@@ -1,5 +1,6 @@
 ﻿#region
 
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -19,7 +20,7 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(PluginManagerPageViewModel));
     private readonly TaskScheduler _scheduler = TaskScheduler.FromCurrentSynchronizationContext();
-    [ObservableProperty] private BindingList<PluginInfo> _items = new();
+    [ObservableProperty] private ObservableCollection<PluginInfo> _items = new();
 
     public PluginManagerPageViewModel()
     {
@@ -84,7 +85,7 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
                 e.VersionInt == pluginInfoEx.VersionInt);
             ConfigManger.Save();
             pluginInfoEx.IsEnabled = false;
-            Items.ResetBindings();
+            // Items.ResetBindings();
             CustomScenarioManger.LoadAll();
         }
         else
@@ -96,7 +97,7 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
             ConfigManger.Config.EnabledPluginInfos.Add(pluginInfoEx);
             ConfigManger.Save();
             pluginInfoEx.IsEnabled = true;
-            Items.ResetBindings();
+            // Items.ResetBindings();
             CustomScenarioManger.ReCheck(true);
         }
     }

@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.Serialization;
+using Avalonia.Collections;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.CustomType;
@@ -74,13 +75,13 @@ public partial class CustomScenario : ObservableRecipient
         set;
     }
 
-    public BindingList<PointItem> nodes
+    public ObservableCollection<PointItem> nodes
     {
         get;
         set;
     } = new();
 
-    public BindingList<ConnectionItem> connections
+    public ObservableCollection<ConnectionItem> connections
     {
         get;
         set;

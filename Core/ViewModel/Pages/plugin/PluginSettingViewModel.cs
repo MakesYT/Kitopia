@@ -1,5 +1,6 @@
 ﻿#region
 
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Core.SDKs.Services.Plugin;
@@ -13,7 +14,7 @@ namespace Core.ViewModel.Pages.plugin;
 public partial class PluginSettingViewModel : ObservableRecipient
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(PluginSettingViewModel));
-    [ObservableProperty] private BindingList<PluginSettingItem> _settingItems = new();
+    [ObservableProperty] private ObservableCollection<PluginSettingItem> _settingItems = new();
 
     public void ChangePlugin(PluginInfo pluginInfoEx) =>
         // var plugin = PluginManager.EnablePlugin[$"{pluginInfoEx.Author}_{pluginInfoEx.PluginId}"];

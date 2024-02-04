@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0-windows</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
@@ -27,26 +27,26 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="11.0.6"/>
-        <PackageReference Include="Avalonia.Desktop" Version="11.0.6"/>
-        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.6"/>
-        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.6"/>
+        <PackageReference Include="Avalonia" Version="11.0.7"/>
+        <PackageReference Include="Avalonia.Desktop" Version="11.0.7"/>
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.7"/>
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.7"/>
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.6"/>
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.7"/>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2"/>
-        <PackageReference Include="InputSimulator" Version="1.0.4"/>
+        <PackageReference Include="FluentAvaloniaUI" Version="2.0.5"/>
         <PackageReference Include="log4net" Version="2.0.15"/>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0"/>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
         <PackageReference Include="NPinyinPro" Version="0.3.3"/>
-        <PackageReference Include="System.Drawing.Common" Version="8.0.0"/>
+        <PackageReference Include="System.Drawing.Common" Version="8.0.1"/>
         <PackageReference Include="System.Management" Version="8.0.0"/>
         <PackageReference Include="System.Runtime.InteropServices" Version="4.3.0"/>
-        <PackageReference Include="Vanara.Core" Version="3.4.16"/>
-        <PackageReference Include="Vanara.PInvoke.FirewallApi" Version="3.4.16"/>
-        <PackageReference Include="Vanara.PInvoke.NetApi32" Version="3.4.15"/>
-        <PackageReference Include="Vanara.PInvoke.NetListMgr" Version="3.4.15"/>
-        <PackageReference Include="Vanara.Windows.Shell" Version="3.4.16"/>
+        <PackageReference Include="Vanara.Core" Version="3.4.17"/>
+        <PackageReference Include="Vanara.PInvoke.FirewallApi" Version="3.4.17"/>
+        <PackageReference Include="Vanara.PInvoke.NetApi32" Version="3.4.17"/>
+        <PackageReference Include="Vanara.PInvoke.NetListMgr" Version="3.4.17"/>
+        <PackageReference Include="Vanara.Windows.Shell" Version="3.4.17"/>
     </ItemGroup>
 
     <ItemGroup>

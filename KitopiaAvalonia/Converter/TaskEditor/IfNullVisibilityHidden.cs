@@ -17,20 +17,20 @@ public class IfNullVisibilityHidden : IValueConverter
     {
         if (value == null)
         {
-            return Visibility.Collapsed;
+            return false;
         }
 
         if (value is List<string> { Count: 0 })
         {
-            return Visibility.Collapsed;
+            return false;
         }
 
         if (value is string s && string.IsNullOrEmpty(s))
         {
-            return Visibility.Collapsed;
+            return false;
         }
 
-        return Visibility.Visible;
+        return true;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>

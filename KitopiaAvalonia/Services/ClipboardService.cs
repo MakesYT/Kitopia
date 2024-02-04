@@ -2,6 +2,7 @@
 
 using System;
 using System.Drawing;
+using System.Linq;
 using Core.SDKs.Services;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,22 +17,15 @@ public class ClipboardService : IClipboardService
 
     public bool IsBitmap()
     {
-        log.Debug(nameof(ClipboardService) + "的接口" + nameof(IsBitmap) + "被调用");
-
-
-        try
-        {
-            var strings = ServiceManager.Services.GetService<MainWindow>().Clipboard.GetFormatsAsync().Result;
-        }
-        catch (Exception e)
-        {
-            return false;
-        }
-
-        return false;
+        var strings = ServiceManager.Services.GetService<MainWindow>().Clipboard.GetFormatsAsync().Result;
+        return strings.Contains("Unknown_Format_8");
     }
 
-    public bool IsText() => throw new NotImplementedException();
+    public bool IsText()
+    {
+        var strings = ServiceManager.Services.GetService<MainWindow>().Clipboard.GetFormatsAsync().Result;
+        return strings.Contains("Text");
+    }
 
     public Bitmap? GetBitmap()
     {
@@ -49,13 +43,15 @@ public class ClipboardService : IClipboardService
         return null;
     }
 
-    public string GetText() => throw new NotImplementedException();
-
-    [STAThread]
+    public string GetText()
+    {
+        return ServiceManager.Services.GetService<MainWindow>().Clipboard.GetTextAsync().Result;
+    }
+    
     public string saveBitmap()
     {
         log.Debug(nameof(ClipboardService) + "的接口" + nameof(saveBitmap) + "被调用");
-
+        var result = ServiceManager.Services.GetService<MainWindow>().Clipboard.GetDataAsync("Unknown_Format_8").Result;
 
         // var r = Application.Current.Dispatcher.Invoke(() =>
         // {

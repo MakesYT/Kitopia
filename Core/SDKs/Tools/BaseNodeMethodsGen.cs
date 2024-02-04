@@ -29,9 +29,9 @@ public class BaseNodeMethodsGen
         return key;
     }
 
-    public static void GenBaseNodeMethods(BindingList<BindingList<object>> nodeMethods)
+    public static void GenBaseNodeMethods(ObservableCollection<ObservableCollection<object>> nodeMethods)
     {
-        var nodes = new BindingList<object>();
+        var nodes = new ObservableCollection<object>();
         foreach (var (key, value) in _baseType)
         {
             var String = new PointItem()

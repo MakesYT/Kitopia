@@ -15,15 +15,15 @@ public class ReverseBoolToVisibilityConverter : IValueConverter
     {
         if (value == null)
         {
-            return Visibility.Collapsed;
+            return false;
         }
 
         if (value is bool && (bool)value)
         {
-            return Visibility.Collapsed;
+            return false;
         }
 
-        return Visibility.Visible;
+        return true;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>

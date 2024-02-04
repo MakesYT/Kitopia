@@ -1,8 +1,10 @@
 ﻿#region
 
 using System;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
+using Avalonia.Threading;
 using log4net;
 using PluginCore;
 
@@ -37,6 +39,10 @@ public class ToastService : IToastService
 
         log.Debug(nameof(ToastService) + "的接口" + nameof(Show) + "被调用");
 
-        notificationManager.Show(new Notification(header, text));
+        Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            notificationManager.Show(new Notification(header, text));
+        });
+
     }
 }

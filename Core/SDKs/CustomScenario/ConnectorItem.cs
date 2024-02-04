@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
 using Avalonia;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
@@ -19,7 +21,7 @@ public partial class ConnectorItem : ObservableRecipient
     [ObservableProperty] private bool _isSelf = false;
 
     [JsonIgnore] private Type? _realType;
-
+    
     public bool SelfInputAble
     {
         get;
@@ -77,7 +79,7 @@ public partial class ConnectorItem : ObservableRecipient
         set;
     }
 
-    public IEnumerable<ConnectorItem> GetSourceOrNextConnectorItems(BindingList<ConnectionItem> connectionItems)
+    public IEnumerable<ConnectorItem> GetSourceOrNextConnectorItems(ObservableCollection<ConnectionItem> connectionItems)
     {
         if (IsOut)
         {
@@ -87,7 +89,7 @@ public partial class ConnectorItem : ObservableRecipient
         return connectionItems.Where((e) => e.Target == this).Select(e => e.Source);
     }
 
-    public IEnumerable<PointItem> GetSourceOrNextPointItems(BindingList<ConnectionItem> connectionItems)
+    public IEnumerable<PointItem> GetSourceOrNextPointItems(ObservableCollection<ConnectionItem> connectionItems)
     {
         if (IsOut)
         {

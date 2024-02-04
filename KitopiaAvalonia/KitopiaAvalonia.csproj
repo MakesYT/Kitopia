@@ -1,0 +1,55 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
+        <SatelliteResourceLanguages>none</SatelliteResourceLanguages>
+    </PropertyGroup>
+    <ItemGroup>
+        <AvaloniaResource Include="Assets\FluentSystemIcons-Filled.ttf"/>
+        <AvaloniaResource Include="Assets\FluentSystemIcons-Regular.ttf"/>
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\NodifyM.Avalonia\NodifyM.Avalonia\NodifyM.Avalonia.csproj"/>
+        <ProjectReference Include="..\Core\Core.csproj"/>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="11.0.7"/>
+        <PackageReference Include="Avalonia.Desktop" Version="11.0.7"/>
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.7"/>
+        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.7"/>
+        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.6"/>
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2"/>
+        <PackageReference Include="log4net" Version="2.0.15"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0"/>
+        <PackageReference Include="System.Drawing.Common" Version="8.0.1"/>
+        <PackageReference Include="Vanara.Core" Version="3.4.17"/>
+        <PackageReference Include="Vanara.Windows.Shell" Version="3.4.17"/>
+    </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Include="log4net.config">
+            <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+        </EmbeddedResource>
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Update="Windows\Dialog.axaml.cs">
+            <DependentUpon>Dialog.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Windows\MainWindow.axaml.cs">
+            <DependentUpon>MainWindow.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Pages\HotKeyManagerPage.axaml.cs">
+            <SubType>Code</SubType>
+            <DependentUpon>HotKeyManagerPage.xaml</DependentUpon>
+        </Compile>
+    </ItemGroup>
+
+</Project>

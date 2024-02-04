@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using Windows.System;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -101,7 +100,7 @@ public partial class HotKeyEditorWindow : Window
                     key != PhysicalKey.MetaLeft && key != PhysicalKey.MetaRight && key != PhysicalKey.ControlLeft &&
                     key != PhysicalKey.ControlRight)
                 {
-                    selectedKey = (EKey)(VirtualKey)KeyInterop.VirtualKeyFromKey((Key)(int)key);
+                    selectedKey = (EKey)KeyInterop.VirtualKeyFromKey((Key)(int)key);
                     KeyName.IsVisible = true;
                     KeyName.Content = selectedKey.ToString();
                 }
@@ -117,7 +116,7 @@ public partial class HotKeyEditorWindow : Window
                 if (key != Key.LeftShift && key != Key.RightShift && key != Key.LeftAlt && key != Key.RightAlt &&
                     key != Key.LWin && key != Key.RWin && key != Key.LeftCtrl && key != Key.RightCtrl)
                 {
-                    selectedKey = (EKey)(VirtualKey)KeyInterop.VirtualKeyFromKey(key);
+                    selectedKey = (EKey)KeyInterop.VirtualKeyFromKey(key);
                     KeyName.IsVisible = true;
                     KeyName.Content = selectedKey.ToString();
                 }

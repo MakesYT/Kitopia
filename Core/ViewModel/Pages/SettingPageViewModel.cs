@@ -26,7 +26,7 @@ public partial class SettingPageViewModel : ObservableRecipient
     [ObservableProperty] private bool _autoStartEverything;
 
     [ObservableProperty] private bool _canReadClipboard;
-    [ObservableProperty] private BindingList<string> _ignoreItems;
+    [ObservableProperty] private ObservableCollection<string> _ignoreItems;
     [ObservableProperty] private int _inputSmoothingMilliseconds;
 
     private bool _isInitializin = true;
@@ -53,7 +53,7 @@ public partial class SettingPageViewModel : ObservableRecipient
         _useEverything = ConfigManger.Config.useEverything;
         _maxHistory = ConfigManger.Config.maxHistory;
         _canReadClipboard = ConfigManger.Config.canReadClipboard;
-        _ignoreItems = new BindingList<string>(ConfigManger.Config.ignoreItems);
+        _ignoreItems = new ObservableCollection<string>(ConfigManger.Config.ignoreItems);
         _inputSmoothingMilliseconds = ConfigManger.Config.inputSmoothingMilliseconds;
         _mouseKey = ConfigManger.Config.mouseKey;
         _mouseKeyInverval = ConfigManger.Config.mouseKeyInverval;

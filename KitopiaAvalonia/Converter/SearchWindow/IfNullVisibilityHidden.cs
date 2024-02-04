@@ -16,10 +16,10 @@ public class IfNullVisibilityHidden : IValueConverter
     {
         if (value == null || (int)value == 0)
         {
-            return Visibility.Collapsed;
+            return false;
         }
 
-        return Visibility.Visible;
+        return true;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
