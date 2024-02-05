@@ -21,21 +21,19 @@
                             <converter:ReverseBoolToVisibilityConverter x:Key="boolToVisibilityConverter" />
                             <searchWindow:IfNullVisibilityHidden x:Key="IfNullVisibilityHidden" />
                             <converter:IntToIconSymbol x:Key="IntToIconSymbol" />
+                            <converter:ReverseBool x:Key="ReverseBool" />
                         </StackPanel.Resources>
                         <Grid>
                             <Image HorizontalAlignment="Left" Focusable="False" Width="48"
                                    Height="48" ZIndex="1"
                                    Source="{Binding  SearchViewItem ,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource PathToImageConverter}}" />
-                            <Button
-                                IsVisible="{Binding SearchViewItem.IconSymbol,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IfNullVisibilityHidden}}"
-                                Height="48" Width="48" FontSize="48" Margin="0" Padding="0"
-                                Background="{x:Null}" IsEnabled="False" 
-                                BorderBrush="{x:Null}">
-                                <controls1:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="{Binding SearchViewItem.IconSymbol,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToIconSymbol},Mode=OneWay}"  />
-                                
-                            </Button>
+                            <controls1:FontIcon Height="48" Width="48" 
+                                                IsVisible="{Binding SearchViewItem.IconSymbol,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IfNullVisibilityHidden}}"
+                                FontFamily="{StaticResource FluentFont}" 
+                                                Glyph="{Binding SearchViewItem.IconSymbol,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IntToIconSymbol},Mode=OneWay}"  />
+                                                                     
                             <TextBlock
-                                IsVisible="{TemplateBinding IsSelected}"
+                                IsVisible="{TemplateBinding IsSelected,Converter={StaticResource ReverseBool}}"
                                 VerticalAlignment="Center" Text="未设置" />
 
 

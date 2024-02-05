@@ -4,8 +4,6 @@
                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                      xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
                      xmlns:windowing="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
-                     xmlns:viewModel="clr-namespace:Core.ViewModel;assembly=Core"
-                     xmlns:searchWindow="clr-namespace:Kitopia.Converter.SearchWindow"
                      xmlns:converter="clr-namespace:Kitopia.Converter"
                      xmlns:pluginCore="clr-namespace:PluginCore;assembly=PluginCore"
                      xmlns:controls1="clr-namespace:KitopiaAvalonia.Controls"
@@ -33,7 +31,19 @@
 
         <converter:ReverseBool x:Key="ReverseBool" />
     </windowing:AppWindow.Resources>
-
+    <Interaction.Behaviors>
+        <EventTriggerBehavior EventName="Closing">
+            <InvokeCommandAction Command="{Binding ReloadScenarioCommand}" PassEventArgsToCommand="True" />
+        </EventTriggerBehavior>
+        <EventTriggerBehavior EventName="DataContextChanged">
+            <InvokeCommandAction Command="{Binding LoadCommand}"
+                                   CommandParameter="{Binding $self}" />
+        </EventTriggerBehavior>
+        <EventTriggerBehavior EventName="Loaded">
+            <InvokeCommandAction Command="{Binding LoadCommand}"
+                                   CommandParameter="{Binding $self}" />
+        </EventTriggerBehavior>
+    </Interaction.Behaviors>
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -52,6 +62,7 @@
         <Border x:Name="border" Grid.Column="0" Padding="0,0,0,0" Margin="0">
             <ScrollViewer Margin="0" ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <ListBox x:Name="ListBox" Margin="3,0,0,0">
+
                     <ListBox.ItemContainerTheme>
                         <ControlTheme TargetType="ListBoxItem">
                             <Setter Property="Template">
@@ -79,7 +90,7 @@
                                     </controls:SettingsExpander.Footer>
                                     <controls:SettingsExpander.IconSource>
                                         <controls:FontIconSource FontFamily="{StaticResource FluentFont}"
-                                                                 Glyph="&#xE61C;" />
+                                                                 Glyph="&#xf669;" />
                                     </controls:SettingsExpander.IconSource>
                                 </controls:SettingsExpander>
                                 <controls:SettingsExpander Margin="0" Header="情景描述">
@@ -89,7 +100,7 @@
                                     </controls:SettingsExpander.Footer>
                                     <controls:SettingsExpander.IconSource>
                                         <controls:FontIconSource FontFamily="{StaticResource FluentFont}"
-                                                                 Glyph="&#xE61C;" />
+                                                                 Glyph="&#xf4a3;" />
                                     </controls:SettingsExpander.IconSource>
                                 </controls:SettingsExpander>
                             </StackPanel>
@@ -101,14 +112,13 @@
 
                         <controls:SettingsExpander.Footer>
                             <ToggleSwitch
-                                IsChecked="{Binding Scenario.IsHaveInputValue,Mode=TwoWay}">
-                            </ToggleSwitch>
+                                IsChecked="{Binding Scenario.IsHaveInputValue,Mode=TwoWay}" />
                         </controls:SettingsExpander.Footer>
 
 
                         <controls:SettingsExpander.IconSource>
                             <controls:FontIconSource FontFamily="{StaticResource FluentFont}"
-                                                     Glyph="&#xE61C;" />
+                                                     Glyph="&#xf226;" />
                         </controls:SettingsExpander.IconSource>
                         <StackPanel />
 
@@ -131,7 +141,7 @@
 
                                     <controls:SettingsExpander.IconSource>
                                         <controls:FontIconSource FontFamily="{StaticResource FluentFont}"
-                                                                 Glyph="&#xE61C;" />
+                                                                 Glyph="&#xed88;" />
                                     </controls:SettingsExpander.IconSource>
                                 </controls:SettingsExpander>
                             </StackPanel>
@@ -145,7 +155,278 @@
                             <StackPanel>
                                 <ListBox Margin="0,0,10,0" x:Name="values"
                                          ItemsSource="{Binding Scenario.Values }">
-                                   
+                                    <ListBox.ItemContainerTheme>
+                                        <ControlTheme TargetType="ListBoxItem">
+                                            <Setter Property="Template">
+                                                <ControlTemplate>
+                                                    <ContentPresenter Name="PART_ContentPresenter"
+                                                                      HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                                      VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                                      Background="{TemplateBinding Background}"
+                                                                      BorderBrush="{TemplateBinding BorderBrush}"
+                                                                      BorderThickness="{TemplateBinding BorderThickness}"
+                                                                      Content="{TemplateBinding Content}"
+                                                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                                      DataContext="{TemplateBinding DataContext}"
+                                                                      CornerRadius="{TemplateBinding CornerRadius}" />
+                                                </ControlTemplate>
+
+                                            </Setter>
+                                        </ControlTheme>
+                                    </ListBox.ItemContainerTheme>
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <Border BorderBrush="LightGray" BorderThickness="1"
+                                                        CornerRadius="3"
+                                                        Background="{DynamicResource ControlFillColorDefaultBrush}">
+                                                    <Border.ContextMenu>
+                                                        <ContextMenu>
+                                                            <!-- ReSharper disable once Xaml.RedundantResource -->
+                                                            <MenuItem Header="删除此变量"
+                                                                      Command="{Binding $parent[Border].((taskEditor1:TaskEditorViewModel)DataContext).DelValueCommand}"
+                                                                      CommandParameter="{Binding $parent[Border].((sdKs:KeyValuePairBindingTool)DataContext).Key }" />
+                                                        </ContextMenu>
+                                                    </Border.ContextMenu>
+
+                                                    <Grid Margin="9">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="30" />
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <Border Tag="Set" PointerMoved="ListBox_OnMouseMove"
+                                                                BorderBrush="LightGray" BorderThickness="1"
+                                                                CornerRadius="3">
+                                                            <DockPanel Panel.ZIndex="1">
+                                                                <Border DockPanel.Dock="Top" CornerRadius="3 3 0 0">
+
+                                                                    <Border Height="20"
+
+                                                                            CornerRadius="3 3 0 0">
+                                                                        <Border.Background>
+                                                                            <SolidColorBrush Opacity="0.5"
+                                                                                Color="{DynamicResource SystemAccentColor}" />
+                                                                        </Border.Background>
+                                                                        <TextBlock HorizontalAlignment="Center"
+
+                                                                            Text="{ReflectionBinding Key}"
+                                                                            Foreground="White" />
+                                                                    </Border>
+
+                                                                </Border>
+                                                                <Border CornerRadius="0 0 3 3">
+                                                                    <Grid>
+                                                                        <Rectangle>
+                                                                            <Rectangle.Fill>
+                                                                                <SolidColorBrush
+                                                                                    Color="{DynamicResource ApplicationBackgroundColor}"
+                                                                                    Opacity="0.2" />
+                                                                            </Rectangle.Fill>
+                                                                        </Rectangle>
+                                                                        <DockPanel>
+                                                                            <StackPanel Orientation="Vertical"
+                                                                                DockPanel.Dock="Left"
+                                                                                VerticalAlignment="Center">
+
+                                                                                <StackPanel Orientation="Horizontal"
+                                                                                    VerticalAlignment="Center">
+                                                                                    <Border Background="Transparent">
+                                                                                        <!-- Set the border color to red -->
+                                                                                        <Border.BorderBrush>
+                                                                                            <SolidColorBrush
+                                                                                                Color="{DynamicResource SystemAccentColor}"
+                                                                                                Opacity="0.5" />
+                                                                                        </Border.BorderBrush>
+                                                                                        <!-- Set the border thickness to 2 -->
+                                                                                        <Border.BorderThickness>2</Border.BorderThickness>
+                                                                                        <!-- Set the border corner radius to 10 -->
+                                                                                        <Border.CornerRadius>10</Border.CornerRadius>
+                                                                                        <!-- Set the padding to 10 -->
+                                                                                        <Border.Padding>5</Border.Padding>
+                                                                                        <!-- Set the margin to 20 -->
+                                                                                        <Border.Margin>5</Border.Margin>
+                                                                                    </Border>
+                                                                                    <!-- Declare a TextBlock element and give it a name -->
+
+                                                                                    <TextBlock
+                                                                                        VerticalAlignment="Center"
+                                                                                        x:Name="textBlock"
+                                                                                        FontSize="12"
+
+                                                                                        Text="节点">
+                                                                                        <TextBlock.Background>
+                                                                                            <SolidColorBrush
+                                                                                                Color="{DynamicResource TextFillColorPrimary}"
+                                                                                                Opacity="0.6" />
+                                                                                        </TextBlock.Background>
+                                                                                        <TextBlock.Foreground>
+                                                                                            <SolidColorBrush
+                                                                                                Color="{DynamicResource TextFillColorInverse}" />
+                                                                                        </TextBlock.Foreground>
+                                                                                    </TextBlock>
+
+
+                                                                                    <TextBlock
+                                                                                        VerticalAlignment="Center"
+                                                                                        Text="流节点">
+                                                                                        <TextBlock.Foreground>
+                                                                                            <SolidColorBrush
+                                                                                                Color="{DynamicResource TextFillColorPrimary}" />
+                                                                                        </TextBlock.Foreground>
+                                                                                    </TextBlock>
+                                                                                </StackPanel>
+                                                                                <StackPanel Orientation="Horizontal"
+                                                                                    VerticalAlignment="Center">
+                                                                                    <Border Background="Transparent">
+                                                                                        <!-- Set the border color to red -->
+                                                                                        <Border.BorderBrush>
+                                                                                            <SolidColorBrush
+                                                                                                Color="{DynamicResource SystemAccentColor}"
+                                                                                                Opacity="0.5" />
+                                                                                        </Border.BorderBrush>
+                                                                                        <!-- Set the border thickness to 2 -->
+                                                                                        <Border.BorderThickness>2</Border.BorderThickness>
+                                                                                        <!-- Set the border corner radius to 10 -->
+                                                                                        <Border.CornerRadius>10</Border.CornerRadius>
+                                                                                        <!-- Set the padding to 10 -->
+                                                                                        <Border.Padding>5</Border.Padding>
+                                                                                        <!-- Set the margin to 20 -->
+                                                                                        <Border.Margin>5</Border.Margin>
+                                                                                    </Border>
+                                                                                    <!-- Declare a TextBlock element and give it a name -->
+
+                                                                                    <TextBlock
+                                                                                        VerticalAlignment="Center"
+
+                                                                                        FontSize="12"
+
+                                                                                        Text="变量">
+                                                                                        <TextBlock.Background>
+                                                                                            <SolidColorBrush
+                                                                                                Color="{DynamicResource TextFillColorPrimary}"
+                                                                                                Opacity="0.6" />
+                                                                                        </TextBlock.Background>
+                                                                                        <TextBlock.Foreground>
+                                                                                            <SolidColorBrush
+                                                                                                Color="{DynamicResource TextFillColorInverse}" />
+                                                                                        </TextBlock.Foreground>
+                                                                                    </TextBlock>
+
+
+                                                                                    <TextBlock
+                                                                                        VerticalAlignment="Center"
+                                                                                        Text="设置">
+                                                                                        <TextBlock.Foreground>
+                                                                                            <SolidColorBrush
+                                                                                                Color="{DynamicResource TextFillColorPrimary}" />
+                                                                                        </TextBlock.Foreground>
+                                                                                    </TextBlock>
+                                                                                </StackPanel>
+                                                                            </StackPanel>
+
+
+                                                                        </DockPanel>
+                                                                    </Grid>
+                                                                </Border>
+
+
+                                                            </DockPanel>
+                                                        </Border>
+                                                        <Border Tag="Get" PointerMoved="ListBox_OnMouseMove"
+                                                                Grid.Column="2"
+                                                                BorderBrush="LightGray" BorderThickness="1"
+                                                                CornerRadius="3">
+                                                            <DockPanel Panel.ZIndex="1">
+                                                                <Border DockPanel.Dock="Top" CornerRadius="3 3 0 0">
+
+                                                                    <Border Height="20"
+
+                                                                            CornerRadius="3 3 0 0">
+                                                                        <Border.Background>
+                                                                            <SolidColorBrush Opacity="0.5"
+                                                                                Color="{DynamicResource SystemAccentColor}" />
+                                                                        </Border.Background>
+                                                                        <TextBlock HorizontalAlignment="Center"
+
+                                                                            Text="{ReflectionBinding Key }"
+                                                                            Foreground="White" />
+                                                                    </Border>
+
+                                                                </Border>
+                                                                <Border CornerRadius="0 0 3 3">
+                                                                    <Grid>
+                                                                        <Rectangle>
+                                                                            <Rectangle.Fill>
+                                                                                <SolidColorBrush
+                                                                                    Color="{DynamicResource ApplicationBackgroundColor}"
+                                                                                    Opacity="0.2" />
+                                                                            </Rectangle.Fill>
+                                                                        </Rectangle>
+                                                                        <StackPanel Orientation="Horizontal"
+                                                                            VerticalAlignment="Center"
+                                                                            HorizontalAlignment="Right">
+
+                                                                            <TextBlock
+                                                                                VerticalAlignment="Center"
+
+                                                                                Text="读取">
+                                                                                <TextBlock.Foreground>
+                                                                                    <SolidColorBrush
+                                                                                        Color="{DynamicResource TextFillColorPrimary}" />
+                                                                                </TextBlock.Foreground>
+                                                                            </TextBlock>
+                                                                            <TextBlock
+                                                                                VerticalAlignment="Center"
+                                                                                FontSize="12"
+
+                                                                                Text="变量">
+                                                                                <TextBlock.Background>
+                                                                                    <SolidColorBrush
+                                                                                        Color="{DynamicResource TextFillColorPrimary}"
+                                                                                        Opacity="0.6" />
+
+                                                                                </TextBlock.Background>
+                                                                                <TextBlock.Foreground>
+                                                                                    <SolidColorBrush
+                                                                                        Color="{DynamicResource TextFillColorInverse}" />
+                                                                                </TextBlock.Foreground>
+                                                                            </TextBlock>
+
+                                                                            <Border Background="Transparent">
+                                                                                <!-- Set the border color to red -->
+                                                                                <Border.BorderBrush>
+                                                                                    <SolidColorBrush
+                                                                                        Color="{DynamicResource SystemAccentColor}"
+                                                                                        Opacity="0.5" />
+                                                                                </Border.BorderBrush>
+                                                                                <!-- Set the border thickness to 2 -->
+                                                                                <Border.BorderThickness>2</Border.BorderThickness>
+                                                                                <!-- Set the border corner radius to 10 -->
+                                                                                <Border.CornerRadius>10</Border.CornerRadius>
+                                                                                <!-- Set the padding to 10 -->
+                                                                                <Border.Padding>5</Border.Padding>
+                                                                                <!-- Set the margin to 20 -->
+                                                                                <Border.Margin>5</Border.Margin>
+                                                                            </Border>
+                                                                            <!-- Declare a TextBlock element and give it a name -->
+
+                                                                        </StackPanel>
+
+
+                                                                    </Grid>
+                                                                </Border>
+
+
+                                                            </DockPanel>
+                                                        </Border>
+                                                    </Grid>
+                                                </Border>
+                                            </Grid>
+
+
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
                                 </ListBox>
                                 <Grid Margin="0,10,10,0">
                                     <Grid.ColumnDefinitions>
@@ -155,8 +436,8 @@
                                     <Button Command="{Binding AddValueCommand}"
                                             CommandParameter="{Binding ValueValue}"
                                             Grid.Column="1" Height="40" Width="40">
-                                        <controls:FontIconSource FontFamily="{StaticResource FluentFont}"
-                                                                 Glyph="&#xE61C;" />
+                                        <controls:FontIcon FontFamily="{StaticResource FluentFont}"
+                                                                 Glyph="&#xf107;" />
                                     </Button>
                                     <DockPanel Grid.Column="0" Margin="0,0,0,0" Height="40">
                                         <TextBox Watermark="变量名称"
@@ -177,21 +458,20 @@
                                                            BorderThickness="0">
                                     <controls:SettingsExpander.Footer>
                                         <ToggleSwitch
-                                            IsChecked="{Binding Scenario.ExecutionManual,Mode=TwoWay}">
-                                        </ToggleSwitch>
+                                            IsChecked="{Binding Scenario.ExecutionManual,Mode=TwoWay}" />
                                     </controls:SettingsExpander.Footer>
 
 
                                     <controls:SettingsExpander.IconSource>
                                         <controls:FontIconSource FontFamily="{StaticResource FluentFont}"
-                                                                 Glyph="&#xE61C;" />
+                                                                 Glyph="&#xf226;" />
                                     </controls:SettingsExpander.IconSource>
                                     <StackPanel>
                                         <controls:SettingsExpander Margin="0" Header="关键词"
                                                                    BorderThickness="0">
                                             <controls:SettingsExpander.IconSource>
                                                 <controls:FontIconSource FontFamily="{StaticResource FluentFont}"
-                                                                         Glyph="&#xE61C;" />
+                                                                         Glyph="&#xf4b6;" />
                                             </controls:SettingsExpander.IconSource>
                                             <Grid ColumnSpan="10" RowSpan="5" Margin="10">
                                                 <Grid.ColumnDefinitions>
@@ -210,14 +490,14 @@
                                                 <Button Command="{Binding DelKeyCommand}"
                                                         CommandParameter="{Binding ElementName=keys,Path=SelectedValue}"
                                                         Grid.Row="0" Grid.Column="1" Height="36" Width="36">
-                                                    <controls:FontIconSource FontFamily="{StaticResource FluentFont}"
-                                                                             Glyph="&#xE61C;" />
+                                                    <controls:FontIcon FontFamily="{StaticResource FluentFont}"
+                                                                             Glyph="&#xebce;" />
                                                 </Button>
                                                 <Button Command="{Binding AddKeyCommand}"
                                                         CommandParameter="{Binding KeyValue}" Grid.Row="1"
                                                         Grid.Column="1" Height="36" Width="36">
-                                                    <controls:FontIconSource FontFamily="{StaticResource FluentFont}"
-                                                                             Glyph="&#xE61C;" />
+                                                    <controls:FontIcon FontFamily="{StaticResource FluentFont}"
+                                                                             Glyph="&#xf107;" />
                                                 </Button>
                                                 <DockPanel Grid.Row="1" Grid.Column="0" Margin="10" Height="40">
                                                     <TextBox
@@ -235,7 +515,7 @@
 
                                     <controls:SettingsExpander.IconSource>
                                         <controls:FontIconSource FontFamily="{StaticResource FluentFont}"
-                                                                 Glyph="&#xE61C;" />
+                                                                 Glyph="&#xf217;" />
                                     </controls:SettingsExpander.IconSource>
 
                                     <ItemsControl Margin="15,0,0,0"
@@ -255,10 +535,12 @@
                                                               ConverterParameter={Binding Key}}" />
                                                     <TextBlock VerticalAlignment="Center"
                                                                Text="{Binding Value.Name}" />
-                                                    <!--     <ui:SymbolIcon Symbol="Info24" Foreground="Coral" -->
-                                                    <!--                    ToolTip="{Binding Value.Description}" -->
-                                                    <!--                    ToolTip.ShowDelay="0" -->
-                                                    <!--                    Visibility="{Binding Value.Description, Converter={StaticResource IfNullVisibilityHidden}}" /> -->
+                                                   
+                                                    <controls:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xf4a3;" 
+                                                                       ToolTip.Tip="{Binding Value.Description}"
+                                                                       ToolTip.ShowDelay="0"
+                                                                       IsVisible="{Binding Value.Description, Converter={StaticResource IfNullVisibilityHidden}}"
+                                                    />
                                                 </StackPanel>
                                             </DataTemplate>
 
@@ -270,56 +552,69 @@
                                                            BorderThickness="0">
                                     <controls:SettingsExpander.IconSource>
                                         <controls:FontIconSource FontFamily="{StaticResource FluentFont}"
-                                                                 Glyph="&#xE61C;" />
+                                                                 Glyph="&#xf4b8;" />
                                     </controls:SettingsExpander.IconSource>
                                     <StackPanel Margin="0" Orientation="Vertical">
                                         <controls:SettingsExpander Header="激活快捷键" Description="修改激活快捷键">
                                             <controls:SettingsExpander.Footer>
-                                                <controls1:HotKeyShow IsEnabled="{Binding IsSaveInLocal}"
+                                                <Panel>
+                                                    <controls1:HotKeyShow x:Name="KeyShow"
+                                                                          IsEnabled="{Binding IsSaveInLocal}">
+                                                        <controls1:HotKeyShow.HotKeySignName>
+                                                            <MultiBinding
+                                                                Converter="{StaticResource HotKeySignNameToolCTr}">
+                                                                <MultiBinding.Bindings>
+                                                                    <Binding Source="Kitopia情景" />
+                                                                    <Binding Path="Scenario.UUID" />
+                                                                    <Binding Source="激活快捷键" />
+                                                                </MultiBinding.Bindings>
+                                                            </MultiBinding>
+                                                        </controls1:HotKeyShow.HotKeySignName>
+                                                    </controls1:HotKeyShow>
+                                                    <Panel Background="{DynamicResource ControlFillColorDisabledBrush}"
+                                                           Width="{Binding #KeyShow.Bounds.Width}"
+                                                           Height="{Binding #KeyShow.Bounds.Height}"
+                                                           IsVisible="{Binding IsSaveInLocal,Converter={StaticResource ReverseBool}}"
+                                                           ToolTip.ShowDelay="100" ToolTip.Tip="需要先保存一次情景才可设置"
+                                                           ZIndex="2" />
+                                                </Panel>
 
-                                                                      ToolTip.ShowDelay="100"
-                                                                      ToolTip.Tip="需要先保存一次情景才可设置"
-                                                                      ToolTip.IsEnabled="{Binding IsSaveInLocal,Converter={StaticResource ReverseBool}}">
-                                                    <controls1:HotKeyShow.HotKeySignName>
-                                                        <MultiBinding
-                                                            Converter="{StaticResource HotKeySignNameToolCTr}">
-                                                            <MultiBinding.Bindings>
-                                                                <Binding Source="Kitopia情景" />
-                                                                <Binding Path="Scenario.UUID" />
-                                                                <Binding Source="激活快捷键" />
-                                                            </MultiBinding.Bindings>
-                                                        </MultiBinding>
-                                                    </controls1:HotKeyShow.HotKeySignName>
-                                                </controls1:HotKeyShow>
+
                                             </controls:SettingsExpander.Footer>
 
                                             <controls:SettingsExpander.IconSource>
                                                 <controls:FontIconSource FontFamily="{StaticResource FluentFont}"
-                                                                         Glyph="&#xE61C;" />
+                                                                         Glyph="&#xf4b8;" />
                                             </controls:SettingsExpander.IconSource>
                                         </controls:SettingsExpander>
                                         <controls:SettingsExpander Header="停止快捷键" Description="修改停止快捷键">
                                             <controls:SettingsExpander.Footer>
-                                                <controls1:HotKeyShow IsEnabled="{Binding IsSaveInLocal}"
-                                                                      ToolTip.ShowDelay="100"
-                                                                      ToolTip.Tip="需要先保存一次情景才可设置"
-                                                                      ToolTip.IsEnabled="{Binding IsSaveInLocal,Converter={StaticResource ReverseBool}}">
-                                                    <controls1:HotKeyShow.HotKeySignName>
-                                                        <MultiBinding
-                                                            Converter="{StaticResource HotKeySignNameToolCTr}">
-                                                            <MultiBinding.Bindings>
-                                                                <Binding Source="Kitopia情景" />
-                                                                <Binding Path="Scenario.UUID" />
-                                                                <Binding Source="停止快捷键" />
-                                                            </MultiBinding.Bindings>
-                                                        </MultiBinding>
-                                                    </controls1:HotKeyShow.HotKeySignName>
-                                                </controls1:HotKeyShow>
+                                                <Panel>
+                                                    <controls1:HotKeyShow x:Name="KeyShow1"
+                                                                          IsEnabled="{Binding IsSaveInLocal}">
+                                                        <controls1:HotKeyShow.HotKeySignName>
+                                                            <MultiBinding
+                                                                Converter="{StaticResource HotKeySignNameToolCTr}">
+                                                                <MultiBinding.Bindings>
+                                                                    <Binding Source="Kitopia情景" />
+                                                                    <Binding Path="Scenario.UUID" />
+                                                                    <Binding Source="停止快捷键" />
+                                                                </MultiBinding.Bindings>
+                                                            </MultiBinding>
+                                                        </controls1:HotKeyShow.HotKeySignName>
+                                                    </controls1:HotKeyShow>
+                                                    <Panel Background="{DynamicResource ControlFillColorDisabledBrush}"
+                                                           Width="{Binding #KeyShow1.Bounds.Width}"
+                                                           Height="{Binding #KeyShow1.Bounds.Height}"
+                                                           IsVisible="{Binding IsSaveInLocal,Converter={StaticResource ReverseBool}}"
+                                                           ToolTip.ShowDelay="100" ToolTip.Tip="需要先保存一次情景才可设置"
+                                                           ZIndex="2" />
+                                                </Panel>
                                             </controls:SettingsExpander.Footer>
 
                                             <controls:SettingsExpander.IconSource>
                                                 <controls:FontIconSource FontFamily="{StaticResource FluentFont}"
-                                                                         Glyph="&#xE61C;" />
+                                                                         Glyph="&#xf4b8;" />
                                             </controls:SettingsExpander.IconSource>
                                         </controls:SettingsExpander>
                                     </StackPanel>
@@ -354,7 +649,7 @@
                                             x:TypeArguments="x:Object" />
                                 </DataTemplate.DataType>
                                 <Expander Header="{ReflectionBinding [0].Plugin}" Margin="0">
-                                    <ListBox Margin="0"
+                                    <ListBox Margin="0" 
                                              PointerMoved="ListBox_OnMouseMove"
                                              ItemsSource="{Binding }">
                                         <ListBox.ItemContainerTheme>
@@ -368,6 +663,7 @@
                                                                           BorderBrush="{TemplateBinding BorderBrush}"
                                                                           BorderThickness="{TemplateBinding BorderThickness}"
                                                                           Content="{TemplateBinding Content}"
+                                                                          Margin="0,0,0,5" 
                                                                           ContentTemplate="{TemplateBinding ContentTemplate}"
                                                                           CornerRadius="{TemplateBinding CornerRadius}" />
                                                     </ControlTemplate>
@@ -625,10 +921,11 @@
                                                                                                 Color="{DynamicResource TextFillColorInverse}" />
                                                                                         </TextBlock.Foreground>
                                                                                     </TextBlock>
-                                                                                    <!-- <ui:SymbolIcon Symbol="AddCircle20" -->
-                                                                                    <!--     ToolTip="{Binding Interfaces, Converter={StaticResource InterfacesToString}}" -->
-                                                                                    <!--     ToolTip.ShowDelay="0" -->
-                                                                                    <!--     Visibility="{Binding Interfaces, Converter={StaticResource IfNullVisibilityHidden}}" /> -->
+                                                                                    <controls:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xf10c;" 
+                                                                                        ToolTip.Tip="{Binding Interfaces, Converter={StaticResource InterfacesToString}}"
+                                                                                        ToolTip.ShowDelay="0"
+                                                                                        IsVisible="{Binding Interfaces, Converter={StaticResource IfNullVisibilityHidden}}"
+                                                                                    />
                                                                                     <Border Background="Transparent">
                                                                                         <!-- Set the border color to red -->
                                                                                         <Border.BorderBrush>
@@ -675,9 +972,7 @@
             </ScrollViewer>
 
             <Interaction.Behaviors>
-                <EventTriggerBehavior EventName="Loaded">
-
-                </EventTriggerBehavior>
+                <EventTriggerBehavior EventName="Loaded" />
 
             </Interaction.Behaviors>
         </Border>
@@ -699,7 +994,21 @@
                                         DisconnectConnectorCommand="{Binding DisconnectConnectorCommand}"
                                         Connections="{Binding Scenario.connections}"
                                         ItemsSource="{Binding Scenario.nodes}">
-
+                    <controls2:NodifyEditor.GridLineTemplate>
+                        <DataTemplate>
+                            <controls2:LargeGridLine
+                                Width="{Binding $parent[controls2:NodifyEditor].Bounds.Width}"
+                                OffsetX="{Binding $parent[controls2:NodifyEditor].OffsetX}"
+                                OffsetY="{Binding $parent[controls2:NodifyEditor].OffsetY}"
+                                Zoom="{Binding $parent[controls2:NodifyEditor].Zoom}"
+                                Height="{Binding $parent[controls2:NodifyEditor].Bounds.Height}"
+                                ZIndex="-2">
+                                <controls2:LargeGridLine.Brush>
+                                    <SolidColorBrush Color="Gainsboro" Opacity="0.5" />
+                                </controls2:LargeGridLine.Brush>
+                            </controls2:LargeGridLine>
+                        </DataTemplate>
+                    </controls2:NodifyEditor.GridLineTemplate>
 
                     <controls2:NodifyEditor.Foreground>
                         <SolidColorBrush Color="{DynamicResource ApplicationBackgroundColor}" Opacity="0.7" />
@@ -775,23 +1084,19 @@
                                         <Interaction.Behaviors>
                                             <DataTriggerBehavior Binding="{Binding Status}" Value="0">
                                                 <ChangePropertyAction TargetObject="Node" PropertyName="BorderBrush"
-                                                                      Value="LightGray">
-                                                </ChangePropertyAction>
+                                                                      Value="LightGray" />
                                             </DataTriggerBehavior>
                                             <DataTriggerBehavior Binding="{Binding Status}" Value="1">
                                                 <ChangePropertyAction PropertyName="BorderBrush" TargetObject="Node"
-                                                                      Value="GreenYellow">
-                                                </ChangePropertyAction>
+                                                                      Value="GreenYellow" />
                                             </DataTriggerBehavior>
                                             <DataTriggerBehavior Binding="{Binding Status}" Value="2">
                                                 <ChangePropertyAction TargetObject="Node" PropertyName="BorderBrush"
-                                                                      Value="OrangeRed">
-                                                </ChangePropertyAction>
+                                                                      Value="OrangeRed" />
                                             </DataTriggerBehavior>
                                             <DataTriggerBehavior Binding="{Binding Status}" Value="3">
                                                 <ChangePropertyAction TargetObject="Node" PropertyName="BorderBrush"
-                                                                      Value="Yellow">
-                                                </ChangePropertyAction>
+                                                                      Value="Yellow" />
                                             </DataTriggerBehavior>
                                         </Interaction.Behaviors>
                                     </Style>
@@ -800,7 +1105,7 @@
                                 <controls2:Node.Resources>
 
                                     <taskEditor:InterfacesToString x:Key="InterfacesToString" />
-                                    
+
 
                                 </controls2:Node.Resources>
 
@@ -816,177 +1121,182 @@
                                                HorizontalAlignment="Center" />
                                 </controls2:Node.Header>
                                 <controls2:Node.InputConnectorTemplate>
-                                    
-                                        
-                                            <plugin:MyDataTemplateSelector >
-                                                <DataTemplate x:Key="InputTemplate"
-                                                  DataType="{x:Type customScenario:ConnectorItem}">
-
-                                        <controls2:NodeInput
-                                            ToolTip.Tip="{Binding InputObject}"
-                                            ToolTip.ShowDelay="0"
-                                            IsConnected="{Binding IsConnected}"
-                                            Anchor="{Binding Anchor, Mode=TwoWay}">
-                                            <controls2:NodeInput.Header>
-
-                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
-                                                            HorizontalAlignment="Right">
-                                                    <TextBlock VerticalAlignment="Center" FontSize="12"
-                                                               Text="{Binding TypeName}">
-                                                        <TextBlock.Styles>
-                                                            <Style Selector="TextBlock">
-                                                                <Interaction.Behaviors>
-                                                                    <DataTriggerBehavior
-                                                                        Binding="{Binding IsNotUsed}" Value="True">
-                                                                        <ChangePropertyAction TargetObject="textBlock"
-                                                                            PropertyName="Background">
-                                                                            <ChangePropertyAction.Value>
-                                                                                <SolidColorBrush
-                                                                                    Color="{DynamicResource ControlFillColorDisabled}"
-                                                                                    Opacity="0.6" />
-                                                                            </ChangePropertyAction.Value>
-                                                                        </ChangePropertyAction>
-                                                                        <ChangePropertyAction TargetObject="textBlock"
-                                                                            PropertyName="Foreground">
-                                                                            <ChangePropertyAction.Value>
-                                                                                <SolidColorBrush
-                                                                                    Color="{DynamicResource TextFillColorTertiary}" />
-                                                                            </ChangePropertyAction.Value>
-                                                                        </ChangePropertyAction>
-                                                                    </DataTriggerBehavior>
-                                                                    <DataTriggerBehavior
-                                                                        Binding="{Binding IsNotUsed}" Value="False">
-                                                                        <ChangePropertyAction TargetObject="textBlock"
-                                                                            PropertyName="Background">
-                                                                            <ChangePropertyAction.Value>
-                                                                                <SolidColorBrush
-                                                                                    Color="{DynamicResource TextFillColorPrimary}"
-                                                                                    Opacity="0.6" />
-                                                                            </ChangePropertyAction.Value>
-                                                                        </ChangePropertyAction>
-                                                                        <ChangePropertyAction TargetObject="textBlock"
-                                                                            PropertyName="Foreground">
-                                                                            <ChangePropertyAction.Value>
-                                                                                <SolidColorBrush
-                                                                                    Color="{DynamicResource TextFillColorInverse}" />
-                                                                            </ChangePropertyAction.Value>
-                                                                        </ChangePropertyAction>
-                                                                    </DataTriggerBehavior>
-                                                                </Interaction.Behaviors>
-
-                                                            </Style>
-                                                        </TextBlock.Styles>
-
-                                                    </TextBlock>
-                                                    <TextBlock VerticalAlignment="Center" x:Name="textBlock"
-                                                               Text="{Binding Title}">
-                                                        <TextBlock.Styles>
-                                                            <Style Selector="TextBlock">
-                                                                <Interaction.Behaviors>
-                                                                    <DataTriggerBehavior
-                                                                        Binding="{Binding IsNotUsed}" Value="True">
-                                                                        <ChangePropertyAction
-                                                                            PropertyName="Foreground">
-                                                                            <ChangePropertyAction.Value>
-                                                                                <SolidColorBrush
-                                                                                    Color="{DynamicResource TextFillColorTertiary}" />
-                                                                            </ChangePropertyAction.Value>
-                                                                        </ChangePropertyAction>
-                                                                    </DataTriggerBehavior>
-                                                                </Interaction.Behaviors>
-
-                                                            </Style>
-                                                        </TextBlock.Styles>
-                                                    </TextBlock>
-                                                </StackPanel>
-                                            </controls2:NodeInput.Header>
-                                            <controls2:NodeInput.BorderBrush>
-                                                <SolidColorBrush
-                                                    Color="{DynamicResource SystemAccentColor}"
-                                                    Opacity="0.5" />
-                                            </controls2:NodeInput.BorderBrush>
-                                        </controls2:NodeInput>
 
 
-                                    </DataTemplate>
-                                                <DataTemplate x:Key="StringTemplate"
-                                                              DataType="{x:Type customScenario:ConnectorItem}">
-                                                    <StackPanel Margin="10,0,0,0" Orientation="Horizontal"
-                                                                VerticalAlignment="Center"
+                                    <plugin:MyDataTemplateSelector>
+                                        <DataTemplate x:Key="InputTemplate"
+                                                      DataType="{x:Type customScenario:ConnectorItem}">
+
+                                            <controls2:NodeInput
+                                                ToolTip.Tip="{Binding InputObject}"
+                                                ToolTip.ShowDelay="0"
+                                                IsConnected="{Binding IsConnected}"
+                                                Anchor="{Binding Anchor, Mode=TwoWay}">
+                                                <controls2:NodeInput.Header>
+
+                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
                                                                 HorizontalAlignment="Right">
+                                                        <TextBlock VerticalAlignment="Center" FontSize="12"
+                                                                   x:Name="TypeNametextBlock"
+                                                                   Text="{Binding TypeName}">
+                                                            <TextBlock.Styles>
+                                                                <Style Selector="TextBlock">
+                                                                    <Interaction.Behaviors>
+                                                                        <DataTriggerBehavior
+                                                                            Binding="{Binding IsNotUsed}" Value="True">
+                                                                            <ChangePropertyAction
+                                                                                TargetObject="TypeNametextBlock"
+                                                                                PropertyName="Background">
+                                                                                <ChangePropertyAction.Value>
+                                                                                    <SolidColorBrush
+                                                                                        Color="{DynamicResource ControlFillColorDisabled}"
+                                                                                        Opacity="0.6" />
+                                                                                </ChangePropertyAction.Value>
+                                                                            </ChangePropertyAction>
+                                                                            <ChangePropertyAction
+                                                                                TargetObject="TypeNametextBlock"
+                                                                                PropertyName="Foreground">
+                                                                                <ChangePropertyAction.Value>
+                                                                                    <SolidColorBrush
+                                                                                        Color="{DynamicResource TextFillColorTertiary}" />
+                                                                                </ChangePropertyAction.Value>
+                                                                            </ChangePropertyAction>
+                                                                        </DataTriggerBehavior>
+                                                                        <DataTriggerBehavior
+                                                                            Binding="{Binding IsNotUsed}" Value="False">
+                                                                            <ChangePropertyAction
+                                                                                TargetObject="TypeNametextBlock"
+                                                                                PropertyName="Background">
+                                                                                <ChangePropertyAction.Value>
+                                                                                    <SolidColorBrush
+                                                                                        Color="{DynamicResource TextFillColorPrimary}"
+                                                                                        Opacity="0.6" />
+                                                                                </ChangePropertyAction.Value>
+                                                                            </ChangePropertyAction>
+                                                                            <ChangePropertyAction
+                                                                                TargetObject="TypeNametextBlock"
+                                                                                PropertyName="Foreground">
+                                                                                <ChangePropertyAction.Value>
+                                                                                    <SolidColorBrush
+                                                                                        Color="{DynamicResource TextFillColorInverse}" />
+                                                                                </ChangePropertyAction.Value>
+                                                                            </ChangePropertyAction>
+                                                                        </DataTriggerBehavior>
+                                                                    </Interaction.Behaviors>
+
+                                                                </Style>
+                                                            </TextBlock.Styles>
+
+                                                        </TextBlock>
                                                         <TextBlock VerticalAlignment="Center" x:Name="textBlock"
-                                                                   Text="{Binding Title}"
-                                                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                                                        <TextBox Margin="10,5,10,5" MinWidth="40"
-                                                                 Text="{Binding InputObject}" Watermark="字符串" />
+                                                                   Text="{Binding Title}">
+                                                            <TextBlock.Styles>
+                                                                <Style Selector="TextBlock">
+                                                                    <Interaction.Behaviors>
+                                                                        <DataTriggerBehavior
+                                                                            Binding="{Binding IsNotUsed}" Value="True">
+                                                                            <ChangePropertyAction
+                                                                                TargetObject="textBlock"
+                                                                                PropertyName="Foreground">
+                                                                                <ChangePropertyAction.Value>
+                                                                                    <SolidColorBrush
+                                                                                        Color="{DynamicResource TextFillColorTertiary}" />
+                                                                                </ChangePropertyAction.Value>
+                                                                            </ChangePropertyAction>
+                                                                        </DataTriggerBehavior>
+                                                                    </Interaction.Behaviors>
+
+                                                                </Style>
+                                                            </TextBlock.Styles>
+                                                        </TextBlock>
                                                     </StackPanel>
+                                                </controls2:NodeInput.Header>
+                                                <controls2:NodeInput.BorderBrush>
+                                                    <SolidColorBrush
+                                                        Color="{DynamicResource SystemAccentColor}"
+                                                        Opacity="0.5" />
+                                                </controls2:NodeInput.BorderBrush>
+                                            </controls2:NodeInput>
 
-                                                </DataTemplate>
-                                                <DataTemplate x:Key="IntTemplate"
-                                                              DataType="{x:Type customScenario:ConnectorItem}">
-                                                    <StackPanel Margin="10,0,0,0" Orientation="Horizontal"
-                                                                VerticalAlignment="Center"
-                                                                HorizontalAlignment="Right">
-                                                        <TextBlock VerticalAlignment="Center" x:Name="textBlock"
-                                                                   Text="{Binding Title}"
-                                                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                                                        <controls:NumberBox Margin="10,5,10,5" MinWidth="40"
-                                                                            ValidationMode="InvalidInputOverwritten"
-                                                                            Maximum="2147483647" Minimum="-2147483648"
-                                                                            Value="{Binding InputObject, Mode=TwoWay}"
-                                                                            PlaceholderText="整型" />
-                                                    </StackPanel>
 
-                                                </DataTemplate>
-                                                <DataTemplate x:Key="DoubleTemplate"
-                                                              DataType="{x:Type customScenario:ConnectorItem}">
-                                                    <StackPanel Margin="10,0,0,0" Orientation="Horizontal"
-                                                                VerticalAlignment="Center"
-                                                                HorizontalAlignment="Right">
-                                                        <TextBlock VerticalAlignment="Center" x:Name="textBlock"
-                                                                   Text="{Binding Title}"
-                                                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                                                        <controls:NumberBox Margin="10,5,10,5" MinWidth="40"
-                                                                            SimpleNumberFormat="F2"
-                                                                            ValidationMode="InvalidInputOverwritten"
-                                                                            Value="{Binding InputObject, Mode=TwoWay}"
-                                                                            PlaceholderText="浮点" />
-                                                    </StackPanel>
+                                        </DataTemplate>
+                                        <DataTemplate x:Key="StringTemplate"
+                                                      DataType="{x:Type customScenario:ConnectorItem}">
+                                            <StackPanel Margin="10,0,0,0" Orientation="Horizontal"
+                                                        VerticalAlignment="Center"
+                                                        HorizontalAlignment="Right">
+                                                <TextBlock VerticalAlignment="Center" x:Name="textBlock"
+                                                           Text="{Binding Title}"
+                                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                <TextBox Margin="10,5,10,5" MinWidth="40"
+                                                         Text="{Binding InputObject}" Watermark="字符串" />
+                                            </StackPanel>
 
-                                                </DataTemplate>
-                                                <DataTemplate x:Key="BoolTemplate"
-                                                              DataType="{x:Type customScenario:ConnectorItem}">
-                                                    <StackPanel Margin="10,0,0,0" Orientation="Horizontal"
-                                                                VerticalAlignment="Center"
-                                                                HorizontalAlignment="Right">
-                                                        <TextBlock VerticalAlignment="Center" x:Name="textBlock"
-                                                                   Text="{Binding Title}"
-                                                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                                                        <ToggleSwitch Margin="10,5,10,5" MinWidth="40"
-                                                                      IsChecked="{Binding InputObject, Mode=TwoWay}" />
-                                                    </StackPanel>
+                                        </DataTemplate>
+                                        <DataTemplate x:Key="IntTemplate"
+                                                      DataType="{x:Type customScenario:ConnectorItem}">
+                                            <StackPanel Margin="10,0,0,0" Orientation="Horizontal"
+                                                        VerticalAlignment="Center"
+                                                        HorizontalAlignment="Right">
+                                                <TextBlock VerticalAlignment="Center" x:Name="textBlock"
+                                                           Text="{Binding Title}"
+                                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                <controls:NumberBox Margin="10,5,10,5" MinWidth="40"
+                                                                    ValidationMode="InvalidInputOverwritten"
+                                                                    Maximum="2147483647" Minimum="-2147483648"
+                                                                    Value="{Binding InputObject, Mode=TwoWay}"
+                                                                    PlaceholderText="整型" />
+                                            </StackPanel>
 
-                                                </DataTemplate>
-                                                <DataTemplate x:Key="SearchItemTemplate"
-                                                              DataType="{x:Type customScenario:ConnectorItem}">
-                                                    <StackPanel Margin="10,0,0,0" Orientation="Horizontal"
-                                                                VerticalAlignment="Center"
-                                                                HorizontalAlignment="Right">
-                                                        <TextBlock VerticalAlignment="Center" x:Name="textBlock"
-                                                                   Text="{Binding Title}"
-                                                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                                                        <controls1:SearchItemShow Margin="10,5,10,5"
-                                                            ToolTip.Tip="{Binding RelativeSource={RelativeSource Self},Path=OnlyKey}"
-                                                            Click="SearchItemShow_OnClick"
-                                                            OnlyKey="{Binding InputObject, Mode=TwoWay}" />
-                                                    </StackPanel>
+                                        </DataTemplate>
+                                        <DataTemplate x:Key="DoubleTemplate"
+                                                      DataType="{x:Type customScenario:ConnectorItem}">
+                                            <StackPanel Margin="10,0,0,0" Orientation="Horizontal"
+                                                        VerticalAlignment="Center"
+                                                        HorizontalAlignment="Right">
+                                                <TextBlock VerticalAlignment="Center" x:Name="textBlock"
+                                                           Text="{Binding Title}"
+                                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                <controls:NumberBox Margin="10,5,10,5" MinWidth="40"
+                                                                    SimpleNumberFormat="F2"
+                                                                    ValidationMode="InvalidInputOverwritten"
+                                                                    Value="{Binding InputObject, Mode=TwoWay}"
+                                                                    PlaceholderText="浮点" />
+                                            </StackPanel>
 
-                                                </DataTemplate>
-                                            </plugin:MyDataTemplateSelector>
-                                            <!-- Use a ContentControl to display the single element -->
+                                        </DataTemplate>
+                                        <DataTemplate x:Key="BoolTemplate"
+                                                      DataType="{x:Type customScenario:ConnectorItem}">
+                                            <StackPanel Margin="10,0,0,0" Orientation="Horizontal"
+                                                        VerticalAlignment="Center"
+                                                        HorizontalAlignment="Right">
+                                                <TextBlock VerticalAlignment="Center" x:Name="textBlock"
+                                                           Text="{Binding Title}"
+                                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                <ToggleSwitch Margin="10,5,10,5" MinWidth="40"
+                                                              IsChecked="{Binding InputObject, Mode=TwoWay}" />
+                                            </StackPanel>
 
-                                       
-                                    
+                                        </DataTemplate>
+                                        <DataTemplate x:Key="SearchItemTemplate"
+                                                      DataType="{x:Type customScenario:ConnectorItem}">
+                                            <StackPanel Margin="10,0,0,0" Orientation="Horizontal"
+                                                        VerticalAlignment="Center"
+                                                        HorizontalAlignment="Right">
+                                                <TextBlock VerticalAlignment="Center" x:Name="textBlock"
+                                                           Text="{Binding Title}"
+                                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                <controls1:SearchItemShow Margin="10,5,10,5"
+                                                                          ToolTip.Tip="{Binding RelativeSource={RelativeSource Self},Path=OnlyKey}"
+                                                                          Click="SearchItemShow_OnClick"
+                                                                          OnlyKey="{Binding InputObject, Mode=TwoWay}" />
+                                            </StackPanel>
+
+                                        </DataTemplate>
+                                    </plugin:MyDataTemplateSelector>
+                                    <!-- Use a ContentControl to display the single element -->
+
+
                                 </controls2:Node.InputConnectorTemplate>
 
                                 <controls2:Node.OutputConnectorTemplate>
@@ -1016,10 +1326,12 @@
                                                                 Color="{DynamicResource TextFillColorInverse}" />
                                                         </TextBlock.Foreground>
                                                     </TextBlock>
-                                                    <!-- <ui:SymbolIcon Symbol="AddCircle20" -->
-                                                    <!--                ToolTip="{Binding Interfaces, Converter={StaticResource InterfacesToString}}" -->
-                                                    <!--                ToolTip.ShowDelay="0" -->
-                                                    <!--                Visibility="{Binding Interfaces, Converter={StaticResource IfNullVisibilityHidden}}" /> -->
+                                                    
+                                                    <controls:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xf10c;" 
+                                                                       ToolTip.Tip="{Binding Interfaces, Converter={StaticResource InterfacesToString}}"
+                                                                       ToolTip.ShowDelay="0"
+                                                                       IsVisible="{Binding Interfaces, Converter={StaticResource IfNullVisibilityHidden}}"
+                                                                       />
                                                 </StackPanel>
                                             </controls2:NodeOutput.Header>
                                             <controls2:NodeOutput.BorderBrush>
@@ -1062,29 +1374,28 @@
                     </StackPanel.Resources>
                     <Button FontSize="25" ToolTip.Tip="清理未连接节点" ToolTip.ShowDelay="100"
                             Command="{Binding CleanUnusedNodeCommand}">
-                        <controls:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xF713;" />
+                        <controls:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xf34c;" />
                     </Button>
                     <Button FontSize="25" ToolTip.Tip="运行测试" ToolTip.ShowDelay="100"
                             IsVisible="{Binding Scenario.IsRunning,Converter={StaticResource reverseBoolToVisibilityConverter}}"
                             Foreground="GreenYellow"
                             Command="{Binding VerifyNodeCommand}">
-                        <controls:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xF713;" />
+                        <controls:FontIcon Foreground="GreenYellow" FontFamily="{StaticResource FluentFont}" Glyph="&#xf605;" />
                     </Button>
                     <Button FontSize="25" ToolTip.Tip="停止测试" ToolTip.ShowDelay="100"
                             IsVisible="{Binding Scenario.IsRunning}"
-                            Background="OrangeRed"
-                            Foreground="White"
+                            
                             Command="{Binding StopCustomScenarioCommand}">
-                        <controls:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xF713;" />
+                        <controls:FontIcon  Foreground="OrangeRed" FontFamily="{StaticResource FluentFont}" Glyph="&#xf72a;" />
                     </Button>
                     <Button FontSize="25" ToolTip.Tip="保存" ToolTip.ShowDelay="100"
                             Command="{Binding SaveCustomScenarioCommand}">
-                        <controls:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xF713;" />
+                        <controls:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xf67f;" />
                     </Button>
                     <Button FontSize="25" ToolTip.Tip="退出并保存" ToolTip.ShowDelay="100"
                             Command="{Binding SaveAndQuitCustomScenarioCommand}"
                             CommandParameter="{Binding $parent[windowing:AppWindow]}">
-                        <controls:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xF713;" />
+                        <controls:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xea45;" />
                     </Button>
                 </StackPanel>
             </Border>

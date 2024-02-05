@@ -504,14 +504,14 @@ public partial class TaskEditorViewModel : ObservableRecipient
             Content = "是否确定保存并退出",
             Title = "保存并退出?",
             PrimaryButtonText = "确定",
-            SecondaryButtonText = "取消",
+            CloseButtonText = "取消",
             PrimaryAction = () =>
             {
-                IsModified = false;
-                CustomScenarioManger.Save(Scenario);
-                OnPropertyChanged(nameof(IsSaveInLocal));
                 Dispatcher.UIThread.InvokeAsync(() =>
                 {
+                    CustomScenarioManger.Save(Scenario);
+                    OnPropertyChanged(nameof(IsSaveInLocal));
+                    IsModified = false;
                     window.Close();
                 });
             }
@@ -625,15 +625,25 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 CloseButtonText = "取消",
                 PrimaryAction = () =>
                 {
-                    IsModified = false;
-                    CustomScenarioManger.Save(Scenario);
-                    _window.Close();
+                    Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        CustomScenarioManger.Save(Scenario);
+                        IsModified = false;
+
+
+                        _window.Close();
+                    });
                 },
                 SecondaryAction = () =>
                 {
-                    CustomScenarioManger.Reload(Scenario);
-                    IsModified = false;
-                    _window.Close();
+                    Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        CustomScenarioManger.Reload(Scenario);
+                        IsModified = false;
+
+
+                        _window.Close();
+                    });
                 },
                 CloseAction = () =>
                 {

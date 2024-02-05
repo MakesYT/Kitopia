@@ -22,7 +22,9 @@ public class ContentDialogService : IContentDialog
             Title = dialogContent.Title,
             Content = dialogContent.Content,
             CloseButtonText = dialogContent.CloseButtonText,
-            PrimaryButtonText = dialogContent.PrimaryButtonText
+            SecondaryButtonText = dialogContent.SecondaryButtonText,
+            PrimaryButtonText = dialogContent.PrimaryButtonText,
+            DefaultButton = ContentDialogButton.Primary
         };
         dialog.ShowAsync((TopLevel)contentPresenter!).ContinueWith(e =>
         {
@@ -74,7 +76,8 @@ public class ContentDialogService : IContentDialog
                 Title = dialogContent.Title,
                 Content = dialogContent.Content,
                 CloseButtonText = dialogContent.CloseButtonText,
-                PrimaryButtonText = dialogContent.PrimaryButtonText
+                PrimaryButtonText = dialogContent.PrimaryButtonText,
+                DefaultButton = ContentDialogButton.Primary
             };
             dialog.ShowAsync((TopLevel)contentPresenter!).ContinueWith(e =>
             {

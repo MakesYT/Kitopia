@@ -1,10 +1,11 @@
-﻿using System.Collections.Specialized;
+﻿using System.Collections;
+using System.Collections.Specialized;
 using System.ComponentModel;
-using Avalonia.Collections;
 
 namespace Core.SDKs.CustomType;
 
-public class ObservableDictionary<TKey, TValue> : Dictionary<TKey, TValue>,IAvaloniaDictionary<TKey, TValue>, INotifyCollectionChanged,
+public class ObservableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IList<KeyValuePair<TKey, TValue>>, IList,
+    INotifyCollectionChanged,
     INotifyPropertyChanged
 {
     private int _index;
@@ -13,22 +14,93 @@ public class ObservableDictionary<TKey, TValue> : Dictionary<TKey, TValue>,IAval
 
     public new ValueCollection Values => base.Values;
 
-    public new int Count => base.Count;
-
     public new TValue this[TKey key]
     {
         get => GetValue(key);
         set => SetValue(key, value);
     }
 
-    public TValue this[int index]
+    public bool IsFixedSize
     {
-        get => GetIndexValue(index);
+        get;
+    }
+
+    object? IList.this[int index]
+    {
+        get => this.GetByIndex(index);
         set => SetIndexValue(index, value);
     }
 
+
+    public int IndexOf(object? value)
+    {
+        if (value is KeyValuePair<TKey, TValue> keyValuePair)
+        {
+            return IndexOf(keyValuePair.Key);
+        }
+
+        return -1;
+    }
+
+    public bool Contains(object? value) => throw new NotImplementedException();
+    public void Insert(int index, object? value) => throw new NotImplementedException();
+
+    public void Remove(object? value) => throw new NotImplementedException();
+    public int Add(object? value) => throw new NotImplementedException();
+
+    public bool IsReadOnly
+    {
+        get;
+    }
+
+    public new int Count => base.Count;
+
+    public KeyValuePair<TKey, TValue> this[int index]
+    {
+        get => this.GetByIndex(index);
+        set => SetIndexValue(index, value);
+    }
+
+    public int IndexOf(KeyValuePair<TKey, TValue> item)
+    {
+        return IndexOf(item.Key);
+    }
+
+    public void Insert(int index, KeyValuePair<TKey, TValue> item) => throw new NotImplementedException();
+
+    public void RemoveAt(int index) => throw new NotImplementedException();
+
+
+    public new void Clear()
+    {
+        base.Clear();
+        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        OnPropertyChanged("Keys");
+        OnPropertyChanged("Values");
+        OnPropertyChanged("Count");
+    }
+
+
     public event NotifyCollectionChangedEventHandler? CollectionChanged;
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    public KeyValuePair<TKey, TValue> GetByIndex(int index)
+    {
+        if (index >= 0)
+        {
+            foreach (KeyValuePair<TKey, TValue> source1 in this)
+            {
+                if (index == 0)
+                {
+                    return source1;
+                }
+
+                --index;
+            }
+        }
+
+        return default(KeyValuePair<TKey, TValue>);
+    }
 
     public new void Add(TKey key, TValue value)
     {
@@ -40,14 +112,6 @@ public class ObservableDictionary<TKey, TValue> : Dictionary<TKey, TValue>,IAval
         OnPropertyChanged("Count");
     }
 
-    public new void Clear()
-    {
-        base.Clear();
-        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-        OnPropertyChanged("Keys");
-        OnPropertyChanged("Values");
-        OnPropertyChanged("Count");
-    }
 
     public new bool Remove(TKey key)
     {
@@ -83,26 +147,38 @@ public class ObservableDictionary<TKey, TValue> : Dictionary<TKey, TValue>,IAval
 
     #region private方法
 
-    private TValue GetIndexValue(int index)
-    {
-        for (int i = 0; i < Count; i++)
-        {
-            if (i == index)
-            {
-                var pair = this.ElementAt(i);
-                return pair.Value;
-            }
-        }
-
-        return default(TValue);
-    }
-
     private void SetIndexValue(int index, TValue value)
     {
         try
         {
-            var pair = this.ElementAtOrDefault(index);
+            var pair = this.GetByIndex(index);
             SetValue(pair.Key, value);
+        }
+        catch (Exception)
+        {
+        }
+    }
+
+    private void SetIndexValue(int index, object value)
+    {
+        if (value is not KeyValuePair<TKey, TValue> keyValuePair)
+            return;
+        try
+        {
+            var pair = this.GetByIndex(index);
+            SetValue(pair.Key, keyValuePair.Value);
+        }
+        catch (Exception)
+        {
+        }
+    }
+
+    private void SetIndexValue(int index, KeyValuePair<TKey, TValue> value)
+    {
+        try
+        {
+            var pair = this.GetByIndex(index);
+            SetValue(pair.Key, value.Value);
         }
         catch (Exception)
         {

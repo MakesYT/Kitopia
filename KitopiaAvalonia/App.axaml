@@ -16,7 +16,7 @@
     </Application.Resources>
     <Application.Styles>
         <styling:FluentAvaloniaTheme PreferSystemTheme="True" PreferUserAccentColor="True"/>
-        
+        <StyleInclude Source="Controls/SearchItemShow.axaml" />
         <StyleInclude Source="Styles/NavigationViewItemStyles.axaml" />
         <StyleInclude Source="Controls/HotKeyShow.axaml" />
         <StyleInclude Source="Controls/HotKeyShowItme.axaml" />

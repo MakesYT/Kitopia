@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Media;
 using Core.SDKs;
 
 namespace KitopiaAvalonia.Controls;
@@ -13,16 +14,20 @@ public partial class Dialog : Window
     public Dialog()
     {
         InitializeComponent();
+        RenderOptions.SetTextRenderingMode(this, TextRenderingMode.Antialias);
     }
 
     public Dialog(DialogContent content)
     {
         InitializeComponent();
+        RenderOptions.SetTextRenderingMode(this, TextRenderingMode.Antialias);
         Title.Text = content.Title;
         Content.Content = content.Content;
+
         if (content.PrimaryButtonText != null)
         {
             PrimaryButton.Content = content.PrimaryButtonText;
+
             PrimaryButton.Click += (sender, args) =>
             {
                 this.Close();
@@ -52,6 +57,8 @@ public partial class Dialog : Window
             };
             SecondaryButton.IsVisible = true;
         }
+
+        PrimaryButton.Classes.Add("accent");
     }
 
     private void InputElement_OnPointerMoved(object? sender, PointerEventArgs e)

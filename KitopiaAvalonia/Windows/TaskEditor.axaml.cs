@@ -9,6 +9,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Media;
 using Avalonia.Threading;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.Services;
@@ -23,8 +24,6 @@ using DataObject = Avalonia.Input.DataObject;
 using DragDrop = Avalonia.Input.DragDrop;
 using DragDropEffects = Avalonia.Input.DragDropEffects;
 using DragEventArgs = Avalonia.Input.DragEventArgs;
-using IDataObject = Avalonia.Input.IDataObject;
-using MouseButtonState = Vanara.PInvoke.MouseButtonState;
 using Point = Avalonia.Point;
 using RoutedEventArgs = Avalonia.Interactivity.RoutedEventArgs;
 
@@ -37,14 +36,15 @@ public partial class TaskEditor : AppWindow
     public TaskEditor()
     {
         InitializeComponent();
+        RenderOptions.SetTextRenderingMode(this, TextRenderingMode.Antialias);
         if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             var size = desktop.MainWindow.Screens.Primary.Bounds.Size;
             Width = size.Width * 2 / 3;
             Height = size.Height * 2 / 3;
         }
-        
-        Editor.AddHandler(DragDrop.DropEvent,NodifyEditor_Drop);
+
+        Editor.AddHandler(DragDrop.DropEvent, NodifyEditor_Drop);
     }
 
     public void LoadTask(CustomScenario name) => ((TaskEditorViewModel)DataContext).Load(name);
@@ -54,21 +54,20 @@ public partial class TaskEditor : AppWindow
         base.OnApplyTemplate(e);
         //((TaskEditorViewModel)DataContext).ContentPresenter = ContentPresenter;
     }
-    
+
 
     private void ListBox_OnMouseMove(object? sender, PointerEventArgs e)
     {
         var point = e.GetCurrentPoint(this);
         if (sender is ListBox listBox)
         {
-          
             if (point.Properties.IsLeftButtonPressed && listBox.SelectedItem != null)
             {
                 try
                 {
-                    var data=new DataObject();
+                    var data = new DataObject();
                     data.Set("KitopiaPointItem", listBox.SelectedItem);
-                    
+
                     DragDrop.DoDragDrop(e, data, DragDropEffects.Copy);
                 }
                 catch (Exception exception)
@@ -86,7 +85,7 @@ public partial class TaskEditor : AppWindow
                 try
                 {
                     var keyValuePair = (KeyValuePair<string, object>)borderDataContext;
-                     var pointItem = new PointItem()
+                    var pointItem = new PointItem()
                     {
                         Title = $"变量:{keyValuePair.Key}",
                         MerthodName = "valueSet",
@@ -126,8 +125,8 @@ public partial class TaskEditor : AppWindow
                         pointItem.MerthodName = "valueGet";
                         pointItem.Output = inpItems;
                     }
-                    
-                    var data=new DataObject();
+
+                    var data = new DataObject();
                     data.Set("KitopiaPointItem", pointItem);
                     DragDrop.DoDragDrop(e, data, DragDropEffects.Copy);
                 }
@@ -141,21 +140,18 @@ public partial class TaskEditor : AppWindow
 
     private void NodifyEditor_Drop(object sender, DragEventArgs e)
     {
-        
         //throw new System.NotImplementedException();
         if (e.Data.Get("KitopiaPointItem") is PointItem fromListNode)
         {
-            
-                var command = add.Command;
-                if (command != null &&
-                    command.CanExecute(fromListNode)) // Check if the command is not null and can be executed
-                {
-                    var point = e.GetPosition(Editor);
-                    point -= new Point(Editor.ViewTranslateTransform.X, Editor.ViewTranslateTransform.Y);
-                    fromListNode.Location = point;
-                    command.Execute(fromListNode); // Pass null or any other parameter as needed
-                }
-            
+            var command = add.Command;
+            if (command != null &&
+                command.CanExecute(fromListNode)) // Check if the command is not null and can be executed
+            {
+                var point = e.GetPosition(Editor);
+                point -= new Point(Editor.ViewTranslateTransform.X, Editor.ViewTranslateTransform.Y);
+                fromListNode.Location = point;
+                command.Execute(fromListNode); // Pass null or any other parameter as needed
+            }
         }
     }
 
@@ -173,7 +169,7 @@ public partial class TaskEditor : AppWindow
     {
         //throw new System.NotImplementedException();
     }
-    
+
 
     private void SearchItemShow_OnClick(object? sender, RoutedEventArgs routedEventArgs)
     {

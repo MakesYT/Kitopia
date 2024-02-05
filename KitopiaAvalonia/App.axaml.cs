@@ -1,19 +1,13 @@
 using System;
-using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Threading;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml;
-using Avalonia.Media;
-using Avalonia.Media.Fonts;
-using Avalonia.Threading;
 using Core.SDKs;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.Services;
@@ -26,7 +20,6 @@ using Core.ViewModel.Pages.customScenario;
 using Core.ViewModel.Pages.plugin;
 using Core.ViewModel.TaskEditor;
 using Kitopia.Services;
-using Kitopia.View.Pages.Plugin;
 using KitopiaAvalonia.Pages;
 using KitopiaAvalonia.Services;
 using KitopiaAvalonia.Windows;
@@ -35,8 +28,6 @@ using log4net.Config;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using PluginCore;
-using Vanara.PInvoke;
-using Vanara.Windows.Shell;
 
 namespace KitopiaAvalonia;
 
@@ -47,10 +38,13 @@ public partial class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+
         if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            var resourceDictionary = Current.Resources;
+            var desktop1 = desktop.MainWindow;
         }
+
+        Console.WriteLine(1);
     }
 
 
@@ -59,31 +53,31 @@ public partial class App : Application
         ServiceManager.Services = ConfigureServices();
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow=ServiceManager.Services.GetService<MainWindow>();
+            desktop.MainWindow = ServiceManager.Services.GetService<MainWindow>();
             ServiceManager.Services.GetService<IToastService>().Init(desktop.MainWindow);
-            DataContext=new AppViewModel();
+            DataContext = new AppViewModel();
             OnStartup();
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
-        {       
+        {
         }
+
         base.OnFrameworkInitializationCompleted();
     }
+
     private void OnStartup()
     {
-        
         var eventWaitHandle = new EventWaitHandle(false, EventResetMode.AutoReset, "Kitopia", out var createNew);
         if (!createNew)
         {
-            var content = new DialogContent("Kitopia", "不能同时开启两个应用" , null,null,"确定", () =>
+            var content = new DialogContent("Kitopia", "不能同时开启两个应用", null, null, "确定", () =>
             {
                 Environment.Exit(0);
-            },null, null);
-            ServiceManager.Services.GetService<IContentDialog>()!.ShowDialog(null,content);
+            }, null, null);
+            ServiceManager.Services.GetService<IContentDialog>()!.ShowDialog(null, content);
         }
         else
         {
-            
             var assembly = Assembly.GetExecutingAssembly();
             var logConfigStream = assembly.GetManifestResourceStream("KitopiaAvalonia.log4net.config")!;
 
@@ -108,7 +102,7 @@ public partial class App : Application
                 //     ServiceManager.Services.GetService<SearchWindow>()!.tx.Focus();
                 // });
             }, null, -1, false);
-            
+
             log.Info("Ioc初始化完成");
             ConfigManger.Init();
             log.Info("配置文件初始化完成");
@@ -136,6 +130,7 @@ public partial class App : Application
                     break;
                 }
             }
+
             log.Info("主题初始化完成");
             log.Debug("注册热键");
             ServiceManager.Services.GetService<MainWindow>().InitHook();
@@ -144,7 +139,7 @@ public partial class App : Application
                 // MouseHookHelper.InsertMouseHook();
             });
 
-           
+
             ServicePointManager.DefaultConnectionLimit = 10240;
 
             if (ConfigManger.Config.autoStart)
@@ -152,10 +147,9 @@ public partial class App : Application
                 log.Info("设置开机自启");
                 SetAutoStartup();
             }
-            
-            
         }
     }
+
     private static IServiceProvider ConfigureServices()
     {
         var services = new ServiceCollection();
@@ -166,26 +160,35 @@ public partial class App : Application
         services.AddSingleton<ITaskEditorOpenService, TaskEditorOpenService>();
         services.AddTransient<IClipboardService, ClipboardService>();
         services.AddTransient<IThemeChange, ThemeChange>();
-        services.AddSingleton<ISearchItemTool,SearchItemTool>();
+        services.AddSingleton<ISearchItemTool, SearchItemTool>();
         services.AddTransient<TaskEditorViewModel>();
-        services.AddTransient<TaskEditor>(e=> new TaskEditor() { DataContext = e.GetService<TaskEditorViewModel>() });
+        services.AddTransient<TaskEditor>(e => new TaskEditor() { DataContext = e.GetService<TaskEditorViewModel>() });
         services.AddSingleton<MainWindowViewModel>();
-        services.AddSingleton<MainWindow>(e=> new MainWindow() { DataContext = e.GetService<MainWindowViewModel>() });
+        services.AddSingleton<MainWindow>(e => new MainWindow() { DataContext = e.GetService<MainWindowViewModel>() });
         services.AddSingleton<SearchWindowViewModel>(e => new SearchWindowViewModel() { IsActive = true });
-        services.AddSingleton<SearchWindow>(e=> new SearchWindow() { DataContext = e.GetService<SearchWindowViewModel>() });
+        services.AddSingleton<SearchWindow>(e => new SearchWindow()
+            { DataContext = e.GetService<SearchWindowViewModel>() });
         services.AddSingleton<SettingPageViewModel>(e => new SettingPageViewModel() { IsActive = true });
-        services.AddKeyedSingleton<UserControl,SettingPage>("SettingPage",(e,_)=> new SettingPage() { DataContext = e.GetService<SettingPageViewModel>() });
+        services.AddKeyedSingleton<UserControl, SettingPage>("SettingPage",
+            (e, _) => new SettingPage() { DataContext = e.GetService<SettingPageViewModel>() });
         services.AddSingleton<HomePageViewModel>(e => new HomePageViewModel() { IsActive = true });
-        services.AddKeyedSingleton<UserControl,HomePage>("HomePage",(e,_)=> new HomePage() { DataContext = e.GetService<HomePageViewModel>() });
-        services.AddSingleton<CustomScenariosManagerPageViewModel>(e => new CustomScenariosManagerPageViewModel() { IsActive = true });
-        services.AddKeyedSingleton<UserControl,CustomScenariosManagerPage>("CustomScenariosManagerPage",(e,_)=> new CustomScenariosManagerPage() { DataContext = e.GetService<CustomScenariosManagerPageViewModel>() });
-        services.AddSingleton<HotKeyManagerPageViewModel>(e => new HotKeyManagerPageViewModel() {  });
-        services.AddKeyedSingleton<UserControl,HotKeyManagerPage>("HotKeyManagerPage",(e,_)=> new HotKeyManagerPage() { DataContext = e.GetService<HotKeyManagerPageViewModel>() });
+        services.AddKeyedSingleton<UserControl, HomePage>("HomePage",
+            (e, _) => new HomePage() { DataContext = e.GetService<HomePageViewModel>() });
+        services.AddSingleton<CustomScenariosManagerPageViewModel>(e => new CustomScenariosManagerPageViewModel()
+            { IsActive = true });
+        services.AddKeyedSingleton<UserControl, CustomScenariosManagerPage>("CustomScenariosManagerPage",
+            (e, _) => new CustomScenariosManagerPage()
+                { DataContext = e.GetService<CustomScenariosManagerPageViewModel>() });
+        services.AddSingleton<HotKeyManagerPageViewModel>(e => new HotKeyManagerPageViewModel() { });
+        services.AddKeyedSingleton<UserControl, HotKeyManagerPage>("HotKeyManagerPage",
+            (e, _) => new HotKeyManagerPage() { DataContext = e.GetService<HotKeyManagerPageViewModel>() });
         services.AddSingleton<PluginManagerPageViewModel>(e => new PluginManagerPageViewModel() { IsActive = true });
-        services.AddKeyedSingleton<UserControl,PluginManagerPage>("PluginManagerPage",(e,_)=> new PluginManagerPage() { DataContext = e.GetService<PluginManagerPageViewModel>() });
+        services.AddKeyedSingleton<UserControl, PluginManagerPage>("PluginManagerPage",
+            (e, _) => new PluginManagerPage() { DataContext = e.GetService<PluginManagerPageViewModel>() });
 
         return services.BuildServiceProvider();
     }
+
     private static void CheckAndDeleteLogFiles()
     {
         // 定义日志文件的目录
@@ -214,6 +217,7 @@ public partial class App : Application
             }
         }
     }
+
     private void SetAutoStartup()
     {
         var strName = AppDomain.CurrentDomain.BaseDirectory + "KitopiaAvalonia.exe"; //获取要自动运行的应用程序名
@@ -257,7 +261,6 @@ public partial class App : Application
                 {
                     log.Info("用户取消启用开机自启");
                 }));
-            
         }
         else if (!registry.GetValue("Kitopia").Equals($"\"{strName}\""))
         {

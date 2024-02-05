@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using Avalonia.Win32.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs;
@@ -25,6 +26,7 @@ public partial class HotKeyEditorWindow : Window
     public HotKeyEditorWindow(HotKeyModel hotKeyModel)
     {
         InitializeComponent();
+        RenderOptions.SetTextRenderingMode(this, TextRenderingMode.Antialias);
         _hotKeyModel = hotKeyModel;
         Name.Text = $"快捷键:{hotKeyModel.SignName}";
 

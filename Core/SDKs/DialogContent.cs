@@ -43,7 +43,7 @@ public record DialogContent
         set;
     }
 
-    public string PrimaryButtonText
+    public string? PrimaryButtonText
     {
         get;
         set;

@@ -9,8 +9,7 @@ using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
-using Avalonia.Markup.Xaml;
-using Avalonia.Platform;
+using Avalonia.Media;
 using Avalonia.Styling;
 using Core.SDKs;
 using Core.SDKs.CustomScenario;
@@ -44,13 +43,17 @@ public class NavigationPageFactory : INavigationPageFactory
         return null;
     }
 }
+
 public partial class MainWindow : AppWindow
 {
     private static readonly ILog log = LogManager.GetLogger(nameof(MainWindow));
-    
+    static User32.WindowProc _wndProcDelegate;
+    private SafeHandle msgWindowHandle;
+
     public MainWindow()
     {
         InitializeComponent();
+        RenderOptions.SetTextRenderingMode(this, TextRenderingMode.Antialias);
         TitleBar.ExtendsContentIntoTitleBar = true;
         TitleBar.TitleBarHitTestType = TitleBarHitTestType.Complex;
         FrameView.NavigationPageFactory = new NavigationPageFactory();
@@ -82,8 +85,7 @@ public partial class MainWindow : AppWindow
 
         IsVisible = false;
     }
-    static User32.WindowProc _wndProcDelegate;
-    private SafeHandle msgWindowHandle;
+
     public void InitHook()
     {
         _wndProcDelegate = new User32.WindowProc(WndProc);
@@ -100,17 +102,16 @@ public partial class MainWindow : AppWindow
         if (atom == 0)
             throw new Win32Exception();
 
-        msgWindowHandle = User32.CreateWindowEx(0, (IntPtr)atom, null, 0, 0, 0, 0, 0, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
+        msgWindowHandle = User32.CreateWindowEx(0, (IntPtr)atom, null, 0, 0, 0, 0, 0, IntPtr.Zero, IntPtr.Zero,
+            IntPtr.Zero, IntPtr.Zero);
         InitHotKey(msgWindowHandle.DangerousGetHandle());
-        
     }
 
     public override void EndInit()
     {
         base.EndInit();
-        
     }
-    
+
     public void InitHotKey(IntPtr handle)
     {
         var list = ConfigManger.Config.hotKeys;
@@ -125,6 +126,7 @@ public partial class MainWindow : AppWindow
         {
             fail += $"{hotKeyModel.MainName}_{hotKeyModel.Name}\n";
         }
+
         ServiceManager.Services.GetService<IContentDialog>().ShowDialogAsync(null, new DialogContent("Kitopia",
             new TextBlock()
             {
@@ -132,7 +134,6 @@ public partial class MainWindow : AppWindow
                 FontSize = 15
             }, "取消", null, "确定", () =>
             {
-               
             }, null, () =>
             {
                 log.Info("用户取消启用开机自启");
@@ -156,9 +157,6 @@ public partial class MainWindow : AppWindow
                 hotKeyEditor.WindowStartupLocation = WindowStartupLocation.CenterOwner;
                 hotKeyEditor.Show(ServiceManager.Services.GetService<MainWindow>());
             }
-
-            
-            
         }
 
 
@@ -166,11 +164,11 @@ public partial class MainWindow : AppWindow
 
         // 弹出热键设置窗体
     }
-   
+
     private static IntPtr WndProc(HWND hwnd, uint uMsg, IntPtr wParam, IntPtr lParam)
     {
         var windowMessage = (User32.WindowMessage)uMsg;
-        log.Debug( $"窗口消息: {windowMessage}");
+        log.Debug($"窗口消息: {windowMessage}");
         switch (windowMessage)
         {
             case User32.WindowMessage.WM_ACTIVATEAPP:
@@ -182,10 +180,10 @@ public partial class MainWindow : AppWindow
                 break;
             }
             case User32.WindowMessage.WM_HOTKEY:
-                 var sid = wParam.ToInt32();
+                var sid = wParam.ToInt32();
                 if (!HotKeyHelper.MHotKeySettingsDic.ContainsValue(sid))
                 {
-                   break;
+                    break;
                 }
 
                 var key = HotKeyHelper.MHotKeySettingsDic.FirstOrDefault(e => e.Value == sid).Key.Split("_", 2);
@@ -208,7 +206,8 @@ public partial class MainWindow : AppWindow
 
                                     ServiceManager.Services.GetService<SearchWindow>()!.Show();
 
-                                    User32.SetForegroundWindow(ServiceManager.Services.GetService<SearchWindow>().TryGetPlatformHandle().Handle); 
+                                    User32.SetForegroundWindow(ServiceManager.Services.GetService<SearchWindow>()
+                                        .TryGetPlatformHandle().Handle);
                                     ServiceManager.Services.GetService<SearchWindow>()!.tx.Focus();
                                     ServiceManager.Services.GetService<SearchWindow>()!.tx.SelectAll();
                                     Task.Run(() =>
@@ -231,7 +230,7 @@ public partial class MainWindow : AppWindow
                             CustomScenarioManger.CustomScenarios.FirstOrDefault(e => e.UUID == strings[0]);
                         if (firstOrDefault == null)
                         {
-                           break;
+                            break;
                         }
 
                         switch (strings[1])
@@ -256,15 +255,15 @@ public partial class MainWindow : AppWindow
                     }
                 }
 
-                
+
                 break;
         }
 
         return User32.DefWindowProc(hwnd, uMsg, wParam, lParam);
     }
+
     protected override void OnLoaded(RoutedEventArgs e)
     {
-        
         base.OnLoaded(e);
         if (VisualRoot is AppWindow aw)
         {
@@ -281,20 +280,20 @@ public partial class MainWindow : AppWindow
     private void NavView_OnItemInvoked(object? sender, NavigationViewItemInvokedEventArgs e)
     {
         FrameView.Tag = e.InvokedItemContainer.Tag;
-        
+
         FrameView.NavigateFromObject(FrameView.Tag);
-        
     }
 
     protected override void OnAttachedToLogicalTree(LogicalTreeAttachmentEventArgs e)
     {
-        
         base.OnAttachedToLogicalTree(e);
-        
     }
+
     public bool HotKeySet(HotKeyModel hotKeyModel)
     {
-        if (!HotKeyHelper.RegisterGlobalHotKey(new[] { hotKeyModel }, TryGetPlatformHandle().Handle, out var hotKeySettingsDic).Any())
+        if (!HotKeyHelper
+                .RegisterGlobalHotKey(new[] { hotKeyModel }, TryGetPlatformHandle().Handle, out var hotKeySettingsDic)
+                .Any())
         {
             return true;
         }
@@ -344,6 +343,7 @@ public partial class MainWindow : AppWindow
             AnimateContentForBackButton(false);
         }
     }
+
     private void SetNVIIcon(NavigationViewItem item, bool selected)
     {
         // Technically, yes you could set up binding and converters and whatnot to let the icon change
@@ -355,35 +355,45 @@ public partial class MainWindow : AppWindow
         var t = item.Tag;
         switch (t)
         {
-            
             case "HomePage":
             {
-                item.IconSource=this.TryFindResource(selected? "HomeIconFilled":"HomeIcon",out var value)?(IconSource)value:null;
+                item.IconSource = this.TryFindResource(selected ? "HomeIconFilled" : "HomeIcon", out var value)
+                    ? (IconSource)value
+                    : null;
                 break;
             }
             case "PluginManagerPage":
             {
-                item.IconSource=this.TryFindResource(selected? "AppsIconFilled":"AppsIcon",out var value)?(IconSource)value:null;
+                item.IconSource = this.TryFindResource(selected ? "AppsIconFilled" : "AppsIcon", out var value)
+                    ? (IconSource)value
+                    : null;
                 break;
             }
             case "CustomScenariosManagerPage":
             {
-                item.IconSource=this.TryFindResource(selected? "AppListDetailIconFilled":"AppListDetailIcon",out var value)?(IconSource)value:null;
+                item.IconSource =
+                    this.TryFindResource(selected ? "AppListDetailIconFilled" : "AppListDetailIcon", out var value)
+                        ? (IconSource)value
+                        : null;
                 break;
             }
             case "HotKeyManagerPage":
             {
-                item.IconSource=this.TryFindResource(selected? "KeyboardIconFilled":"KeyboardIcon",out var value)?(IconSource)value:null;
+                item.IconSource = this.TryFindResource(selected ? "KeyboardIconFilled" : "KeyboardIcon", out var value)
+                    ? (IconSource)value
+                    : null;
                 break;
             }
             case "SettingPage":
             {
-                item.IconSource=this.TryFindResource(selected? "SettingsIconFilled":"SettingsIcon",out var value)?(IconSource)value:null;
+                item.IconSource = this.TryFindResource(selected ? "SettingsIconFilled" : "SettingsIcon", out var value)
+                    ? (IconSource)value
+                    : null;
                 break;
             }
-            
         }
     }
+
     private async void AnimateContentForBackButton(bool show)
     {
         if (!WindowIcon.IsVisible)
@@ -408,10 +418,10 @@ public partial class MainWindow : AppWindow
                     new KeyFrame
                     {
                         Cue = new Cue(1d),
-                        KeySpline = new KeySpline(0,0,0,1),
+                        KeySpline = new KeySpline(0, 0, 0, 1),
                         Setters =
                         {
-                            new Setter(MarginProperty, new Thickness(48,4,12,4))
+                            new Setter(MarginProperty, new Thickness(48, 4, 12, 4))
                         }
                     }
                 }
@@ -442,10 +452,10 @@ public partial class MainWindow : AppWindow
                     new KeyFrame
                     {
                         Cue = new Cue(1d),
-                        KeySpline = new KeySpline(0,0,0,1),
+                        KeySpline = new KeySpline(0, 0, 0, 1),
                         Setters =
                         {
-                            new Setter(MarginProperty, new Thickness(12,4,12,4))
+                            new Setter(MarginProperty, new Thickness(12, 4, 12, 4))
                         }
                     }
                 }

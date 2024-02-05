@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Runtime.InteropServices;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.Services;
@@ -19,7 +17,7 @@ public partial class SearchWindow : Window
     public SearchWindow()
     {
         InitializeComponent();
-       
+        RenderOptions.SetTextRenderingMode(this, TextRenderingMode.Antialias);
         WeakReferenceMessenger.Default.Register<string, string>(this, "SearchWindowClose", (_, _) =>
         {
             Dispatcher.UIThread.InvokeAsync(() =>
@@ -28,12 +26,12 @@ public partial class SearchWindow : Window
             });
         });
     }
+
     private void w_Deactivated(object? sender, EventArgs eventArgs)
     {
-         IsVisible = false;
+        IsVisible = false;
     }
 
-    
 
     private void w_Activated(object sender, EventArgs e)
     {

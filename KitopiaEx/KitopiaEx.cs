@@ -25,7 +25,6 @@ public class KitopiaEx : IPlugin
         //MessageBox.Show("OnEnabled");
         Kitopia._i18n.TryAdd("System.Windows.Media.Imaging.BitmapSource", "图像BitmapSource");
         ServiceProvider = serviceProvider;
-        serviceProvider.GetService<OcrEx>()!.InitOcr();
     }
 
     public void OnDisabled()
@@ -38,7 +37,6 @@ public class KitopiaEx : IPlugin
         services.AddSingleton<KitopiaEx>();
         services.AddSingleton<SearchItemEx>();
         services.AddSingleton<ClipboardEx>();
-        services.AddSingleton<OcrEx>();
         services.AddSingleton<ImageTools>();
         services.AddSingleton<Test1>();
         return services.BuildServiceProvider();
