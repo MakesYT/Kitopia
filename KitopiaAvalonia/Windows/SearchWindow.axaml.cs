@@ -1,5 +1,8 @@
 ﻿using System;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Threading;
@@ -27,9 +30,19 @@ public partial class SearchWindow : Window
         });
     }
 
+    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+    {
+        base.OnApplyTemplate(e);
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            var size = desktop.MainWindow.Screens.Primary.Bounds.Size;
+            Position = new PixelPoint((int)((size.Width - Width) / 2), size.Height / 4);
+        }
+    }
+
     private void w_Deactivated(object? sender, EventArgs eventArgs)
     {
-        IsVisible = false;
+        // IsVisible = false;
     }
 
 

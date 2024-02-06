@@ -1,7 +1,6 @@
 ﻿#region
 
 using System.Drawing;
-using System.IO;
 using System.Runtime.InteropServices;
 using Core.SDKs.Services;
 using log4net;
@@ -108,7 +107,7 @@ public class IconTools
         var shfi = new Shell32.SHFILEINFO();
         var hIcon = Shell32.SHGetFileInfo(path, 0, ref shfi, Shell32.SHFILEINFO.Size,
             Shell32.SHGFI.SHGFI_ICONLOCATION | Shell32.SHGFI.SHGFI_SYSICONINDEX);
-        if (hIcon == IntPtr.Zero) throw new System.ComponentModel.Win32Exception();
+        if (hIcon == IntPtr.Zero) return null;
 
         // Get the icon from the image list
         var safe = ((ComCtl32.IImageList2)iml).GetIcon(shfi.iIcon, ComCtl32.IMAGELISTDRAWFLAGS.ILD_TRANSPARENT);

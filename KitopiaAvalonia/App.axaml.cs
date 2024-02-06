@@ -8,6 +8,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 using Core.SDKs;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.Services;
@@ -43,8 +44,6 @@ public partial class App : Application
         {
             var desktop1 = desktop.MainWindow;
         }
-
-        Console.WriteLine(1);
     }
 
 
@@ -92,16 +91,30 @@ public partial class App : Application
             log.Info("启动");
             ThreadPool.RegisterWaitForSingleObject(eventWaitHandle, (_, _) =>
             {
-                // Dispatcher.Invoke(() =>
-                // {
-                //     ServiceManager.Services.GetService<SearchWindow>()!.Show();
-                //     User32.SetForegroundWindow(
-                //         new WindowInteropHelper(ServiceManager.Services.GetService<SearchWindow>()!)
-                //             .Handle);
-                //
-                //     ServiceManager.Services.GetService<SearchWindow>()!.tx.Focus();
-                // });
+                Dispatcher.UIThread.Invoke(() =>
+                {
+                    ServiceManager.Services.GetService<SearchWindow>()!.Show();
+                    ServiceManager.Services.GetService<SearchWindow>()!.Focus();
+
+                    ServiceManager.Services.GetService<SearchWindow>()!.tx.Focus();
+                });
             }, null, -1, false);
+            var appReloadEventWaitHandle =
+                new EventWaitHandle(false, EventResetMode.AutoReset, "Kitopia_appReload", out var appReload);
+            if (!appReload)
+            {
+                var content = new DialogContent("Kitopia", "右键菜单捕获出现异常,\n请关闭软件重试,将会导致部分功能异常 ", null, null, "确定", () =>
+                {
+                }, null, null);
+                ServiceManager.Services.GetService<IContentDialog>()!.ShowDialog(null, content);
+            }
+            else
+            {
+                ThreadPool.RegisterWaitForSingleObject(appReloadEventWaitHandle, (_, _) =>
+                {
+                    ServiceManager.Services.GetService<SearchWindowViewModel>()!.ReloadApps();
+                }, null, -1, false);
+            }
 
             log.Info("Ioc初始化完成");
             ConfigManger.Init();
@@ -147,6 +160,8 @@ public partial class App : Application
                 log.Info("设置开机自启");
                 SetAutoStartup();
             }
+
+            ServiceManager.Services.GetService<SearchWindowViewModel>()!.ReloadApps();
         }
     }
 

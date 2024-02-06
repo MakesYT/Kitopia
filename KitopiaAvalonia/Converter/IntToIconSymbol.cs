@@ -3,7 +3,6 @@
 using System;
 using System.Globalization;
 using Avalonia.Data.Converters;
-using FluentAvalonia.UI.Controls;
 
 #endregion
 
@@ -14,7 +13,7 @@ public class IntToIconSymbol : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        return $"&#x{((int)value).ToString("X")};";
+        return System.Convert.ToChar(value).ToString();
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>

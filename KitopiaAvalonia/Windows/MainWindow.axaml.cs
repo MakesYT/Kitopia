@@ -301,7 +301,8 @@ public partial class MainWindow : AppWindow
     public bool HotKeySet(HotKeyModel hotKeyModel)
     {
         if (!HotKeyHelper
-                .RegisterGlobalHotKey(new[] { hotKeyModel }, TryGetPlatformHandle().Handle, out var hotKeySettingsDic)
+                .RegisterGlobalHotKey(new[] { hotKeyModel }, msgWindowHandle.DangerousGetHandle(),
+                    out var hotKeySettingsDic)
                 .Any())
         {
             return true;
@@ -312,7 +313,7 @@ public partial class MainWindow : AppWindow
 
     public void RemoveHotKey(HotKeyModel hotKeyModel)
     {
-        HotKeyHelper.UnRegisterHotKey(hotKeyModel, TryGetPlatformHandle().Handle);
+        HotKeyHelper.UnRegisterHotKey(hotKeyModel, msgWindowHandle.DangerousGetHandle());
     }
 
     private void FrameView_OnNavigated(object sender, NavigationEventArgs e)

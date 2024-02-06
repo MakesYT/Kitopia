@@ -15,13 +15,13 @@
                      TransparencyLevelHint="AcrylicBlur"
                      Background="Transparent"
                      Activated="w_Activated"
-                     WindowStartupLocation="CenterScreen"
                     ShowInTaskbar="False"
                      ExtendClientAreaToDecorationsHint="True"
                      Width="800"
                      SizeToContent="Height"
                      ExtendClientAreaChromeHints="SystemChrome"
                      SystemDecorations="BorderOnly"
+                      
                      Title="SearchWindow">
     <windowing:AppWindow.Resources>
         <searchWindow:StarBoolToText x:Key="StarBoolToText" />
@@ -113,9 +113,10 @@
                                 <Image Grid.Column="1" HorizontalAlignment="Left" Focusable="False" Width="48"
                                        Height="48" ZIndex="1"
                                        Source="{Binding ., Converter={StaticResource PathToImageConverter}}" />
-                                <controls:SymbolIcon Height="48" Width="48" FontSize="48" Grid.Column="1"
-                                                     IsVisible="{Binding $self.Symbol,Converter={StaticResource SymbolToVisible}}"
-                                                     Symbol="{Binding IconSymbol,Converter={StaticResource IntToIconSymbol},Mode=OneWay}" />
+                                <controls:FontIcon Height="48" Width="48" FontSize="48" Grid.Column="1"
+                                                   FontFamily="{StaticResource FluentFont}"
+                                                     IsVisible="{Binding IconSymbol,Converter={StaticResource SymbolToVisible}}"
+                                                     Glyph="{Binding IconSymbol,Converter={StaticResource IntToIconSymbol}}" />
 
 
                                 <StackPanel Grid.Column="2" Margin="5" VerticalAlignment="Top">
@@ -159,12 +160,12 @@
                                             CommandParameter="{Binding}">
                                         <Interaction.Behaviors>
                                             <DataTriggerBehavior Binding="{Binding IsStared}" Value="False">
-                                                <ChangePropertyAction TargetObject="{Binding #Source}" PropertyName="FontFamily" Value="{StaticResource FluentFont}"/>
-                                                <ChangePropertyAction TargetObject="{Binding #Source}" PropertyName="Glyph" Value="&#xF713;"/>
+                                                <ChangePropertyAction TargetObject="Source" PropertyName="FontFamily" Value="{StaticResource FluentFont}"/>
+                                                <ChangePropertyAction TargetObject="Source" PropertyName="Glyph" Value="&#xF713;"/>
                                             </DataTriggerBehavior>
                                             <DataTriggerBehavior Binding="{Binding IsStared}" Value="True">
-                                                <ChangePropertyAction TargetObject="{Binding #Source}" PropertyName="FontFamily" Value="{StaticResource FluentFontFilled}"/>
-                                                <ChangePropertyAction TargetObject="{Binding #Source}" PropertyName="Glyph" Value="&#xF718;"/>
+                                                <ChangePropertyAction TargetObject="Source" PropertyName="FontFamily" Value="{StaticResource FluentFontFilled}"/>
+                                                <ChangePropertyAction TargetObject="Source" PropertyName="Glyph" Value="&#xF718;"/>
                                             </DataTriggerBehavior>
                                         </Interaction.Behaviors>
                                         <controls:FontIcon x:Name="Source" FontFamily="{StaticResource FluentFont}" Glyph="&#xF713;"   />

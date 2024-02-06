@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:viewModel="clr-namespace:Core.ViewModel;assembly=Core"
              xmlns:styling="clr-namespace:FluentAvalonia.Styling;assembly=FluentAvalonia"
+             xmlns:converter="clr-namespace:Kitopia.Converter"
              x:Class="KitopiaAvalonia.App"
              x:DataType="viewModel:AppViewModel"
              RequestedThemeVariant="Default">
@@ -12,6 +13,7 @@
                 <ResourceInclude Source="Styles/Icons.axaml" />
                 <ResourceInclude Source="Styles/FluentUiStyles.axaml" />
             </ResourceDictionary.MergedDictionaries>
+            <converter:DoubleQuarterConverter x:Key="doubleQuarterConverter" />
         </ResourceDictionary>
     </Application.Resources>
     <Application.Styles>

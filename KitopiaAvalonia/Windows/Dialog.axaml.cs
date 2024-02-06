@@ -27,6 +27,7 @@ public partial class Dialog : Window
         Title.Text = content.Title;
         Content.Content = content.Content;
 
+
         if (content.PrimaryButtonText != null)
         {
             PrimaryButton.Content = content.PrimaryButtonText;
@@ -61,10 +62,67 @@ public partial class Dialog : Window
             SecondaryButton.IsVisible = true;
         }
 
-        PseudoClasses.Set(s_pcPrimary, !string.IsNullOrEmpty(content.PrimaryButtonText));
-        PseudoClasses.Set(s_pcSecondary, !string.IsNullOrEmpty(content.SecondaryButtonText));
-        PseudoClasses.Set(s_pcClose, !string.IsNullOrEmpty(content.CloseButtonText));
-        PrimaryButton.Classes.Add("accent");
+        var hasPrimary = content.PrimaryButtonText != null;
+        var hasSecondary = content.SecondaryButtonText != null;
+        var hasClose = content.CloseButtonText != null;
+        if (hasPrimary && hasSecondary && hasClose)
+        {
+            PrimaryButton.SetValue(Grid.ColumnProperty, 0);
+            PrimaryButton.Margin = new Thickness(0, 0, 4, 0);
+            SecondaryButton.SetValue(Grid.ColumnProperty, 1);
+            SecondaryButton.Margin = new Thickness(4, 0, 4, 0);
+            SecondaryButton.SetValue(Grid.ColumnSpanProperty, 2);
+            CloseButton.SetValue(Grid.ColumnProperty, 2);
+            CloseButton.Margin = new Thickness(4, 0, 0, 0);
+        }
+
+        if (!hasPrimary && hasSecondary && hasClose)
+        {
+            PrimaryButton.SetValue(Grid.ColumnProperty, 0);
+            PrimaryButton.Margin = new Thickness(0, 0, 4, 0);
+            PrimaryButton.SetValue(Grid.ColumnSpanProperty, 2);
+            CloseButton.SetValue(Grid.ColumnProperty, 2);
+            CloseButton.SetValue(Grid.ColumnSpanProperty, 2);
+            CloseButton.Margin = new Thickness(4, 0, 0, 0);
+        }
+
+        if (hasPrimary && hasSecondary && !hasClose)
+        {
+            PrimaryButton.SetValue(Grid.ColumnProperty, 0);
+            PrimaryButton.Margin = new Thickness(0, 0, 4, 0);
+            PrimaryButton.SetValue(Grid.ColumnSpanProperty, 2);
+            SecondaryButton.SetValue(Grid.ColumnProperty, 2);
+            SecondaryButton.SetValue(Grid.ColumnSpanProperty, 2);
+            SecondaryButton.Margin = new Thickness(4, 0, 0, 0);
+        }
+
+        if (hasPrimary && !hasSecondary && hasClose)
+        {
+            PrimaryButton.SetValue(Grid.ColumnProperty, 0);
+            PrimaryButton.Margin = new Thickness(0, 0, 4, 0);
+            PrimaryButton.SetValue(Grid.ColumnSpanProperty, 2);
+            CloseButton.SetValue(Grid.ColumnProperty, 2);
+            CloseButton.SetValue(Grid.ColumnSpanProperty, 2);
+            CloseButton.Margin = new Thickness(4, 0, 0, 0);
+        }
+
+        if (!hasPrimary && !hasSecondary && hasClose)
+        {
+            CloseButton.SetValue(Grid.ColumnProperty, 2);
+            CloseButton.SetValue(Grid.ColumnSpanProperty, 2);
+        }
+
+        if (!hasPrimary && hasSecondary && !hasClose)
+        {
+            SecondaryButton.SetValue(Grid.ColumnProperty, 2);
+            SecondaryButton.SetValue(Grid.ColumnSpanProperty, 2);
+        }
+
+        if (hasPrimary && !hasSecondary && !hasClose)
+        {
+            PrimaryButton.SetValue(Grid.ColumnProperty, 2);
+            PrimaryButton.SetValue(Grid.ColumnSpanProperty, 2);
+        }
     }
 
     private void InputElement_OnPointerMoved(object? sender, PointerEventArgs e)
