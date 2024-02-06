@@ -21,8 +21,12 @@
                      x:Class="KitopiaAvalonia.Windows.TaskEditor"
                      Title="情景编排"
                      WindowStartupLocation="CenterScreen"
+                     TransparencyLevelHint="AcrylicBlur"
                      x:DataType="taskEditor1:TaskEditorViewModel" Height="450" Width="1800">
+    <windowing:AppWindow.Background>
+        <SolidColorBrush Color="{DynamicResource SolidBackgroundFillColorBase}" Opacity="0.65" />
 
+    </windowing:AppWindow.Background>
     <windowing:AppWindow.Resources>
 
         <converter:HotKeySignNameToolCTr x:Key="HotKeySignNameToolCTr" />

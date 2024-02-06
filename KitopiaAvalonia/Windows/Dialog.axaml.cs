@@ -8,6 +8,9 @@ namespace KitopiaAvalonia.Controls;
 
 public partial class Dialog : Window
 {
+    private const string s_pcPrimary = ":primary";
+    private const string s_pcSecondary = ":secondary";
+    private const string s_pcClose = ":close";
     private bool _mouseDownForWindowMoving = false;
     private PointerPoint _originalPoint;
 
@@ -58,6 +61,9 @@ public partial class Dialog : Window
             SecondaryButton.IsVisible = true;
         }
 
+        PseudoClasses.Set(s_pcPrimary, !string.IsNullOrEmpty(content.PrimaryButtonText));
+        PseudoClasses.Set(s_pcSecondary, !string.IsNullOrEmpty(content.SecondaryButtonText));
+        PseudoClasses.Set(s_pcClose, !string.IsNullOrEmpty(content.CloseButtonText));
         PrimaryButton.Classes.Add("accent");
     }
 

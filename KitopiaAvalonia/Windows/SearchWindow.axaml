@@ -7,7 +7,6 @@
                      xmlns:viewModel="clr-namespace:Core.ViewModel;assembly=Core"
                      xmlns:searchWindow="clr-namespace:Kitopia.Converter.SearchWindow"
                      xmlns:converter="clr-namespace:Kitopia.Converter"
-                     xmlns:pluginCore="clr-namespace:PluginCore;assembly=PluginCore"
                      xmlns:controls1="clr-namespace:KitopiaAvalonia.Controls"
                      mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
                      x:Class="KitopiaAvalonia.Windows.SearchWindow"
@@ -35,7 +34,7 @@
     </windowing:AppWindow.Resources>
     <Panel>
         <Panel.Background>
-            <SolidColorBrush Color="{DynamicResource SolidBackgroundFillColorBase}" Opacity="0.65"></SolidColorBrush>
+            <SolidColorBrush Color="{DynamicResource SolidBackgroundFillColorBase}" Opacity="0.65" />
         </Panel.Background>
 
         <StackPanel Margin="10" MinHeight="150">
@@ -168,7 +167,7 @@
                                                 <ChangePropertyAction TargetObject="{Binding #Source}" PropertyName="Glyph" Value="&#xF718;"/>
                                             </DataTriggerBehavior>
                                         </Interaction.Behaviors>
-                                        <controls:FontIcon Name="Source" FontFamily="{StaticResource FluentFont}" Glyph="&#xF713;"   />
+                                        <controls:FontIcon x:Name="Source" FontFamily="{StaticResource FluentFont}" Glyph="&#xF713;"   />
                                         
                                     </Button>
 

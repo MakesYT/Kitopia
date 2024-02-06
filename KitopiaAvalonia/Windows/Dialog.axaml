@@ -1,28 +1,167 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="KitopiaAvalonia.Controls.Dialog"
-        Foreground="{DynamicResource ContentDialogForeground}"
-        Background="{DynamicResource ContentDialogBackground}"
-        BorderBrush="{DynamicResource ContentDialogBorderBrush}"
-        BorderThickness="{DynamicResource ContentDialogBorderWidth}"
-        CornerRadius="{DynamicResource OverlayCornerRadius}"
-        Topmost="True"
-        CanResize="False"
-        SystemDecorations="BorderOnly"
-        ExtendClientAreaChromeHints="NoChrome"
-        ExtendClientAreaTitleBarHeightHint="25"
-        ExtendClientAreaToDecorationsHint="True"
-        WindowStartupLocation="CenterScreen"
-        ShowInTaskbar="False"
-        Name="myWindow"
-        Width="{Binding ElementName=BackgroundElement,Path=Bounds.Width}"
-        Height="{Binding ElementName=BackgroundElement,Path=Bounds.Height}"
-        Title="Dialog">
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+           xmlns:controls1="clr-namespace:KitopiaAvalonia.Controls"
+           mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+           x:Class="KitopiaAvalonia.Controls.Dialog"
+           Foreground="{DynamicResource ContentDialogForeground}"
+           
+           BorderBrush="{DynamicResource ContentDialogBorderBrush}"
+           BorderThickness="{DynamicResource ContentDialogBorderWidth}"
+           CornerRadius="{DynamicResource OverlayCornerRadius}"
+           Topmost="True"
+           CanResize="False"
+           SystemDecorations="BorderOnly"
+           ExtendClientAreaChromeHints="NoChrome"
+           ExtendClientAreaTitleBarHeightHint="25"
+           ExtendClientAreaToDecorationsHint="True"
+           WindowStartupLocation="CenterScreen"
+           ShowInTaskbar="False"
+           Name="myWindow"
+           Width="{Binding ElementName=BackgroundElement,Path=Bounds.Width}"
+           Height="{Binding ElementName=BackgroundElement,Path=Bounds.Height}"
+           TransparencyLevelHint="AcrylicBlur"
+           Title="Dialog">
+    <Window.Background>
+        <SolidColorBrush Color="{DynamicResource SolidBackgroundFillColorBase}" Opacity="0.65" />
 
+    </Window.Background>
+    <Window.Styles>
+        
+
+        
+        <!-- Primary Button Only -->
+        <Style Selector="controls1|Dialog:primary > Button#PrimaryButton">
+            <Setter Property="IsVisible" Value="True"/>
+            <Setter Property="Grid.Column" Value="2" />
+            <Setter Property="Grid.ColumnSpan" Value="2" />
+        </Style>
+        <Style Selector="controls1|Dialog:primary > Button#SecondaryButton">
+            <Setter Property="IsVisible" Value="False"/>
+        </Style>
+        <Style Selector="controls1|Dialog:primary > Button#CloseButton">
+            <Setter Property="IsVisible" Value="False"/>
+        </Style>
+
+        <!-- Secondary Button Only -->
+        <Style Selector="controls1|Dialog:secondary > Button#PrimaryButton">
+            <Setter Property="IsVisible" Value="False"/>
+        </Style>
+        <Style Selector="controls1|Dialog:secondary > Button#SecondaryButton">
+            <Setter Property="IsVisible" Value="True"/>
+            <Setter Property="Grid.Column" Value="2" />
+            <Setter Property="Grid.ColumnSpan" Value="2" />
+        </Style>
+        <Style Selector="controls1|Dialog:secondary > Button#CloseButton">
+            <Setter Property="IsVisible" Value="False"/>
+        </Style>
+
+        <!-- Close Button Only -->
+        <Style Selector="controls1|Dialog:close > Button#PrimaryButton">
+            <Setter Property="IsVisible" Value="False"/>
+        </Style>
+        <Style Selector="controls1|Dialog:close > Button#SecondaryButton">
+            <Setter Property="IsVisible" Value="False"/>
+        </Style>
+        <Style Selector="controls1|Dialog:close > Button#CloseButton">
+            <Setter Property="IsVisible" Value="True"/>
+            <Setter Property="Grid.Column" Value="2" />
+            <Setter Property="Grid.ColumnSpan" Value="2" />
+        </Style>
+
+        <!-- Margins are defined by ContentDialogButtonSpacing (8) -->
+
+        <!-- Primary and Secondary -->
+        <Style Selector="controls1|Dialog:primary:secondary > Button#PrimaryButton">
+            <Setter Property="IsVisible" Value="True"/>
+            <Setter Property="Grid.Column" Value="0" />
+            <Setter Property="Grid.ColumnSpan" Value="2" />
+            <Setter Property="Margin" Value="0 0 4 0" />
+        </Style>
+        <Style Selector="controls1|Dialog:primary:secondary > Button#SecondaryButton">
+            <Setter Property="IsVisible" Value="True"/>
+            <Setter Property="Grid.Column" Value="2" />
+            <Setter Property="Grid.ColumnSpan" Value="2" />
+            <Setter Property="Margin" Value="4 0 0 0" />
+        </Style>
+        <Style Selector="controls1|Dialog:primary:secondary > Button#CloseButton">
+            <Setter Property="IsVisible" Value="False"/>
+        </Style>
+
+        <!-- Primary and Close Buttons -->
+        <Style Selector="controls1|Dialog:primary:close > Button#PrimaryButton">
+            <Setter Property="IsVisible" Value="True"/>
+            <Setter Property="Grid.Column" Value="0" />
+            <Setter Property="Grid.ColumnSpan" Value="2" />
+            <Setter Property="Margin" Value="0 0 4 0" />
+        </Style>
+        <Style Selector="controls1|Dialog:primary:close > Button#SecondaryButton">
+            <Setter Property="IsVisible" Value="False"/>
+        </Style>
+        <Style Selector="controls1|Dialog:primary:close > Button#CloseButton">
+            <Setter Property="IsVisible" Value="True"/>
+            <Setter Property="Grid.Column" Value="2" />
+            <Setter Property="Grid.ColumnSpan" Value="2" />
+            <Setter Property="Margin" Value="4 0 0 0" />
+        </Style>
+
+        <!-- Primary and Secondary Buttons -->
+        <Style Selector="controls1|Dialog:primary:secondary > Button#PrimaryButton">
+            <Setter Property="IsVisible" Value="True"/>
+            <Setter Property="Grid.Column" Value="0" />
+            <Setter Property="Grid.ColumnSpan" Value="2" />
+            <Setter Property="Margin" Value="0 0 4 0" />
+        </Style>
+        <Style Selector="controls1|Dialog:primary:secondary > Button#CloseButton">
+            <Setter Property="IsVisible" Value="False"/>
+        </Style>
+        <Style Selector="controls1|Dialog:primary:secondary > Button#SecondaryButton">
+            <Setter Property="IsVisible" Value="True"/>
+            <Setter Property="Grid.Column" Value="2" />
+            <Setter Property="Grid.ColumnSpan" Value="2" />
+            <Setter Property="Margin" Value="4 0 0 0" />
+        </Style>
+
+        <!-- Secondary and Close Buttons -->
+        <Style Selector="controls1|Dialog:secondary:close > Button#Secondary">
+            <Setter Property="IsVisible" Value="True"/>
+            <Setter Property="Grid.Column" Value="0" />
+            <Setter Property="Grid.ColumnSpan" Value="2" />
+            <Setter Property="Margin" Value="0 0 4 0" />
+        </Style>
+        <Style Selector="controls1|Dialog:secondary:close > Button#PrimaryButton">
+            <Setter Property="IsVisible" Value="False"/>
+        </Style>
+        <Style Selector="controls1|Dialog:secondary:close > Button#CloseButton">
+            <Setter Property="IsVisible" Value="True"/>
+            <Setter Property="Grid.Column" Value="2" />
+            <Setter Property="Grid.ColumnSpan" Value="2" />
+            <Setter Property="Margin" Value="4 0 0 0" />
+        </Style>
+
+
+        <!-- All Buttons -->
+        <Style Selector="controls1|Dialog:primary:secondary:close > Button#PrimaryButton">
+            <Setter Property="IsVisible" Value="True"/>
+            <Setter Property="Grid.Column" Value="0" />
+            <Setter Property="Grid.ColumnSpan" Value="1" />
+            <Setter Property="Margin" Value="0 0 4 0" />
+        </Style>
+        <Style Selector="controls1|Dialog:primary:secondary:close > Button#SecondaryButton">
+            <Setter Property="IsVisible" Value="True"/>
+            <Setter Property="Grid.Column" Value="1" />
+            <Setter Property="Grid.ColumnSpan" Value="2" />
+            <Setter Property="Margin" Value="4 0 4 0" />
+        </Style>
+        <Style Selector="controls1|Dialog:primary:secondary:close > Button#CloseButton">
+            <Setter Property="IsVisible" Value="True"/>
+            <Setter Property="Grid.Column" Value="3" />
+            <Setter Property="Grid.ColumnSpan" Value="1" />
+            <Setter Property="Margin" Value="4 0 0 0" />
+        </Style>
+    </Window.Styles>
 
     <controls:FABorder Name="BackgroundElement"
                        Background="{DynamicResource ContentDialogBackground}"

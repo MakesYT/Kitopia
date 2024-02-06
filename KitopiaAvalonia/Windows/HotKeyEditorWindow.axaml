@@ -9,7 +9,12 @@
         x:Class="KitopiaAvalonia.Windows.HotKeyEditorWindow"
         KeyDown="HotKeyEditorWindow_OnKeyDown"
         KeyUp="HotKeyEditorWindow_OnKeyUp"
+        TransparencyLevelHint="AcrylicBlur"
         Title="HotKeyEditorWindow">
+    <windowing:AppWindow.Background>
+        <SolidColorBrush Color="{DynamicResource SolidBackgroundFillColorBase}" Opacity="0.65" />
+
+    </windowing:AppWindow.Background>
     <Grid>
         <Grid Focusable="False">
             <Grid.Background>

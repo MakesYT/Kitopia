@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -21,6 +22,7 @@ using FluentAvalonia.UI.Controls;
 using FluentAvalonia.UI.Navigation;
 using FluentAvalonia.UI.Windowing;
 using Kitopia.SDKs;
+using KitopiaAvalonia.Pages;
 using KitopiaAvalonia.Windows;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
@@ -85,6 +87,15 @@ public partial class MainWindow : AppWindow
 
         IsVisible = false;
     }
+
+    private IReadOnlyDictionary<Type, string> Pages => new Dictionary<Type, string>
+    {
+        { typeof(HomePage), "HomePage" },
+        { typeof(PluginManagerPage), "PluginManagerPage" },
+        { typeof(CustomScenariosManagerPage), "CustomScenariosManagerPage" },
+        { typeof(HotKeyManagerPage), "HotKeyManagerPage" },
+        { typeof(SettingPage), "SettingPage" }
+    };
 
     public void InitHook()
     {
@@ -279,9 +290,7 @@ public partial class MainWindow : AppWindow
 
     private void NavView_OnItemInvoked(object? sender, NavigationViewItemInvokedEventArgs e)
     {
-        FrameView.Tag = e.InvokedItemContainer.Tag;
-
-        FrameView.NavigateFromObject(FrameView.Tag);
+        FrameView.NavigateFromObject(e.InvokedItemContainer.Tag);
     }
 
     protected override void OnAttachedToLogicalTree(LogicalTreeAttachmentEventArgs e)
@@ -308,6 +317,7 @@ public partial class MainWindow : AppWindow
 
     private void FrameView_OnNavigated(object sender, NavigationEventArgs e)
     {
+        FrameView.Tag = Pages.GetValueOrDefault(e.Content.GetType());
         foreach (NavigationViewItem nvi in NavView.MenuItems)
         {
             if (nvi.Tag == FrameView.Tag)

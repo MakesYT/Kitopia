@@ -17,6 +17,16 @@ public class ContentDialogService : IContentDialog
 {
     public void ShowDialogAsync(object? contentPresenter, DialogContent dialogContent)
     {
+        if (contentPresenter is null)
+        {
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                var dialog = new Dialog(dialogContent);
+                dialog.Show();
+            });
+            return;
+        }
+
         var dialog = new ContentDialog()
         {
             Title = dialogContent.Title,
