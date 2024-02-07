@@ -1,11 +1,11 @@
 ﻿#region
 
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.HotKey;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
@@ -47,6 +47,19 @@ public partial class SettingPageViewModel : ObservableRecipient
 
     public SettingPageViewModel()
     {
+        WeakReferenceMessenger.Default.Register<string, string>(this, "ConfigSave", (s, o) =>
+        {
+            ThemeChoice = ConfigManger.Config.themeChoice;
+            AutoStart = ConfigManger.Config.autoStart;
+            AutoStartEverything = ConfigManger.Config.autoStartEverything;
+            UseEverything = ConfigManger.Config.useEverything;
+            MaxHistory = ConfigManger.Config.maxHistory;
+            CanReadClipboard = ConfigManger.Config.canReadClipboard;
+            IgnoreItems = new ObservableCollection<string>(ConfigManger.Config.ignoreItems);
+            InputSmoothingMilliseconds = ConfigManger.Config.inputSmoothingMilliseconds;
+            MouseKey = ConfigManger.Config.mouseKey;
+            MouseKeyInverval = ConfigManger.Config.mouseKeyInverval;
+        });
         _themeChoice = ConfigManger.Config.themeChoice;
         _autoStart = ConfigManger.Config.autoStart;
         _autoStartEverything = ConfigManger.Config.autoStartEverything;

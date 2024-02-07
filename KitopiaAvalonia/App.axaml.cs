@@ -81,12 +81,6 @@ public partial class App : Application
             var logConfigStream = assembly.GetManifestResourceStream("KitopiaAvalonia.log4net.config")!;
 
             XmlConfigurator.Configure(logConfigStream);
-#if !DEBUG
-            log.Info("异常捕获");
-            // DispatcherUnhandledException += App_DispatcherUnhandledException;
-            // Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
-            // AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-#endif
             CheckAndDeleteLogFiles();
             log.Info("启动");
             ThreadPool.RegisterWaitForSingleObject(eventWaitHandle, (_, _) =>
@@ -161,7 +155,7 @@ public partial class App : Application
                 SetAutoStartup();
             }
 
-            ServiceManager.Services.GetService<SearchWindowViewModel>()!.ReloadApps();
+            ServiceManager.Services.GetService<SearchWindowViewModel>();
         }
     }
 

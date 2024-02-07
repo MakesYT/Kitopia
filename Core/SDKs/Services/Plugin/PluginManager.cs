@@ -1,6 +1,5 @@
 ﻿#region
 
-using System.IO;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.Services.Config;
 using log4net;

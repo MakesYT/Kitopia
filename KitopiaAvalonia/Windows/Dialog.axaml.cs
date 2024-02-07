@@ -71,7 +71,6 @@ public partial class Dialog : Window
             PrimaryButton.Margin = new Thickness(0, 0, 4, 0);
             SecondaryButton.SetValue(Grid.ColumnProperty, 1);
             SecondaryButton.Margin = new Thickness(4, 0, 4, 0);
-            SecondaryButton.SetValue(Grid.ColumnSpanProperty, 2);
             CloseButton.SetValue(Grid.ColumnProperty, 2);
             CloseButton.Margin = new Thickness(4, 0, 0, 0);
         }

@@ -1,6 +1,6 @@
 ﻿#region
 
-using System.IO;
+using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.Services.Plugin;
 using log4net;
 using Newtonsoft.Json;
@@ -57,5 +57,7 @@ public class ConfigManger
                     JsonConvert.SerializeObject(dConfig.Value.GetConfigJObject(), Formatting.Indented));
             }
         }
+
+        WeakReferenceMessenger.Default.Send("ConfigSave", "ConfigSave");
     }
 }

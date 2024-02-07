@@ -106,7 +106,7 @@
                                             IsVisible="{Binding Path=FileType, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter='Pin'}"
                                             Tag="{Binding IsPined}"
                                             IsChecked="{Binding IsPined}"
-                                            Command="{Binding $parent[Grid].((viewModel:SearchWindowViewModel)DataContext).PinCommand}"
+                                            Command="{Binding $parent[ListBox].((viewModel:SearchWindowViewModel)DataContext).PinCommand}"
                                             CommandParameter="{Binding}" Padding="2" />
                                 </Panel>
 
@@ -158,17 +158,12 @@
                                             IsVisible="{Binding Path=FileType, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter='Star'}"
                                             Command="{Binding $parent[ListBox].((viewModel:SearchWindowViewModel)DataContext).StarCommand}"
                                             CommandParameter="{Binding}">
-                                        <Interaction.Behaviors>
-                                            <DataTriggerBehavior Binding="{Binding IsStared}" Value="False">
-                                                <ChangePropertyAction TargetObject="Source" PropertyName="FontFamily" Value="{StaticResource FluentFont}"/>
-                                                <ChangePropertyAction TargetObject="Source" PropertyName="Glyph" Value="&#xF713;"/>
-                                            </DataTriggerBehavior>
-                                            <DataTriggerBehavior Binding="{Binding IsStared}" Value="True">
-                                                <ChangePropertyAction TargetObject="Source" PropertyName="FontFamily" Value="{StaticResource FluentFontFilled}"/>
-                                                <ChangePropertyAction TargetObject="Source" PropertyName="Glyph" Value="&#xF718;"/>
-                                            </DataTriggerBehavior>
-                                        </Interaction.Behaviors>
-                                        <controls:FontIcon x:Name="Source" FontFamily="{StaticResource FluentFont}" Glyph="&#xF713;"   />
+                                        <Button.Resources>
+                                            <searchWindow:StarIconCtr x:Key="StarIconCtr" />
+                                        </Button.Resources>
+                                        <controls:FontIcon x:Name="Source" 
+                                                           FontFamily="{Binding IsStared,Converter={StaticResource StarIconCtr},ConverterParameter='FM'}" 
+                                                           Glyph="{Binding IsStared,Converter={StaticResource StarIconCtr},ConverterParameter='F'}"   />
                                         
                                     </Button>
 
