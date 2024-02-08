@@ -41,11 +41,11 @@
         </EventTriggerBehavior>
         <EventTriggerBehavior EventName="DataContextChanged">
             <InvokeCommandAction Command="{Binding LoadCommand}"
-                                   CommandParameter="{Binding $self}" />
+                                 CommandParameter="{Binding $self}" />
         </EventTriggerBehavior>
         <EventTriggerBehavior EventName="Loaded">
             <InvokeCommandAction Command="{Binding LoadCommand}"
-                                   CommandParameter="{Binding $self}" />
+                                 CommandParameter="{Binding $self}" />
         </EventTriggerBehavior>
     </Interaction.Behaviors>
 
@@ -441,7 +441,7 @@
                                             CommandParameter="{Binding ValueValue}"
                                             Grid.Column="1" Height="40" Width="40">
                                         <controls:FontIcon FontFamily="{StaticResource FluentFont}"
-                                                                 Glyph="&#xf107;" />
+                                                           Glyph="&#xf107;" />
                                     </Button>
                                     <DockPanel Grid.Column="0" Margin="0,0,0,0" Height="40">
                                         <TextBox Watermark="变量名称"
@@ -495,13 +495,13 @@
                                                         CommandParameter="{Binding ElementName=keys,Path=SelectedValue}"
                                                         Grid.Row="0" Grid.Column="1" Height="36" Width="36">
                                                     <controls:FontIcon FontFamily="{StaticResource FluentFont}"
-                                                                             Glyph="&#xebce;" />
+                                                                       Glyph="&#xebce;" />
                                                 </Button>
                                                 <Button Command="{Binding AddKeyCommand}"
                                                         CommandParameter="{Binding KeyValue}" Grid.Row="1"
                                                         Grid.Column="1" Height="36" Width="36">
                                                     <controls:FontIcon FontFamily="{StaticResource FluentFont}"
-                                                                             Glyph="&#xf107;" />
+                                                                       Glyph="&#xf107;" />
                                                 </Button>
                                                 <DockPanel Grid.Row="1" Grid.Column="0" Margin="10" Height="40">
                                                     <TextBox
@@ -539,12 +539,12 @@
                                                               ConverterParameter={Binding Key}}" />
                                                     <TextBlock VerticalAlignment="Center"
                                                                Text="{Binding Value.Name}" />
-                                                   
-                                                    <controls:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xf4a3;" 
+
+                                                    <controls:FontIcon FontFamily="{StaticResource FluentFont}"
+                                                                       Glyph="&#xf4a3;"
                                                                        ToolTip.Tip="{Binding Value.Description}"
                                                                        ToolTip.ShowDelay="0"
-                                                                       IsVisible="{Binding Value.Description, Converter={StaticResource IfNullVisibilityHidden}}"
-                                                    />
+                                                                       IsVisible="{Binding Value.Description, Converter={StaticResource IfNullVisibilityHidden}}" />
                                                 </StackPanel>
                                             </DataTemplate>
 
@@ -653,7 +653,7 @@
                                             x:TypeArguments="x:Object" />
                                 </DataTemplate.DataType>
                                 <Expander Header="{ReflectionBinding [0].Plugin}" Margin="0">
-                                    <ListBox Margin="0" 
+                                    <ListBox Margin="0"
                                              PointerMoved="ListBox_OnMouseMove"
                                              ItemsSource="{Binding }">
                                         <ListBox.ItemContainerTheme>
@@ -667,7 +667,7 @@
                                                                           BorderBrush="{TemplateBinding BorderBrush}"
                                                                           BorderThickness="{TemplateBinding BorderThickness}"
                                                                           Content="{TemplateBinding Content}"
-                                                                          Margin="0,0,0,5" 
+                                                                          Margin="0,0,0,5"
                                                                           ContentTemplate="{TemplateBinding ContentTemplate}"
                                                                           CornerRadius="{TemplateBinding CornerRadius}" />
                                                     </ControlTemplate>
@@ -925,11 +925,12 @@
                                                                                                 Color="{DynamicResource TextFillColorInverse}" />
                                                                                         </TextBlock.Foreground>
                                                                                     </TextBlock>
-                                                                                    <controls:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xf10c;" 
+                                                                                    <controls:FontIcon
+                                                                                        FontFamily="{StaticResource FluentFont}"
+                                                                                        Glyph="&#xf10c;"
                                                                                         ToolTip.Tip="{Binding Interfaces, Converter={StaticResource InterfacesToString}}"
                                                                                         ToolTip.ShowDelay="0"
-                                                                                        IsVisible="{Binding Interfaces, Converter={StaticResource IfNullVisibilityHidden}}"
-                                                                                    />
+                                                                                        IsVisible="{Binding Interfaces, Converter={StaticResource IfNullVisibilityHidden}}" />
                                                                                     <Border Background="Transparent">
                                                                                         <!-- Set the border color to red -->
                                                                                         <Border.BorderBrush>
@@ -975,10 +976,6 @@
                 </ListBox>
             </ScrollViewer>
 
-            <Interaction.Behaviors>
-                <EventTriggerBehavior EventName="Loaded" />
-
-            </Interaction.Behaviors>
         </Border>
         <!-- 拖动部分 -->
         <GridSplitter Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Width="5" HorizontalAlignment="Center"
@@ -998,6 +995,9 @@
                                         DisconnectConnectorCommand="{Binding DisconnectConnectorCommand}"
                                         Connections="{Binding Scenario.connections}"
                                         ItemsSource="{Binding Scenario.nodes}">
+                    <controls2:NodifyEditor.Resources>
+                        <taskEditor:NodeStatusBorderCtr x:Key="NodeStatusBorderCtr" />
+                    </controls2:NodifyEditor.Resources>
                     <controls2:NodifyEditor.GridLineTemplate>
                         <DataTemplate>
                             <controls2:LargeGridLine
@@ -1065,6 +1065,10 @@
                     <controls2:NodifyEditor.ItemTemplate>
                         <DataTemplate DataType="{x:Type customScenario:PointItem}">
                             <controls2:Node
+                                Classes.Status0="{Binding  Status, Converter={StaticResource NodeStatusBorderCtr},ConverterParameter=0}"
+                                Classes.Status1="{Binding  Status, Converter={StaticResource NodeStatusBorderCtr},ConverterParameter=1}"
+                                Classes.Status2="{Binding  Status, Converter={StaticResource NodeStatusBorderCtr},ConverterParameter=2}"
+                                Classes.Status3="{Binding  Status, Converter={StaticResource NodeStatusBorderCtr},ConverterParameter=3}"
                                 x:Name="Node"
                                 Input="{Binding Input}"
                                 Location="{Binding Location,Mode=TwoWay}"
@@ -1084,27 +1088,18 @@
                                     </ContextMenu>
                                 </controls2:Node.ContextMenu>
                                 <controls2:Node.Styles>
-                                    <Style Selector="controls2|Node">
-                                        <Interaction.Behaviors>
-                                            <DataTriggerBehavior Binding="{Binding Status}" Value="0">
-                                                <ChangePropertyAction TargetObject="Node" PropertyName="BorderBrush"
-                                                                      Value="LightGray" />
-                                            </DataTriggerBehavior>
-                                            <DataTriggerBehavior Binding="{Binding Status}" Value="1">
-                                                <ChangePropertyAction PropertyName="BorderBrush" TargetObject="Node"
-                                                                      Value="GreenYellow" />
-                                            </DataTriggerBehavior>
-                                            <DataTriggerBehavior Binding="{Binding Status}" Value="2">
-                                                <ChangePropertyAction TargetObject="Node" PropertyName="BorderBrush"
-                                                                      Value="OrangeRed" />
-                                            </DataTriggerBehavior>
-                                            <DataTriggerBehavior Binding="{Binding Status}" Value="3">
-                                                <ChangePropertyAction TargetObject="Node" PropertyName="BorderBrush"
-                                                                      Value="Yellow" />
-                                            </DataTriggerBehavior>
-                                        </Interaction.Behaviors>
+                                    <Style Selector="controls2|Node.Status0">
+                                        <Setter Property="BorderBrush" Value="LightGray" />
                                     </Style>
-
+                                    <Style Selector="controls2|Node.Status1">
+                                        <Setter Property="BorderBrush" Value="GreenYellow" />
+                                    </Style>
+                                    <Style Selector="controls2|Node.Status2">
+                                        <Setter Property="BorderBrush" Value="OrangeRed" />
+                                    </Style>
+                                    <Style Selector="controls2|Node.Status3">
+                                        <Setter Property="BorderBrush" Value="Yellow" />
+                                    </Style>
                                 </controls2:Node.Styles>
                                 <controls2:Node.Resources>
 
@@ -1142,76 +1137,43 @@
                                                                 HorizontalAlignment="Right">
                                                         <TextBlock VerticalAlignment="Center" FontSize="12"
                                                                    x:Name="TypeNametextBlock"
+                                                                   Classes.IsNotUsed="{Binding IsNotUsed}"
                                                                    Text="{Binding TypeName}">
+                                                            <TextBlock.Background>
+                                                                <SolidColorBrush
+                                                                    Color="{DynamicResource TextFillColorPrimary}"
+                                                                    Opacity="0.6" />
+                                                            </TextBlock.Background>
+                                                            <TextBlock.Foreground>
+                                                                <SolidColorBrush
+                                                                    Color="{DynamicResource TextFillColorInverse}" />
+                                                            </TextBlock.Foreground>
                                                             <TextBlock.Styles>
-                                                                <Style Selector="TextBlock">
-                                                                    <Interaction.Behaviors>
-                                                                        <DataTriggerBehavior
-                                                                            Binding="{Binding IsNotUsed}" Value="True">
-                                                                            <ChangePropertyAction
-                                                                                TargetObject="TypeNametextBlock"
-                                                                                PropertyName="Background">
-                                                                                <ChangePropertyAction.Value>
-                                                                                    <SolidColorBrush
-                                                                                        Color="{DynamicResource ControlFillColorDisabled}"
-                                                                                        Opacity="0.6" />
-                                                                                </ChangePropertyAction.Value>
-                                                                            </ChangePropertyAction>
-                                                                            <ChangePropertyAction
-                                                                                TargetObject="TypeNametextBlock"
-                                                                                PropertyName="Foreground">
-                                                                                <ChangePropertyAction.Value>
-                                                                                    <SolidColorBrush
-                                                                                        Color="{DynamicResource TextFillColorTertiary}" />
-                                                                                </ChangePropertyAction.Value>
-                                                                            </ChangePropertyAction>
-                                                                        </DataTriggerBehavior>
-                                                                        <DataTriggerBehavior
-                                                                            Binding="{Binding IsNotUsed}" Value="False">
-                                                                            <ChangePropertyAction
-                                                                                TargetObject="TypeNametextBlock"
-                                                                                PropertyName="Background">
-                                                                                <ChangePropertyAction.Value>
-                                                                                    <SolidColorBrush
-                                                                                        Color="{DynamicResource TextFillColorPrimary}"
-                                                                                        Opacity="0.6" />
-                                                                                </ChangePropertyAction.Value>
-                                                                            </ChangePropertyAction>
-                                                                            <ChangePropertyAction
-                                                                                TargetObject="TypeNametextBlock"
-                                                                                PropertyName="Foreground">
-                                                                                <ChangePropertyAction.Value>
-                                                                                    <SolidColorBrush
-                                                                                        Color="{DynamicResource TextFillColorInverse}" />
-                                                                                </ChangePropertyAction.Value>
-                                                                            </ChangePropertyAction>
-                                                                        </DataTriggerBehavior>
-                                                                    </Interaction.Behaviors>
-
+                                                                <Style Selector="TextBlock.IsNotUsed">
+                                                                    <Setter Property="Background">
+                                                                        <Setter.Value>
+                                                                            <SolidColorBrush
+                                                                                Color="{DynamicResource ControlFillColorDisabled}"
+                                                                                Opacity="0.6" />
+                                                                        </Setter.Value>
+                                                                    </Setter>
+                                                                    <Setter Property="Foreground">
+                                                                        <Setter.Value>
+                                                                            <SolidColorBrush
+                                                                                Color="{DynamicResource TextFillColorTertiary}" />
+                                                                        </Setter.Value>
+                                                                    </Setter>
                                                                 </Style>
                                                             </TextBlock.Styles>
 
                                                         </TextBlock>
                                                         <TextBlock VerticalAlignment="Center" x:Name="textBlock"
+                                                                   Classes.IsNotUsed="{Binding IsNotUsed}"
                                                                    Text="{Binding Title}">
-                                                            <TextBlock.Styles>
-                                                                <Style Selector="TextBlock">
-                                                                    <Interaction.Behaviors>
-                                                                        <DataTriggerBehavior
-                                                                            Binding="{Binding IsNotUsed}" Value="True">
-                                                                            <ChangePropertyAction
-                                                                                TargetObject="textBlock"
-                                                                                PropertyName="Foreground">
-                                                                                <ChangePropertyAction.Value>
-                                                                                    <SolidColorBrush
-                                                                                        Color="{DynamicResource TextFillColorTertiary}" />
-                                                                                </ChangePropertyAction.Value>
-                                                                            </ChangePropertyAction>
-                                                                        </DataTriggerBehavior>
-                                                                    </Interaction.Behaviors>
-
-                                                                </Style>
-                                                            </TextBlock.Styles>
+                                                            <TextBlock.Foreground>
+                                                                <SolidColorBrush
+                                                                    Color="{DynamicResource TextFillColorTertiary}" />
+                                                            </TextBlock.Foreground>
                                                         </TextBlock>
                                                     </StackPanel>
                                                 </controls2:NodeInput.Header>
@@ -1330,12 +1292,12 @@
                                                                 Color="{DynamicResource TextFillColorInverse}" />
                                                         </TextBlock.Foreground>
                                                     </TextBlock>
-                                                    
-                                                    <controls:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xf10c;" 
+
+                                                    <controls:FontIcon FontFamily="{StaticResource FluentFont}"
+                                                                       Glyph="&#xf10c;"
                                                                        ToolTip.Tip="{Binding Interfaces, Converter={StaticResource InterfacesToString}}"
                                                                        ToolTip.ShowDelay="0"
-                                                                       IsVisible="{Binding Interfaces, Converter={StaticResource IfNullVisibilityHidden}}"
-                                                                       />
+                                                                       IsVisible="{Binding Interfaces, Converter={StaticResource IfNullVisibilityHidden}}" />
                                                 </StackPanel>
                                             </controls2:NodeOutput.Header>
                                             <controls2:NodeOutput.BorderBrush>
@@ -1384,13 +1346,15 @@
                             IsVisible="{Binding Scenario.IsRunning,Converter={StaticResource reverseBoolToVisibilityConverter}}"
                             Foreground="GreenYellow"
                             Command="{Binding VerifyNodeCommand}">
-                        <controls:FontIcon Foreground="GreenYellow" FontFamily="{StaticResource FluentFont}" Glyph="&#xf605;" />
+                        <controls:FontIcon Foreground="GreenYellow" FontFamily="{StaticResource FluentFont}"
+                                           Glyph="&#xf605;" />
                     </Button>
                     <Button FontSize="25" ToolTip.Tip="停止测试" ToolTip.ShowDelay="100"
                             IsVisible="{Binding Scenario.IsRunning}"
-                            
+
                             Command="{Binding StopCustomScenarioCommand}">
-                        <controls:FontIcon  Foreground="OrangeRed" FontFamily="{StaticResource FluentFont}" Glyph="&#xf72a;" />
+                        <controls:FontIcon Foreground="OrangeRed" FontFamily="{StaticResource FluentFont}"
+                                           Glyph="&#xf72a;" />
                     </Button>
                     <Button FontSize="25" ToolTip.Tip="保存" ToolTip.ShowDelay="100"
                             Command="{Binding SaveCustomScenarioCommand}">

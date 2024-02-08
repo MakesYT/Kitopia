@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -81,7 +80,6 @@ public partial class TaskEditor : AppWindow
             if (point.Properties.IsLeftButtonPressed)
             {
                 var borderDataContext = border.DataContext;
-                Debug.WriteLine(border.DataContext);
                 try
                 {
                     var keyValuePair = (KeyValuePair<string, object>)borderDataContext;
