@@ -1,6 +1,5 @@
 ﻿#region
 
-using System.IO;
 using System.Text;
 using Core.SDKs.Services.Config;
 using Core.SDKs.Tools;
@@ -77,7 +76,7 @@ public class Tools
             AppTools.NameSolver(keys, fileInfo.Name).Wait();
             var searchViewItem = new SearchViewItem
             {
-                IsVisible = true, FileInfo = fileInfo, FileName = fileInfo.Name, FileType = fileType,
+                IsVisible = true, ItemDisplayName = fileInfo.Name, FileType = fileType,
                 Keys = keys,
                 OnlyKey = filePath,
                 Icon = null
@@ -137,7 +136,7 @@ public class Tools
             AppTools.NameSolver(keys, fileInfo.Name).Wait();
             var searchViewItem = new SearchViewItem
             {
-                IsVisible = true, FileInfo = fileInfo, FileName = fileInfo.Name, FileType = fileType,
+                IsVisible = true, ItemDisplayName = fileInfo.Name, FileType = fileType,
                 Keys = keys,
                 OnlyKey = filePath,
                 Icon = null

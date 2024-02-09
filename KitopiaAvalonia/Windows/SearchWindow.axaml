@@ -121,7 +121,7 @@
 
                                 <StackPanel Grid.Column="2" Margin="5" VerticalAlignment="Top">
                                     <TextBlock VerticalAlignment="Center" Margin="0" Focusable="False"
-                                               Text="{Binding Path=FileName}"
+                                               Text="{Binding Path=ItemDisplayName}"
                                                
                                                Background="{x:Null}"
                                                FontWeight="Normal" FontSize="18" />

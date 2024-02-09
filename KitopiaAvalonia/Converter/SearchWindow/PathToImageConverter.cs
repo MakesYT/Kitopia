@@ -1,15 +1,10 @@
 ﻿#region
 
 using System;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.Globalization;
-using Avalonia;
 using Avalonia.Data.Converters;
-using Avalonia.Media;
 using Core.SDKs.Tools;
 using PluginCore;
-using Bitmap = Avalonia.Media.Imaging.Bitmap;
 
 #endregion
 
@@ -30,7 +25,6 @@ public partial class PathToImageConverter : IValueConverter
 
         if (searchViewItem is { Icon: null })
         {
-            //Console.WriteLine("开始获取2 "+DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond );
             IconTools.GetIconInItems(searchViewItem);
             //.WriteLine("完成获取2 "+DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond );
         }
@@ -64,19 +58,7 @@ public partial class PathToImageConverter : IValueConverter
         {
             if (searchViewItem != null)
             {
-                var icon = searchViewItem.Icon;
-                
-                System.Drawing.Bitmap bitmapTmp = icon.ToBitmap();
-                var bitmapdata = bitmapTmp.LockBits(new Rectangle(0, 0, bitmapTmp.Width, bitmapTmp.Height), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
-                Bitmap bitmap1 = new Bitmap(Avalonia.Platform.PixelFormat.Bgra8888, Avalonia.Platform.AlphaFormat.Unpremul,
-                    bitmapdata.Scan0,
-                    new Avalonia.PixelSize(bitmapdata.Width, bitmapdata.Height),
-                    new Avalonia.Vector(96, 96),
-                    bitmapdata.Stride);
-                bitmapTmp.UnlockBits(bitmapdata);
-                bitmapTmp.Dispose();
-                //Console.WriteLine("完成获取  "+DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond );
-                return bitmap1;
+                return searchViewItem.Icon;
             }
         }
         catch (Exception e)

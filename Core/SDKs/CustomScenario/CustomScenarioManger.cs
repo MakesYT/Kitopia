@@ -165,7 +165,7 @@ public static class CustomScenarioManger
             {
                 var viewItem1 = new SearchViewItem()
                 {
-                    FileName = "执行自定义情景:" + scenario.Name,
+                    ItemDisplayName = "执行自定义情景:" + scenario.Name,
                     FileType = FileType.自定义情景,
                     OnlyKey = $"CustomScenario:{scenario.UUID}",
                     Keys = scenario.Keys.ToHashSet(),

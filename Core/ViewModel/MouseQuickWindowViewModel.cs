@@ -47,7 +47,7 @@ public partial class MouseQuickWindowViewModel : ObservableRecipient
             {
                 Items.Add(new SearchViewItem()
                 {
-                    FileName = "添加",
+                    ItemDisplayName = "添加",
                     FileType = FileType.None,
                     IconSymbol = 0xF136,
                     OnlyKey = "Add",

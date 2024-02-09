@@ -25,14 +25,15 @@ public class SearchItemToInfo : IValueConverter
         {
             case FileType.文件夹:
                 info.Append("名称:");
-                info.AppendLine(item.DirectoryInfo.Name);
+                info.AppendLine(item.OnlyKey.Substring(item.OnlyKey.LastIndexOf('\\') + 1,
+                    item.OnlyKey.Length - item.OnlyKey.LastIndexOf('\\') - 1));
                 info.Append("位置:");
-                info.Append(item.DirectoryInfo.FullName);
+                info.Append(item.OnlyKey);
                 break;
             case FileType.命令:
             case FileType.URL:
                 info.Append("名称:");
-                info.AppendLine(item.FileName);
+                info.AppendLine(item.ItemDisplayName);
                 info.Append("目标:");
                 info.Append(item.OnlyKey);
                 break;
@@ -49,9 +50,10 @@ public class SearchItemToInfo : IValueConverter
             case FileType.文件:
             {
                 info.Append("名称:");
-                info.AppendLine(item.FileInfo.Name);
+                info.AppendLine(item.OnlyKey.Substring(item.OnlyKey.LastIndexOf('\\') + 1,
+                    item.OnlyKey.Length - item.OnlyKey.LastIndexOf('\\') - 1));
                 info.Append("位置:");
-                info.Append(item.FileInfo.FullName);
+                info.Append(item.OnlyKey);
                 break;
             }
             default:

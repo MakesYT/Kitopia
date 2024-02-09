@@ -135,7 +135,7 @@
                                 <controls:SettingsExpander Margin="0" Header="执行间隔(秒)">
                                     <controls:SettingsExpander.Footer>
                                         <controls:NumberBox
-
+                                            SpinButtonPlacementMode="Inline"
                                             Minimum="0.1"
                                             ValidationMode="InvalidInputOverwritten"
                                             Text="{Binding Scenario.TickIntervalSecond}"
@@ -812,6 +812,7 @@
                                                                                             Margin="10,5,10,5"
                                                                                             MinWidth="40"
                                                                                             ValidationMode="InvalidInputOverwritten"
+                                                                                            SpinButtonPlacementMode="Inline"
                                                                                             Maximum="2147483647"
                                                                                             Minimum="-2147483648"
                                                                                             Value="{Binding InputObject, Mode=TwoWay}"
@@ -834,6 +835,7 @@
                                                                                             Margin="10,5,10,5"
                                                                                             MinWidth="40"
                                                                                             SimpleNumberFormat="F2"
+                                                                                            SpinButtonPlacementMode="Inline"
                                                                                             ValidationMode="InvalidInputOverwritten"
                                                                                             Value="{Binding InputObject, Mode=TwoWay}"
                                                                                             PlaceholderText="浮点" />
@@ -1135,46 +1137,45 @@
 
                                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
                                                                 HorizontalAlignment="Right">
+                                                        <StackPanel.Styles>
+                                                            <Style Selector="TextBlock#TypeNametextBlock">
+                                                                <Setter Property="Background">
+                                                                    <Setter.Value>
+                                                                        <SolidColorBrush
+                                                                            Color="{DynamicResource TextFillColorPrimary}"
+                                                                            Opacity="0.6" />
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                                <Setter Property="Foreground">
+                                                                    <Setter.Value>
+                                                                        <SolidColorBrush
+                                                                            Color="{DynamicResource TextFillColorInverse}" />
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                            </Style>
+                                                            <Style  Selector="TextBlock.IsNotUsed">
+                                                                <Setter Property="Background">
+                                                                    <Setter.Value>
+                                                                        <SolidColorBrush
+                                                                            Color="{DynamicResource ControlFillColorDisabled}"
+                                                                            Opacity="0.6" />
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                                <Setter Property="Foreground">
+                                                                    <Setter.Value>
+                                                                        <SolidColorBrush
+                                                                            Color="{DynamicResource TextFillColorTertiary}" />
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                            </Style>
+                                                        </StackPanel.Styles>
                                                         <TextBlock VerticalAlignment="Center" FontSize="12"
                                                                    x:Name="TypeNametextBlock"
                                                                    Classes.IsNotUsed="{Binding IsNotUsed}"
-                                                                   Text="{Binding TypeName}">
-                                                            <TextBlock.Background>
-                                                                <SolidColorBrush
-                                                                    Color="{DynamicResource TextFillColorPrimary}"
-                                                                    Opacity="0.6" />
-                                                            </TextBlock.Background>
-                                                            <TextBlock.Foreground>
-                                                                <SolidColorBrush
-                                                                    Color="{DynamicResource TextFillColorInverse}" />
-                                                            </TextBlock.Foreground>
-                                                            <TextBlock.Styles>
-                                                                <Style Selector="TextBlock.IsNotUsed">
-                                                                    <Setter Property="Background">
-                                                                        <Setter.Value>
-                                                                            <SolidColorBrush
-                                                                                Color="{DynamicResource ControlFillColorDisabled}"
-                                                                                Opacity="0.6" />
-                                                                        </Setter.Value>
-                                                                    </Setter>
-                                                                    <Setter Property="Foreground">
-                                                                        <Setter.Value>
-                                                                            <SolidColorBrush
-                                                                                Color="{DynamicResource TextFillColorTertiary}" />
-                                                                        </Setter.Value>
-                                                                    </Setter>
-                                                                </Style>
-                                                            </TextBlock.Styles>
-
-                                                        </TextBlock>
+                                                                   Text="{Binding TypeName}" />
                                                         <TextBlock VerticalAlignment="Center" x:Name="textBlock"
                                                                    Classes.IsNotUsed="{Binding IsNotUsed}"
-                                                                   Text="{Binding Title}">
-                                                            <TextBlock.Foreground>
-                                                                <SolidColorBrush
-                                                                    Color="{DynamicResource TextFillColorTertiary}" />
-                                                            </TextBlock.Foreground>
-                                                        </TextBlock>
+                                                                   Text="{Binding Title}" />
                                                     </StackPanel>
                                                 </controls2:NodeInput.Header>
                                                 <controls2:NodeInput.BorderBrush>
@@ -1195,6 +1196,7 @@
                                                            Text="{Binding Title}"
                                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
                                                 <TextBox Margin="10,5,10,5" MinWidth="40"
+                                                         Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                                          Text="{Binding InputObject}" Watermark="字符串" />
                                             </StackPanel>
 
@@ -1209,8 +1211,10 @@
                                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
                                                 <controls:NumberBox Margin="10,5,10,5" MinWidth="40"
                                                                     ValidationMode="InvalidInputOverwritten"
+                                                                    SpinButtonPlacementMode="Inline"
                                                                     Maximum="2147483647" Minimum="-2147483648"
-                                                                    Value="{Binding InputObject, Mode=TwoWay}"
+                                                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                                                    Value="{Binding InputObject, Mode=TwoWay }"
                                                                     PlaceholderText="整型" />
                                             </StackPanel>
 
@@ -1225,7 +1229,9 @@
                                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
                                                 <controls:NumberBox Margin="10,5,10,5" MinWidth="40"
                                                                     SimpleNumberFormat="F2"
+                                                                    SpinButtonPlacementMode="Inline"
                                                                     ValidationMode="InvalidInputOverwritten"
+                                                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                                                     Value="{Binding InputObject, Mode=TwoWay}"
                                                                     PlaceholderText="浮点" />
                                             </StackPanel>

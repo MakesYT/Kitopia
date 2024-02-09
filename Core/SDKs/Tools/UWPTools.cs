@@ -1,6 +1,5 @@
 ﻿#region
 
-using System.IO;
 using System.Xml;
 using Core.SDKs.Services.Config;
 using log4net;
@@ -159,7 +158,7 @@ public static class UwpTools
         {
             var searchViewItem = new SearchViewItem()
             {
-                FileName = fileName,
+                ItemDisplayName = fileName,
                 OnlyKey = $"{appContainer.appContainerName}!{id}",
                 FileType = FileType.UWP应用,
                 Keys = keys,
@@ -181,7 +180,7 @@ public static class UwpTools
                 {
                     var searchViewItem = new SearchViewItem()
                     {
-                        FileName = fileName,
+                        ItemDisplayName = fileName,
                         OnlyKey = $"{appContainer.appContainerName}!{id}",
                         FileType = FileType.UWP应用,
                         Keys = keys,

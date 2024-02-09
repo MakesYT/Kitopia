@@ -19,11 +19,11 @@
         <ProjectReference Include="..\Core\Core.csproj"/>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="11.0.7"/>
-        <PackageReference Include="Avalonia.Desktop" Version="11.0.7"/>
-        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.7"/>
+        <PackageReference Include="Avalonia" Version="11.0.9"/>
+        <PackageReference Include="Avalonia.Desktop" Version="11.0.9"/>
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.9"/>
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.7"/>
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.9"/>
         <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.6"/>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2"/>
         <PackageReference Include="log4net" Version="2.0.15"/>
@@ -50,6 +50,9 @@
             <SubType>Code</SubType>
             <DependentUpon>HotKeyManagerPage.xaml</DependentUpon>
         </Compile>
+    </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Tools\"/>
     </ItemGroup>
 
 </Project>

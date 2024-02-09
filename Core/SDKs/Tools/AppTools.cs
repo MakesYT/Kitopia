@@ -178,7 +178,7 @@ public partial class AppTools
                 {
                     var viewItem1 = new SearchViewItem()
                     {
-                        FileName = "执行自定义情景:" + customScenario.Name,
+                        ItemDisplayName = "执行自定义情景:" + customScenario.Name,
                         FileType = FileType.自定义情景,
                         OnlyKey = $"CustomScenario:{customScenario.UUID}",
                         Keys = customScenario.Keys.ToHashSet(),
@@ -430,7 +430,7 @@ public partial class AppTools
                         {
                             collection.TryAdd(refFileInfo.FullName, new SearchViewItem
                             {
-                                Keys = keys, IsVisible = true, FileInfo = refFileInfo, FileName = localName,
+                                Keys = keys, IsVisible = true, ItemDisplayName = localName,
                                 OnlyKey = refFileInfo.FullName, IsStared = star, Arguments = arg,
                                 FileType = FileType.应用程序, Icon = null
                             });
@@ -500,8 +500,9 @@ public partial class AppTools
                     {
                         collection.TryAdd(url, new SearchViewItem
                         {
-                            Keys = keys, IsVisible = true, FileName = localName,
-                            OnlyKey = url, Url = url, FileInfo = new FileInfo(relFile), IsStared = star,
+                            Keys = keys, IsVisible = true, ItemDisplayName = localName,
+                            OnlyKey = url, IsStared = star,
+                            IconPath = relFile,
                             FileType = FileType.URL, Icon = null
                         });
                     }
@@ -516,8 +517,7 @@ public partial class AppTools
                         await NameSolver(keys, localizedName);
                         collection.TryAdd(file, new SearchViewItem()
                         {
-                            FileInfo = new FileInfo(file),
-                            FileName = localizedName,
+                            ItemDisplayName = localizedName,
                             FileType = FileType.文件,
 
                             OnlyKey = file,
@@ -539,8 +539,7 @@ public partial class AppTools
 
                 collection.TryAdd(file, new SearchViewItem()
                 {
-                    DirectoryInfo = new DirectoryInfo(file),
-                    FileName = file.Split("\\").Last(),
+                    ItemDisplayName = file.Split("\\").Last(),
                     FileType = FileType.文件夹,
                     IsStared = star,
                     OnlyKey = file,

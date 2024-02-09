@@ -3,6 +3,7 @@
 using System.Drawing;
 using System.Runtime.InteropServices;
 using Core.SDKs.Services;
+using KitopiaAvalonia.Tools;
 using log4net;
 using PluginCore;
 using Vanara.PInvoke;
@@ -20,7 +21,7 @@ public class IconTools
     private const uint SHGFI_USEFILEATTRIBUTES = 0x000000010;
     private const uint SHGFI_OPENICON = 0x000000002;
     private static readonly ILog log = LogManager.GetLogger(nameof(IconTools));
-    private static readonly Dictionary<string, Icon> _icons = new(250);
+    private static readonly Dictionary<string, Avalonia.Media.Imaging.Bitmap> _icons = new(250);
 
 
     [DllImport("User32.dll")]
@@ -131,12 +132,12 @@ public class IconTools
             switch (t.FileType)
             {
                 case FileType.文件夹:
-                    IconTools.ExtractFromPath(t.DirectoryInfo!.FullName, t);
+                    IconTools.ExtractFromPath(t.OnlyKey, t);
                     break;
                 case FileType.URL:
-                    if (t.FileInfo is not null)
+                    if (t.IconPath is not null)
                     {
-                        IconTools.GetIcon(t.FileInfo!.FullName, t);
+                        IconTools.GetIcon(t.IconPath, t);
                     }
 
                     break;
@@ -158,7 +159,7 @@ public class IconTools
                 case FileType.PDF文档:
                 case FileType.图像:
                 case FileType.文件:
-                    IconTools.GetIcon(t.FileInfo!.FullName, t);
+                    IconTools.GetIcon(t.OnlyKey, t);
                     break;
                 case FileType.命令:
                 case FileType.自定义情景:
@@ -169,7 +170,7 @@ public class IconTools
                     break;
 
                 default:
-                    IconTools.GetIcon(t.FileInfo!.FullName, t);
+                    IconTools.GetIcon(t.OnlyKey, t);
                     break;
             }
         }
@@ -229,13 +230,13 @@ public class IconTools
             goto retry;
         }
 
-        var clone = (Icon)iconBase.Clone();
+        var clone = ((Bitmap)iconBase.ToBitmap()).ToAvaloniaBitmap();
         _icons.TryAdd(cacheKey, clone);
         iconBase.Dispose();
         item.Icon = clone;
     }
 
-    public Icon? GetFormClipboard()
+    public Avalonia.Media.Imaging.Bitmap? GetFormClipboard()
     {
         var bitmap =
             ((IClipboardService)ServiceManager.Services.GetService(typeof(IClipboardService)))
@@ -254,7 +255,7 @@ public class IconTools
         ms.Position = 0; // 重置流位置
         icon = new Icon(ms); // 从流中创建 icon 对象
         ms.Close(); // 关闭流
-        var independenceIcon12 = (Icon)icon.Clone();
+        var independenceIcon12 = icon.ToBitmap().ToAvaloniaBitmap();
         DestroyIcon(icon.Handle);
         //_icons.Add(cacheKey,independenceIcon12);
         return independenceIcon12;
@@ -278,7 +279,7 @@ public class IconTools
                     path,
                     0, ref shinfo, (uint)Marshal.SizeOf(shinfo),
                     SHGFI_ICON | SHGFI_LARGEICON);
-                var independenceIcon12 = (Icon)Icon.FromHandle(shinfo.hIcon).Clone();
+                var independenceIcon12 = Icon.FromHandle(shinfo.hIcon).ToBitmap().ToAvaloniaBitmap();
                 DestroyIcon(shinfo.hIcon);
                 _icons.TryAdd(path, independenceIcon12);
                 item.Icon = independenceIcon12;

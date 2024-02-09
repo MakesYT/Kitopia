@@ -2,7 +2,6 @@
 
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Avalonia.Threading;
@@ -120,7 +119,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
             return;
         }
 
-        if (Items.Count > 0 && (Items[0].FileType == FileType.剪贴板图像 || Items[0].FileName.StartsWith("打开")))
+        if (Items.Count > 0 && (Items[0].FileType == FileType.剪贴板图像 || Items[0].ItemDisplayName.StartsWith("打开")))
         {
             Items.RemoveAt(0);
         }
@@ -144,7 +143,15 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     AppTools.AppSolverA(a, text).Wait();
                     foreach (var (key, value) in a)
                     {
-                        value.FileName = $"打开文件: {value.FileName} ?";
+                        if (value.FileType == FileType.文件夹)
+                        {
+                            value.ItemDisplayName = $"打开文件夹: {value.ItemDisplayName} ?";
+                        }
+                        else
+                        {
+                            value.ItemDisplayName = $"打开文件: {value.ItemDisplayName} ?";
+                        }
+
                         Items.Insert(0, value);
                         //GetIconInItemsAsync(value);
                     }
@@ -168,7 +175,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
             Items.Insert(0, new SearchViewItem()
             {
-                FileName = "保存剪贴板图像?",
+                ItemDisplayName = "保存剪贴板图像?",
                 FileType = FileType.剪贴板图像,
                 IconSymbol = 0xE357,
                 OnlyKey = "ClipboardImageData",
@@ -329,7 +336,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     var e = SDKs.Tools.Math.Evaluate(value);
                     Items.Add(new SearchViewItem()
                     {
-                        FileName = "=" + e,
+                        ItemDisplayName = "=" + e,
                         FileType = FileType.数学运算,
                         OnlyKey = value,
                         Icon = null,
@@ -341,7 +348,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 {
                     Items.Add(new SearchViewItem()
                     {
-                        FileName = "错误的表达式",
+                        ItemDisplayName = "错误的表达式",
                         FileType = FileType.数学运算,
                         OnlyKey = value,
                         Icon = null,
@@ -461,8 +468,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                         temp = "https://" + temp;
                         var viewItem = new SearchViewItem()
                         {
-                            Url = temp,
-                            FileName = "打开网页:" + temp,
+                            ItemDisplayName = "打开网页:" + temp,
                             FileType = FileType.URL,
                             OnlyKey = temp,
                             Icon = null,
@@ -473,8 +479,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                         temp = "http://" + value;
                         var viewItem1 = new SearchViewItem()
                         {
-                            Url = temp,
-                            FileName = "打开网页:" + temp,
+                            ItemDisplayName = "打开网页:" + temp,
                             FileType = FileType.URL,
                             OnlyKey = temp,
                             Icon = null,
@@ -487,8 +492,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     {
                         var viewItem1 = new SearchViewItem()
                         {
-                            Url = value,
-                            FileName = "打开路径:" + value,
+                            ItemDisplayName = "打开路径:" + value,
                             FileType = FileType.URL,
                             OnlyKey = value,
                             Icon = null,
@@ -501,8 +505,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     {
                         var viewItem1 = new SearchViewItem()
                         {
-                            Url = value,
-                            FileName = "打开网页:" + value,
+                            ItemDisplayName = "打开网页:" + value,
                             FileType = FileType.URL,
                             OnlyKey = value,
                             Icon = null,
@@ -515,7 +518,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
                 var searchViewItem3 = new SearchViewItem()
                 {
-                    FileName = "将内容添加至便签" + value,
+                    ItemDisplayName = "将内容添加至便签" + value,
                     FileType = FileType.便签,
                     OnlyKey = value,
                     Icon = null,
@@ -525,8 +528,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 Items.Add(searchViewItem3);
                 var searchViewItem = new SearchViewItem()
                 {
-                    Url = "https://www.bing.com/search?q=" + value,
-                    FileName = "在网页中搜索" + value,
+                    ItemDisplayName = "在网页中搜索" + value,
                     FileType = FileType.URL,
                     OnlyKey = "https://www.bing.com/search?q=" + value,
                     Icon = null,
@@ -538,8 +540,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
                 var item = new SearchViewItem()
                 {
-                    Url = value,
-                    FileName = "执行命令:" + value,
+                    ItemDisplayName = "执行命令:" + value,
                     FileType = FileType.命令,
                     OnlyKey = value,
                     Icon = null,
@@ -580,7 +581,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
     [RelayCommand]
     private void IgnoreItem(SearchViewItem searchViewItem)
-    { 
+    {
         Task.Run(() =>
         {
             ConfigManger.Config.ignoreItems.Add(searchViewItem.OnlyKey);
@@ -594,7 +595,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    private void OpenFolder(object searchViewItem) => 
+    private void OpenFolder(object searchViewItem) =>
         Task.Run(() =>
         {
             WeakReferenceMessenger.Default.Send("a", "SearchWindowClose");
@@ -692,51 +693,29 @@ public partial class SearchWindowViewModel : ObservableRecipient
         // Items.ResetItem(index);
         item.IsStared = !item.IsStared;
         // Items.ResetBindings();
-        if (item.FileInfo is not null)
+        if (item.OnlyKey is not null)
         {
-            if (ConfigManger.Config.customCollections.Contains(item.FileInfo.FullName))
+            if (ConfigManger.Config.customCollections.Contains(item.OnlyKey))
             {
-                ConfigManger.Config.customCollections.Remove(item.FileInfo.FullName);
+                ConfigManger.Config.customCollections.Remove(item.OnlyKey);
             }
 
             if (item.IsStared) //收藏操作
             {
-                AppTools.AppSolverA(_collection, item.FileInfo.FullName, true);
-                ConfigManger.Config.customCollections.Insert(0, item.FileInfo.FullName);
+                AppTools.AppSolverA(_collection, item.OnlyKey, true);
+                ConfigManger.Config.customCollections.Insert(0, item.OnlyKey);
             }
             else
             {
                 var keyValuePairs = _collection.Where(e =>
-                    e.Value.FileInfo != null && e.Value.FileInfo.FullName.Equals(item.FileInfo.FullName));
+                    e.Value.OnlyKey != null && e.Value.OnlyKey.Equals(item.OnlyKey));
                 foreach (var keyValuePair in keyValuePairs)
                 {
                     _collection.Remove(keyValuePair.Key);
                 }
             }
         }
-        else if (item.DirectoryInfo is not null)
-        {
-            if (ConfigManger.Config.customCollections.Contains(item.DirectoryInfo.FullName))
-            {
-                ConfigManger.Config.customCollections.Remove(item.DirectoryInfo.FullName);
-            }
 
-            if (item.IsStared) //收藏操作
-            {
-                AppTools.AppSolverA(_collection, item.DirectoryInfo.FullName, true);
-                ConfigManger.Config.customCollections.Insert(0, item.DirectoryInfo.FullName);
-            }
-            else
-            {
-                var keyValuePairs = _collection.Where(e =>
-                    e.Value.DirectoryInfo != null &&
-                    e.Value.DirectoryInfo.FullName.Equals(item.DirectoryInfo.FullName));
-                foreach (var keyValuePair in keyValuePairs)
-                {
-                    _collection.Remove(keyValuePair.Key);
-                }
-            }
-        }
 
         //GetItemsIcon();
 
@@ -781,14 +760,14 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 startInfo.FileName = @"C:\Windows\sysnative\cmd.exe";
             }
 
-            if (item.FileInfo != null)
+            if (item.FileType == FileType.文件夹)
             {
-                startInfo.WorkingDirectory = item.FileInfo.DirectoryName;
+                startInfo.WorkingDirectory = item.OnlyKey;
             }
 
-            if (item.DirectoryInfo != null)
+            if (item.FileType is FileType.文件 or FileType.Excel文档 or FileType.Word文档 or FileType.PDF文档 or FileType.PPT文档)
             {
-                startInfo.WorkingDirectory = item.DirectoryInfo.FullName;
+                startInfo.WorkingDirectory = item.OnlyKey[..item.OnlyKey.LastIndexOf('\\')];
             }
 
             Process.Start(startInfo);

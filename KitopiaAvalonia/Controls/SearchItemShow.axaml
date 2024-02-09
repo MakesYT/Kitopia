@@ -40,7 +40,7 @@
                         </Grid>
                         <StackPanel Margin="5" VerticalAlignment="Top">
                             <TextBlock VerticalAlignment="Center" Margin="0" Focusable="False"
-                                       Text="{Binding Path=SearchViewItem.FileName,RelativeSource={RelativeSource TemplatedParent}}"
+                                       Text="{Binding Path=SearchViewItem.ItemDisplayName,RelativeSource={RelativeSource TemplatedParent}}"
 
                                        Background="{x:Null}"
                                        FontWeight="Normal" FontSize="18" />
