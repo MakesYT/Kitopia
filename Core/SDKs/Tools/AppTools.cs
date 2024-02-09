@@ -178,10 +178,10 @@ public partial class AppTools
                 {
                     var viewItem1 = new SearchViewItem()
                     {
-                        ItemDisplayName = "执行自定义情景:" + customScenario.Name,
+                        ItemDisplayName = $"执行自定义情景:{customScenario.Name}",
                         FileType = FileType.自定义情景,
                         OnlyKey = $"CustomScenario:{customScenario.UUID}",
-                        Keys = customScenario.Keys.ToHashSet(),
+                        Keys = customScenario.Keys.ToList(),
                         Icon = null,
                         IconSymbol = 0xF78B,
                         IsVisible = true
@@ -419,7 +419,7 @@ public partial class AppTools
                         !fileInfo.Name.Contains("install") &&
                         !fileInfo.Name.Contains("安装") && !fileInfo.Name.Contains("卸载"))
                     {
-                        var keys = new HashSet<string>();
+                        var keys = new List<string>();
 
                         //collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = fileInfo.Name.Replace(".lnk", ""), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
                         var localName = localizedName;
@@ -440,10 +440,6 @@ public partial class AppTools
                     }
                     else
                     {
-                        if (file.Contains("Control.url"))
-                        {
-                        }
-
                         log.Debug("不符合要求跳过索引:" + file);
                     }
 
@@ -489,7 +485,7 @@ public partial class AppTools
                         return;
                     }
 
-                    var keys = new HashSet<string>();
+                    var keys = new List<string>();
 
                     //collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = fileInfo.Name.Replace(".lnk", ""), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
                     var localName = localizedName;
@@ -513,7 +509,7 @@ public partial class AppTools
                 default:
                     if (File.Exists(file))
                     {
-                        var keys = new HashSet<string>();
+                        var keys = new List<string>();
                         await NameSolver(keys, localizedName);
                         collection.TryAdd(file, new SearchViewItem()
                         {
@@ -534,7 +530,7 @@ public partial class AppTools
         {
             if (Directory.Exists(file))
             {
-                var keys = new HashSet<string>();
+                var keys = new List<string>();
                 await NameSolver(keys, file.Split("\\").Last());
 
                 collection.TryAdd(file, new SearchViewItem()
@@ -553,7 +549,7 @@ public partial class AppTools
 
 
     //Console.WriteLine();
-    private static void CreateCombinations(HashSet<string> keys, int startIndex, string pair, string[] initialArray)
+    private static void CreateCombinations(List<string> keys, int startIndex, string pair, string[] initialArray)
     {
         // 遍历初始数组中的元素
         for (var i = startIndex; i < initialArray.Length; i++)
@@ -566,8 +562,8 @@ public partial class AppTools
 
             // 添加原始字符串、拼音首字母、拼音全拼和去除非字母字符后的字符串到HashSet中
             AddUtil(keys, lowerValue);
-            AddUtil(keys, Pinyin.GetInitials(value).ToLowerInvariant());
-            AddUtil(keys, Pinyin.GetPinyin(value).ToLowerInvariant());
+            AddUtil(keys, Pinyin.GetInitials(value).Replace(" ", "").ToLowerInvariant());
+            AddUtil(keys, Pinyin.GetPinyin(value).Replace(" ", "").ToLowerInvariant());
             AddUtil(keys, MyRegex().Replace(lowerValue, ""));
 
             // 递归调用自身方法，生成更长的字符串组合
@@ -577,7 +573,7 @@ public partial class AppTools
 
 
     // 使用const或readonly修饰符来声明pattern字符串
-    public static async Task NameSolver(HashSet<string> keys, string name)
+    public static async Task NameSolver(List<string> keys, string name)
     {
         var initials = name.Split(" ");
         CreateCombinations(keys, 0, "", initials);
@@ -587,7 +583,7 @@ public partial class AppTools
             string.Concat(MyRegex().Replace(name, "").ToLowerInvariant(), name.Last().ToString().ToLowerInvariant()));
     }
 
-    private static void AddUtil(HashSet<string> keys, string name)
+    private static void AddUtil(List<string> keys, string name)
     {
         if (string.IsNullOrEmpty(name) || name.Length <= 1)
         {
@@ -595,7 +591,13 @@ public partial class AppTools
         }
 
 
-        keys.Add(name);
+        if (!keys.Contains(name))
+        {
+            keys.Add(name);
+            if (name.Contains(" "))
+            {
+            }
+        }
     }
 
     [GeneratedRegex("[^A-Z]")]

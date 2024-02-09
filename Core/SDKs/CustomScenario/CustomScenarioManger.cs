@@ -168,7 +168,7 @@ public static class CustomScenarioManger
                     ItemDisplayName = "执行自定义情景:" + scenario.Name,
                     FileType = FileType.自定义情景,
                     OnlyKey = $"CustomScenario:{scenario.UUID}",
-                    Keys = scenario.Keys.ToHashSet(),
+                    Keys = scenario.Keys.ToList(),
                     Icon = null,
                     IconSymbol = 0xF78B,
                     IsVisible = true

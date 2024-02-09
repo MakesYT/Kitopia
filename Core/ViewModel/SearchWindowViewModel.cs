@@ -26,13 +26,13 @@ public partial class SearchWindowViewModel : ObservableRecipient
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(SearchWindowViewModel));
     private static readonly List<SearchViewItem> TempList = new(1000);
+
     public readonly Dictionary<string, SearchViewItem> _collection = new(400); //存储本机所有软件
     private readonly TaskScheduler _scheduler = TaskScheduler.FromCurrentSynchronizationContext();
 
     private readonly DelayAction _searchDelayAction = new();
 
     [ObservableProperty] private bool? _everythingIsOk = true;
-
     [ObservableProperty] private ObservableCollection<SearchViewItem> _items = new(TempList); //搜索界面显示的软件
 
 
@@ -288,6 +288,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 return;
             }
 
+            var lastItem = Items.FirstOrDefault();
 
             Log.Debug("搜索变更:" + Search);
             // Items.RaiseListChangedEvents = false;
@@ -308,7 +309,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
             #endregion
 
-            value = Search.ToLowerInvariant();
+            value = Search.ToLowerInvariant().Split(" ").First();
             var pluginItem = 0;
             foreach (var searchAction in PluginOverall.SearchActions)
             {
@@ -388,6 +389,11 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     {
                         weight += 10;
                     }
+                }
+
+                if (item.Value == lastItem)
+                {
+                    weight -= 4;
                 }
 
                 if (weight > 0)
@@ -550,9 +556,27 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 Items.Add(item);
             }
 
-            // Items.RaiseListChangedEvents = true;
-            // Items.ResetBindings();
+            var strings = Search.Split(" ");
+            if (strings.Length > 1)
+            {
+                for (var index = 1; index < strings.Length; index++)
+                {
+                    ReSearch(strings[index]);
+                }
+            }
         });
+    }
+
+    private void ReSearch(string value)
+    {
+        for (var index = Items.Count - 1; index >= 0; index--)
+        {
+            var searchViewItem = Items[index];
+            if (!searchViewItem.Keys.Exists((e) => e.Contains(value)))
+            {
+                Items.RemoveAt(index);
+            }
+        }
     }
 
     public void SetSelectMode(bool flag, Action<SearchViewItem> action)

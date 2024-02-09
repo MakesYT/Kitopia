@@ -72,7 +72,7 @@ public class Tools
                 fileType = FileType.PPT文档;
             }
 
-            var keys = new HashSet<string>();
+            var keys = new List<string>();
             AppTools.NameSolver(keys, fileInfo.Name).Wait();
             var searchViewItem = new SearchViewItem
             {
@@ -132,7 +132,7 @@ public class Tools
                 fileType = FileType.PPT文档;
             }
 
-            var keys = new HashSet<string>();
+            var keys = new List<string>();
             AppTools.NameSolver(keys, fileInfo.Name).Wait();
             var searchViewItem = new SearchViewItem
             {

@@ -85,7 +85,7 @@ public static class UwpTools
             return;
         }
 
-        HashSet<string> keys = new();
+        List<string> keys = new();
         await AppTools.NameSolver(keys, fileName);
         var xmlDocument = new XmlDocument();
         if (File.Exists($"{appContainer.workingDirectory}\\AppxManifest.xml"))

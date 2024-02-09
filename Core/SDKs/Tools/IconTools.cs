@@ -138,6 +138,7 @@ public class IconTools
                     if (t.IconPath is not null)
                     {
                         IconTools.GetIcon(t.IconPath, t);
+                        t.IconPath = null;
                     }
 
                     break;
@@ -151,6 +152,7 @@ public class IconTools
                     break;
                 case FileType.UWP应用:
                     IconTools.GetIcon(t.IconPath!, t);
+                    t.IconPath = null;
                     break;
                 case FileType.应用程序:
                 case FileType.Word文档:
