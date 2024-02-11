@@ -27,28 +27,32 @@
                 <SolidColorBrush Color="{DynamicResource TextFillColorPrimary}" />
             </TextBlock.Foreground>
         </TextBlock>
-        <WrapPanel
-            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-            MaxHeight="385"
 
-            Margin="0,10,0,0">
-            <ItemsControl ItemsSource="{Binding HotKeys,Mode=OneWay}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="4">
-                            <StackPanel HorizontalAlignment="Center" Margin="5,0,5,5">
-                                <TextBlock Margin="0,5,0,0" Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                           Text="{Binding SignName,Converter={StaticResource HotKeySignNameToStringCtr}}" />
-                                <controls1:HotKeyShow Margin="0,5,0,0" HotKeySignName="{Binding SignName}" />
-                            </StackPanel>
+        <ItemsControl ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                      MaxHeight="385"
 
-                        </Border>
+                      Margin="0,10,0,0" ItemsSource="{Binding HotKeys,Mode=OneWay}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="4">
+                        <StackPanel HorizontalAlignment="Center" Margin="5,0,5,5">
+                            <TextBlock Margin="0,5,0,0" Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                       Text="{Binding SignName,Converter={StaticResource HotKeySignNameToStringCtr}}" />
+                            <controls1:HotKeyShow Margin="0,5,0,0" HotKeySignName="{Binding SignName}" />
+                        </StackPanel>
 
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                    </Border>
+
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+        </ItemsControl>
 
 
-        </WrapPanel>
     </StackPanel>
 </UserControl>

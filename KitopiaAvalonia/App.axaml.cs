@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -20,6 +21,7 @@ using Core.ViewModel.Pages;
 using Core.ViewModel.Pages.customScenario;
 using Core.ViewModel.Pages.plugin;
 using Core.ViewModel.TaskEditor;
+using Kitopia.SDKs;
 using Kitopia.Services;
 using KitopiaAvalonia.Pages;
 using KitopiaAvalonia.Services;
@@ -77,10 +79,6 @@ public partial class App : Application
         }
         else
         {
-            var assembly = Assembly.GetExecutingAssembly();
-            var logConfigStream = assembly.GetManifestResourceStream("KitopiaAvalonia.log4net.config")!;
-
-            XmlConfigurator.Configure(logConfigStream);
             CheckAndDeleteLogFiles();
             log.Info("启动");
             ThreadPool.RegisterWaitForSingleObject(eventWaitHandle, (_, _) =>
@@ -141,10 +139,7 @@ public partial class App : Application
             log.Info("主题初始化完成");
             log.Debug("注册热键");
             ServiceManager.Services.GetService<MainWindow>().InitHook();
-            SystemEvents.InvokeOnEventsThread(() =>
-            {
-                // MouseHookHelper.InsertMouseHook();
-            });
+            MouseHookHelper.InsertMouseHook();
 
 
             ServicePointManager.DefaultConnectionLimit = 10240;
@@ -170,6 +165,7 @@ public partial class App : Application
         services.AddTransient<IClipboardService, ClipboardService>();
         services.AddTransient<IThemeChange, ThemeChange>();
         services.AddSingleton<ISearchItemTool, SearchItemTool>();
+        services.AddSingleton<ISearchItemChooseService, SearchItemChooseService>();
         services.AddTransient<TaskEditorViewModel>();
         services.AddTransient<TaskEditor>(e => new TaskEditor() { DataContext = e.GetService<TaskEditorViewModel>() });
         services.AddSingleton<MainWindowViewModel>();
@@ -177,6 +173,9 @@ public partial class App : Application
         services.AddSingleton<SearchWindowViewModel>(e => new SearchWindowViewModel() { IsActive = true });
         services.AddSingleton<SearchWindow>(e => new SearchWindow()
             { DataContext = e.GetService<SearchWindowViewModel>() });
+        services.AddTransient<MouseQuickWindowViewModel>();
+        services.AddTransient<MouseQuickWindow>(e => new MouseQuickWindow()
+            { DataContext = e.GetService<MouseQuickWindowViewModel>() });
         services.AddSingleton<SettingPageViewModel>(e => new SettingPageViewModel() { IsActive = true });
         services.AddKeyedSingleton<UserControl, SettingPage>("SettingPage",
             (e, _) => new SettingPage() { DataContext = e.GetService<SettingPageViewModel>() });

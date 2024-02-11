@@ -12,8 +12,8 @@
                      Title="Avalonia">
 
     <windowing:AppWindow.Background>
-        <SolidColorBrush Color="{DynamicResource SolidBackgroundFillColorBase}" Opacity="0.65"></SolidColorBrush>
-        
+        <SolidColorBrush Color="{DynamicResource SolidBackgroundFillColorBase}" Opacity="0.65" />
+
     </windowing:AppWindow.Background>
     <Grid RowDefinitions="Auto,*">
         <Grid Name="TitleBarHost"
@@ -65,26 +65,28 @@
                            IsBackEnabled="{Binding #FrameView.CanGoBack}" AlwaysShowHeader="False"
                            BackRequested="NavView_OnBackRequested"
                            IsSettingsVisible="False">
-
+            <ui:NavigationView.Styles>
+                <Style Selector="ui|NavigationView /template/ Button#NavigationViewBackButton">
+                    <Setter Property="FontFamily" Value="{StaticResource SymbolThemeFontFamily}"/>
+                </Style>
+            </ui:NavigationView.Styles>
             <ui:Frame Name="FrameView" Navigated="FrameView_OnNavigated" />
             <ui:NavigationView.MenuItems>
-                <ui:NavigationViewItem Classes="SampleAppNav" Content="主页" FontSize="30" Cursor="Hand" Tag="HomePage" />
-                <ui:NavigationViewItem Classes="SampleAppNav" Content="插件" FontSize="30" Cursor="Hand"
+                <ui:NavigationViewItem Classes="SampleAppNav" Content="主页"  FontSize="30" Cursor="Hand" Tag="HomePage" />
+                <ui:NavigationViewItem Classes="SampleAppNav" Content="插件"  FontSize="30" Cursor="Hand"
                                        Tag="PluginManagerPage" />
-                <ui:NavigationViewItem Classes="SampleAppNav" Content="情景" FontSize="30" Cursor="Hand"
+                <ui:NavigationViewItem Classes="SampleAppNav" Content="情景"  FontSize="30" Cursor="Hand"
                                        Tag="CustomScenariosManagerPage" />
-                <ui:NavigationViewItem Classes="SampleAppNav" Content="快捷键" FontSize="30" Cursor="Hand"
+                <ui:NavigationViewItem Classes="SampleAppNav" Content="快捷键"  FontSize="30" Cursor="Hand"
                                        Tag="HotKeyManagerPage" />
             </ui:NavigationView.MenuItems>
             <ui:NavigationView.FooterMenuItems>
-                <ui:NavigationViewItem Classes="SampleAppNav" Content="设置" FontSize="30" Cursor="Hand"
+                <ui:NavigationViewItem Classes="SampleAppNav" Content="设置"  FontSize="30" Cursor="Hand"
                                        Tag="SettingPage" />
             </ui:NavigationView.FooterMenuItems>
         </ui:NavigationView>
         <Panel Name="OverlayHost"
-               Grid.Row="1">
-
-        </Panel>
+               Grid.Row="1" />
 
     </Grid>
 

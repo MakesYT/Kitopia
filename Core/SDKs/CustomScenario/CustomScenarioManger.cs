@@ -161,25 +161,26 @@ public static class CustomScenarioManger
 
         if (scenario.ExecutionManual)
         {
+            var onlyKey = $"{nameof(CustomScenario)}:{scenario.UUID}";
             if (scenario.Keys.Any())
             {
                 var viewItem1 = new SearchViewItem()
                 {
                     ItemDisplayName = "执行自定义情景:" + scenario.Name,
                     FileType = FileType.自定义情景,
-                    OnlyKey = $"CustomScenario:{scenario.UUID}",
+                    OnlyKey = onlyKey,
                     Keys = scenario.Keys.ToList(),
                     Icon = null,
                     IconSymbol = 0xF78B,
                     IsVisible = true
                 };
                 ((SearchWindowViewModel)ServiceManager.Services.GetService(typeof(SearchWindowViewModel))!)
-                    ._collection.TryAdd($"CustomScenario:{scenario.UUID}", viewItem1);
+                    ._collection.TryAdd(onlyKey, viewItem1);
             }
             else
             {
                 ((SearchWindowViewModel)ServiceManager.Services.GetService(typeof(SearchWindowViewModel))!)
-                    ._collection.Remove($"CustomScenario:{scenario.UUID}");
+                    ._collection.Remove(onlyKey);
             }
         }
 
@@ -221,11 +222,11 @@ public static class CustomScenarioManger
 
         toRemove = null;
         ((SearchWindowViewModel)ServiceManager.Services.GetService(typeof(SearchWindowViewModel))!)
-            ._collection.Remove($"CustomScenario:{scenario.UUID}");
+            ._collection.Remove($"{nameof(CustomScenario)}:{scenario.UUID}");
         ConfigManger.Save();
         if (deleteFile)
         {
-            File.Delete(AppDomain.CurrentDomain.BaseDirectory + $"customScenarios\\{scenario.UUID}.json");
+            File.Delete($"{AppDomain.CurrentDomain.BaseDirectory}customScenarios\\{scenario.UUID}.json");
         }
 
         scenario.Dispose();

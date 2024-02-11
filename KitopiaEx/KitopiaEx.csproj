@@ -2,7 +2,6 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-        <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
         <Nullable>enable</Nullable>
         <EnableDynamicLoading>true</EnableDynamicLoading>
         <AssemblyName>KitopiaEx</AssemblyName>

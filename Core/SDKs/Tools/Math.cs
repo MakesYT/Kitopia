@@ -52,7 +52,7 @@ public static class Math
             if (match.Groups[1].Value.StartsWith("-"))
             {
                 expression = expression.Remove(match.Index, match.Length)
-                    .Insert(match.Index, "+" + subResult.ToString());
+                    .Insert(match.Index, $"+{subResult}");
                 continue;
             }
 

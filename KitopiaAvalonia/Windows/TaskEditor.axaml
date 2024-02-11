@@ -184,14 +184,14 @@
                                                 <Border BorderBrush="LightGray" BorderThickness="1"
                                                         CornerRadius="3"
                                                         Background="{DynamicResource ControlFillColorDefaultBrush}">
-                                                    <Border.ContextMenu>
-                                                        <ContextMenu>
+                                                    <Border.ContextFlyout>
+                                                        <MenuFlyout>
                                                             <!-- ReSharper disable once Xaml.RedundantResource -->
-                                                            <MenuItem Header="删除此变量"
+                                                            <MenuItem Header="删除此变量"  Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                                                       Command="{Binding $parent[Border].((taskEditor1:TaskEditorViewModel)DataContext).DelValueCommand}"
                                                                       CommandParameter="{Binding $parent[Border].((sdKs:KeyValuePairBindingTool)DataContext).Key }" />
-                                                        </ContextMenu>
-                                                    </Border.ContextMenu>
+                                                        </MenuFlyout>
+                                                    </Border.ContextFlyout>
 
                                                     <Grid Margin="9">
                                                         <Grid.ColumnDefinitions>
@@ -1015,24 +1015,21 @@
                             </controls2:LargeGridLine>
                         </DataTemplate>
                     </controls2:NodifyEditor.GridLineTemplate>
-
-                    <controls2:NodifyEditor.Foreground>
-                        <SolidColorBrush Color="{DynamicResource ApplicationBackgroundColor}" Opacity="0.7" />
-                    </controls2:NodifyEditor.Foreground>
+                    
 
                     <controls2:NodifyEditor.ConnectionTemplate>
                         <DataTemplate DataType="{x:Type customScenario:ConnectionItem}">
                             <Grid>
                                 <controls2:Connection Source="{Binding Source.Anchor}" Focusable="True"
                                                       Target="{Binding Target.Anchor}">
-                                    <controls2:Connection.ContextMenu>
-                                        <ContextMenu>
+                                    <controls2:Connection.ContextFlyout>
+                                        <MenuFlyout>
                                             <!-- ReSharper disable once Xaml.RedundantResource -->
-                                            <MenuItem Header="删除此连接"
-                                                      Command="{Binding $parent[Grid].((taskEditor1:TaskEditorViewModel)DataContext).DelConnectionCommand}"
+                                            <MenuItem Header="删除此连接"  Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                                      Command="{Binding $parent[Window].((taskEditor1:TaskEditorViewModel)DataContext).DelConnectionCommand}"
                                                       CommandParameter="{Binding }" />
-                                        </ContextMenu>
-                                    </controls2:Connection.ContextMenu>
+                                        </MenuFlyout>
+                                    </controls2:Connection.ContextFlyout>
                                     <controls2:Connection.Stroke>
                                         <SolidColorBrush Color="{DynamicResource SystemAccentColor}"
                                                          Opacity="0.5" />
@@ -1076,19 +1073,19 @@
                                 Location="{Binding Location,Mode=TwoWay}"
                                 VerticalAlignment="Center"
                                 Output="{Binding Output}">
-                                <controls2:Node.ContextMenu>
-                                    <ContextMenu>
+                                <controls2:Node.ContextFlyout>
+                                    <MenuFlyout>
                                         <!-- ReSharper disable once Xaml.RedundantResource -->
-                                        <MenuItem Header="复制节点"
+                                        <MenuItem Header="复制节点"  Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                                   Command="{Binding $parent[Grid].((taskEditor1:TaskEditorViewModel)DataContext).CopyNodeCommand}"
                                                   CommandParameter="{Binding }" />
                                         <!-- ReSharper disable once Xaml.RedundantResource -->
-                                        <MenuItem Header="删除此节点"
+                                        <MenuItem Header="删除此节点"  Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                                   Command="{Binding $parent[Grid].((taskEditor1:TaskEditorViewModel)DataContext).DelNodeCommand}"
                                                   CommandParameter="{Binding }" />
 
-                                    </ContextMenu>
-                                </controls2:Node.ContextMenu>
+                                    </MenuFlyout>
+                                </controls2:Node.ContextFlyout>
                                 <controls2:Node.Styles>
                                     <Style Selector="controls2|Node.Status0">
                                         <Setter Property="BorderBrush" Value="LightGray" />

@@ -64,8 +64,8 @@ public partial class AppTools
                         var dialog = new DialogContent()
                         {
                             Title = $"Kitopia提示",
-                            Content = "Kitopia即将使用任务计划来创建绕过UAC启动Everything的快捷方式\n需要确认UAC权限\n按下取消则关闭自动启动功能\n路径:" +
-                                      AppDomain.CurrentDomain.BaseDirectory + "noUAC\\" + 程序名称 + ".lnk",
+                            Content =
+                                $"Kitopia即将使用任务计划来创建绕过UAC启动Everything的快捷方式\n需要确认UAC权限\n按下取消则关闭自动启动功能\n路径:{AppDomain.CurrentDomain.BaseDirectory}noUAC\\{程序名称}.lnk",
                             PrimaryButtonText = "确定",
                             CloseButtonText = "取消",
                             PrimaryAction = () =>
@@ -73,25 +73,20 @@ public partial class AppTools
                                 Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + "noUAC");
                                 var TempFileName = AppDomain.CurrentDomain.BaseDirectory + "noUAC\\" + 程序名称 + ".xml";
                                 var XML_Text =
-                                    "<?xml version=\"1.0\" encoding=\"UTF-16\"?>\n<Task version=\"1.2\" xmlns=\"http://schemas.microsoft.com/windows/2004/02/mit/task\">\n  <Triggers />\n  <Principals>\n    <Principal id=\"Author\">\n      <LogonType>InteractiveToken</LogonType>\n      <RunLevel>HighestAvailable</RunLevel>\n    </Principal>\n  </Principals>\n  <Settings>\n    <MultipleInstancesPolicy>Parallel</MultipleInstancesPolicy>\n    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>\n    <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>\n    <AllowHardTerminate>false</AllowHardTerminate>\n    <StartWhenAvailable>false</StartWhenAvailable>\n    <RunOnlyIfNetworkAvailable>false</RunOnlyIfNetworkAvailable>\n    <IdleSettings>\n      <StopOnIdleEnd>false</StopOnIdleEnd>\n      <RestartOnIdle>false</RestartOnIdle>\n    </IdleSettings>\n    <AllowStartOnDemand>true</AllowStartOnDemand>\n    <Enabled>true</Enabled>\n    <Hidden>false</Hidden>\n    <RunOnlyIfIdle>false</RunOnlyIfIdle>\n    <WakeToRun>false</WakeToRun>\n    <ExecutionTimeLimit>PT0S</ExecutionTimeLimit>\n    <Priority>7</Priority>\n  </Settings>\n  <Actions Context=\"Author\">\n    <Exec>"
-                                    + Environment.NewLine +
-                                    "      <Command>\"" +
-                                    searchViewItem.OnlyKey +
-                                    "\"</Command>" + Environment.NewLine +
-                                    "      <Arguments>-startup</Arguments>" + Environment.NewLine +
-                                    "    </Exec>\n  </Actions>\n</Task>";
+                                    $"<?xml version=\"1.0\" encoding=\"UTF-16\"?>\n<Task version=\"1.2\" xmlns=\"http://schemas.microsoft.com/windows/2004/02/mit/task\">\n  <Triggers />\n  <Principals>\n    <Principal id=\"Author\">\n      <LogonType>InteractiveToken</LogonType>\n      <RunLevel>HighestAvailable</RunLevel>\n    </Principal>\n  </Principals>\n  <Settings>\n    <MultipleInstancesPolicy>Parallel</MultipleInstancesPolicy>\n    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>\n    <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>\n    <AllowHardTerminate>false</AllowHardTerminate>\n    <StartWhenAvailable>false</StartWhenAvailable>\n    <RunOnlyIfNetworkAvailable>false</RunOnlyIfNetworkAvailable>\n    <IdleSettings>\n      <StopOnIdleEnd>false</StopOnIdleEnd>\n      <RestartOnIdle>false</RestartOnIdle>\n    </IdleSettings>\n    <AllowStartOnDemand>true</AllowStartOnDemand>\n    <Enabled>true</Enabled>\n    <Hidden>false</Hidden>\n    <RunOnlyIfIdle>false</RunOnlyIfIdle>\n    <WakeToRun>false</WakeToRun>\n    <ExecutionTimeLimit>PT0S</ExecutionTimeLimit>\n    <Priority>7</Priority>\n  </Settings>\n  <Actions Context=\"Author\">\n    <Exec>{Environment.NewLine}      <Command>\"{searchViewItem.OnlyKey}\"</Command>{Environment.NewLine}      <Arguments>-startup</Arguments>{Environment.NewLine}    </Exec>\n  </Actions>\n</Task>";
                                 File.WriteAllText(TempFileName, XML_Text, Encoding.Unicode);
 
                                 Shell32.ShellExecute(IntPtr.Zero, "runas", "schtasks.exe",
-                                    "/create " + "/tn " + '"' + 程序名称 + '"' + " /xml " + '"' + @TempFileName + '"', "",
+                                    $"/create /tn \"{程序名称}\" /xml \"{@TempFileName}\"", "",
                                     ShowWindowCommand.SW_HIDE);
+
                                 var shell = new WshShell();
                                 var shortcut =
-                                    (IWshShortcut)shell.CreateShortcut(AppDomain.CurrentDomain.BaseDirectory +
-                                                                       "noUAC\\" + 程序名称 + ".lnk");
+                                    (IWshShortcut)shell.CreateShortcut(
+                                        $"{AppDomain.CurrentDomain.BaseDirectory}noUAC\\{程序名称}.lnk");
                                 //Debug.Print(Path.GetDirectoryName(Application.ExecutablePath) + @"\" + TextBox_程序名称.Text + ".lnk");
                                 shortcut.TargetPath = "schtasks.exe";
-                                shortcut.Arguments = "/run " + "/tn " + '"' + 程序名称 + '"';
+                                shortcut.Arguments = $"/run /tn \"{程序名称}\"";
                                 shortcut.IconLocation = searchViewItem.OnlyKey + ", 0";
                                 shortcut.WindowStyle = 7;
                                 shortcut.Save();
@@ -99,7 +94,7 @@ public partial class AppTools
                                 File.Delete(TempFileName);
                                 log.Debug("创建Everything的noUAC任务计划完成");
                                 Shell32.ShellExecute(IntPtr.Zero, "open",
-                                    AppDomain.CurrentDomain.BaseDirectory + "noUAC\\" + 程序名称 + ".lnk", "", "",
+                                    $"{AppDomain.CurrentDomain.BaseDirectory}noUAC\\{程序名称}.lnk", "", "",
                                     ShowWindowCommand.SW_HIDE);
                                 action.Invoke();
                             },
@@ -118,7 +113,7 @@ public partial class AppTools
 
                     {
                         Shell32.ShellExecute(IntPtr.Zero, "open",
-                            AppDomain.CurrentDomain.BaseDirectory + "noUAC\\" + 程序名称 + ".lnk", "", "",
+                            $"{AppDomain.CurrentDomain.BaseDirectory}noUAC\\{程序名称}.lnk", "", "",
                             ShowWindowCommand.SW_HIDE);
                     }
                 }
@@ -176,18 +171,19 @@ public partial class AppTools
             {
                 if (customScenario.Keys.Any())
                 {
+                    var onlyKey = $"CustomScenario:{customScenario.UUID}";
                     var viewItem1 = new SearchViewItem()
                     {
                         ItemDisplayName = $"执行自定义情景:{customScenario.Name}",
                         FileType = FileType.自定义情景,
-                        OnlyKey = $"CustomScenario:{customScenario.UUID}",
+                        OnlyKey = onlyKey,
                         Keys = customScenario.Keys.ToList(),
                         Icon = null,
                         IconSymbol = 0xF78B,
                         IsVisible = true
                     };
 
-                    collection.TryAdd($"CustomScenario:{customScenario.UUID}", viewItem1);
+                    collection.TryAdd(onlyKey, viewItem1);
                 }
             }
         }
@@ -265,14 +261,14 @@ public partial class AppTools
                 {
                     foreach (var s in ErrorLnkList)
                     {
-                        log.Debug("删除无效快捷方式:" + s);
+                        log.Debug($"删除无效快捷方式:{s}");
                         try
                         {
                             File.Delete(s);
                         }
                         catch (Exception)
                         {
-                            log.Debug("添加无效快捷方式记录:" + s);
+                            log.Debug($"添加无效快捷方式记录:{s}");
                             ConfigManger.Config.errorLnk.Add(s);
                             ConfigManger.Save();
                         }
@@ -284,7 +280,7 @@ public partial class AppTools
                 {
                     foreach (var s in ErrorLnkList)
                     {
-                        log.Debug("添加无效快捷方式记录:" + s);
+                        log.Debug($"添加无效快捷方式记录:{s}");
                         ConfigManger.Config.errorLnk.Add(s);
                         ConfigManger.Save();
                     }
@@ -381,13 +377,14 @@ public partial class AppTools
 
                     next:
                     var refFileInfo = new FileInfo(targetPath);
+                    var fullName = refFileInfo.FullName;
                     if (refFileInfo.Exists)
                     {
-                        if (collection.ContainsKey(refFileInfo.FullName))
+                        if (collection.ContainsKey(fullName))
                         {
                             if (logging)
                             {
-                                log.Debug("重复索引:" + file);
+                                log.Debug($"重复索引:{file}");
                             }
 
 
@@ -396,13 +393,13 @@ public partial class AppTools
 
                         if (ConfigManger.Config.ignoreItems.Contains(targetPath))
                         {
-                            log.Debug("忽略索引:" + targetPath);
+                            log.Debug($"忽略索引:{targetPath}");
                             return;
                         }
                     }
                     else
                     {
-                        log.Debug("无效索引:\n" + file + "\n目标位置:" + refFileInfo.FullName);
+                        log.Debug($"无效索引:\n{file}\n目标位置:{fullName}");
                         if (!ErrorLnkList.Contains(file) && !ConfigManger.Config.errorLnk.Contains(file))
                         {
                             ErrorLnkList.Add(file);
@@ -428,19 +425,19 @@ public partial class AppTools
                         await NameSolver(keys, refFileInfo.Name.Replace(".exe", ""));
 
                         {
-                            collection.TryAdd(refFileInfo.FullName, new SearchViewItem
+                            collection.TryAdd(fullName, new SearchViewItem
                             {
                                 Keys = keys, IsVisible = true, ItemDisplayName = localName,
-                                OnlyKey = refFileInfo.FullName, IsStared = star, Arguments = arg,
+                                OnlyKey = fullName, IsStared = star, Arguments = arg,
                                 FileType = FileType.应用程序, Icon = null
                             });
                         }
 
-                        log.Debug("完成索引:" + file);
+                        log.Debug($"完成索引:{file}");
                     }
                     else
                     {
-                        log.Debug("不符合要求跳过索引:" + file);
+                        log.Debug($"不符合要求跳过索引:{file}");
                     }
 
                     break;
@@ -457,19 +454,20 @@ public partial class AppTools
                         url = match.Groups[1].Value.Replace("\r", ""); // get the url from the first group
                     }
 
-                    if (collection.ContainsKey(url))
+                    var onlyKey = url;
+                    if (collection.ContainsKey(onlyKey))
                     {
                         if (logging)
                         {
-                            log.Debug("重复索引:" + file);
+                            log.Debug($"重复索引:{file}");
                         }
 
                         return;
                     }
 
-                    if (ConfigManger.Config.ignoreItems.Contains(url))
+                    if (ConfigManger.Config.ignoreItems.Contains(onlyKey))
                     {
-                        log.Debug("忽略索引:" + url);
+                        log.Debug($"忽略索引:{onlyKey}");
                         return;
                     }
 
@@ -494,16 +492,16 @@ public partial class AppTools
                     await NameSolver(keys, fileInfo.Name.Replace(".url", ""));
 
                     {
-                        collection.TryAdd(url, new SearchViewItem
+                        collection.TryAdd(onlyKey, new SearchViewItem
                         {
                             Keys = keys, IsVisible = true, ItemDisplayName = localName,
-                            OnlyKey = url, IsStared = star,
+                            OnlyKey = onlyKey, IsStared = star,
                             IconPath = relFile,
                             FileType = FileType.URL, Icon = null
                         });
                     }
 
-                    log.Debug("完成索引:" + file);
+                    log.Debug($"完成索引:{file}");
                     break;
                 }
                 default:
@@ -594,9 +592,6 @@ public partial class AppTools
         if (!keys.Contains(name))
         {
             keys.Add(name);
-            if (name.Contains(" "))
-            {
-            }
         }
     }
 

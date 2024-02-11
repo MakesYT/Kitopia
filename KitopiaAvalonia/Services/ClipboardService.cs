@@ -2,10 +2,15 @@
 
 using System;
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using Avalonia.Threading;
 using Core.SDKs.Services;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
+using Vanara.PInvoke;
 
 #endregion
 
@@ -51,26 +56,53 @@ public class ClipboardService : IClipboardService
     public string saveBitmap()
     {
         log.Debug(nameof(ClipboardService) + "的接口" + nameof(saveBitmap) + "被调用");
-        var result = ServiceManager.Services.GetService<MainWindow>().Clipboard.GetDataAsync("Unknown_Format_8").Result;
+        var ts = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0);
+        var timeStamp = Convert.ToInt64(ts.TotalMilliseconds);
+        var f = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads\\Kitopia" +
+                timeStamp + ".png";
+        if (!User32.OpenClipboard(HWND.NULL))
+        {
+            return "";
+        }
+        HBITMAP hbitmap = (HBITMAP)User32.GetClipboardData(2);
+        if (hbitmap.IsNull)
+        {
+            User32.CloseClipboard();
+            return "";
+        }
 
-        // var r = Application.Current.Dispatcher.Invoke(() =>
-        // {
-        //     var data = Clipboard.GetDataObject();
-        //     if (data.GetDataPresent(DataFormats.Bitmap))
-        //     {
-        //         var ts = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0);
-        //         var timeStamp = Convert.ToInt64(ts.TotalMilliseconds);
-        //         var f = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads\\Kitopia" +
-        //                 timeStamp + ".png";
-        //         var img = (Bitmap)data.GetData(typeof(Bitmap));
-        //         img.Save(f, ImageFormat.Png); // 将 bitmap 以 png 格式保存到文件
-        //         return f;
-        //     }
-        //
-        //     return "";
-        // });
+        var hBitmapCopy = User32.CopyImage(hbitmap.DangerousGetHandle(), 0, 0, 0,   User32.CopyImageOptions.LR_COPYRETURNORG);
+        if (hBitmapCopy != IntPtr.Zero)
+        {
+            Image img = Image.FromHbitmap(hBitmapCopy.DangerousGetHandle());
+            img.Save(f);
+        }
 
+       
+        
+        User32.CloseClipboard();
+        return f;
+            
+        
+        return "";
+        
+            
+    }
+    byte[] getBytes(object str) {
+        int size = Marshal.SizeOf(str);
+        byte[] arr = new byte[size];
 
-        return null;
+        IntPtr ptr = IntPtr.Zero;
+        try
+        {
+            ptr = Marshal.AllocHGlobal(size);
+            Marshal.StructureToPtr(str, ptr, true);
+            Marshal.Copy(ptr, arr, 0, size);
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(ptr);
+        }
+        return arr;
     }
 }
