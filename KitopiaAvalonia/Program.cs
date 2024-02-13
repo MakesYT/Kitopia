@@ -7,6 +7,8 @@ using Avalonia.Fonts.Inter;
 using Avalonia.Media;
 using Avalonia.Media.Fonts;
 using Avalonia.Threading;
+using DesktopNotifications;
+using DesktopNotifications.Avalonia;
 using KitopiaAvalonia.Services;
 using KitopiaAvalonia.Windows;
 using log4net;
@@ -18,6 +20,8 @@ namespace KitopiaAvalonia;
 class Program
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(Program));
+
+    public static INotificationManager NotificationManager = null!;
 
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
@@ -68,6 +72,7 @@ class Program
             },
         });
         buildAvaloniaApp.LogToTrace();
+        buildAvaloniaApp.SetupDesktopNotifications(out NotificationManager!);
         return buildAvaloniaApp;
     }
 }

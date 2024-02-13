@@ -135,14 +135,6 @@ public partial class HotKeyEditorWindow : Window
     {
     }
 
-    public bool GetResult()
-    {
-        while (!isFinnish)
-        {
-        }
-
-        return setSuccess;
-    }
 
     private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
     {
@@ -194,19 +186,6 @@ public partial class HotKeyEditorWindow : Window
         }
 
         ConfigManger.Save();
-        setSuccess = ((MainWindow)ServiceManager.Services.GetService(typeof(MainWindow))).HotKeySet(_hotKeyModel);
-        if (!setSuccess)
-        {
-            ServiceManager.Services.GetService<IContentDialog>().ShowDialog(null, new DialogContent("Kitopia",
-                new TextBlock()
-                {
-                    Text = $"无法注册快捷键\n{_hotKeyModel.MainName}_{_hotKeyModel.Name}\n现在你需要重新设置\n在设置界面按下取消以取消该快捷键注册",
-                    FontSize = 15
-                }, null, null, "确定", () =>
-                {
-                }, null, null));
-            return;
-        }
 
         isFinnish = true;
         WeakReferenceMessenger.Default.Send(_hotKeyModel.SignName, "hotkey");

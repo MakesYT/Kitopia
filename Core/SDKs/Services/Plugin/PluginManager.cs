@@ -17,9 +17,10 @@ public class PluginManager
 
     public static void Init()
     {
-        Kitopia.ISearchItemTool = (ISearchItemTool)ServiceManager.Services.GetService(typeof(ISearchItemTool))!;
-        Kitopia.IToastService = (IToastService)ServiceManager.Services.GetService(typeof(IToastService))!;
-        Kitopia._i18n = CustomScenarioGloble._i18n;
+        PluginCore.Kitopia.ISearchItemTool =
+            (ISearchItemTool)ServiceManager.Services.GetService(typeof(ISearchItemTool))!;
+        PluginCore.Kitopia.IToastService = (IToastService)ServiceManager.Services.GetService(typeof(IToastService))!;
+        PluginCore.Kitopia._i18n = CustomScenarioGloble._i18n;
         var pluginsDirectoryInfo = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "plugins");
         if (!pluginsDirectoryInfo.Exists)
         {

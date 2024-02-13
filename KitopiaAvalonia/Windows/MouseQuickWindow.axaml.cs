@@ -9,9 +9,12 @@ using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using Core.ViewModel;
+using Desktop.Robot;
 using PluginCore;
+using SharpHook;
+using SharpHook.Native;
 using Vanara.PInvoke;
-using WindowsInput;
+using Key = Desktop.Robot.Key;
 
 namespace KitopiaAvalonia.Windows;
 
@@ -69,8 +72,14 @@ public partial class MouseQuickWindow : Window
             text = Clipboard.GetTextAsync().Result;
         }
 
-        var keyboardSimulator = new InputSimulator().Keyboard;
-        keyboardSimulator.ModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_C).Sleep(200);
+
+        var robot = new Robot();
+        robot.AutoDelay = 1;
+        robot.KeyDown(Key.Control);
+        robot.KeyDown(Key.C);
+        Task.Delay(200);
+        robot.KeyUp(Key.C);
+        robot.KeyUp(Key.Control);
 
         Dispatcher.UIThread.InvokeAsync(() =>
         {

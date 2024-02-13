@@ -187,7 +187,7 @@ public class HotKeyShow : TemplatedControl
     {
         if (hotKeyModel != null)
         {
-            ((MainWindow)ServiceManager.Services.GetService(typeof(MainWindow))!).RemoveHotKey(hotKeyModel);
+            ConfigManger.Config.hotKeys.Remove(hotKeyModel);
             WeakReferenceMessenger.Default.Send(hotKeyModel.SignName, "hotkey");
         }
     }

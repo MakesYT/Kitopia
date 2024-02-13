@@ -1,7 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup Condition=" '$(OS)' != 'Windows_NT' ">
+        <TargetFrameworks>net8.0</TargetFrameworks>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
+        <TargetFrameworks>net8.0-windows10.0.17763.0</TargetFrameworks>
+    </PropertyGroup>
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
         <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -27,7 +32,6 @@
         <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.9"/>
         <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.6"/>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2"/>
-        <PackageReference Include="H.InputSimulator" Version="1.4.1"/>
         <PackageReference Include="log4net" Version="2.0.15"/>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0"/>
         <PackageReference Include="System.Drawing.Common" Version="8.0.1"/>

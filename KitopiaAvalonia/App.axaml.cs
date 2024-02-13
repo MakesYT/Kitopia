@@ -31,6 +31,7 @@ using log4net.Config;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using PluginCore;
+using SharpHook.Reactive;
 
 namespace KitopiaAvalonia;
 
@@ -55,7 +56,6 @@ public partial class App : Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.MainWindow = ServiceManager.Services.GetService<MainWindow>();
-            ServiceManager.Services.GetService<IToastService>().Init(desktop.MainWindow);
             DataContext = new AppViewModel();
             OnStartup();
         }
@@ -138,8 +138,8 @@ public partial class App : Application
 
             log.Info("主题初始化完成");
             log.Debug("注册热键");
-            ServiceManager.Services.GetService<MainWindow>().InitHook();
-            MouseHookHelper.InsertMouseHook();
+            Core.SDKs.HotKey.HotKeyManager.Init();
+            // ServiceManager.Services.GetService<MainWindow>().InitHook();
 
 
             ServicePointManager.DefaultConnectionLimit = 10240;
@@ -166,6 +166,7 @@ public partial class App : Application
         services.AddTransient<IThemeChange, ThemeChange>();
         services.AddSingleton<ISearchItemTool, SearchItemTool>();
         services.AddSingleton<ISearchItemChooseService, SearchItemChooseService>();
+        services.AddSingleton<IMouseQuickWindowService, MouseQuickWindowService>();
         services.AddTransient<TaskEditorViewModel>();
         services.AddTransient<TaskEditor>(e => new TaskEditor() { DataContext = e.GetService<TaskEditorViewModel>() });
         services.AddSingleton<MainWindowViewModel>();

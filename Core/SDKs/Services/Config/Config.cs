@@ -31,7 +31,7 @@ public record Config
 
 
     //鼠标快捷键
-    public MouseHookType mouseKey = MouseHookType.鼠标中键按下;
+    public MouseHookType mouseKey = MouseHookType.鼠标侧键2;
     public int mouseKeyInverval = 1000;
     public List<string> mouseQuickItems = new();
 

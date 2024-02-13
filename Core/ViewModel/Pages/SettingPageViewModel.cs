@@ -38,7 +38,7 @@ public partial class SettingPageViewModel : ObservableRecipient
     [ObservableProperty] private int _mouseKeyInverval;
 
     [ObservableProperty] private ObservableCollection<MouseHookType> _mouseKeyOptions = new()
-        { MouseHookType.鼠标左键按下, MouseHookType.鼠标中键按下, MouseHookType.鼠标右键按下, MouseHookType.鼠标侧键1按下 };
+        { MouseHookType.鼠标左键, MouseHookType.鼠标右键, MouseHookType.鼠标中键, MouseHookType.鼠标侧键1, MouseHookType.鼠标侧键2 };
 
     [ObservableProperty] private string _themeChoice;
 

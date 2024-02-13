@@ -52,7 +52,7 @@ public class HotKeyEditorService : IHotKeyEditor
 
     public void RemoveByHotKeyModel(HotKeyModel hotKeyModel)
     {
-        ((MainWindow)ServiceManager.Services.GetService(typeof(MainWindow))!).RemoveHotKey(hotKeyModel);
+        ConfigManger.Config.hotKeys.Remove(hotKeyModel);
         WeakReferenceMessenger.Default.Send(hotKeyModel.SignName, "hotkey");
     }
 }
