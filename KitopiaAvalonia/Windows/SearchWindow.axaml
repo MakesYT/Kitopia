@@ -8,6 +8,7 @@
                      xmlns:searchWindow="clr-namespace:Kitopia.Converter.SearchWindow"
                      xmlns:converter="clr-namespace:Kitopia.Converter"
                      xmlns:controls1="clr-namespace:KitopiaAvalonia.Controls"
+                     xmlns:pluginCore="clr-namespace:PluginCore;assembly=PluginCore"
                      mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
                      x:Class="KitopiaAvalonia.Windows.SearchWindow"
                      x:DataType="viewModel:SearchWindowViewModel"
@@ -15,13 +16,13 @@
                      TransparencyLevelHint="AcrylicBlur"
                      Background="Transparent"
                      Activated="w_Activated"
-                    ShowInTaskbar="False"
+                     ShowInTaskbar="False"
                      ExtendClientAreaToDecorationsHint="True"
                      Width="800"
                      SizeToContent="Height"
                      ExtendClientAreaChromeHints="SystemChrome"
                      SystemDecorations="BorderOnly"
-                      
+
                      Title="SearchWindow">
     <windowing:AppWindow.Resources>
         <searchWindow:StarBoolToText x:Key="StarBoolToText" />
@@ -55,125 +56,125 @@
                               IsClosable="False" />
             <ListBox Name="dataGrid" MaxHeight="415"
                      ItemsSource="{Binding Items,Mode=OneWay }"
+                     KeyDown="DataGrid_OnKeyDown"
                      Margin="0,0,0,0">
-                <ListBox.ItemContainerTheme>
-                    <ControlTheme TargetType="ListBoxItem">
+                <ListBox.Styles>
+                    <Style Selector="ListBoxItem:selected > Button#Item">
+                        <Setter Property="BorderBrush" Value="DimGray" />
+                    </Style>
+                    <Style Selector="ListBoxItem">
                         <Setter Property="Template">
-                            <ControlTemplate>
-                                <ContentPresenter Name="PART_ContentPresenter"
-                                                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                  Background="{TemplateBinding Background}"
-                                                  BorderBrush="{TemplateBinding BorderBrush}"
-                                                  BorderThickness="{TemplateBinding BorderThickness}"
-                                                  Content="{TemplateBinding Content}"
-                                                  ContentTemplate="{TemplateBinding ContentTemplate}"
-                                                  CornerRadius="{TemplateBinding CornerRadius}" />
+                             <ControlTemplate x:DataType="pluginCore:SearchViewItem">
+                                
+                                <Button ToolTip.Tip="{Binding Path=. ,Converter={StaticResource SearchItemToInfo}}"
+                                        IsTabStop="True"
+                                        Name="Item"
+                                        Command="{Binding  $parent[ListBox].((viewModel:SearchWindowViewModel)DataContext).OpenFileCommand}"
+                                        CommandParameter="{Binding .}"
+                                        Background="Transparent">
+                                    <Button.Styles>
+                                        <Style Selector="Button#Item:pointerover">
+                                            <Setter Property="BorderBrush" Value="DimGray" />
+                                        </Style>
+                                    </Button.Styles>
+                                    <Button.ContextFlyout>
+                                        <MenuFlyout>
+                                            <!-- ReSharper disable once Xaml.RedundantResource -->
+
+                                            <MenuItem Header="忽略"
+                                                      Command="{Binding $parent[ListBox].((viewModel:SearchWindowViewModel)DataContext).IgnoreItemCommand}"
+                                                      IsVisible="{Binding Path=FileType,Converter={StaticResource CanIgnoreCtr}}"
+                                                      CommandParameter="{Binding .}" />
+                                        </MenuFlyout>
+
+                                    </Button.ContextFlyout>
+                                    <Grid HorizontalAlignment="Left" Margin="5,0,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="30" />
+                                            <ColumnDefinition Width="48" />
+                                            <ColumnDefinition Width="455 " />
+                                            <ColumnDefinition Width="195" />
+                                        </Grid.ColumnDefinitions>
+                                        <Panel Width="28">
+                                            <controls1:PinButton KeyboardNavigation.TabNavigation="None" FontSize="26"
+                                                                 IsVisible="{Binding Path=FileType, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter='Pin'}"
+                                                                 Tag="{Binding IsPined}"
+                                                                 IsChecked="{Binding IsPined}"
+                                                                 Command="{Binding $parent[ListBox].((viewModel:SearchWindowViewModel)DataContext).PinCommand}"
+                                                                 CommandParameter="{Binding}" Padding="2" />
+                                        </Panel>
+
+                                        <Image Grid.Column="1" HorizontalAlignment="Left" Focusable="False" Width="48"
+                                               Height="48" ZIndex="1"
+                                               Source="{Binding Icon, Converter={StaticResource PathToImageConverter},ConverterParameter={Binding .}}" />
+                                        <controls:FontIcon Height="48" Width="48" FontSize="48" Grid.Column="1"
+                                                           FontFamily="{StaticResource FluentFont}"
+                                                           IsVisible="{Binding IconSymbol,Converter={StaticResource SymbolToVisible}}"
+                                                           Glyph="{Binding IconSymbol,Converter={StaticResource IntToIconSymbol}}" />
+
+
+                                        <StackPanel Grid.Column="2" Margin="5" VerticalAlignment="Top">
+                                            <TextBlock VerticalAlignment="Center" Margin="0" Focusable="False"
+                                                       Text="{Binding Path=ItemDisplayName}"
+
+                                                       Background="{x:Null}"
+                                                       FontWeight="Normal" FontSize="18" />
+                                            <TextBlock VerticalAlignment="Top" Margin="0"
+                                                       Text="{Binding Path=FileType}" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="3" Orientation="Horizontal" Focusable="False"
+                                                    HorizontalAlignment="Right">
+                                            <Button KeyboardNavigation.TabNavigation="None" FontSize="26"
+                                                    ToolTip.Tip="以管理员身份运行" Background="{x:Null}"
+                                                    IsVisible="{Binding Path=FileType, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter='RunAsAdmin'}"
+                                                    Command="{Binding $parent[ListBox].((viewModel:SearchWindowViewModel)DataContext).RunAsAdminCommand}"
+                                                    CommandParameter="{Binding  }">
+                                                <controls:FontIcon FontFamily="{StaticResource FluentFont}"
+                                                                   Glyph="&#xF0B2;" />
+
+
+                                            </Button>
+                                            <Button KeyboardNavigation.TabNavigation="None" FontSize="26"
+                                                    ToolTip.Tip="打开文件所在文件夹" Background="{x:Null}"
+                                                    IsVisible="{Binding Path=FileType, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter='Folder'}"
+                                                    Command="{Binding $parent[ListBox].((viewModel:SearchWindowViewModel)DataContext).OpenFolderCommand}"
+                                                    CommandParameter="{Binding}">
+                                                <controls:FontIcon FontFamily="{StaticResource FluentFont}"
+                                                                   Glyph="&#xF419;" />
+                                            </Button>
+                                            <Button KeyboardNavigation.TabNavigation="None" FontSize="26"
+                                                    ToolTip.Tip="在终端中打开文件夹/文件所在文件夹" Background="{x:Null}"
+                                                    IsVisible="{Binding Path=FileType, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter='Console'}"
+                                                    Command="{Binding $parent[ListBox].((viewModel:SearchWindowViewModel)DataContext).OpenFolderInTerminalCommand}"
+                                                    CommandParameter="{Binding}">
+                                                <controls:FontIcon FontFamily="{StaticResource FluentFont}"
+                                                                   Glyph="&#xEE6F;" />
+                                            </Button>
+                                            <Button KeyboardNavigation.TabNavigation="None" FontSize="26"
+                                                    ToolTip.Tip="{Binding IsStared,Converter={StaticResource StarBoolToText},ConverterParameter='Star'}"
+                                                    Background="{x:Null}"
+                                                    IsVisible="{Binding Path=FileType, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter='Star'}"
+                                                    Command="{Binding $parent[ListBox].((viewModel:SearchWindowViewModel)DataContext).StarCommand}"
+                                                    CommandParameter="{Binding}">
+                                                <Button.Resources>
+                                                    <searchWindow:StarIconCtr x:Key="StarIconCtr" />
+                                                </Button.Resources>
+                                                <controls:FontIcon x:Name="Source"
+                                                                   FontFamily="{Binding IsStared,Converter={StaticResource StarIconCtr},ConverterParameter='FM'}"
+                                                                   Glyph="{Binding IsStared,Converter={StaticResource StarIconCtr},ConverterParameter='F'}" />
+
+                                            </Button>
+
+
+                                        </StackPanel>
+                                    </Grid>
+                                </Button>
+                            
                             </ControlTemplate>
-
                         </Setter>
-                    </ControlTheme>
-                </ListBox.ItemContainerTheme>
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Button ToolTip.Tip="{Binding Path=. ,Converter={StaticResource SearchItemToInfo}}"
-                                IsTabStop="True"
-                                Command="{Binding  $parent[ListBox].((viewModel:SearchWindowViewModel)DataContext).OpenFileCommand}"
-                                CommandParameter="{Binding .}"
-                                Background="Transparent"
-                                KeyDown="Button_PreviewKeyDown">
+                    </Style>
 
-                            <Button.ContextFlyout>
-                                <MenuFlyout>
-                                    <!-- ReSharper disable once Xaml.RedundantResource -->
-
-                                    <MenuItem Header="忽略"
-                                              Command="{Binding $parent[ListBox].((viewModel:SearchWindowViewModel)DataContext).IgnoreItemCommand}"
-                                              IsVisible="{Binding Path=FileType,Converter={StaticResource CanIgnoreCtr}}"
-                                              CommandParameter="{Binding .}" />
-                                </MenuFlyout>
-
-                            </Button.ContextFlyout>
-                            <Grid HorizontalAlignment="Left" Margin="5,0,0,0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="30" />
-                                    <ColumnDefinition Width="48" />
-                                    <ColumnDefinition Width="455 " />
-                                    <ColumnDefinition Width="195" />
-                                </Grid.ColumnDefinitions>
-                                <Panel Width="28">
-                                    <controls1:PinButton KeyboardNavigation.TabNavigation="None" FontSize="26"
-                                            IsVisible="{Binding Path=FileType, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter='Pin'}"
-                                            Tag="{Binding IsPined}"
-                                            IsChecked="{Binding IsPined}"
-                                            Command="{Binding $parent[ListBox].((viewModel:SearchWindowViewModel)DataContext).PinCommand}"
-                                            CommandParameter="{Binding}" Padding="2" />
-                                </Panel>
-
-                                <Image Grid.Column="1" HorizontalAlignment="Left" Focusable="False" Width="48"
-                                       Height="48" ZIndex="1"
-                                       Source="{Binding ., Converter={StaticResource PathToImageConverter}}" />
-                                <controls:FontIcon Height="48" Width="48" FontSize="48" Grid.Column="1"
-                                                   FontFamily="{StaticResource FluentFont}"
-                                                     IsVisible="{Binding IconSymbol,Converter={StaticResource SymbolToVisible}}"
-                                                     Glyph="{Binding IconSymbol,Converter={StaticResource IntToIconSymbol}}" />
-
-
-                                <StackPanel Grid.Column="2" Margin="5" VerticalAlignment="Top">
-                                    <TextBlock VerticalAlignment="Center" Margin="0" Focusable="False"
-                                               Text="{Binding Path=ItemDisplayName}"
-                                               
-                                               Background="{x:Null}"
-                                               FontWeight="Normal" FontSize="18" />
-                                    <TextBlock VerticalAlignment="Top" Margin="0" Text="{Binding Path=FileType}" />
-                                </StackPanel>
-                                <StackPanel Grid.Column="3" Orientation="Horizontal" Focusable="False"
-                                            HorizontalAlignment="Right">
-                                    <Button KeyboardNavigation.TabNavigation="None" FontSize="26"
-                                            ToolTip.Tip="以管理员身份运行" Background="{x:Null}"
-                                            IsVisible="{Binding Path=FileType, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter='RunAsAdmin'}"
-                                            Command="{Binding $parent[ListBox].((viewModel:SearchWindowViewModel)DataContext).RunAsAdminCommand}"
-                                            CommandParameter="{Binding  }">
-                                        <controls:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xF0B2;"  />
-                                        
-
-                                    </Button>
-                                    <Button KeyboardNavigation.TabNavigation="None" FontSize="26"
-                                            ToolTip.Tip="打开文件所在文件夹" Background="{x:Null}"
-                                            IsVisible="{Binding Path=FileType, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter='Folder'}"
-                                            Command="{Binding $parent[ListBox].((viewModel:SearchWindowViewModel)DataContext).OpenFolderCommand}"
-                                            CommandParameter="{Binding}">
-                                        <controls:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xF419;"  />
-                                    </Button>
-                                    <Button KeyboardNavigation.TabNavigation="None" FontSize="26"
-                                            ToolTip.Tip="在终端中打开文件夹/文件所在文件夹" Background="{x:Null}"
-                                            IsVisible="{Binding Path=FileType, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter='Console'}"
-                                            Command="{Binding $parent[ListBox].((viewModel:SearchWindowViewModel)DataContext).OpenFolderInTerminalCommand}"
-                                            CommandParameter="{Binding}">
-                                        <controls:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xEE6F;"  />
-                                    </Button>
-                                    <Button KeyboardNavigation.TabNavigation="None" FontSize="26"
-                                            ToolTip.Tip="{Binding IsStared,Converter={StaticResource StarBoolToText},ConverterParameter='Star'}"
-                                            Background="{x:Null}"
-                                            IsVisible="{Binding Path=FileType, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter='Star'}"
-                                            Command="{Binding $parent[ListBox].((viewModel:SearchWindowViewModel)DataContext).StarCommand}"
-                                            CommandParameter="{Binding}">
-                                        <Button.Resources>
-                                            <searchWindow:StarIconCtr x:Key="StarIconCtr" />
-                                        </Button.Resources>
-                                        <controls:FontIcon x:Name="Source" 
-                                                           FontFamily="{Binding IsStared,Converter={StaticResource StarIconCtr},ConverterParameter='FM'}" 
-                                                           Glyph="{Binding IsStared,Converter={StaticResource StarIconCtr},ConverterParameter='F'}"   />
-                                        
-                                    </Button>
-
-
-                                </StackPanel>
-                            </Grid>
-                        </Button>
-                    </DataTemplate>
-
-                </ListBox.ItemTemplate>
+                </ListBox.Styles>
             </ListBox>
         </StackPanel>
     </Panel>

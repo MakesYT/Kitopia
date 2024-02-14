@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Messaging;
@@ -42,7 +45,7 @@ public partial class SearchWindow : Window
 
     private void w_Deactivated(object? sender, EventArgs eventArgs)
     {
-        IsVisible = false;
+        //IsVisible = false;
     }
 
 
@@ -87,15 +90,27 @@ public partial class SearchWindow : Window
             }
 
             e.Handled = true;
+            return;
         }
         else if (e.Key == Key.Down)
         {
             var keyArgs = new KeyEventArgs() { Key = Key.Tab };
-            // 设置 RoutedEvent 属性为 Keyboard.KeyDownEvent
             keyArgs.RoutedEvent = KeyDownEvent;
-            // 调用 InputManager.Current.ProcessInput 方法来处理该事件
             RaiseEvent(keyArgs);
             e.Handled = true;
+            return;
+        }
+
+        dataGrid.SelectedIndex = -1;
+        Debug.WriteLine("Key Down");
+    }
+
+    private void DataGrid_OnKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter)
+        {
+            var item = (SearchViewItem?)dataGrid.SelectedItem;
+            ((ISearchItemTool)ServiceManager.Services.GetService(typeof(ISearchItemTool))!).OpenSearchItem(item);
         }
     }
 }

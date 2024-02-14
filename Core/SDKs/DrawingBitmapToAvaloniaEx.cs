@@ -5,7 +5,7 @@ namespace KitopiaAvalonia.Tools;
 
 public static class DrawingBitmapToAvaloniaEx
 {
-    public static Avalonia.Media.Imaging.Bitmap? ToAvaloniaBitmap(this Bitmap bitmapTmp)
+    public static Avalonia.Media.Imaging.Bitmap ToAvaloniaBitmap(this Bitmap bitmapTmp)
     {
         var bitmapdata = bitmapTmp.LockBits(new Rectangle(0, 0, bitmapTmp.Width, bitmapTmp.Height),
             ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);

@@ -15,7 +15,7 @@ public class SearchItemTool : ISearchItemTool
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(SearchItemTool));
 
-    public void OpenSearchItem(SearchViewItem searchViewItem)
+    public void OpenSearchItem(SearchViewItem? searchViewItem)
     {
         WeakReferenceMessenger.Default.Send("a", "SearchWindowClose");
         Log.Debug("打开指定内容" + searchViewItem.OnlyKey);

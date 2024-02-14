@@ -2,7 +2,9 @@
 
 using System;
 using System.Globalization;
+using Avalonia.Controls;
 using Avalonia.Data.Converters;
+using Avalonia.Markup.Xaml.MarkupExtensions;
 using Core.SDKs.Tools;
 using PluginCore;
 
@@ -15,17 +17,18 @@ public partial class PathToImageConverter : IValueConverter
     public object? Convert(object? value, Type targetType, object parameter, CultureInfo culture)
     {
         //Console.WriteLine("开始获取  "+DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond );
-        if (value is null)
+        if (value is not null)
         {
-            return null;
+            return value;
         }
 
-        var searchViewItem = value as SearchViewItem;
+        var searchViewItem =
+            ((Control)((CompiledBindingExtension)parameter).DefaultAnchor.Target).DataContext as SearchViewItem;
 
 
         if (searchViewItem is { Icon: null })
         {
-            IconTools.GetIconInItems(searchViewItem);
+            IconTools.GetIconByItemAsync(searchViewItem);
             //.WriteLine("完成获取2 "+DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond );
         }
 

@@ -2,7 +2,6 @@
 
 using System.Drawing;
 using System.Runtime.InteropServices;
-using Core.SDKs.Services;
 using KitopiaAvalonia.Tools;
 using log4net;
 using PluginCore;
@@ -124,7 +123,7 @@ public class IconTools
         }
     }
 
-    public static void GetIconInItems(SearchViewItem t)
+    public static async Task GetIconByItemAsync(SearchViewItem t)
     {
         //Log.Debug($"为{t.OnlyKey}生成Icon");
 
@@ -132,12 +131,12 @@ public class IconTools
             switch (t.FileType)
             {
                 case FileType.文件夹:
-                    IconTools.ExtractFromPath(t.OnlyKey, t);
+                    await IconTools.GetIconByPathAsync(t.OnlyKey, t);
                     break;
                 case FileType.URL:
                     if (t.IconPath is not null)
                     {
-                        IconTools.GetIcon(t.IconPath, t);
+                        await IconTools.GetIconAsync(t.IconPath, t);
                         t.IconPath = null;
                     }
 
@@ -145,13 +144,12 @@ public class IconTools
                 case FileType.自定义:
                     if (t.GetIconAction != null)
                     {
-                        var icon3 = t.GetIconAction(t);
-                        t.Icon = icon3;
+                        t.Icon = t.GetIconAction(t);
                     }
 
                     break;
                 case FileType.UWP应用:
-                    IconTools.GetIcon(t.IconPath!, t);
+                    await IconTools.GetIconAsync(t.IconPath!, t);
                     t.IconPath = null;
                     break;
                 case FileType.应用程序:
@@ -161,7 +159,7 @@ public class IconTools
                 case FileType.PDF文档:
                 case FileType.图像:
                 case FileType.文件:
-                    IconTools.GetIcon(t.OnlyKey, t);
+                    await IconTools.GetIconAsync(t.OnlyKey, t);
                     break;
                 case FileType.命令:
                 case FileType.自定义情景:
@@ -172,7 +170,7 @@ public class IconTools
                     break;
 
                 default:
-                    IconTools.GetIcon(t.OnlyKey, t);
+                    await IconTools.GetIconAsync(t.OnlyKey, t);
                     break;
             }
         }
@@ -182,7 +180,7 @@ public class IconTools
         //
     }
 
-    public static void GetIcon(string path, SearchViewItem item)
+    public static async Task GetIconAsync(string path, SearchViewItem item)
     {
         //log.Debug(1);
 
@@ -224,54 +222,31 @@ public class IconTools
             item.Icon = icon2;
         }
 
-
-        retry:
-        var iconBase = GetIconBase(path, cacheKey);
-        if (iconBase == null)
+        await Task.Run(() =>
         {
-            goto retry;
-        }
+            retry:
+            var iconBase = GetIconBase(path, cacheKey);
+            if (iconBase == null)
+            {
+                goto retry;
+            }
 
-        var clone = ((Bitmap)iconBase.ToBitmap()).ToAvaloniaBitmap();
-        _icons.TryAdd(cacheKey, clone);
-        iconBase.Dispose();
-        item.Icon = clone;
-    }
-
-    public Avalonia.Media.Imaging.Bitmap? GetFormClipboard()
-    {
-        var bitmap =
-            ((IClipboardService)ServiceManager.Services.GetService(typeof(IClipboardService)))
-            .GetBitmap();
-        if (bitmap is null)
-        {
-            return null;
-        }
-
-        var image = bitmap.GetThumbnailImage(48, 48, null, IntPtr.Zero); // 获取指定大小的缩略图
-        var converter = new IconConverter(); // 创建转换器对象
-        var bytes = converter.ConvertTo(image, typeof(byte[])) as byte[]; // 将 image 转换为字节数组
-        var icon = converter.ConvertFrom(bytes) as Icon; // 将字节数组转换为 icon 对象
-        var ms = new MemoryStream(); // 创建内存流
-        icon.Save(ms); // 将 icon 保存到流中
-        ms.Position = 0; // 重置流位置
-        icon = new Icon(ms); // 从流中创建 icon 对象
-        ms.Close(); // 关闭流
-        var independenceIcon12 = icon.ToBitmap().ToAvaloniaBitmap();
-        DestroyIcon(icon.Handle);
-        //_icons.Add(cacheKey,independenceIcon12);
-        return independenceIcon12;
+            var clone = ((Bitmap)iconBase.ToBitmap()).ToAvaloniaBitmap();
+            _icons.TryAdd(cacheKey, clone);
+            iconBase.Dispose();
+            item.Icon = clone;
+        });
     }
 
 
-    public static void ExtractFromPath(string path, SearchViewItem item)
+    public static async Task GetIconByPathAsync(string path, SearchViewItem item)
     {
         if (_icons.TryGetValue(path, out var fromPath))
         {
             item.Icon = fromPath;
         }
 
-
+        await Task.Run(() =>
         {
             retry:
             try
@@ -290,7 +265,7 @@ public class IconTools
             {
                 goto retry;
             }
-        }
+        });
     }
 
     [DllImport("shell32.dll")]

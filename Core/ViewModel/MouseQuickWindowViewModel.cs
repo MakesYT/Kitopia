@@ -59,7 +59,7 @@ public partial class MouseQuickWindowViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    public void Excute(SearchViewItem searchViewItem)
+    public void Excute(SearchViewItem? searchViewItem)
     {
         if (searchViewItem.OnlyKey == "Add")
         {

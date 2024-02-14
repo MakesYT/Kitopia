@@ -2,7 +2,6 @@
 
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
@@ -179,9 +178,6 @@ public partial class TaskEditorViewModel : ObservableRecipient
     {
         get;
     }
-
-    [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
-    public static extern IntPtr GetForegroundWindow();
 
     [RelayCommand]
     private void VerifyNode()

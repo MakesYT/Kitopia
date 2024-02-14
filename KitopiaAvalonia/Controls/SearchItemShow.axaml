@@ -3,30 +3,32 @@
         xmlns:controls="using:KitopiaAvalonia.Controls"
         xmlns:controls1="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
         xmlns:searchWindow="clr-namespace:Kitopia.Converter.SearchWindow"
-        xmlns:converter="clr-namespace:Kitopia.Converter">
+        xmlns:converter="clr-namespace:Kitopia.Converter"
+        x:DataType="pluginCore:SearchViewItem"
+        xmlns:pluginCore="clr-namespace:PluginCore;assembly=PluginCore">
     <Design.PreviewWith>
         <controls:SearchItemShow />
     </Design.PreviewWith>
-
+    <Styles.Resources>
+        <searchWindow:PathToImageConverter x:Key="PathToImageConverter" />
+        <converter:ReverseBoolToVisibilityConverter x:Key="boolToVisibilityConverter" />
+        <searchWindow:IfNullVisibilityHidden x:Key="IfNullVisibilityHidden" />
+        <converter:IntToIconSymbol x:Key="IntToIconSymbol" />
+        <converter:ReverseBool x:Key="ReverseBool" />
+    </Styles.Resources>
     <Style Selector="controls|SearchItemShow">
         <!-- Set Defaults -->
         <Setter Property="Template">
-            <ControlTemplate TargetType="{x:Type controls:SearchItemShow}">
-                <Button Padding="10" Margin="0" Command="{TemplateBinding Command}"
-                           DataContext="{x:Type controls:SearchItemShow}">
+            <ControlTemplate TargetType="{x:Type controls:SearchItemShow}" >
+                <Button Padding="10" Margin="0" Command="{TemplateBinding Command}" DataContext="{TemplateBinding SearchViewItem}">
 
                     <StackPanel Orientation="Horizontal" Height="{TemplateBinding Height}" VerticalAlignment="Center">
-                        <StackPanel.Resources>
-                            <searchWindow:PathToImageConverter x:Key="PathToImageConverter" />
-                            <converter:ReverseBoolToVisibilityConverter x:Key="boolToVisibilityConverter" />
-                            <searchWindow:IfNullVisibilityHidden x:Key="IfNullVisibilityHidden" />
-                            <converter:IntToIconSymbol x:Key="IntToIconSymbol" />
-                            <converter:ReverseBool x:Key="ReverseBool" />
-                        </StackPanel.Resources>
+                        
                         <Grid>
                             <Image HorizontalAlignment="Left" Focusable="False" Width="48"
                                    Height="48" ZIndex="1"
-                                   Source="{Binding  SearchViewItem ,RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource PathToImageConverter}}" />
+                                   
+                                   Source="{Binding  $parent[Button].((pluginCore:SearchViewItem)DataContext).Icon, Converter={StaticResource PathToImageConverter},ConverterParameter={Binding $parent[Button].((pluginCore:SearchViewItem)DataContext)}}" />
                             <controls1:FontIcon Height="48" Width="48" 
                                                 IsVisible="{Binding SearchViewItem.IconSymbol,RelativeSource={RelativeSource TemplatedParent},Converter={StaticResource IfNullVisibilityHidden}}"
                                 FontFamily="{StaticResource FluentFont}" 

@@ -12,12 +12,15 @@ namespace KitopiaAvalonia.Controls;
 
 public class SearchItemShow : Button
 {
-    public static readonly StyledProperty<SearchViewItem> SearchViewItemProperty = AvaloniaProperty.Register<SearchItemShow, SearchViewItem>(nameof(SearchViewItem));
+    public static readonly StyledProperty<SearchViewItem> SearchViewItemProperty =
+        AvaloniaProperty.Register<SearchItemShow, SearchViewItem>(nameof(SearchViewItem));
 
-    public static readonly AvaloniaProperty IsSelectedProperty = AvaloniaProperty.Register<SearchItemShow,bool>(nameof(IsSelected),false);
+    public static readonly AvaloniaProperty IsSelectedProperty =
+        AvaloniaProperty.Register<SearchItemShow, bool>(nameof(IsSelected), false);
 
 
-    public static readonly StyledProperty<string> OnlyKeyProperty = AvaloniaProperty.Register<SearchItemShow,string>(nameof(OnlyKey),"");
+    public static readonly StyledProperty<string> OnlyKeyProperty =
+        AvaloniaProperty.Register<SearchItemShow, string>(nameof(OnlyKey), "");
 
     [Bindable(true)]
     [Category("SearchViewItem")]
@@ -47,6 +50,7 @@ public class SearchItemShow : Button
     {
         OnlyKeyProperty.Changed.AddClassHandler<SearchItemShow>(OnOnlyKeyChanged);
     }
+
     private static void OnOnlyKeyChanged(SearchItemShow searchItemShow, AvaloniaPropertyChangedEventArgs e)
     {
         var value = (string)e.NewValue;

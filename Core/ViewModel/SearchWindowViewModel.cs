@@ -43,7 +43,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
 
     private bool nowInSelectMode = false;
-    private Action<SearchViewItem>? selectAction;
+    private Action<SearchViewItem?>? selectAction;
 
     public SearchWindowViewModel()
     {
@@ -586,7 +586,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    public void OpenFile(SearchViewItem item)
+    public void OpenFile(SearchViewItem? item)
     {
         Task.Run(() =>
         {

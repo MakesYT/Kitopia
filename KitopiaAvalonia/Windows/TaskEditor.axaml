@@ -536,7 +536,7 @@
                                                     </StackPanel.Resources>
                                                     <CheckBox
                                                         IsChecked="{Binding Path=$parent[Expander].((taskEditor1:TaskEditorViewModel)DataContext).Scenario,Converter={StaticResource AutoTriggersCtr},
-                                                              ConverterParameter={Binding Key}}" />
+                                                              ConverterParameter={Binding .}}" />
                                                     <TextBlock VerticalAlignment="Center"
                                                                Text="{Binding Value.Name}" />
 

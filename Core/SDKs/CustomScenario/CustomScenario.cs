@@ -327,6 +327,11 @@ public partial class CustomScenario : ObservableRecipient
 
     public void Stop()
     {
+        if (!IsRunning)
+        {
+            return;
+        }
+
         _tickUtil?.Dispose();
         try
         {
