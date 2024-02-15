@@ -21,7 +21,7 @@
         <AvaloniaResource Include="Assets\HarmonyOS_Sans_SC_Regular.ttf"/>
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\..\NodifyM.Avalonia\NodifyM.Avalonia\NodifyM.Avalonia.csproj"/>
+        <ProjectReference Include="..\NodifyM.Avalonia\NodifyM.Avalonia\NodifyM.Avalonia.csproj"/>
         <ProjectReference Include="..\Core\Core.csproj"/>
     </ItemGroup>
     <ItemGroup>

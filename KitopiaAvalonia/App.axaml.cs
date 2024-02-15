@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
@@ -68,90 +69,66 @@ public partial class App : Application
 
     private void OnStartup()
     {
-        var eventWaitHandle = new EventWaitHandle(false, EventResetMode.AutoReset, "Kitopia", out var createNew);
-        if (!createNew)
+        FileInfo lockFile = new FileInfo("Kitopia.lock");
+        if (lockFile.Exists)
         {
-            var content = new DialogContent("Kitopia", "不能同时开启两个应用", null, null, "确定", () =>
-            {
-                Environment.Exit(0);
-            }, null, null);
+            lockFile.Delete();
+        }
+
+        if (lockFile.Exists)
+        {
+            var content = new DialogContent("Kitopia", "不能同时开启两个应用", null, null, "确定", () => { Environment.Exit(0); },
+                null, null);
             ServiceManager.Services.GetService<IContentDialog>()!.ShowDialog(null, content);
         }
-        else
+
+        CheckAndDeleteLogFiles();
+        log.Info("启动");
+
+
+        log.Info("Ioc初始化完成");
+        ConfigManger.Init();
+        log.Info("配置文件初始化完成");
+        PluginManager.Init();
+        log.Info("插件管理器初始化完成");
+        CustomScenarioManger.Init();
+        log.Info("场景管理器初始化完成");
+        switch (ConfigManger.Config.themeChoice)
         {
-            CheckAndDeleteLogFiles();
-            log.Info("启动");
-            ThreadPool.RegisterWaitForSingleObject(eventWaitHandle, (_, _) =>
+            case "跟随系统":
             {
-                Dispatcher.UIThread.Invoke(() =>
-                {
-                    ServiceManager.Services.GetService<SearchWindow>()!.Show();
-                    ServiceManager.Services.GetService<SearchWindow>()!.Focus();
-
-                    ServiceManager.Services.GetService<SearchWindow>()!.tx.Focus();
-                });
-            }, null, -1, false);
-            var appReloadEventWaitHandle =
-                new EventWaitHandle(false, EventResetMode.AutoReset, "Kitopia_appReload", out var appReload);
-            if (!appReload)
-            {
-                var content = new DialogContent("Kitopia", "右键菜单捕获出现异常,\n请关闭软件重试,将会导致部分功能异常 ", null, null, "确定", () =>
-                {
-                }, null, null);
-                ServiceManager.Services.GetService<IContentDialog>()!.ShowDialog(null, content);
+                ServiceManager.Services.GetService<IThemeChange>().followSys(true);
+                break;
             }
-            else
+            case "深色":
             {
-                ThreadPool.RegisterWaitForSingleObject(appReloadEventWaitHandle, (_, _) =>
-                {
-                    ServiceManager.Services.GetService<SearchWindowViewModel>()!.ReloadApps();
-                }, null, -1, false);
+                ServiceManager.Services.GetService<IThemeChange>().followSys(false);
+                ServiceManager.Services.GetService<IThemeChange>().changeTo("theme_dark");
+                break;
             }
-
-            log.Info("Ioc初始化完成");
-            ConfigManger.Init();
-            log.Info("配置文件初始化完成");
-            PluginManager.Init();
-            log.Info("插件管理器初始化完成");
-            CustomScenarioManger.Init();
-            log.Info("场景管理器初始化完成");
-            switch (ConfigManger.Config.themeChoice)
+            case "浅色":
             {
-                case "跟随系统":
-                {
-                    ServiceManager.Services.GetService<IThemeChange>().followSys(true);
-                    break;
-                }
-                case "深色":
-                {
-                    ServiceManager.Services.GetService<IThemeChange>().followSys(false);
-                    ServiceManager.Services.GetService<IThemeChange>().changeTo("theme_dark");
-                    break;
-                }
-                case "浅色":
-                {
-                    ServiceManager.Services.GetService<IThemeChange>().followSys(false);
-                    ServiceManager.Services.GetService<IThemeChange>().changeTo("theme_light");
-                    break;
-                }
+                ServiceManager.Services.GetService<IThemeChange>().followSys(false);
+                ServiceManager.Services.GetService<IThemeChange>().changeTo("theme_light");
+                break;
             }
-
-            log.Info("主题初始化完成");
-            log.Debug("注册热键");
-            Core.SDKs.HotKey.HotKeyManager.Init();
-            // ServiceManager.Services.GetService<MainWindow>().InitHook();
-
-
-            ServicePointManager.DefaultConnectionLimit = 10240;
-
-            if (ConfigManger.Config.autoStart)
-            {
-                log.Info("设置开机自启");
-                SetAutoStartup();
-            }
-
-            ServiceManager.Services.GetService<SearchWindowViewModel>();
         }
+
+        log.Info("主题初始化完成");
+        log.Debug("注册热键");
+        Core.SDKs.HotKey.HotKeyManager.Init();
+        // ServiceManager.Services.GetService<MainWindow>().InitHook();
+
+
+        ServicePointManager.DefaultConnectionLimit = 10240;
+
+        if (ConfigManger.Config.autoStart)
+        {
+            log.Info("设置开机自启");
+            SetAutoStartup();
+        }
+
+        ServiceManager.Services.GetService<SearchWindowViewModel>();
     }
 
     private static IServiceProvider ConfigureServices()
@@ -229,6 +206,20 @@ public partial class App : Application
 
     private void SetAutoStartup()
     {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            SetAutoStartupWindow();
+        }else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            SetAutoStartupLinux();
+        } else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            throw new  NotImplementedException();
+        }
+        
+    }
+    private void SetAutoStartupWindow()
+    {
         var strName = AppDomain.CurrentDomain.BaseDirectory + "KitopiaAvalonia.exe"; //获取要自动运行的应用程序名
         if (!File.Exists(strName)) //判断要自动运行的应用程序文件是否存在
         {
@@ -266,10 +257,7 @@ public partial class App : Application
                         ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show("开机自启",
                             "开机自启设置失败,请检查杀毒软件后重试");
                     }
-                }, null, () =>
-                {
-                    log.Info("用户取消启用开机自启");
-                }));
+                }, null, () => { log.Info("用户取消启用开机自启"); }));
         }
         else if (!registry.GetValue("Kitopia").Equals($"\"{strName}\""))
         {
@@ -291,4 +279,21 @@ public partial class App : Application
             log.Debug("程序自启已存在");
         }
     }
+    
+    private void SetAutoStartupLinux()
+    {
+        var strName = AppDomain.CurrentDomain.BaseDirectory + "KitopiaAvalonia";
+        if (!File.Exists(strName)) //判断要自动运行的应用程序文件是否存在
+        {
+            return;
+        }
+        var iniF = "~/.config/autostart/kitopia.desktop";
+        if (File.Exists(iniF)) //判断要自动运行的应用程序文件是否存在
+        {
+            return;
+        }
+        File.WriteAllText(iniF, $"[Unit]\nDescription=Kitopia\n[Service]\nType=simple\nExecStart=./{strName}\n[Install]\nWantedBy=multi-user.target");
+        
+    }
+    
 }

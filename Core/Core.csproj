@@ -72,7 +72,7 @@
 
 
     <ItemGroup>
-        <ProjectReference Include="..\..\DesktopNotifications\DesktopNotifications.Avalonia\DesktopNotifications.Avalonia.csproj"/>
+        <ProjectReference Include="..\DesktopNotifications\DesktopNotifications.Avalonia\DesktopNotifications.Avalonia.csproj"/>
         <ProjectReference Include="..\PluginCore\PluginCore.csproj"/>
     </ItemGroup>
 
