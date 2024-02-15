@@ -7,3 +7,9 @@
 [submodule "KitopiaWeb"]
 	path = KitopiaWeb
 	url = https://github.com/MakesYT/KitopiaWeb
+[submodule "NodifyM.Avalonia"]
+	path = NodifyM.Avalonia
+	url = https://github.com/MakesYT/NodifyM.Avalonia/
+[submodule "DesktopNotifications"]
+	path = DesktopNotifications
+	url = https://github.com/pr8x/DesktopNotifications
