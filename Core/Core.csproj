@@ -19,7 +19,7 @@
         <None Remove="Everything32.dll"/>
         <None Remove="Everything64.dll"/>
     </ItemGroup>
-    <ItemGroup>
+    <!--<ItemGroup>
         <COMReference Include="IWshRuntimeLibrary">
             <WrapperTool>tlbimp</WrapperTool>
             <VersionMinor>0</VersionMinor>
@@ -29,7 +29,7 @@
             <Isolated>false</Isolated>
             <EmbedInteropTypes>true</EmbedInteropTypes>
         </COMReference>
-    </ItemGroup>
+    </ItemGroup>-->
 
     <ItemGroup>
         <PackageReference Include="Avalonia" Version="11.0.7"/>
