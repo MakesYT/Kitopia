@@ -3,12 +3,12 @@
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using Core.SDKs.Everything;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
@@ -53,59 +53,40 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
     public async Task AddCollection(string search)
     {
-        await AppTools.AppSolverA(_collection, search, false);
+        await ServiceManager.Services.GetService<IAppToolService>()!.AppSolverA(_collection, search, false);
     }
 
     public void ReloadApps(bool logging = false)
     {
-        AppTools.DelNullFile(_collection);
-        AppTools.GetAllApps(_collection, logging);
-        if (ConfigManger.Config.useEverything)
+        ServiceManager.Services.GetService<IAppToolService>()!.DelNullFile(_collection);
+        ServiceManager.Services.GetService<IAppToolService>()!.GetAllApps(_collection, logging);
+
+        if (ConfigManger.Config.useEverything && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             Log.Debug("everything检测");
 
 
-            if (IntPtr.Size == 8)
-            {
-                // 64-bit
-                Everything64.Everything_SetMax(1);
-                EverythingIsOk = Everything64.Everything_QueryW(true);
-            }
-            else
-            {
-                // 32-bit
-                Everything32.Everything_SetMax(1);
-                EverythingIsOk = Everything32.Everything_QueryW(true);
-            }
+            var service = ServiceManager.Services.GetService<IEverythingService>()!;
+            EverythingIsOk = service.isRun();
 
             if (!EverythingIsOk.Value)
             {
-                AppTools.AutoStartEverything(_collection, () =>
+                ServiceManager.Services.GetService<IAppToolService>()!.AutoStartEverything(_collection, () =>
                 {
                     Thread.Sleep(1500);
-                    if (IntPtr.Size == 8)
-                    {
-                        // 64-bit
-                        Everything64.Everything_SetMax(1);
-                        EverythingIsOk = Everything64.Everything_QueryW(true);
-                    }
-                    else
-                    {
-                        // 32-bit
-                        Everything32.Everything_SetMax(1);
-                        EverythingIsOk = Everything32.Everything_QueryW(true);
-                    }
+                    var everythingService = ServiceManager.Services.GetService<IEverythingService>()!;
+                    EverythingIsOk = everythingService.isRun();
 
                     if (EverythingIsOk != null && EverythingIsOk.Value)
                     {
-                        Tools.main(_collection); //Everything文档检索
+                        everythingService.GetItem(_collection); //Everything文档检索
                     }
                 });
             }
 
             if (EverythingIsOk != null && EverythingIsOk.Value)
             {
-                Tools.main(_collection); //Everything文档检索
+                service.GetItem(_collection); //Everything文档检索
             }
         }
     }
@@ -140,7 +121,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 {
                     Log.Debug("检测路径");
                     Dictionary<string, SearchViewItem> a = new();
-                    AppTools.AppSolverA(a, text).Wait();
+                    ServiceManager.Services.GetService<IAppToolService>()!.AppSolverA(a, text).Wait();
                     foreach (var (key, value) in a)
                     {
                         if (value.FileType == FileType.文件夹)
@@ -726,7 +707,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
             if (item.IsStared) //收藏操作
             {
-                AppTools.AppSolverA(_collection, item.OnlyKey, true);
+                ServiceManager.Services.GetService<IAppToolService>()!.AppSolverA(_collection, item.OnlyKey, true);
                 ConfigManger.Config.customCollections.Insert(0, item.OnlyKey);
             }
             else

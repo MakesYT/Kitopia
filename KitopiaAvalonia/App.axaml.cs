@@ -13,6 +13,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using Core.SDKs;
 using Core.SDKs.CustomScenario;
+using Core.SDKs.Everything;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
@@ -72,7 +73,10 @@ public partial class App : Application
 
         if (lockFile.Exists)
         {
-            var content = new DialogContent("Kitopia", "不能同时开启两个应用", null, null, "确定", () => { Environment.Exit(0); },
+            var content = new DialogContent("Kitopia", "不能同时开启两个应用", null, null, "确定", () =>
+                {
+                    Environment.Exit(0);
+                },
                 null, null);
             ServiceManager.Services.GetService<IContentDialog>()!.ShowDialog(null, content);
         }
@@ -129,7 +133,6 @@ public partial class App : Application
     private static IServiceProvider ConfigureServices()
     {
         var services = new ServiceCollection();
-        services.AddSingleton<IconTools>();
         services.AddSingleton<IToastService, ToastService>();
         services.AddTransient<IContentDialog, ContentDialogService>();
         services.AddTransient<IHotKeyEditor, HotKeyEditorService>();
@@ -139,6 +142,12 @@ public partial class App : Application
         services.AddSingleton<ISearchItemTool, SearchItemTool>();
         services.AddSingleton<ISearchItemChooseService, SearchItemChooseService>();
         services.AddSingleton<IMouseQuickWindowService, MouseQuickWindowService>();
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            services.AddTransient<IEverythingService, EverythingService>();
+            services.AddTransient<IAppToolService, AppToolService>();
+        }
+
         services.AddTransient<TaskEditorViewModel>();
         services.AddTransient<TaskEditor>(e => new TaskEditor() { DataContext = e.GetService<TaskEditorViewModel>() });
         services.AddSingleton<MainWindowViewModel>();
@@ -204,15 +213,17 @@ public partial class App : Application
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             SetAutoStartupWindow();
-        }else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
             SetAutoStartupLinux();
-        } else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-        {
-            throw new  NotImplementedException();
         }
-        
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            throw new NotImplementedException();
+        }
     }
+
     private void SetAutoStartupWindow()
     {
         var strName = AppDomain.CurrentDomain.BaseDirectory + "KitopiaAvalonia.exe"; //获取要自动运行的应用程序名
@@ -252,7 +263,10 @@ public partial class App : Application
                         ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show("开机自启",
                             "开机自启设置失败,请检查杀毒软件后重试");
                     }
-                }, null, () => { log.Info("用户取消启用开机自启"); }));
+                }, null, () =>
+                {
+                    log.Info("用户取消启用开机自启");
+                }));
         }
         else if (!registry.GetValue("Kitopia").Equals($"\"{strName}\""))
         {
@@ -274,7 +288,7 @@ public partial class App : Application
             log.Debug("程序自启已存在");
         }
     }
-    
+
     private void SetAutoStartupLinux()
     {
         var strName = AppDomain.CurrentDomain.BaseDirectory + "KitopiaAvalonia";
@@ -282,14 +296,15 @@ public partial class App : Application
         {
             return;
         }
+
         var iniF = $"{Environment.GetEnvironmentVariable("HOME")}/.config/autostart/kitopia.desktop";
         if (File.Exists(iniF)) //判断要自动运行的应用程序文件是否存在
         {
             return;
         }
+
         // \nIcon=/home/makesyt/.local/share/JetBrains/Toolbox/toolbox.svg
-        File.WriteAllText(iniF, $"[Desktop Entry]\nExec={strName}\nVersion=1.0\nType=Application\nCategories=Development\nName=Kitopia\nStartupWMClass=kitopia\nTerminal=false\nX-GNOME-Autostart-enabled=true\nStartupNotify=false\nX-GNOME-Autostart-Delay=10\nX-MATE-Autostart-Delay=10\nX-KDE-autostart-after=panel\nX-Deepin-CreatedBy=com.deepin.SessionManager\nX-Deepin-AppID=kitopia\nHidden=false");
-        
+        File.WriteAllText(iniF,
+            $"[Desktop Entry]\nExec={strName}\nVersion=1.0\nType=Application\nCategories=Development\nName=Kitopia\nStartupWMClass=kitopia\nTerminal=false\nX-GNOME-Autostart-enabled=true\nStartupNotify=false\nX-GNOME-Autostart-Delay=10\nX-MATE-Autostart-Delay=10\nX-KDE-autostart-after=panel\nX-Deepin-CreatedBy=com.deepin.SessionManager\nX-Deepin-AppID=kitopia\nHidden=false");
     }
-    
 }

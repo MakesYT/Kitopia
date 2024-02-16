@@ -15,10 +15,7 @@
         <DebugType>none</DebugType>
     </PropertyGroup>
 
-    <ItemGroup>
-        <None Remove="Everything32.dll"/>
-        <None Remove="Everything64.dll"/>
-    </ItemGroup>
+    
     <!--<ItemGroup>
         <COMReference Include="IWshRuntimeLibrary">
             <WrapperTool>tlbimp</WrapperTool>
@@ -58,15 +55,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="Everything32.dll">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
-        <Content Include="Everything64.dll">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
-    </ItemGroup>
-
-    <ItemGroup>
         <Folder Include="SDKs\Msgs\"/>
     </ItemGroup>
 
@@ -74,7 +62,6 @@
     <ItemGroup>
         <ProjectReference Include="..\DesktopNotifications\DesktopNotifications.Avalonia\DesktopNotifications.Avalonia.csproj"/>
         <ProjectReference Include="..\PluginCore\PluginCore.csproj"/>
-        <ProjectReference Include="..\Share\Share.csproj" />
     </ItemGroup>
 
 

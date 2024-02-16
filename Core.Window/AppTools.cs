@@ -5,10 +5,10 @@ using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Text.RegularExpressions;
 using Core.SDKs.CustomScenario;
-using Core.SDKs.Everything;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using log4net;
+using Microsoft.Extensions.DependencyInjection;
 using NPinyin;
 using PluginCore;
 using Vanara.PInvoke;
@@ -18,12 +18,12 @@ using File = System.IO.File;
 
 namespace Core.SDKs.Tools;
 
-public partial class AppTools
+internal partial class AppTools
 {
     private static readonly ILog log = LogManager.GetLogger(nameof(AppTools));
     private static readonly List<string> ErrorLnkList = new();
 
-    public static void AutoStartEverything(Dictionary<string, SearchViewItem> collection, Action action)
+    internal static void AutoStartEverything(Dictionary<string, SearchViewItem> collection, Action action)
     {
         if (ConfigManger.Config.autoStartEverything)
         {
@@ -42,19 +42,8 @@ public partial class AppTools
 
             if (collection.TryGetValue(ConfigManger.Config.everythingOnlyKey, out var searchViewItem))
             {
-                var isRun = false;
-                if (IntPtr.Size == 8)
-                {
-                    // 64-bit
-                    Everything64.Everything_SetMax(1);
-                    isRun = Everything64.Everything_QueryW(true);
-                }
-                else
-                {
-                    // 32-bit
-                    Everything32.Everything_SetMax(1);
-                    isRun = Everything32.Everything_QueryW(true);
-                }
+                var isRun = ServiceManager.Services.GetService<IEverythingService>().isRun();
+
 
                 if (!isRun)
                 {
@@ -121,7 +110,7 @@ public partial class AppTools
         }
     }
 
-    public static void DelNullFile(Dictionary<string, SearchViewItem> collection)
+    internal static void DelNullFile(Dictionary<string, SearchViewItem> collection)
     {
         var toRemove = new List<string>();
         foreach (var (key, searchViewItem) in collection)
@@ -161,7 +150,7 @@ public partial class AppTools
         }
     }
 
-    public static void GetAllApps(Dictionary<string, SearchViewItem> collection,
+    internal static void GetAllApps(Dictionary<string, SearchViewItem> collection,
         bool logging = false)
     {
         log.Debug("索引全部软件及收藏项目");
@@ -202,9 +191,11 @@ public partial class AppTools
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            filePaths.AddRange(Directory.EnumerateFiles(@"C:\ProgramData\Microsoft\Windows\Start Menu\Programs", "*.lnk",
+            filePaths.AddRange(Directory.EnumerateFiles(@"C:\ProgramData\Microsoft\Windows\Start Menu\Programs",
+                "*.lnk",
                 SearchOption.AllDirectories));
-            filePaths.AddRange(Directory.EnumerateFiles(@"C:\ProgramData\Microsoft\Windows\Start Menu\Programs", "*.url",
+            filePaths.AddRange(Directory.EnumerateFiles(@"C:\ProgramData\Microsoft\Windows\Start Menu\Programs",
+                "*.url",
                 SearchOption.AllDirectories));
             filePaths.AddRange(Directory.EnumerateFiles(@"C:\ProgramData\Microsoft\Windows\Start Menu\Programs",
                 "*.appref-ms", SearchOption.AllDirectories));
@@ -216,7 +207,7 @@ public partial class AppTools
             filePaths.AddRange(Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Programs),
                 "*.url", SearchOption.AllDirectories));
         }
-        
+
         var options = new ParallelOptions();
         options.MaxDegreeOfParallelism = 256;
 // 使用Parallel.ForEach并行执行AppSolverA方法
@@ -294,7 +285,7 @@ public partial class AppTools
         }
     }
 
-    public static async Task AppSolverA(Dictionary<string, SearchViewItem> collection, string file,
+    internal static async Task AppSolverA(Dictionary<string, SearchViewItem> collection, string file,
         bool star = false, bool logging = false)
     {
         //log.Debug(Thread.CurrentThread.ManagedThreadId);
@@ -571,7 +562,7 @@ public partial class AppTools
 
 
     // 使用const或readonly修饰符来声明pattern字符串
-    public static async Task NameSolver(List<string> keys, string name)
+    internal static async Task NameSolver(List<string> keys, string name)
     {
         var initials = name.Split(" ");
         CreateCombinations(keys, 0, "", initials);

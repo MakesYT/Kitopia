@@ -12,7 +12,7 @@ using Vanara.Windows.Shell;
 
 namespace Core.SDKs.Tools;
 
-public static class UwpTools
+internal static class UwpTools
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(UwpTools));
 
@@ -35,17 +35,17 @@ public static class UwpTools
         return null;
     }
 
-    public static async Task GetAll(Dictionary<string, SearchViewItem> items)
+    internal static async Task GetAll(Dictionary<string, SearchViewItem> items)
     {
         List<Task> list = new();
         FirewallApi.NetworkIsolationEnumAppContainers(FirewallApi.NETISO_FLAG.NETISO_FLAG_FORCE_COMPUTE_BINARIES,
-            out var pdwNumPublicAppCs, out var ppPublicAppCs);
+            out var pdwNuminternalAppCs, out var ppinternalAppCs);
         var options = new ParallelOptions
         {
             MaxDegreeOfParallelism = 256
         };
-        Parallel.ForEach(ppPublicAppCs.ToIEnum<FirewallApi.INET_FIREWALL_APP_CONTAINER>(
-            (int)pdwNumPublicAppCs), options, file =>
+        Parallel.ForEach(ppinternalAppCs.ToIEnum<FirewallApi.INET_FIREWALL_APP_CONTAINER>(
+            (int)pdwNuminternalAppCs), options, file =>
         {
             list.Add(AppContainerAnalyse(file, items));
         });

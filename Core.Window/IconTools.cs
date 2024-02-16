@@ -12,7 +12,7 @@ using Size = System.Drawing.Size;
 
 namespace Core.SDKs.Tools;
 
-public class IconTools
+internal class IconTools
 {
     private const uint SHGFI_ICON = 0x100;
     private const uint SHGFI_LARGEICON = 0x0;
@@ -24,7 +24,7 @@ public class IconTools
 
 
     [DllImport("User32.dll")]
-    public static extern int PrivateExtractIcons(
+    internal static extern int PrivateExtractIcons(
         string lpszFile, //file name
         int nIconIndex, //The zero-based index of the first icon to extract.
         int cxIcon, //The horizontal icon size wanted.
@@ -38,7 +38,7 @@ public class IconTools
     //details:https://msdn.microsoft.com/en-us/library/windows/desktop/ms648063(v=vs.85).aspx
     //Destroys an icon and frees any memory the icon occupied.
     [DllImport("User32.dll")]
-    public static extern bool DestroyIcon(
+    internal static extern bool DestroyIcon(
         IntPtr hIcon //A handle to the icon to be destroyed. The icon must not be in use.
     );
 
@@ -123,7 +123,7 @@ public class IconTools
         }
     }
 
-    public static async Task GetIconByItemAsync(SearchViewItem t)
+    internal static async Task GetIconByItemAsync(SearchViewItem t)
     {
         //Log.Debug($"为{t.OnlyKey}生成Icon");
 
@@ -180,7 +180,7 @@ public class IconTools
         //
     }
 
-    public static async Task GetIconAsync(string path, SearchViewItem item)
+    internal static async Task GetIconAsync(string path, SearchViewItem item)
     {
         //log.Debug(1);
 
@@ -239,7 +239,7 @@ public class IconTools
     }
 
 
-    public static async Task GetIconByPathAsync(string path, SearchViewItem item)
+    internal static async Task GetIconByPathAsync(string path, SearchViewItem item)
     {
         if (_icons.TryGetValue(path, out var fromPath))
         {
@@ -276,14 +276,14 @@ public class IconTools
     [StructLayout(LayoutKind.Sequential)]
     private struct SHFILEINFO
     {
-        public IntPtr hIcon;
-        public int iIcon;
-        public uint dwAttributes;
+        internal IntPtr hIcon;
+        internal int iIcon;
+        internal uint dwAttributes;
 
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
-        public string szDisplayName;
+        internal string szDisplayName;
 
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 80)]
-        public string szTypeName;
+        internal string szTypeName;
     };
 }

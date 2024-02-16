@@ -5,7 +5,9 @@ using System.Globalization;
 using Avalonia.Controls;
 using Avalonia.Data.Converters;
 using Avalonia.Markup.Xaml.MarkupExtensions;
+using Core.SDKs.Services;
 using Core.SDKs.Tools;
+using Microsoft.Extensions.DependencyInjection;
 using PluginCore;
 
 #endregion
@@ -28,7 +30,8 @@ public partial class PathToImageConverter : IValueConverter
 
         if (searchViewItem is { Icon: null })
         {
-            IconTools.GetIconByItemAsync(searchViewItem);
+            ServiceManager.Services.GetService<IAppToolService>().GetIconByItemAsync(searchViewItem);
+            return null;
             //.WriteLine("完成获取2 "+DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond );
         }
 
