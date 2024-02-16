@@ -26,4 +26,7 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="NPinyinPro" Version="0.3.3"/>
+    </ItemGroup>
 </Project>
