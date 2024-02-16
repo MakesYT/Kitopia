@@ -11,6 +11,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
+using Core.Linux;
 using Core.SDKs;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.Everything;
@@ -146,6 +147,11 @@ public partial class App : Application
         {
             services.AddTransient<IEverythingService, EverythingService>();
             services.AddTransient<IAppToolService, AppToolService>();
+        }
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            
+            services.AddTransient<IAppToolService, AppToolLinuxService>();
         }
 
         services.AddTransient<TaskEditorViewModel>();

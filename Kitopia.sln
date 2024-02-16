@@ -32,6 +32,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DesktopNotifications.Window
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Window", "Core.Window\Core.Window.csproj", "{2B14A838-2840-4412-83B4-DE568C36FCA6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Linux", "Core.Linux\Core.Linux.csproj", "{88621E02-A1A5-4896-A43C-B536803C1AFE}"
+EndProject
 
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -407,6 +409,26 @@ Global
 		{2B14A838-2840-4412-83B4-DE568C36FCA6}.Release|x64.Build.0 = Release|Any CPU
 		{2B14A838-2840-4412-83B4-DE568C36FCA6}.Release|x86.ActiveCfg = Release|Any CPU
 		{2B14A838-2840-4412-83B4-DE568C36FCA6}.Release|x86.Build.0 = Release|Any CPU
+		{88621E02-A1A5-4896-A43C-B536803C1AFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88621E02-A1A5-4896-A43C-B536803C1AFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88621E02-A1A5-4896-A43C-B536803C1AFE}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{88621E02-A1A5-4896-A43C-B536803C1AFE}.Debug|ARM.Build.0 = Debug|Any CPU
+		{88621E02-A1A5-4896-A43C-B536803C1AFE}.Debug|arm64.ActiveCfg = Debug|Any CPU
+		{88621E02-A1A5-4896-A43C-B536803C1AFE}.Debug|arm64.Build.0 = Debug|Any CPU
+		{88621E02-A1A5-4896-A43C-B536803C1AFE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{88621E02-A1A5-4896-A43C-B536803C1AFE}.Debug|x64.Build.0 = Debug|Any CPU
+		{88621E02-A1A5-4896-A43C-B536803C1AFE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{88621E02-A1A5-4896-A43C-B536803C1AFE}.Debug|x86.Build.0 = Debug|Any CPU
+		{88621E02-A1A5-4896-A43C-B536803C1AFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88621E02-A1A5-4896-A43C-B536803C1AFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88621E02-A1A5-4896-A43C-B536803C1AFE}.Release|ARM.ActiveCfg = Release|Any CPU
+		{88621E02-A1A5-4896-A43C-B536803C1AFE}.Release|ARM.Build.0 = Release|Any CPU
+		{88621E02-A1A5-4896-A43C-B536803C1AFE}.Release|arm64.ActiveCfg = Release|Any CPU
+		{88621E02-A1A5-4896-A43C-B536803C1AFE}.Release|arm64.Build.0 = Release|Any CPU
+		{88621E02-A1A5-4896-A43C-B536803C1AFE}.Release|x64.ActiveCfg = Release|Any CPU
+		{88621E02-A1A5-4896-A43C-B536803C1AFE}.Release|x64.Build.0 = Release|Any CPU
+		{88621E02-A1A5-4896-A43C-B536803C1AFE}.Release|x86.ActiveCfg = Release|Any CPU
+		{88621E02-A1A5-4896-A43C-B536803C1AFE}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
