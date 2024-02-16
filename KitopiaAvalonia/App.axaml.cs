@@ -43,11 +43,6 @@ public partial class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
-
-        if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-        {
-            var desktop1 = desktop.MainWindow;
-        }
     }
 
 
@@ -287,12 +282,13 @@ public partial class App : Application
         {
             return;
         }
-        var iniF = "~/.config/autostart/kitopia.desktop";
+        var iniF = $"{Environment.GetEnvironmentVariable("HOME")}/.config/autostart/kitopia.desktop";
         if (File.Exists(iniF)) //判断要自动运行的应用程序文件是否存在
         {
             return;
         }
-        File.WriteAllText(iniF, $"[Unit]\nDescription=Kitopia\n[Service]\nType=simple\nExecStart=./{strName}\n[Install]\nWantedBy=multi-user.target");
+        // \nIcon=/home/makesyt/.local/share/JetBrains/Toolbox/toolbox.svg
+        File.WriteAllText(iniF, $"[Desktop Entry]\nExec={strName}\nVersion=1.0\nType=Application\nCategories=Development\nName=Kitopia\nStartupWMClass=kitopia\nTerminal=false\nX-GNOME-Autostart-enabled=true\nStartupNotify=false\nX-GNOME-Autostart-Delay=10\nX-MATE-Autostart-Delay=10\nX-KDE-autostart-after=panel\nX-Deepin-CreatedBy=com.deepin.SessionManager\nX-Deepin-AppID=kitopia\nHidden=false");
         
     }
     

@@ -15,7 +15,7 @@ using log4net;
 using Newtonsoft.Json;
 using PluginCore;
 using PluginCore.Attribute;
-using Vanara.Extensions.Reflection;
+
 
 #endregion
 
@@ -668,7 +668,8 @@ public partial class CustomScenario : ObservableRecipient
                             {
                                 if (connectorItem.Type == memberInfo.PropertyType)
                                 {
-                                    var value = invoke.GetPropertyValue<object>(memberInfo.Name);
+                                    var value = invoke.GetType().InvokeMember(memberInfo.Name,BindingFlags.Instance| BindingFlags.IgnoreCase| BindingFlags.Public | BindingFlags.NonPublic| BindingFlags.GetProperty, null, invoke, null);
+                                    
                                     connectorItem.InputObject = value;
                                     foreach (var item in connectorItem.GetSourceOrNextConnectorItems(connections))
                                     {

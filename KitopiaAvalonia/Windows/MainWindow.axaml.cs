@@ -41,9 +41,6 @@ public class NavigationPageFactory : INavigationPageFactory
 public partial class MainWindow : AppWindow
 {
     private static readonly ILog log = LogManager.GetLogger(nameof(MainWindow));
-    static User32.WindowProc _wndProcDelegate;
-    private SafeHandle msgWindowHandle;
-
     public MainWindow()
     {
         InitializeComponent();

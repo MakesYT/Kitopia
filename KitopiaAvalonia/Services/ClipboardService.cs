@@ -23,12 +23,20 @@ public class ClipboardService : IClipboardService
     public bool IsBitmap()
     {
         var strings = ServiceManager.Services.GetService<MainWindow>().Clipboard.GetFormatsAsync().Result;
+        if (strings is null)
+        {
+            return false;
+        }
         return strings.Contains("Unknown_Format_8");
     }
 
     public bool IsText()
     {
         var strings = ServiceManager.Services.GetService<MainWindow>().Clipboard.GetFormatsAsync().Result;
+        if (strings is null)
+        {
+            return false;
+        }
         return strings.Contains("Text");
     }
 

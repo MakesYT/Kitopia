@@ -1,5 +1,6 @@
 ﻿#region
 
+using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -198,24 +199,24 @@ public partial class AppTools
         filePaths.AddRange(Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)));
         filePaths.AddRange(
             Directory.EnumerateDirectories(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)));
-// 把开始菜单中的.lnk和.appref-ms文件路径添加到集合中
-        filePaths.AddRange(Directory.EnumerateFiles(@"C:\ProgramData\Microsoft\Windows\Start Menu\Programs", "*.lnk",
-            SearchOption.AllDirectories));
-        filePaths.AddRange(Directory.EnumerateFiles(@"C:\ProgramData\Microsoft\Windows\Start Menu\Programs", "*.url",
-            SearchOption.AllDirectories));
-        filePaths.AddRange(Directory.EnumerateFiles(@"C:\ProgramData\Microsoft\Windows\Start Menu\Programs",
-            "*.appref-ms", SearchOption.AllDirectories));
 
-// 把自定义集合中的文件路径添加到集合中
-        filePaths.AddRange(ConfigManger.Config.customCollections);
-
-// 把程序文件夹中的.lnk和.appref-ms文件路径添加到集合中
-        filePaths.AddRange(Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Programs),
-            "*.lnk", SearchOption.AllDirectories));
-        filePaths.AddRange(Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Programs),
-            "*.appref-ms", SearchOption.AllDirectories));
-        filePaths.AddRange(Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Programs),
-            "*.url", SearchOption.AllDirectories));
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            filePaths.AddRange(Directory.EnumerateFiles(@"C:\ProgramData\Microsoft\Windows\Start Menu\Programs", "*.lnk",
+                SearchOption.AllDirectories));
+            filePaths.AddRange(Directory.EnumerateFiles(@"C:\ProgramData\Microsoft\Windows\Start Menu\Programs", "*.url",
+                SearchOption.AllDirectories));
+            filePaths.AddRange(Directory.EnumerateFiles(@"C:\ProgramData\Microsoft\Windows\Start Menu\Programs",
+                "*.appref-ms", SearchOption.AllDirectories));
+            filePaths.AddRange(ConfigManger.Config.customCollections);
+            filePaths.AddRange(Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Programs),
+                "*.lnk", SearchOption.AllDirectories));
+            filePaths.AddRange(Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Programs),
+                "*.appref-ms", SearchOption.AllDirectories));
+            filePaths.AddRange(Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Programs),
+                "*.url", SearchOption.AllDirectories));
+        }
+        
         var options = new ParallelOptions();
         options.MaxDegreeOfParallelism = 256;
 // 使用Parallel.ForEach并行执行AppSolverA方法

@@ -9,6 +9,7 @@
                      Closing="Window_OnClosing"
                      TransparencyLevelHint="AcrylicBlur"
                      xmlns:sty="using:FluentAvalonia.Styling"
+                     Icon="/Assets/icon.png"
                      Title="Avalonia">
 
     <windowing:AppWindow.Background>
