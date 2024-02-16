@@ -28,5 +28,10 @@
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="NPinyinPro" Version="0.3.3"/>
+        <PackageReference Include="Vanara.Core" Version="3.4.17"/>
+        <PackageReference Include="Vanara.PInvoke.FirewallApi" Version="3.4.17"/>
+        <PackageReference Include="Vanara.PInvoke.NetApi32" Version="3.4.17"/>
+        <PackageReference Include="Vanara.PInvoke.NetListMgr" Version="3.4.17"/>
+        <PackageReference Include="Vanara.Windows.Shell" Version="3.4.17"/>
     </ItemGroup>
 </Project>

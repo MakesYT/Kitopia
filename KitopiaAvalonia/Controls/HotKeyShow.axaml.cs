@@ -192,8 +192,6 @@ public class HotKeyShow : TemplatedControl
         }
     }
 
-    [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
-    public static extern IntPtr GetForegroundWindow();
 
     private void Edit(string? hotKeyModelSignName)
     {

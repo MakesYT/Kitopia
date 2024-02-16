@@ -16,7 +16,6 @@ using Core.SDKs.Tools;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
 using PluginCore;
-using Vanara.PInvoke;
 
 #endregion
 
@@ -579,7 +578,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 return;
             }
 
-            ((ISearchItemTool)ServiceManager.Services.GetService(typeof(ISearchItemTool))!).OpenSearchItem(item);
+            ServiceManager.Services.GetService<ISearchItemTool>()!.OpenFile(item);
         });
         Search = "";
     }
@@ -587,144 +586,31 @@ public partial class SearchWindowViewModel : ObservableRecipient
     [RelayCommand]
     private void IgnoreItem(SearchViewItem searchViewItem)
     {
-        Task.Run(() =>
+        Dispatcher.UIThread.InvokeAsync(() =>
         {
-            ConfigManger.Config.ignoreItems.Add(searchViewItem.OnlyKey);
-            ConfigManger.Save();
-            _collection.Remove(searchViewItem.OnlyKey);
-            Dispatcher.UIThread.Invoke(() =>
-            {
-                Items.Remove(searchViewItem);
-            });
+            Items.Remove(searchViewItem);
         });
+        ServiceManager.Services.GetService<ISearchItemTool>()!.IgnoreItem(searchViewItem);
     }
 
     [RelayCommand]
-    private void OpenFolder(object searchViewItem) =>
-        Task.Run(() =>
-        {
-            WeakReferenceMessenger.Default.Send("a", "SearchWindowClose");
-            var item = (SearchViewItem)searchViewItem;
-            Log.Debug("打开指定内容文件夹" + item.OnlyKey);
-            Shell32.ShellExecute(IntPtr.Zero, "open", "explorer.exe", "/select," + item.OnlyKey, "",
-                ShowWindowCommand.SW_SHOW);
-
-            switch (item.FileType)
-            {
-                case FileType.文件夹:
-                case FileType.应用程序:
-                case FileType.Word文档:
-                case FileType.PPT文档:
-                case FileType.Excel文档:
-                case FileType.PDF文档:
-                case FileType.图像:
-                case FileType.文件:
-                {
-                    if (ConfigManger.Config.lastOpens.ContainsKey(item.OnlyKey))
-                    {
-                        ConfigManger.Config.lastOpens[item.OnlyKey]++;
-                    }
-                    else
-                    {
-                        ConfigManger.Config.lastOpens.Add(item.OnlyKey, 1);
-                    }
-
-                    break;
-                }
-                    ;
-            }
-
-            //if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
-            Search = "";
-            ConfigManger.Save();
-        });
+    private void OpenFolder(object searchViewItem)
+    {
+        Search = "";
+        ServiceManager.Services.GetService<ISearchItemTool>()!.OpenFolder((SearchViewItem?)searchViewItem);
+    }
 
     [RelayCommand]
-    private void RunAsAdmin(object searchViewItem) =>
-        Task.Run(() =>
-        {
-            WeakReferenceMessenger.Default.Send("a", "SearchWindowClose");
-            var item = (SearchViewItem)searchViewItem;
-            Log.Debug("以管理员身份打开指定内容" + item.OnlyKey);
-            if (item.FileType == FileType.UWP应用)
-            {
-                //explorer.exe shell:AppsFolder\Microsoft.WindowsMaps_8wekyb3d8bbwe!App
-
-                Shell32.ShellExecute(IntPtr.Zero, "runas", "explorer.exe", $"shell:AppsFolder\\{item.OnlyKey}!App",
-                    "", ShowWindowCommand.SW_NORMAL);
-            }
-            else
-            {
-                Shell32.ShellExecute(IntPtr.Zero, "runas", item.OnlyKey, "", "",
-                    ShowWindowCommand.SW_NORMAL);
-            }
-
-            switch (item.FileType)
-            {
-                case FileType.文件夹:
-                case FileType.应用程序:
-                case FileType.Word文档:
-                case FileType.PPT文档:
-                case FileType.Excel文档:
-                case FileType.PDF文档:
-                case FileType.图像:
-                case FileType.文件:
-                {
-                    if (ConfigManger.Config.lastOpens.ContainsKey(item.OnlyKey))
-                    {
-                        ConfigManger.Config.lastOpens[item.OnlyKey]++;
-                    }
-                    else
-                    {
-                        ConfigManger.Config.lastOpens.Add(item.OnlyKey, 1);
-                    }
-
-                    break;
-                }
-                    ;
-            }
-
-            //if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
-            Search = "";
-            ConfigManger.Save();
-        });
+    private void RunAsAdmin(object searchViewItem)
+    {
+        Search = "";
+        ServiceManager.Services.GetService<ISearchItemTool>()!.RunAsAdmin((SearchViewItem?)searchViewItem);
+    }
 
     [RelayCommand]
     private void Star(SearchViewItem item)
     {
-        Log.Debug("添加/移除收藏" + item.OnlyKey);
-        // var index = Items.IndexOf(item);
-        // Items[index].IsStared = !Items[index].IsStared;
-        // Items.ResetItem(index);
-        item.IsStared = !item.IsStared;
-        // Items.ResetBindings();
-        if (item.OnlyKey is not null)
-        {
-            if (ConfigManger.Config.customCollections.Contains(item.OnlyKey))
-            {
-                ConfigManger.Config.customCollections.Remove(item.OnlyKey);
-            }
-
-            if (item.IsStared) //收藏操作
-            {
-                ServiceManager.Services.GetService<IAppToolService>()!.AppSolverA(_collection, item.OnlyKey, true);
-                ConfigManger.Config.customCollections.Insert(0, item.OnlyKey);
-            }
-            else
-            {
-                var keyValuePairs = _collection.Where(e =>
-                    e.Value.OnlyKey != null && e.Value.OnlyKey.Equals(item.OnlyKey));
-                foreach (var keyValuePair in keyValuePairs)
-                {
-                    _collection.Remove(keyValuePair.Key);
-                }
-            }
-        }
-
-
-        //GetItemsIcon();
-
-        ConfigManger.Save();
+        ServiceManager.Services.GetService<ISearchItemTool>()!.Star(item);
     }
 
     [RelayCommand]
@@ -735,75 +621,14 @@ public partial class SearchWindowViewModel : ObservableRecipient
         var index = Items.IndexOf(item);
         Items[index].IsPined = !Items[index].IsPined;
         //Items.ResetItem(index);
-        if (ConfigManger.Config.alwayShows.Contains(item.OnlyKey))
-        {
-            ConfigManger.Config.alwayShows.Remove(item.OnlyKey);
-        }
 
-        if (item.IsPined) //收藏操作
-        {
-            ConfigManger.Config.alwayShows.Insert(0, item.OnlyKey);
-        }
-
-        ConfigManger.Save();
+        ServiceManager.Services.GetService<ISearchItemTool>()!.Pin(item);
     }
 
     [RelayCommand]
-    private void OpenFolderInTerminal(object searchViewItem) =>
-        Task.Run(() =>
-        {
-            WeakReferenceMessenger.Default.Send("a", "SearchWindowClose");
-            var item = (SearchViewItem)searchViewItem;
-            Log.Debug("打开指定内容在终端中" + item.OnlyKey);
-            var startInfo = new ProcessStartInfo
-            {
-                FileName = @"C:\Windows\System32\cmd.exe"
-            };
-            if (!File.Exists(@"C:\Windows\System32\cmd.exe"))
-            {
-                Log.Debug("64");
-                startInfo.FileName = @"C:\Windows\sysnative\cmd.exe";
-            }
-
-            if (item.FileType == FileType.文件夹)
-            {
-                startInfo.WorkingDirectory = item.OnlyKey;
-            }
-
-            if (item.FileType is FileType.文件 or FileType.Excel文档 or FileType.Word文档 or FileType.PDF文档 or FileType.PPT文档)
-            {
-                startInfo.WorkingDirectory = item.OnlyKey[..item.OnlyKey.LastIndexOf('\\')];
-            }
-
-            Process.Start(startInfo);
-
-            switch (item.FileType)
-            {
-                case FileType.文件夹:
-                case FileType.应用程序:
-                case FileType.Word文档:
-                case FileType.PPT文档:
-                case FileType.Excel文档:
-                case FileType.PDF文档:
-                case FileType.图像:
-                case FileType.文件:
-                {
-                    if (ConfigManger.Config.lastOpens.ContainsKey(item.OnlyKey))
-                    {
-                        ConfigManger.Config.lastOpens[item.OnlyKey]++;
-                    }
-                    else
-                    {
-                        ConfigManger.Config.lastOpens.Add(item.OnlyKey, 1);
-                    }
-
-                    break;
-                }
-                    ;
-            }
-
-            //if (ConfigManger.config.lastOpens.Count > ConfigManger.config.maxHistory) ConfigManger.config.lastOpens.RemoveAt(ConfigManger.config.lastOpens.Count-1);
-            Search = "";
-            ConfigManger.Save();
-        });
+    private void OpenFolderInTerminal(object searchViewItem)
+    {
+        Search = "";
+        ServiceManager.Services.GetService<ISearchItemTool>()!.OpenFolderInTerminal((SearchViewItem?)searchViewItem);
+    }
 }

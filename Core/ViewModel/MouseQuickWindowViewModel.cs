@@ -75,7 +75,7 @@ public partial class MouseQuickWindowViewModel : ObservableRecipient
         }
         else
         {
-            ServiceManager.Services.GetService<ISearchItemTool>()!.OpenSearchItem(searchViewItem);
+            ServiceManager.Services.GetService<ISearchItemTool>()!.OpenFile(searchViewItem);
         }
     }
 

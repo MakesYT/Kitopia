@@ -24,6 +24,7 @@ using Core.ViewModel.Pages;
 using Core.ViewModel.Pages.customScenario;
 using Core.ViewModel.Pages.plugin;
 using Core.ViewModel.TaskEditor;
+using Core.Window;
 using Kitopia.SDKs;
 using Kitopia.Services;
 using KitopiaAvalonia.Pages;
@@ -62,6 +63,61 @@ public partial class App : Application
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    private static IServiceProvider ConfigureServices()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton<IToastService, ToastService>();
+        services.AddTransient<IContentDialog, ContentDialogService>();
+        services.AddTransient<IHotKeyEditor, HotKeyEditorService>();
+        services.AddSingleton<ITaskEditorOpenService, TaskEditorOpenService>();
+        services.AddTransient<IClipboardService, ClipboardService>();
+        services.AddTransient<IThemeChange, ThemeChange>();
+
+        services.AddSingleton<ISearchItemChooseService, SearchItemChooseService>();
+        services.AddSingleton<IMouseQuickWindowService, MouseQuickWindowService>();
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            services.AddTransient<IEverythingService, EverythingService>();
+            services.AddTransient<IAppToolService, AppToolService>();
+            services.AddSingleton<ISearchItemTool, SearchItemTool>();
+        }
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            services.AddTransient<IAppToolService, AppToolLinuxService>();
+        }
+
+        services.AddTransient<TaskEditorViewModel>();
+        services.AddTransient<TaskEditor>(e => new TaskEditor() { DataContext = e.GetService<TaskEditorViewModel>() });
+        services.AddSingleton<MainWindowViewModel>();
+        services.AddSingleton<MainWindow>(e => new MainWindow() { DataContext = e.GetService<MainWindowViewModel>() });
+        services.AddSingleton<SearchWindowViewModel>(e => new SearchWindowViewModel() { IsActive = true });
+        services.AddSingleton<SearchWindow>(e => new SearchWindow()
+            { DataContext = e.GetService<SearchWindowViewModel>() });
+        services.AddTransient<MouseQuickWindowViewModel>();
+        services.AddTransient<MouseQuickWindow>(e => new MouseQuickWindow()
+            { DataContext = e.GetService<MouseQuickWindowViewModel>() });
+        services.AddSingleton<SettingPageViewModel>(e => new SettingPageViewModel() { IsActive = true });
+        services.AddKeyedSingleton<UserControl, SettingPage>("SettingPage",
+            (e, _) => new SettingPage() { DataContext = e.GetService<SettingPageViewModel>() });
+        services.AddSingleton<HomePageViewModel>(e => new HomePageViewModel() { IsActive = true });
+        services.AddKeyedSingleton<UserControl, HomePage>("HomePage",
+            (e, _) => new HomePage() { DataContext = e.GetService<HomePageViewModel>() });
+        services.AddSingleton<CustomScenariosManagerPageViewModel>(e => new CustomScenariosManagerPageViewModel()
+            { IsActive = true });
+        services.AddKeyedSingleton<UserControl, CustomScenariosManagerPage>("CustomScenariosManagerPage",
+            (e, _) => new CustomScenariosManagerPage()
+                { DataContext = e.GetService<CustomScenariosManagerPageViewModel>() });
+        services.AddSingleton<HotKeyManagerPageViewModel>(e => new HotKeyManagerPageViewModel() { });
+        services.AddKeyedSingleton<UserControl, HotKeyManagerPage>("HotKeyManagerPage",
+            (e, _) => new HotKeyManagerPage() { DataContext = e.GetService<HotKeyManagerPageViewModel>() });
+        services.AddSingleton<PluginManagerPageViewModel>(e => new PluginManagerPageViewModel() { IsActive = true });
+        services.AddKeyedSingleton<UserControl, PluginManagerPage>("PluginManagerPage",
+            (e, _) => new PluginManagerPage() { DataContext = e.GetService<PluginManagerPageViewModel>() });
+
+        return services.BuildServiceProvider();
     }
 
     private void OnStartup()
@@ -131,59 +187,6 @@ public partial class App : Application
         ServiceManager.Services.GetService<SearchWindowViewModel>();
     }
 
-    private static IServiceProvider ConfigureServices()
-    {
-        var services = new ServiceCollection();
-        services.AddSingleton<IToastService, ToastService>();
-        services.AddTransient<IContentDialog, ContentDialogService>();
-        services.AddTransient<IHotKeyEditor, HotKeyEditorService>();
-        services.AddSingleton<ITaskEditorOpenService, TaskEditorOpenService>();
-        services.AddTransient<IClipboardService, ClipboardService>();
-        services.AddTransient<IThemeChange, ThemeChange>();
-        services.AddSingleton<ISearchItemTool, SearchItemTool>();
-        services.AddSingleton<ISearchItemChooseService, SearchItemChooseService>();
-        services.AddSingleton<IMouseQuickWindowService, MouseQuickWindowService>();
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            services.AddTransient<IEverythingService, EverythingService>();
-            services.AddTransient<IAppToolService, AppToolService>();
-        }
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-        {
-            
-            services.AddTransient<IAppToolService, AppToolLinuxService>();
-        }
-
-        services.AddTransient<TaskEditorViewModel>();
-        services.AddTransient<TaskEditor>(e => new TaskEditor() { DataContext = e.GetService<TaskEditorViewModel>() });
-        services.AddSingleton<MainWindowViewModel>();
-        services.AddSingleton<MainWindow>(e => new MainWindow() { DataContext = e.GetService<MainWindowViewModel>() });
-        services.AddSingleton<SearchWindowViewModel>(e => new SearchWindowViewModel() { IsActive = true });
-        services.AddSingleton<SearchWindow>(e => new SearchWindow()
-            { DataContext = e.GetService<SearchWindowViewModel>() });
-        services.AddTransient<MouseQuickWindowViewModel>();
-        services.AddTransient<MouseQuickWindow>(e => new MouseQuickWindow()
-            { DataContext = e.GetService<MouseQuickWindowViewModel>() });
-        services.AddSingleton<SettingPageViewModel>(e => new SettingPageViewModel() { IsActive = true });
-        services.AddKeyedSingleton<UserControl, SettingPage>("SettingPage",
-            (e, _) => new SettingPage() { DataContext = e.GetService<SettingPageViewModel>() });
-        services.AddSingleton<HomePageViewModel>(e => new HomePageViewModel() { IsActive = true });
-        services.AddKeyedSingleton<UserControl, HomePage>("HomePage",
-            (e, _) => new HomePage() { DataContext = e.GetService<HomePageViewModel>() });
-        services.AddSingleton<CustomScenariosManagerPageViewModel>(e => new CustomScenariosManagerPageViewModel()
-            { IsActive = true });
-        services.AddKeyedSingleton<UserControl, CustomScenariosManagerPage>("CustomScenariosManagerPage",
-            (e, _) => new CustomScenariosManagerPage()
-                { DataContext = e.GetService<CustomScenariosManagerPageViewModel>() });
-        services.AddSingleton<HotKeyManagerPageViewModel>(e => new HotKeyManagerPageViewModel() { });
-        services.AddKeyedSingleton<UserControl, HotKeyManagerPage>("HotKeyManagerPage",
-            (e, _) => new HotKeyManagerPage() { DataContext = e.GetService<HotKeyManagerPageViewModel>() });
-        services.AddSingleton<PluginManagerPageViewModel>(e => new PluginManagerPageViewModel() { IsActive = true });
-        services.AddKeyedSingleton<UserControl, PluginManagerPage>("PluginManagerPage",
-            (e, _) => new PluginManagerPage() { DataContext = e.GetService<PluginManagerPageViewModel>() });
-
-        return services.BuildServiceProvider();
-    }
 
     private static void CheckAndDeleteLogFiles()
     {
