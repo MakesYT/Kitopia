@@ -112,8 +112,7 @@ public class HotKeyManager
 
                                     ServiceManager.Services.GetService<SearchWindow>()!.Show();
 
-                                    User32.SetForegroundWindow(ServiceManager.Services.GetService<SearchWindow>()
-                                        .TryGetPlatformHandle().Handle);
+                                    ServiceManager.Services.GetService<SearchWindow>()!.Focus();
                                     ServiceManager.Services.GetService<SearchWindow>()!.tx.Focus();
                                     ServiceManager.Services.GetService<SearchWindow>()!.tx.SelectAll();
                                     Task.Run(() =>
