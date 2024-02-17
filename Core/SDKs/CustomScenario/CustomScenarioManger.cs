@@ -184,7 +184,7 @@ public static class CustomScenarioManger
             }
         }
 
-        var configF = new FileInfo(AppDomain.CurrentDomain.BaseDirectory + $"customScenarios\\{scenario.UUID}.json");
+        var configF = new FileInfo(AppDomain.CurrentDomain.BaseDirectory + $"customScenarios{Path.DirectorySeparatorChar}{scenario.UUID}.json");
 
         var setting = new JsonSerializerSettings();
         setting.PreserveReferencesHandling = PreserveReferencesHandling.Objects;
@@ -226,7 +226,7 @@ public static class CustomScenarioManger
         ConfigManger.Save();
         if (deleteFile)
         {
-            File.Delete($"{AppDomain.CurrentDomain.BaseDirectory}customScenarios\\{scenario.UUID}.json");
+            File.Delete($"{AppDomain.CurrentDomain.BaseDirectory}customScenarios{Path.DirectorySeparatorChar}{scenario.UUID}.json");
         }
 
         scenario.Dispose();
@@ -249,7 +249,8 @@ public static class CustomScenarioManger
     public static void Reload(CustomScenario scenario)
     {
         Remove(scenario, false);
-        var configF = new FileInfo(AppDomain.CurrentDomain.BaseDirectory + $"customScenarios\\{scenario.UUID}.json");
+        var configF = new FileInfo(
+            $"{AppDomain.CurrentDomain.BaseDirectory}customScenarios{Path.DirectorySeparatorChar}{scenario.UUID}.json");
         if (configF.Exists)
         {
             Load(configF);
@@ -282,8 +283,8 @@ public static class CustomScenarioManger
             }
 
             Remove(customScenario, false);
-            var configF = new FileInfo(AppDomain.CurrentDomain.BaseDirectory +
-                                       $"customScenarios\\{customScenario.UUID}.json");
+            var configF = new FileInfo(
+                $"{AppDomain.CurrentDomain.BaseDirectory}customScenarios{Path.DirectorySeparatorChar}{customScenario.UUID}.json");
             if (configF.Exists)
             {
                 Load(configF);

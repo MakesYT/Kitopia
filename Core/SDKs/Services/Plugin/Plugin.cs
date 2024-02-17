@@ -27,7 +27,7 @@ public class Plugin
 
     public Plugin(string path)
     {
-        _plugin = new AssemblyLoadContextH(path, path.Split("\\").Last() + "_plugin");
+        _plugin = new AssemblyLoadContextH(path, path.Split(Path.DirectorySeparatorChar).Last() + "_plugin");
         Log.Debug($"加载插件:{path}");
         var t = _dll.GetExportedTypes();
         Dictionary<string, (MethodInfo, object)> methodInfos = new();
@@ -311,8 +311,8 @@ public class Plugin
     public void Unload(out WeakReference weakReference)
     {
         Log.Debug($"卸载插件:{PluginInfo.ToPlgString()}");
-        var config1 = new FileInfo(AppDomain.CurrentDomain.BaseDirectory +
-                                   $"configs\\{PluginInfo.ToPlgString()}.json");
+        var config1 = new FileInfo(
+            $"{AppDomain.CurrentDomain.BaseDirectory}configs{Path.DirectorySeparatorChar}{PluginInfo.ToPlgString()}.json");
 
         File.WriteAllText(config1.FullName,
             JsonConvert.SerializeObject(GetConfigJObject(), Formatting.Indented));

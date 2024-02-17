@@ -16,12 +16,12 @@ public class ConfigManger
 
     public static void Init()
     {
-        if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "configs"))
+        if (!Directory.Exists($"{AppDomain.CurrentDomain.BaseDirectory}configs"))
         {
-            Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + "configs");
+            Directory.CreateDirectory($"{AppDomain.CurrentDomain.BaseDirectory}configs");
         }
 
-        var configF = new FileInfo(AppDomain.CurrentDomain.BaseDirectory + "configs\\config.json");
+        var configF = new FileInfo($"{AppDomain.CurrentDomain.BaseDirectory}configs{Path.DirectorySeparatorChar}config.json");
         if (!configF.Exists)
         {
             var j = JsonConvert.SerializeObject(new Config(), Formatting.Indented);
@@ -44,14 +44,15 @@ public class ConfigManger
 
     public static void Save()
     {
-        var configF = new FileInfo(AppDomain.CurrentDomain.BaseDirectory + "configs\\config.json");
+        var configF = new FileInfo(
+            $"{AppDomain.CurrentDomain.BaseDirectory}configs{Path.DirectorySeparatorChar}config.json");
 
         File.WriteAllText(configF.FullName, JsonConvert.SerializeObject(Config, Formatting.Indented));
         foreach (var dConfig in PluginManager.EnablePlugin)
         {
             {
-                var config1 = new FileInfo(AppDomain.CurrentDomain.BaseDirectory +
-                                           $"configs\\{dConfig.Value.PluginInfo.Author}_{dConfig.Value.PluginInfo.PluginId}.json");
+                var config1 = new FileInfo(
+                    $"{AppDomain.CurrentDomain.BaseDirectory}configs{Path.DirectorySeparatorChar}{dConfig.Value.PluginInfo.Author}_{dConfig.Value.PluginInfo.PluginId}.json");
 
                 File.WriteAllText(config1.FullName,
                     JsonConvert.SerializeObject(dConfig.Value.GetConfigJObject(), Formatting.Indented));

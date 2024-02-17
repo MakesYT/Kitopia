@@ -200,7 +200,7 @@ internal class IconTools
             }
             case "msc":
             {
-                cacheKey = path.Split("\\").Last();
+                cacheKey = path.Split(Path.DirectorySeparatorChar).Last();
                 break;
             }
             default:

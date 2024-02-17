@@ -51,9 +51,7 @@ public partial class SearchWindow : Window
 
     private void w_Activated(object sender, EventArgs e)
     {
-        var hwnd = TryGetPlatformHandle().Handle;
-        User32.SetForegroundWindow(hwnd);
-        User32.SetFocus(hwnd);
+        this.Focus();
     }
 
     private void Button_PreviewKeyDown(object sender, KeyEventArgs e)

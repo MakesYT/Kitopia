@@ -48,19 +48,21 @@ internal partial class AppTools
                 if (!isRun)
                 {
                     var 程序名称 = "noUAC.Everything";
-                    if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + "noUAC\\" + 程序名称 + ".lnk"))
+                    if (!File.Exists(
+                            $"{AppDomain.CurrentDomain.BaseDirectory}noUAC{Path.DirectorySeparatorChar}{程序名称}.lnk"))
                     {
                         var dialog = new DialogContent()
                         {
                             Title = $"Kitopia提示",
                             Content =
-                                $"Kitopia即将使用任务计划来创建绕过UAC启动Everything的快捷方式\n需要确认UAC权限\n按下取消则关闭自动启动功能\n路径:{AppDomain.CurrentDomain.BaseDirectory}noUAC\\{程序名称}.lnk",
+                                $"Kitopia即将使用任务计划来创建绕过UAC启动Everything的快捷方式\n需要确认UAC权限\n按下取消则关闭自动启动功能\n路径:{AppDomain.CurrentDomain.BaseDirectory}noUAC{Path.DirectorySeparatorChar}{程序名称}.lnk",
                             PrimaryButtonText = "确定",
                             CloseButtonText = "取消",
                             PrimaryAction = () =>
                             {
                                 Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + "noUAC");
-                                var TempFileName = AppDomain.CurrentDomain.BaseDirectory + "noUAC\\" + 程序名称 + ".xml";
+                                var TempFileName =
+                                    $"{AppDomain.CurrentDomain.BaseDirectory}noUAC{Path.DirectorySeparatorChar}{程序名称}.xml";
                                 var XML_Text =
                                     $"<?xml version=\"1.0\" encoding=\"UTF-16\"?>\n<Task version=\"1.2\" xmlns=\"http://schemas.microsoft.com/windows/2004/02/mit/task\">\n  <Triggers />\n  <Principals>\n    <Principal id=\"Author\">\n      <LogonType>InteractiveToken</LogonType>\n      <RunLevel>HighestAvailable</RunLevel>\n    </Principal>\n  </Principals>\n  <Settings>\n    <MultipleInstancesPolicy>Parallel</MultipleInstancesPolicy>\n    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>\n    <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>\n    <AllowHardTerminate>false</AllowHardTerminate>\n    <StartWhenAvailable>false</StartWhenAvailable>\n    <RunOnlyIfNetworkAvailable>false</RunOnlyIfNetworkAvailable>\n    <IdleSettings>\n      <StopOnIdleEnd>false</StopOnIdleEnd>\n      <RestartOnIdle>false</RestartOnIdle>\n    </IdleSettings>\n    <AllowStartOnDemand>true</AllowStartOnDemand>\n    <Enabled>true</Enabled>\n    <Hidden>false</Hidden>\n    <RunOnlyIfIdle>false</RunOnlyIfIdle>\n    <WakeToRun>false</WakeToRun>\n    <ExecutionTimeLimit>PT0S</ExecutionTimeLimit>\n    <Priority>7</Priority>\n  </Settings>\n  <Actions Context=\"Author\">\n    <Exec>{Environment.NewLine}      <Command>\"{searchViewItem.OnlyKey}\"</Command>{Environment.NewLine}      <Arguments>-startup</Arguments>{Environment.NewLine}    </Exec>\n  </Actions>\n</Task>";
                                 File.WriteAllText(TempFileName, XML_Text, Encoding.Unicode);
@@ -83,7 +85,7 @@ internal partial class AppTools
                                 File.Delete(TempFileName);
                                 log.Debug("创建Everything的noUAC任务计划完成");
                                 Shell32.ShellExecute(IntPtr.Zero, "open",
-                                    $"{AppDomain.CurrentDomain.BaseDirectory}noUAC\\{程序名称}.lnk", "", "",
+                                    $"{AppDomain.CurrentDomain.BaseDirectory}noUAC{Path.DirectorySeparatorChar}{程序名称}.lnk", "", "",
                                     ShowWindowCommand.SW_HIDE);
                                 action.Invoke();
                             },
@@ -102,7 +104,7 @@ internal partial class AppTools
 
                     {
                         Shell32.ShellExecute(IntPtr.Zero, "open",
-                            $"{AppDomain.CurrentDomain.BaseDirectory}noUAC\\{程序名称}.lnk", "", "",
+                            $"{AppDomain.CurrentDomain.BaseDirectory}noUAC{Path.DirectorySeparatorChar}{程序名称}.lnk", "", "",
                             ShowWindowCommand.SW_HIDE);
                     }
                 }
@@ -520,11 +522,11 @@ internal partial class AppTools
             if (Directory.Exists(file))
             {
                 var keys = new List<string>();
-                await NameSolver(keys, file.Split("\\").Last());
+                await NameSolver(keys, file.Split(Path.DirectorySeparatorChar).Last());
 
                 collection.TryAdd(file, new SearchViewItem()
                 {
-                    ItemDisplayName = file.Split("\\").Last(),
+                    ItemDisplayName = file.Split(Path.DirectorySeparatorChar).Last(),
                     FileType = FileType.文件夹,
                     IsStared = star,
                     OnlyKey = file,

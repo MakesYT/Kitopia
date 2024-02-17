@@ -22,22 +22,37 @@ public class ClipboardService : IClipboardService
 
     public bool IsBitmap()
     {
-        var strings = ServiceManager.Services.GetService<MainWindow>().Clipboard.GetFormatsAsync().Result;
-        if (strings is null)
+        try
+        {
+            var strings = ServiceManager.Services.GetService<MainWindow>().Clipboard.GetFormatsAsync().WaitAsync(TimeSpan.FromSeconds(1)).GetAwaiter().GetResult();
+            if (strings is null)
+            {
+                return false;
+            }
+            return strings.Contains("Unknown_Format_8");
+        }
+        catch (Exception e)
         {
             return false;
         }
-        return strings.Contains("Unknown_Format_8");
     }
 
     public bool IsText()
     {
-        var strings = ServiceManager.Services.GetService<MainWindow>().Clipboard.GetFormatsAsync().Result;
-        if (strings is null)
+        var mainWindow = ServiceManager.Services.GetService<MainWindow>();
+        try
+        {
+            var strings = mainWindow.Clipboard.GetFormatsAsync().WaitAsync(TimeSpan.FromSeconds(1)).GetAwaiter().GetResult();
+            if (strings is null)
+            {
+                return false;
+            }
+            return strings.Contains("Text");
+        }
+        catch (Exception e)
         {
             return false;
         }
-        return strings.Contains("Text");
     }
 
     public Bitmap? GetBitmap()

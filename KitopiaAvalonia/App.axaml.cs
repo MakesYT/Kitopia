@@ -184,7 +184,7 @@ public partial class App : Application
             SetAutoStartup();
         }
 
-        ServiceManager.Services.GetService<SearchWindowViewModel>();
+       
     }
 
 

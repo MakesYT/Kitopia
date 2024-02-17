@@ -2,6 +2,7 @@
 
 using System;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using Avalonia.Data.Converters;
 using PluginCore;
@@ -25,8 +26,8 @@ public class SearchItemToInfo : IValueConverter
         {
             case FileType.文件夹:
                 info.Append("名称:");
-                info.AppendLine(item.OnlyKey.Substring(item.OnlyKey.LastIndexOf('\\') + 1,
-                    item.OnlyKey.Length - item.OnlyKey.LastIndexOf('\\') - 1));
+                info.AppendLine(item.OnlyKey.Substring(item.OnlyKey.LastIndexOf(Path.DirectorySeparatorChar) + 1,
+                    item.OnlyKey.Length - item.OnlyKey.LastIndexOf(Path.DirectorySeparatorChar) - 1));
                 info.Append("位置:");
                 info.Append(item.OnlyKey);
                 break;
@@ -50,8 +51,8 @@ public class SearchItemToInfo : IValueConverter
             case FileType.文件:
             {
                 info.Append("名称:");
-                info.AppendLine(item.OnlyKey.Substring(item.OnlyKey.LastIndexOf('\\') + 1,
-                    item.OnlyKey.Length - item.OnlyKey.LastIndexOf('\\') - 1));
+                info.AppendLine(item.OnlyKey.Substring(item.OnlyKey.LastIndexOf(Path.DirectorySeparatorChar) + 1,
+                    item.OnlyKey.Length - item.OnlyKey.LastIndexOf(Path.DirectorySeparatorChar) - 1));
                 info.Append("位置:");
                 info.Append(item.OnlyKey);
                 break;

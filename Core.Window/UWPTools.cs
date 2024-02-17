@@ -88,13 +88,13 @@ internal static class UwpTools
         List<string> keys = new();
         await AppTools.NameSolver(keys, fileName);
         var xmlDocument = new XmlDocument();
-        if (File.Exists($"{appContainer.workingDirectory}\\AppxManifest.xml"))
+        if (File.Exists($"{appContainer.workingDirectory}{Path.DirectorySeparatorChar}AppxManifest.xml"))
         {
-            xmlDocument.Load($"{appContainer.workingDirectory}\\AppxManifest.xml");
+            xmlDocument.Load($"{appContainer.workingDirectory}{Path.DirectorySeparatorChar}AppxManifest.xml");
         }
-        else if (File.Exists($"{appContainer.workingDirectory}\\appxmanifest.xml"))
+        else if (File.Exists($"{appContainer.workingDirectory}{Path.DirectorySeparatorChar}appxmanifest.xml"))
         {
-            xmlDocument.Load($"{appContainer.workingDirectory}\\appxmanifest.xml");
+            xmlDocument.Load($"{appContainer.workingDirectory}{Path.DirectorySeparatorChar}appxmanifest.xml");
         }
         else
         {
@@ -144,8 +144,8 @@ internal static class UwpTools
         }
 
         var squareLogo = visualElementsAttribute.Value;
-        var logoName = squareLogo.Split("\\").Last().Split(".").First();
-        var path = $"{appContainer.workingDirectory}{squareLogo.Split("\\").First()}";
+        var logoName = squareLogo.Split(Path.DirectorySeparatorChar).Last().Split(".").First();
+        var path = $"{appContainer.workingDirectory}{squareLogo.Split(Path.DirectorySeparatorChar).First()}";
         if (!Directory.Exists(path))
         {
             return;
@@ -153,7 +153,7 @@ internal static class UwpTools
 
         var logos =
             new DirectoryInfo(path);
-        var pa = $"{path}\\{logoName}.scale-200.png";
+        var pa = $"{path}{Path.DirectorySeparatorChar}{logoName}.scale-200.png";
         if (File.Exists(pa))
         {
             var searchViewItem = new SearchViewItem()

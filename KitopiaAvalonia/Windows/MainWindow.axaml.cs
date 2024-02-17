@@ -12,6 +12,7 @@ using Avalonia.Media;
 using Avalonia.Styling;
 using Core.SDKs.HotKey;
 using Core.SDKs.Services;
+using Core.ViewModel;
 using FluentAvalonia.UI.Controls;
 using FluentAvalonia.UI.Navigation;
 using FluentAvalonia.UI.Windowing;
@@ -94,6 +95,7 @@ public partial class MainWindow : AppWindow
         {
             TitleBarHost.ColumnDefinitions[3].Width = new GridLength(aw.TitleBar.RightInset, GridUnitType.Pixel);
         }
+        
     }
 
     private void Window_OnClosing(object? sender, WindowClosingEventArgs e)
@@ -112,6 +114,11 @@ public partial class MainWindow : AppWindow
         base.OnAttachedToLogicalTree(e);
     }
 
+    protected override void OnOpened(EventArgs e)
+    {
+        base.OnOpened(e);
+        //ServiceManager.Services.GetService<SearchWindowViewModel>();
+    }
 
     private void FrameView_OnNavigated(object sender, NavigationEventArgs e)
     {
