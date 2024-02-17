@@ -1,8 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Controls;
@@ -10,17 +7,13 @@ using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.Styling;
-using Core.SDKs.HotKey;
 using Core.SDKs.Services;
-using Core.ViewModel;
 using FluentAvalonia.UI.Controls;
 using FluentAvalonia.UI.Navigation;
 using FluentAvalonia.UI.Windowing;
-using Kitopia.SDKs;
 using KitopiaAvalonia.Pages;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
-using Vanara.PInvoke;
 
 namespace KitopiaAvalonia;
 
@@ -42,6 +35,7 @@ public class NavigationPageFactory : INavigationPageFactory
 public partial class MainWindow : AppWindow
 {
     private static readonly ILog log = LogManager.GetLogger(nameof(MainWindow));
+
     public MainWindow()
     {
         InitializeComponent();
@@ -95,7 +89,6 @@ public partial class MainWindow : AppWindow
         {
             TitleBarHost.ColumnDefinitions[3].Width = new GridLength(aw.TitleBar.RightInset, GridUnitType.Pixel);
         }
-        
     }
 
     private void Window_OnClosing(object? sender, WindowClosingEventArgs e)
@@ -117,7 +110,7 @@ public partial class MainWindow : AppWindow
     protected override void OnOpened(EventArgs e)
     {
         base.OnOpened(e);
-        //ServiceManager.Services.GetService<SearchWindowViewModel>();
+        //
     }
 
     private void FrameView_OnNavigated(object sender, NavigationEventArgs e)

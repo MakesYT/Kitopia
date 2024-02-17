@@ -2,15 +2,11 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using Avalonia.Threading;
 using Core.Linux;
 using Core.SDKs;
 using Core.SDKs.CustomScenario;
@@ -25,17 +21,14 @@ using Core.ViewModel.Pages.customScenario;
 using Core.ViewModel.Pages.plugin;
 using Core.ViewModel.TaskEditor;
 using Core.Window;
-using Kitopia.SDKs;
 using Kitopia.Services;
 using KitopiaAvalonia.Pages;
 using KitopiaAvalonia.Services;
 using KitopiaAvalonia.Windows;
 using log4net;
-using log4net.Config;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using PluginCore;
-using SharpHook.Reactive;
 
 namespace KitopiaAvalonia;
 
@@ -184,7 +177,7 @@ public partial class App : Application
             SetAutoStartup();
         }
 
-       
+        ServiceManager.Services.GetService<SearchWindowViewModel>();
     }
 
 
