@@ -21,7 +21,8 @@ public class ConfigManger
             Directory.CreateDirectory($"{AppDomain.CurrentDomain.BaseDirectory}configs");
         }
 
-        var configF = new FileInfo($"{AppDomain.CurrentDomain.BaseDirectory}configs{Path.DirectorySeparatorChar}config.json");
+        var configF =
+            new FileInfo($"{AppDomain.CurrentDomain.BaseDirectory}configs{Path.DirectorySeparatorChar}config.json");
         if (!configF.Exists)
         {
             var j = JsonConvert.SerializeObject(new Config(), Formatting.Indented);
@@ -59,6 +60,6 @@ public class ConfigManger
             }
         }
 
-        WeakReferenceMessenger.Default.Send("ConfigSave", "ConfigSave");
+        WeakReferenceMessenger.Default.Send<string, string>("ConfigSave", "ConfigSave");
     }
 }

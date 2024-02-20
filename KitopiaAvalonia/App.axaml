@@ -5,6 +5,7 @@
              xmlns:converter="clr-namespace:Kitopia.Converter"
              x:Class="KitopiaAvalonia.App"
              x:DataType="viewModel:AppViewModel"
+              
              RequestedThemeVariant="Default">
     <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
     <Application.Resources>
@@ -27,6 +28,7 @@
         <StyleInclude Source="Controls/PinButton.axaml" />
         <StyleInclude Source="avares://NodifyM.Avalonia/Styles/ControlStyles.axaml" />
     </Application.Styles>
+    
     <TrayIcon.Icons>
         <TrayIcons>
             <TrayIcon ToolTipText="KitopiaAvalonia" Icon="/Assets/icon.png" Command="{Binding OpenMainWindowCommand}">

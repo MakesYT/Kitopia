@@ -14,6 +14,8 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
         <SatelliteResourceLanguages>none</SatelliteResourceLanguages>
+        <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
+
     </PropertyGroup>
     <ItemGroup>
         <AvaloniaResource Include="Assets\FluentSystemIcons-Filled.ttf"/>
@@ -57,9 +59,6 @@
             <SubType>Code</SubType>
             <DependentUpon>HotKeyManagerPage.xaml</DependentUpon>
         </Compile>
-    </ItemGroup>
-    <ItemGroup>
-        <Folder Include="Tools\"/>
     </ItemGroup>
 
 </Project>

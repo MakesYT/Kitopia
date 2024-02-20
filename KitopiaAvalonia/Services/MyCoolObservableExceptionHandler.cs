@@ -13,8 +13,6 @@ public class MyCoolObservableExceptionHandler : IObserver<Exception>
 
     public void OnNext(Exception value)
     {
-        Program.cts.Cancel();
-        Program.cts.Dispose();
         if (Debugger.IsAttached) Debugger.Break();
         Log.Error(value);
         new ErrorDialog(null, value.ToString()).Show();
@@ -26,8 +24,6 @@ public class MyCoolObservableExceptionHandler : IObserver<Exception>
 
     public void OnError(Exception error)
     {
-        Program.cts.Cancel();
-        Program.cts.Dispose();
         if (Debugger.IsAttached) Debugger.Break();
         Log.Error(error);
         new ErrorDialog(null, error.ToString()).Show();
@@ -39,8 +35,6 @@ public class MyCoolObservableExceptionHandler : IObserver<Exception>
 
     public void OnCompleted()
     {
-        Program.cts.Cancel();
-        Program.cts.Dispose();
         if (Debugger.IsAttached) Debugger.Break();
         RxApp.MainThreadScheduler.Schedule(() =>
         {

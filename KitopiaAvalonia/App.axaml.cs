@@ -29,6 +29,7 @@ using log4net;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using PluginCore;
+using HotKeyManager = KitopiaAvalonia.SDKs.HotKeyManager;
 
 namespace KitopiaAvalonia;
 
@@ -165,8 +166,7 @@ public partial class App : Application
 
         log.Info("主题初始化完成");
         log.Debug("注册热键");
-        Core.SDKs.HotKey.HotKeyManager.Init();
-        // ServiceManager.Services.GetService<MainWindow>().InitHook();
+        HotKeyManager.Init();
 
 
         ServicePointManager.DefaultConnectionLimit = 10240;

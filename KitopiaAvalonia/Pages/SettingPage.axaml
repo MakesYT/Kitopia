@@ -45,10 +45,27 @@
                                </controls:SettingsExpander.IconSource>
                                
                            </controls:SettingsExpander>
-                           
+                           <controls:SettingsExpander Header="截图快捷键" Description="修改截图快捷键">
+                               <controls:SettingsExpander.Footer>
+                                   <controls1:HotKeyShow>
+                                       <controls1:HotKeyShow.HotKeySignName>
+                                           <MultiBinding Converter="{StaticResource HotKeySignNameToolCTr}">
+                                               <MultiBinding.Bindings>
+                                                   <Binding Source="Kitopia" />
+                                                   <Binding Source="截图" />
+                                               </MultiBinding.Bindings>
+                                           </MultiBinding>
+                                       </controls1:HotKeyShow.HotKeySignName>
+                                   </controls1:HotKeyShow>
+                               </controls:SettingsExpander.Footer>
+                               <controls:SettingsExpander.IconSource>
+                                   <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xF4B8;"  />
+                               </controls:SettingsExpander.IconSource>
+                           </controls:SettingsExpander>
                        </StackPanel>
                    </Expander.Content>
                </Expander>
+           
                <Expander IsExpanded="True">
                    <Expander.Header>
                        <TextBlock FontSize="16" Text="鼠标快捷菜单" />

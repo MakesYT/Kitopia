@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Threading;
@@ -17,10 +15,9 @@ using PluginCore;
 using SharpHook;
 using SharpHook.Native;
 using SharpHook.Reactive;
-using Vanara.PInvoke;
 using Timer = System.Timers.Timer;
 
-namespace Core.SDKs.HotKey;
+namespace KitopiaAvalonia.SDKs;
 
 public class HotKeyManager
 {
@@ -32,10 +29,11 @@ public class HotKeyManager
     private static readonly ILog log = LogManager.GetLogger(nameof(HotKeyManager));
     private static Timer keyPressTimer = new(1000);
     private static bool canPress = true;
+    public static SimpleReactiveGlobalHook hook;
 
     public static void Init()
     {
-        var hook = new SimpleReactiveGlobalHook();
+        hook = new SimpleReactiveGlobalHook();
 
         hook.KeyPressed.Subscribe(OnKeyPressed);
         hook.KeyReleased.Subscribe(OnKeyReleased);
@@ -97,6 +95,15 @@ public class HotKeyManager
                 {
                     switch (configHotKey.Name)
                     {
+                        case "截图":
+                        {
+                            log.Debug("截图热键被触发");
+                            Dispatcher.UIThread.InvokeAsync(() =>
+                            {
+                                KitopiaAvalonia.Tools.ScreenCapture.StartUserManualCapture();
+                            });
+                            break;
+                        }
                         case "显示搜索框":
                         {
                             log.Debug("显示搜索框热键被触发");
