@@ -30,7 +30,6 @@ public class ScreenCapture
                     IsVisible = true,
                 };
                 window.Image.Source = captureAllScreen.Count > 0 ? captureAllScreen.Dequeue() : null;
-                window.Image.OpacityMask = new SolidColorBrush(Colors.Black, 0.7d);
                 window.Show();
             }
         }

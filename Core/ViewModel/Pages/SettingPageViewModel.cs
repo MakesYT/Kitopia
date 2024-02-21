@@ -45,6 +45,7 @@ public partial class SettingPageViewModel : ObservableRecipient
     [ObservableProperty] private ObservableCollection<string> _themeChoiceOptions = new() { "跟随系统", "深色", "浅色" };
     [ObservableProperty] private bool _useEverything;
 
+    [ObservableProperty] private bool _截图直接复制到剪贴板;
     public SettingPageViewModel()
     {
         WeakReferenceMessenger.Default.Register<string, string>(this, "ConfigSave", (s, o) =>
@@ -59,6 +60,7 @@ public partial class SettingPageViewModel : ObservableRecipient
             InputSmoothingMilliseconds = ConfigManger.Config.inputSmoothingMilliseconds;
             MouseKey = ConfigManger.Config.mouseKey;
             MouseKeyInverval = ConfigManger.Config.mouseKeyInverval;
+            截图直接复制到剪贴板=ConfigManger.Config.截图直接复制到剪贴板;
         });
         _themeChoice = ConfigManger.Config.themeChoice;
         _autoStart = ConfigManger.Config.autoStart;
@@ -70,6 +72,7 @@ public partial class SettingPageViewModel : ObservableRecipient
         _inputSmoothingMilliseconds = ConfigManger.Config.inputSmoothingMilliseconds;
         _mouseKey = ConfigManger.Config.mouseKey;
         _mouseKeyInverval = ConfigManger.Config.mouseKeyInverval;
+        _截图直接复制到剪贴板=ConfigManger.Config.截图直接复制到剪贴板;
         _isInitializin = false;
     }
 
@@ -116,9 +119,6 @@ public partial class SettingPageViewModel : ObservableRecipient
         ConfigManger.Config.themeChoice = value;
         ConfigManger.Save();
     }
-
-    [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
-    public static extern IntPtr GetForegroundWindow();
 
     [RelayCommand]
     private async Task DelKey(string key) =>

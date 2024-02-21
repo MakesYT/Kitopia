@@ -28,7 +28,8 @@ public record Config
 
     public Dictionary<string, int> lastOpens = new();
     public int maxHistory = 4;
-
+    //截图
+    public bool 截图直接复制到剪贴板 = true;
 
     //鼠标快捷键
     public MouseHookType mouseKey = MouseHookType.鼠标侧键2;
@@ -51,6 +52,12 @@ public record Config
             MainName = "Kitopia", Name = "显示搜索框", IsUsable = true, IsSelectCtrl = false, IsSelectAlt = true,
             IsSelectWin = false,
             IsSelectShift = false, SelectKey = EKey.空格
+        },
+        new HotKeyModel
+        {
+            MainName = "Kitopia", Name = "截图", IsUsable = true, IsSelectCtrl = true, IsSelectAlt = true,
+            IsSelectWin = false,
+            IsSelectShift = false, SelectKey = EKey.Q
         }
     };
 

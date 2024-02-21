@@ -29,6 +29,7 @@ public class ClipboardService : IClipboardService
             {
                 return false;
             }
+            
             return strings.Contains("Unknown_Format_8");
         }
         catch (Exception e)

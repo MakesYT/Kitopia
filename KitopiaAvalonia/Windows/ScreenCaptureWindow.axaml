@@ -3,9 +3,25 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="KitopiaAvalonia.Windows.ScreenCaptureWindow"
+        x:Class="KitopiaAvalonia.Windows.ScreenCaptureWindow" Cursor="SizeAll"
         Title="ScreenCaptureWindow">
-    <DockPanel>
+    <Canvas>
         <Image Name="Image" />
-    </DockPanel>
+        <Rectangle ZIndex="1" Name="Rectangle" Width="{Binding $parent[Window].Bounds.Width}" Height="{Binding $parent[Window].Bounds.Height}"  >
+            <Rectangle.Fill>
+                <SolidColorBrush Color="Black" Opacity="0.5"></SolidColorBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+        <Rectangle ZIndex="2" Name="SelectBox" 
+                   PointerEntered="SelectBox_OnPointerEntered" PointerExited="SelectBox_OnPointerExited" 
+                   PointerPressed="SelectBox_OnPointerPressed" PointerMoved="SelectBox_OnPointerMoved"
+                   PointerReleased="SelectBox_OnPointerReleased">
+            <Rectangle.Fill>
+                    <SolidColorBrush Color="WhiteSmoke" Opacity="0.01"></SolidColorBrush>
+                </Rectangle.Fill>
+        </Rectangle>
+        <Line ZIndex="2" Name="X" Fill="WhiteSmoke" Stroke="WhiteSmoke"  StrokeThickness="1.5" IsVisible="False"></Line>
+        <Line ZIndex="2" Name="Y" Fill="WhiteSmoke" Stroke="WhiteSmoke"  StrokeThickness="1.5" IsVisible="False"></Line>
+        
+    </Canvas>
 </Window>

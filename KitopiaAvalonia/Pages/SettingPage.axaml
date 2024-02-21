@@ -62,6 +62,15 @@
                                    <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xF4B8;"  />
                                </controls:SettingsExpander.IconSource>
                            </controls:SettingsExpander>
+                           <controls:SettingsExpander Header="截图直接复制到剪贴板" Description="截图直接复制到剪贴板,不显示工具栏">
+                               <controls:SettingsExpander.Footer>
+                                   <ToggleSwitch IsChecked="{Binding AutoStart}" FlowDirection="RightToLeft" OffContent="关" OnContent="开"/>
+                               </controls:SettingsExpander.Footer>
+                               <controls:SettingsExpander.IconSource>
+                                   <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xE61C;"  />
+                               </controls:SettingsExpander.IconSource>
+                               
+                           </controls:SettingsExpander>
                        </StackPanel>
                    </Expander.Content>
                </Expander>

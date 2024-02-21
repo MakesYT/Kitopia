@@ -2,20 +2,13 @@
   "solution": {
     "path": "Kitopia.sln",
     "projects": [
-      "..\\ScreenCapture.NET\\ScreenCapture.NET.DX11\\ScreenCapture.NET.DX11.csproj",
-      "..\\ScreenCapture.NET\\ScreenCapture.NET\\ScreenCapture.NET.csproj",
       "Core.Linux\\Core.Linux.csproj",
       "Core.Window\\Core.Window.csproj",
       "Core\\Core.csproj",
-      "DesktopNotifications\\DesktopNotifications.Avalonia\\DesktopNotifications.Avalonia.csproj",
-      "DesktopNotifications\\DesktopNotifications.FreeDesktop\\DesktopNotifications.FreeDesktop.csproj",
-      "DesktopNotifications\\DesktopNotifications.Windows\\DesktopNotifications.Windows.csproj",
-      "DesktopNotifications\\DesktopNotifications\\DesktopNotifications.csproj",
       "KitopiaAvalonia\\KitopiaAvalonia.csproj",
       "KitopiaEx\\KitopiaEx.csproj",
       "KitopiaWeb\\kitopiaweb.client\\kitopiaweb.client.esproj",
       "KitopiaWeb\\KitopiaWeb.Server\\KitopiaWeb.Server.csproj",
-      "NodifyM.Avalonia\\NodifyM.Avalonia\\NodifyM.Avalonia.csproj",
       "PlugCleanTool\\PlugCleanTool.csproj",
       "PluginCore\\PluginCore.csproj"
     ]
