@@ -15,6 +15,8 @@ namespace Core.Window;
 
 public class ClipboardWindow : IClipboardService
 {
+    private IntPtr ptr2;
+
     public bool HasText()
     {
         try
@@ -163,13 +165,14 @@ public class ClipboardWindow : IClipboardService
                         ((((((int)image.Size.Width) * PixelFormat.Bgra8888.BitsPerPixel) + 31) & ~31) >> 3));
                     byte[] img1 = new byte[(int)(image.Size.Width * image.Size.Height * 4)];
                     Marshal.Copy(ptr, img1, 0, (int)(image.Size.Width * image.Size.Height * 4));
-                    Marshal.FreeHGlobal(ptr);
+
                     var load = SixLabors.ImageSharp.Image.LoadPixelData<Rgba32>(img1, (int)image.Size.Width,
                         (int)image.Size.Height);
                     var b = new byte[(int)(image.Size.Width * image.Size.Height * 4)];
+
+
+                    load.Mutate(x => x.Flip(FlipMode.Vertical));
                     load.CopyPixelDataTo(b);
-
-
                     Array.Copy(b, 0, img, 40, img.Length - 40);
 
 
@@ -183,23 +186,28 @@ public class ClipboardWindow : IClipboardService
                     var structToBytes = StructToBytes(bitmapinfoheader);
                     Array.Copy(structToBytes, 0, img, 0, 40);
 
+                    if (User32.OpenClipboard(appLifetime.MainWindow.TryGetPlatformHandle().Handle))
+                    {
+                        if (ptr != null)
+                        {
+                            Marshal.FreeHGlobal(ptr2);
+                        }
 
-                    data.Set("Unknown_Format_8", img);
+                        ptr2 = Marshal.AllocHGlobal((int)(image.Size.Width * image.Size.Height * 4));
+                        Marshal.Copy(img, 0, ptr2, (int)(image.Size.Width * image.Size.Height * 4));
+                        // System.Windows.
+                    }
 
-                    // var mem = new MemoryStream();
-                    // image.Save(mem);
-                    // System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(mem);
-                    // data.Set("Unknown_Format_2", bitmap.GetHbitmap());
-                    // bitmap.Dispose();
-                    // mem.Dispose();
-
-                    appLifetime.MainWindow.Clipboard.SetDataObjectAsync(data).WaitAsync(TimeSpan.FromSeconds(1))
-                        .GetAwaiter().GetResult();
-                    return true;
+                    return false;
                 }
                 catch (Exception e)
                 {
                     return false;
+                }
+                finally
+                {
+                    User32.CloseClipboard();
+                    Marshal.FreeHGlobal(ptr);
                 }
             }
         }

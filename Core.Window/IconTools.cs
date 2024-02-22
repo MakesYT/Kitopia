@@ -1,6 +1,7 @@
 ﻿#region
 
 using System.Drawing;
+using System.IO;
 using System.Runtime.InteropServices;
 using KitopiaAvalonia.Tools;
 using log4net;

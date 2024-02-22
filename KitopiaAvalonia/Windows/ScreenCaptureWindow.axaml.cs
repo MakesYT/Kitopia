@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -33,11 +32,12 @@ public partial class ScreenCaptureWindow : Window
             {
                 case "Close":
                 {
-                    Image.Source = null;
-                    if (Image.Source is Bitmap bitmap)
+                    if (Image is not null && Image.Source is Bitmap bitmap)
                     {
                         bitmap.Dispose();
+                        Image.Source = null;
                     }
+
 
                     this.Close();
                     WeakReferenceMessenger.Default.Unregister<string>(this);
@@ -48,17 +48,7 @@ public partial class ScreenCaptureWindow : Window
                     IsSelected = true;
                     Cursor?.Dispose();
                     Cursor = Cursor.Default;
-                    if (ConfigManger.Config.截图直接复制到剪贴板)
-                    {
-                        ServiceManager.Services.GetService<IClipboardService>().SetImage((Bitmap)Image.Source);
-                        Image.Source = null;
-                        if (Image.Source is Bitmap bitmap)
-                        {
-                            bitmap.Dispose();
-                        }
 
-                        this.Close();
-                    }
 
                     break;
                 }
@@ -126,18 +116,20 @@ public partial class ScreenCaptureWindow : Window
             Selecting = false;
             IsSelected = true;
             Cursor = Cursor.Default;
-            var data = new DataObject();
-            var imageSource = (Bitmap)Image.Source;
-            using (MemoryStream stream = new MemoryStream())
-            {
-                imageSource.Save(stream);
-                data.Set("Unknown_Format_2", stream.ToArray());
-            }
-
-
-            this.Clipboard.SetDataObjectAsync(data);
-
             WeakReferenceMessenger.Default.Send<string, string>("Selected", "ScreenCapture");
+            if (ConfigManger.Config.截图直接复制到剪贴板)
+            {
+                ServiceManager.Services.GetService<IClipboardService>().SetImage((Bitmap)Image.Source);
+                if (Image.Source is Bitmap bitmap)
+                {
+                    bitmap.Dispose();
+                }
+
+                Image.Source = null;
+
+                WeakReferenceMessenger.Default.Send<string, string>("Close", "ScreenCapture");
+                this.Close();
+            }
         }
     }
 

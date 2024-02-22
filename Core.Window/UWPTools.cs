@@ -1,5 +1,6 @@
 ﻿#region
 
+using System.IO;
 using System.Xml;
 using Core.SDKs.Services.Config;
 using log4net;

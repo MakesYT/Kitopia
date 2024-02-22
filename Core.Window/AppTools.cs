@@ -1,5 +1,6 @@
 ﻿#region
 
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
@@ -85,7 +86,8 @@ internal partial class AppTools
                                 File.Delete(TempFileName);
                                 log.Debug("创建Everything的noUAC任务计划完成");
                                 Shell32.ShellExecute(IntPtr.Zero, "open",
-                                    $"{AppDomain.CurrentDomain.BaseDirectory}noUAC{Path.DirectorySeparatorChar}{程序名称}.lnk", "", "",
+                                    $"{AppDomain.CurrentDomain.BaseDirectory}noUAC{Path.DirectorySeparatorChar}{程序名称}.lnk",
+                                    "", "",
                                     ShowWindowCommand.SW_HIDE);
                                 action.Invoke();
                             },
@@ -104,7 +106,8 @@ internal partial class AppTools
 
                     {
                         Shell32.ShellExecute(IntPtr.Zero, "open",
-                            $"{AppDomain.CurrentDomain.BaseDirectory}noUAC{Path.DirectorySeparatorChar}{程序名称}.lnk", "", "",
+                            $"{AppDomain.CurrentDomain.BaseDirectory}noUAC{Path.DirectorySeparatorChar}{程序名称}.lnk", "",
+                            "",
                             ShowWindowCommand.SW_HIDE);
                     }
                 }
