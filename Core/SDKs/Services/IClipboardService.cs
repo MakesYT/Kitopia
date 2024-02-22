@@ -1,6 +1,6 @@
 ﻿#region
 
-using System.Drawing;
+using Bitmap = Avalonia.Media.Imaging.Bitmap;
 
 #endregion
 
@@ -8,11 +8,12 @@ namespace Core.SDKs.Services;
 
 public interface IClipboardService
 {
-    bool IsBitmap();
-    bool IsText();
-    Bitmap? GetBitmap();
+    bool HasText();
     string GetText();
-    string saveBitmap();
+    bool SetText(string text);
+    bool HasImage();
+    Bitmap? GetImage();
+    bool SetImage(Bitmap image);
 }
 
 public enum ClipboardType

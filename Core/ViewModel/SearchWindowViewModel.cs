@@ -2,7 +2,6 @@
 
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Avalonia.Threading;
@@ -104,7 +103,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
             Items.RemoveAt(0);
         }
 
-        var data = ServiceManager.Services.GetService<IClipboardService>().IsText();
+        var data = ServiceManager.Services.GetService<IClipboardService>().HasText();
         try
         {
             if (data)
@@ -143,7 +142,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
         }
 
 
-        if (((IClipboardService)ServiceManager.Services!.GetService(typeof(IClipboardService))!).IsBitmap())
+        if (((IClipboardService)ServiceManager.Services!.GetService(typeof(IClipboardService))!).HasImage())
         {
             Log.Debug("剪贴板有图像信息");
 

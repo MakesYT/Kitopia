@@ -66,7 +66,7 @@ public partial class App : Application
         services.AddTransient<IContentDialog, ContentDialogService>();
         services.AddTransient<IHotKeyEditor, HotKeyEditorService>();
         services.AddSingleton<ITaskEditorOpenService, TaskEditorOpenService>();
-        services.AddTransient<IClipboardService, ClipboardService>();
+
         services.AddTransient<IThemeChange, ThemeChange>();
 
         services.AddSingleton<ISearchItemChooseService, SearchItemChooseService>();
@@ -76,6 +76,7 @@ public partial class App : Application
             services.AddTransient<IEverythingService, EverythingService>();
             services.AddTransient<IAppToolService, AppToolService>();
             services.AddSingleton<ISearchItemTool, SearchItemTool>();
+            services.AddTransient<IClipboardService, ClipboardWindow>();
         }
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))

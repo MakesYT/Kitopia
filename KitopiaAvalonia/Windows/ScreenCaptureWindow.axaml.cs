@@ -3,17 +3,27 @@ using System.IO;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
-using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.Messaging;
+using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace KitopiaAvalonia.Windows;
 
 public partial class ScreenCaptureWindow : Window
 {
+    private Point DragStartPoint;
+    private Point endPoint;
+
+    private bool IsDrag = false;
+    bool IsSelected = false;
+    bool PointerOver = false;
+    private bool Selecting = false;
+    private Point startPoint;
+
     public ScreenCaptureWindow()
     {
         InitializeComponent();
@@ -28,6 +38,7 @@ public partial class ScreenCaptureWindow : Window
                     {
                         bitmap.Dispose();
                     }
+
                     this.Close();
                     WeakReferenceMessenger.Default.Unregister<string>(this);
                     break;
@@ -36,38 +47,37 @@ public partial class ScreenCaptureWindow : Window
                 {
                     IsSelected = true;
                     Cursor?.Dispose();
-                    Cursor=Cursor.Default;
+                    Cursor = Cursor.Default;
                     if (ConfigManger.Config.截图直接复制到剪贴板)
                     {
+                        ServiceManager.Services.GetService<IClipboardService>().SetImage((Bitmap)Image.Source);
                         Image.Source = null;
                         if (Image.Source is Bitmap bitmap)
                         {
                             bitmap.Dispose();
                         }
+
                         this.Close();
                     }
+
                     break;
                 }
             }
-            
-
-           
         });
     }
+
+    bool ShowAlignLine => !IsSelected && PointerOver && !Selecting;
 
     protected override void OnOpened(EventArgs e)
     {
         base.OnOpened(e);
-        
     }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        
     }
 
-    
 
     protected override void OnKeyDown(KeyEventArgs e)
     {
@@ -88,27 +98,25 @@ public partial class ScreenCaptureWindow : Window
             WindowState = WindowState.Normal;
         }
     }
-    private Point startPoint;
-    private Point endPoint;
+
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);
-        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed&&!IsSelected)
+        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed && !IsSelected)
         {
             Selecting = true;
             X.IsVisible = false;
             Y.IsVisible = false;
-            
-            startPoint=e.GetPosition(this);
-            endPoint=e.GetPosition(this);
-            
+
+            startPoint = e.GetPosition(this);
+            endPoint = e.GetPosition(this);
         }
     }
 
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
         base.OnPointerReleased(e);
-         if (e.InitialPressMouseButton == MouseButton.Right)
+        if (e.InitialPressMouseButton == MouseButton.Right)
         {
             WeakReferenceMessenger.Default.Send<string, string>("Close", "ScreenCapture");
         }
@@ -117,27 +125,22 @@ public partial class ScreenCaptureWindow : Window
         {
             Selecting = false;
             IsSelected = true;
-            Cursor=Cursor.Default;
+            Cursor = Cursor.Default;
             var data = new DataObject();
             var imageSource = (Bitmap)Image.Source;
             using (MemoryStream stream = new MemoryStream())
             {
                 imageSource.Save(stream);
-                data.Set("Unknown_Format_2",stream.ToArray());
+                data.Set("Unknown_Format_2", stream.ToArray());
             }
-            
-            
+
+
             this.Clipboard.SetDataObjectAsync(data);
-            
+
             WeakReferenceMessenger.Default.Send<string, string>("Selected", "ScreenCapture");
         }
-        
     }
 
-    bool ShowAlignLine=>!IsSelected&&PointerOver&&!Selecting;
-    private bool Selecting = false;
-    bool IsSelected = false;
-    bool PointerOver = false;
     protected override void OnPointerEntered(PointerEventArgs e)
     {
         base.OnPointerEntered(e);
@@ -155,22 +158,22 @@ public partial class ScreenCaptureWindow : Window
     protected override void OnPointerMoved(PointerEventArgs e)
     {
         base.OnPointerMoved(e);
-        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed&&Selecting)
+        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed && Selecting)
         {
             endPoint = e.GetPosition(this);
             UpdateSelectBox();
         }
+
         if (ShowAlignLine)
         {
             X.IsVisible = true;
             Y.IsVisible = true;
-            X.StartPoint=new Point(0, e.GetPosition(this).Y);
-            
-            X.EndPoint=new Point(this.Width, e.GetPosition(this).Y);
-            
-            Y.StartPoint=new Point(e.GetPosition(this).X,0 );
-            Y.EndPoint=new Point(e.GetPosition(this).X, this.Height);
-            
+            X.StartPoint = new Point(0, e.GetPosition(this).Y);
+
+            X.EndPoint = new Point(this.Width, e.GetPosition(this).Y);
+
+            Y.StartPoint = new Point(e.GetPosition(this).X, 0);
+            Y.EndPoint = new Point(e.GetPosition(this).X, this.Height);
         }
         else
         {
@@ -185,7 +188,7 @@ public partial class ScreenCaptureWindow : Window
         if (IsSelected)
         {
             Cursor?.Dispose();
-            Cursor = new Cursor (StandardCursorType.SizeAll);
+            Cursor = new Cursor(StandardCursorType.SizeAll);
         }
     }
 
@@ -194,15 +197,13 @@ public partial class ScreenCaptureWindow : Window
         if (IsSelected)
         {
             Cursor?.Dispose();
-            Cursor=Cursor.Default;
+            Cursor = Cursor.Default;
         }
     }
 
-    private bool IsDrag = false;
-    private Point DragStartPoint;
     private void SelectBox_OnPointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed&& IsSelected)
+        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed && IsSelected)
         {
             IsDrag = true;
             DragStartPoint = e.GetPosition(this);
@@ -217,16 +218,18 @@ public partial class ScreenCaptureWindow : Window
 
             var dragStartPoint = DragStartPoint - endPoint1;
             startPoint -= dragStartPoint;
-            if (startPoint.X<0)
+            if (startPoint.X < 0)
             {
-                startPoint=new Point(0, startPoint.Y);
-                dragStartPoint=new Point(0, dragStartPoint.Y);
+                startPoint = new Point(0, startPoint.Y);
+                dragStartPoint = new Point(0, dragStartPoint.Y);
             }
-            if (startPoint.Y<0)
+
+            if (startPoint.Y < 0)
             {
-                startPoint=new Point(startPoint.X, 0);
-                dragStartPoint=new Point(dragStartPoint.X, 0);
+                startPoint = new Point(startPoint.X, 0);
+                dragStartPoint = new Point(dragStartPoint.X, 0);
             }
+
             endPoint -= dragStartPoint;
             DragStartPoint = endPoint1;
             UpdateSelectBox();
@@ -237,9 +240,9 @@ public partial class ScreenCaptureWindow : Window
     {
         IsDrag = false;
     }
+
     private void UpdateSelectBox()
     {
-        
         var fullScreenRect = new RectangleGeometry
         {
             Rect = new Rect(0, 0, this.Bounds.Width, this.Bounds.Height),
@@ -248,7 +251,7 @@ public partial class ScreenCaptureWindow : Window
         {
             Rect = new Rect(startPoint, endPoint),
         };
-        
+
 
         var combinedGeometry = new CombinedGeometry
         {
@@ -257,8 +260,8 @@ public partial class ScreenCaptureWindow : Window
             GeometryCombineMode = GeometryCombineMode.Exclude
         };
         Rectangle.Clip = combinedGeometry;
-        SelectBox.Width=double.Abs(endPoint.X-startPoint.X);
-        SelectBox.Height=double.Abs(endPoint.Y-startPoint.Y);
+        SelectBox.Width = double.Abs(endPoint.X - startPoint.X);
+        SelectBox.Height = double.Abs(endPoint.Y - startPoint.Y);
         SelectBox.SetValue(Canvas.LeftProperty, double.Min(startPoint.X, endPoint.X));
         SelectBox.SetValue(Canvas.TopProperty, double.Min(startPoint.Y, endPoint.Y));
     }
