@@ -1,7 +1,6 @@
 ﻿#region
 
 using System.Collections.ObjectModel;
-using System.Runtime.InteropServices;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -21,6 +20,8 @@ namespace Core.ViewModel.Pages;
 public partial class SettingPageViewModel : ObservableRecipient
 {
     private static readonly ILog log = LogManager.GetLogger("SettingPageViewModel");
+
+    [ObservableProperty] private bool _截图直接复制到剪贴板;
 
     [ObservableProperty] private bool _autoStart;
     [ObservableProperty] private bool _autoStartEverything;
@@ -45,7 +46,6 @@ public partial class SettingPageViewModel : ObservableRecipient
     [ObservableProperty] private ObservableCollection<string> _themeChoiceOptions = new() { "跟随系统", "深色", "浅色" };
     [ObservableProperty] private bool _useEverything;
 
-    [ObservableProperty] private bool _截图直接复制到剪贴板;
     public SettingPageViewModel()
     {
         WeakReferenceMessenger.Default.Register<string, string>(this, "ConfigSave", (s, o) =>
@@ -60,7 +60,7 @@ public partial class SettingPageViewModel : ObservableRecipient
             InputSmoothingMilliseconds = ConfigManger.Config.inputSmoothingMilliseconds;
             MouseKey = ConfigManger.Config.mouseKey;
             MouseKeyInverval = ConfigManger.Config.mouseKeyInverval;
-            截图直接复制到剪贴板=ConfigManger.Config.截图直接复制到剪贴板;
+            截图直接复制到剪贴板 = ConfigManger.Config.截图直接复制到剪贴板;
         });
         _themeChoice = ConfigManger.Config.themeChoice;
         _autoStart = ConfigManger.Config.autoStart;
@@ -72,7 +72,7 @@ public partial class SettingPageViewModel : ObservableRecipient
         _inputSmoothingMilliseconds = ConfigManger.Config.inputSmoothingMilliseconds;
         _mouseKey = ConfigManger.Config.mouseKey;
         _mouseKeyInverval = ConfigManger.Config.mouseKeyInverval;
-        _截图直接复制到剪贴板=ConfigManger.Config.截图直接复制到剪贴板;
+        _截图直接复制到剪贴板 = ConfigManger.Config.截图直接复制到剪贴板;
         _isInitializin = false;
     }
 
@@ -188,6 +188,16 @@ public partial class SettingPageViewModel : ObservableRecipient
         ConfigManger.Save();
     }
 
+    partial void On截图直接复制到剪贴板Changed(bool value)
+    {
+        if (_isInitializin)
+        {
+            return;
+        }
+
+        ConfigManger.Config.截图直接复制到剪贴板 = value;
+        ConfigManger.Save();
+    }
 
     partial void OnAutoStartChanged(bool value)
     {

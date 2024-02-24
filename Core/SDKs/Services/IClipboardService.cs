@@ -1,5 +1,6 @@
 ﻿#region
 
+using SixLabors.ImageSharp;
 using Bitmap = Avalonia.Media.Imaging.Bitmap;
 
 #endregion
@@ -14,6 +15,7 @@ public interface IClipboardService
     bool HasImage();
     Bitmap? GetImage();
     bool SetImage(Bitmap image);
+    Task<bool> SetImageAsync(Image image);
 }
 
 public enum ClipboardType

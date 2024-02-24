@@ -64,7 +64,7 @@
                            </controls:SettingsExpander>
                            <controls:SettingsExpander Header="截图直接复制到剪贴板" Description="截图直接复制到剪贴板,不显示工具栏">
                                <controls:SettingsExpander.Footer>
-                                   <ToggleSwitch IsChecked="{Binding AutoStart}" FlowDirection="RightToLeft" OffContent="关" OnContent="开"/>
+                                   <ToggleSwitch IsChecked="{Binding 截图直接复制到剪贴板}" FlowDirection="RightToLeft" OffContent="关" OnContent="开"/>
                                </controls:SettingsExpander.Footer>
                                <controls:SettingsExpander.IconSource>
                                    <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xE61C;"  />

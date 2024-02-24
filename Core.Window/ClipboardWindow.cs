@@ -1,15 +1,22 @@
 ﻿using System.Buffers;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Runtime.InteropServices;
+using System.Windows.Media.Imaging;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Input;
 using Avalonia.Platform;
 using Avalonia.Threading;
 using Core.SDKs.Services;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using Vanara.PInvoke;
 using Bitmap = Avalonia.Media.Imaging.Bitmap;
+using DataObject = System.Windows.DataObject;
+using PixelFormat = Avalonia.Platform.PixelFormat;
+using PixelFormats = System.Windows.Media.PixelFormats;
+using Rectangle = System.Drawing.Rectangle;
 
 namespace Core.Window;
 
@@ -152,64 +159,26 @@ public class ClipboardWindow : IClipboardService
     {
         try
         {
-            if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime appLifetime)
-            {
-                var data = new DataObject();
-                var img = new byte[(int)(image.Size.Width * image.Size.Height * 4 + 40)];
+            var data2 = new DataObject();
+            var memoryStream = new MemoryStream();
+            image.Save(memoryStream);
+            var bitmap = new System.Drawing.Bitmap(memoryStream);
 
-                IntPtr ptr = Marshal.AllocHGlobal((int)(image.Size.Width * image.Size.Height * 4));
-                try
-                {
-                    image.CopyPixels(new PixelRect(0, 0, (int)image.Size.Width, (int)image.Size.Height), ptr,
-                        (int)(image.Size.Width * image.Size.Height * 4),
-                        ((((((int)image.Size.Width) * PixelFormat.Bgra8888.BitsPerPixel) + 31) & ~31) >> 3));
-                    byte[] img1 = new byte[(int)(image.Size.Width * image.Size.Height * 4)];
-                    Marshal.Copy(ptr, img1, 0, (int)(image.Size.Width * image.Size.Height * 4));
+            var bitmapData = bitmap.LockBits(
+                new Rectangle(0, 0, bitmap.Width, bitmap.Height),
+                ImageLockMode.ReadOnly, bitmap.PixelFormat);
 
-                    var load = SixLabors.ImageSharp.Image.LoadPixelData<Rgba32>(img1, (int)image.Size.Width,
-                        (int)image.Size.Height);
-                    var b = new byte[(int)(image.Size.Width * image.Size.Height * 4)];
+            var bitmapSource = BitmapSource.Create(
+                bitmapData.Width, bitmapData.Height,
+                bitmap.HorizontalResolution, bitmap.VerticalResolution,
+                PixelFormats.Bgr24, null,
+                bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
 
+            bitmap.UnlockBits(bitmapData);
+            bitmap.Dispose();
 
-                    load.Mutate(x => x.Flip(FlipMode.Vertical));
-                    load.CopyPixelDataTo(b);
-                    Array.Copy(b, 0, img, 40, img.Length - 40);
-
-
-                    var bitmapinfoheader = new Gdi32.BITMAPINFOHEADER((int)image.Size.Width, (int)image.Size.Height);
-                    bitmapinfoheader.biCompression = Gdi32.BitmapCompressionMode.BI_RGB;
-                    bitmapinfoheader.biPlanes = 1;
-                    bitmapinfoheader.biYPelsPerMeter = 3780;
-                    bitmapinfoheader.biXPelsPerMeter = 3780;
-                    bitmapinfoheader.biSize = 40;
-                    bitmapinfoheader.biBitCount = 32;
-                    var structToBytes = StructToBytes(bitmapinfoheader);
-                    Array.Copy(structToBytes, 0, img, 0, 40);
-
-                    if (User32.OpenClipboard(appLifetime.MainWindow.TryGetPlatformHandle().Handle))
-                    {
-                        if (ptr != null)
-                        {
-                            Marshal.FreeHGlobal(ptr2);
-                        }
-
-                        ptr2 = Marshal.AllocHGlobal((int)(image.Size.Width * image.Size.Height * 4));
-                        Marshal.Copy(img, 0, ptr2, (int)(image.Size.Width * image.Size.Height * 4));
-                        // System.Windows.
-                    }
-
-                    return false;
-                }
-                catch (Exception e)
-                {
-                    return false;
-                }
-                finally
-                {
-                    User32.CloseClipboard();
-                    Marshal.FreeHGlobal(ptr);
-                }
-            }
+            data2.SetImage(bitmapSource);
+            Ole32.OleSetClipboard(data2);
         }
         catch (Exception e)
         {
@@ -217,7 +186,34 @@ public class ClipboardWindow : IClipboardService
         }
 
 
-        return false;
+        return true;
+    }
+
+    public async Task<bool> SetImageAsync(Image image)
+    {
+        return await Task.Run(() =>
+        {
+            var memoryStream = new MemoryStream();
+            image.SaveAsBmp(memoryStream);
+            var bitmap = new System.Drawing.Bitmap(memoryStream);
+
+            var bitmapData = bitmap.LockBits(
+                new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
+                System.Drawing.Imaging.ImageLockMode.ReadOnly, bitmap.PixelFormat);
+
+            var bitmapSource = BitmapSource.Create(
+                bitmapData.Width, bitmapData.Height,
+                bitmap.HorizontalResolution, bitmap.VerticalResolution,
+                PixelFormats.Bgr24, null,
+                bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
+
+            bitmap.UnlockBits(bitmapData);
+            bitmap.Dispose();
+            var data2 = new DataObject();
+            data2.SetImage(bitmapSource);
+            Ole32.OleSetClipboard(data2);
+            return true;
+        });
     }
 
     private static T BytesToStructure<T>(byte[] bytes)

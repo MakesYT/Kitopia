@@ -2,26 +2,87 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+        xmlns:controls1="clr-namespace:KitopiaAvalonia.Controls"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="KitopiaAvalonia.Windows.ScreenCaptureWindow" Cursor="SizeAll"
         Title="ScreenCaptureWindow">
     <Canvas>
         <Image Name="Image" />
-        <Rectangle ZIndex="1" Name="Rectangle" Width="{Binding $parent[Window].Bounds.Width}" Height="{Binding $parent[Window].Bounds.Height}"  >
+        <Rectangle ZIndex="1" Name="Rectangle" Width="{Binding $parent[Window].Bounds.Width}"
+                   Height="{Binding $parent[Window].Bounds.Height}" PointerEntered="Rectangle_OnPointerEntered">
             <Rectangle.Fill>
-                <SolidColorBrush Color="Black" Opacity="0.5"></SolidColorBrush>
+                <SolidColorBrush Color="Black" Opacity="0.5" />
             </Rectangle.Fill>
         </Rectangle>
-        <Rectangle ZIndex="2" Name="SelectBox" 
-                   PointerEntered="SelectBox_OnPointerEntered" PointerExited="SelectBox_OnPointerExited" 
+        <Rectangle PointerEntered="SelectBox_OnPointerEntered" ZIndex="2" Name="SelectBox"
                    PointerPressed="SelectBox_OnPointerPressed" PointerMoved="SelectBox_OnPointerMoved"
                    PointerReleased="SelectBox_OnPointerReleased">
             <Rectangle.Fill>
-                    <SolidColorBrush Color="WhiteSmoke" Opacity="0.01"></SolidColorBrush>
-                </Rectangle.Fill>
+                <SolidColorBrush Color="WhiteSmoke" Opacity="0.01" />
+            </Rectangle.Fill>
         </Rectangle>
-        <Line ZIndex="2" Name="X" Fill="WhiteSmoke" Stroke="WhiteSmoke"  StrokeThickness="1.5" IsVisible="False"></Line>
-        <Line ZIndex="2" Name="Y" Fill="WhiteSmoke" Stroke="WhiteSmoke"  StrokeThickness="1.5" IsVisible="False"></Line>
-        
+        <Border ZIndex="5" BorderThickness="3" BorderBrush="LightBlue" Name="ResizeSizeBoxBorder"
+                PointerEntered="ReSizeBox_OnPointerEntered" IsVisible="False" PointerMoved="ResizeSizeBoxBorder_OnPointerMoved"
+                PointerPressed="ResizeSizeBoxBorder_OnPointerPressed" PointerReleased="ResizeSizeBoxBorder_OnPointerReleased" />
+
+        <Canvas ZIndex="3" Name="Canvas" />
+        <Border ZIndex="3" Padding="5" CornerRadius="4" IsVisible="False" Name="ToolBar">
+            <Border.Background>
+                <SolidColorBrush Color="{DynamicResource SolidBackgroundFillColorBase}" Opacity="0.5" />
+            </Border.Background>
+            <StackPanel Orientation="Horizontal" Spacing="2">
+
+                <Button BorderThickness="0" ToolTip.Tip="矩形" Width="32" Height="32" Click="RectangleButton_OnClick">
+                    <Rectangle
+                        Width="20" Height="20" Stroke="{StaticResource TextFillColorSecondaryBrush}"
+                        StrokeThickness="1" />
+                </Button>
+                <Button BorderThickness="0" ToolTip.Tip="圆" Width="32" Height="32" >
+                    <Ellipse VerticalAlignment="Center" HorizontalAlignment="Center"
+                             Width="20" Height="20" Stroke="{StaticResource TextFillColorSecondaryBrush}"
+                             StrokeThickness="1" />
+                </Button>
+                <Button BorderThickness="0" ToolTip.Tip="箭头" Width="32" Height="32" >
+                    <controls:FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" Width="24" Height="24"
+                                       FontFamily="{StaticResource FluentFont}" Glyph="&#xf14b;" FontSize="24">
+                        <controls:FontIcon.RenderTransform>
+                            <RotateTransform Angle="180" />
+                        </controls:FontIcon.RenderTransform>
+                    </controls:FontIcon>
+                </Button>
+                <Button BorderThickness="0" ToolTip.Tip="批注" Width="32" Height="32" Padding="0,3,0,0" >
+                    <controls:FontIcon  Width="24" Height="24"
+                                       FontFamily="{StaticResource FluentFont}" Glyph="&#xe8d8;" FontSize="24" />
+                </Button>
+                <Button BorderThickness="0" ToolTip.Tip="文本" Width="32" Height="32" Padding="1,3,0,0">
+                    <controls:FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" Width="24" Height="24"
+                                       FontFamily="{StaticResource FluentFont}" Glyph="&#xecaf;" FontSize="24" />
+                </Button>
+                <Button BorderThickness="0" ToolTip.Tip="马赛克" Width="32" Height="32" >
+                    <controls1:MosaicIcon Width="18" Height="18" />
+                </Button>
+                <Line Height="32" Width="1" Stroke="{StaticResource TextFillColorSecondaryBrush}" StrokeThickness="1"
+                      StartPoint="0.5,0"
+                      EndPoint="0.5,32" />
+                <Button BorderThickness="0" ToolTip.Tip="拓展功能" Width="32" Height="32" Padding="1" />
+                <Line Height="32" Width="1" Stroke="{StaticResource TextFillColorSecondaryBrush}" StrokeThickness="1"
+                      StartPoint="0.5,0"
+                      EndPoint="0.5,32" />
+                <Button BorderThickness="0" ToolTip.Tip="取消" Width="32" Height="32" Padding="1,3,0,0" Click="Close_Click">
+                    <controls:FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" Width="24" Height="24"
+                                       FontFamily="{StaticResource FluentFont}" Glyph="&#xf36a;" FontSize="24" />
+                </Button>
+                <Button BorderThickness="0" ToolTip.Tip="复制到剪贴板" Width="32" Height="32" Padding="1,3,0,0" Click="SaveToClipboard_Click">
+                    <controls:FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" Width="24" Height="24" 
+                                       FontFamily="{StaticResource FluentFont}" Glyph="&#xf295;" FontSize="24" />
+                </Button>
+            </StackPanel>
+        </Border>
+
+
+        <Line ZIndex="2" Name="X" Fill="WhiteSmoke" Stroke="WhiteSmoke" StrokeThickness="1.5" IsVisible="False" />
+        <Line ZIndex="2" Name="Y" Fill="WhiteSmoke" Stroke="WhiteSmoke" StrokeThickness="1.5" IsVisible="False" />
+
     </Canvas>
 </Window>
