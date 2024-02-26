@@ -2,6 +2,7 @@
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Windows;
 using System.Windows.Media.Imaging;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -12,17 +13,19 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using Vanara.PInvoke;
+using Application = Avalonia.Application;
 using Bitmap = Avalonia.Media.Imaging.Bitmap;
 using DataObject = System.Windows.DataObject;
 using PixelFormat = Avalonia.Platform.PixelFormat;
 using PixelFormats = System.Windows.Media.PixelFormats;
 using Rectangle = System.Drawing.Rectangle;
+using Vector = Avalonia.Vector;
 
 namespace Core.Window;
 
 public class ClipboardWindow : IClipboardService
 {
-    private IntPtr ptr2;
+  
 
     public bool HasText()
     {
@@ -157,6 +160,7 @@ public class ClipboardWindow : IClipboardService
 
     public bool SetImage(Bitmap image)
     {
+        
         try
         {
             var data2 = new DataObject();
@@ -189,10 +193,13 @@ public class ClipboardWindow : IClipboardService
         return true;
     }
 
+    [STAThread]
     public async Task<bool> SetImageAsync(Image image)
     {
-        return await Task.Run(() =>
+        var tcs = new TaskCompletionSource<bool>();
+        var thread = new Thread(() =>
         {
+            
             var memoryStream = new MemoryStream();
             image.SaveAsBmp(memoryStream);
             var bitmap = new System.Drawing.Bitmap(memoryStream);
@@ -209,11 +216,14 @@ public class ClipboardWindow : IClipboardService
 
             bitmap.UnlockBits(bitmapData);
             bitmap.Dispose();
-            var data2 = new DataObject();
-            data2.SetImage(bitmapSource);
-            Ole32.OleSetClipboard(data2);
-            return true;
+            
+            Clipboard.SetImage(bitmapSource);
+            
+            
         });
+        thread.SetApartmentState(ApartmentState.STA);
+        thread.Start();
+        return await tcs.Task;
     }
 
     private static T BytesToStructure<T>(byte[] bytes)

@@ -101,6 +101,16 @@ public class HotKeyManager
                             Dispatcher.UIThread.InvokeAsync(() =>
                             {
                                 KitopiaAvalonia.Tools.ScreenCapture.StartUserManualCapture();
+                            }).GetTask().ContinueWith((e) =>
+                            {
+                                if (e.IsFaulted)
+                                {
+                                    log.Error(e.Exception);
+                                    Dispatcher.UIThread.Invoke(() =>
+                                    {
+                                        new ErrorDialog(null, e.Exception.ToString()).Show();
+                                    });
+                                }
                             });
                             break;
                         }
