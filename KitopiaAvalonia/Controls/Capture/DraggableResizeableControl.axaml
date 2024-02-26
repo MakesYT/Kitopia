@@ -1,0 +1,27 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:KitopiaAvalonia.Controls"
+        xmlns:capture="clr-namespace:KitopiaAvalonia.Controls.Capture">
+    <Design.PreviewWith>
+        <capture:DraggableResizeableControl Width="200" Height="200">
+            <Rectangle Fill="Red"></Rectangle>
+        </capture:DraggableResizeableControl>
+    </Design.PreviewWith>
+
+    <Style Selector="capture|DraggableResizeableControl">
+        <!-- Set Defaults -->
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Panel>
+                    <ContentPresenter Name="Presenter" Content="{TemplateBinding Content}" />
+                    <Border BorderThickness="2" Name="ResizeSizeBoxBorder"
+                            Width="{Binding #Presenter.Bounds.Width}" Height="{Binding #Presenter.Bounds.Height}">
+                        <Border.BorderBrush>
+                            <SolidColorBrush Color="LightBlue" Opacity="0.6"></SolidColorBrush>
+                        </Border.BorderBrush>
+                    </Border>
+                </Panel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Avalonia;
@@ -15,6 +16,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using KitopiaAvalonia.Controls;
+using KitopiaAvalonia.Controls.Capture;
 using KitopiaAvalonia.Tools;
 using Microsoft.Extensions.DependencyInjection;
 using SixLabors.ImageSharp.PixelFormats;
@@ -44,7 +46,7 @@ public partial class ScreenCaptureWindow : Window
     private bool Selecting = false;
     private bool PointerOver = false;
     private Point _startPoint;
-    
+    private Stack<Control> redoStack = new();
 
     public ScreenCaptureWindow()
     {

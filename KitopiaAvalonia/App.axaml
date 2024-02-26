@@ -27,7 +27,7 @@
         <StyleInclude Source="Controls/HotKeyShowItme.axaml" />
         <StyleInclude Source="Controls/PinButton.axaml" />
         <StyleInclude Source="Controls/MosaicIcon.axaml" />
-        <StyleInclude Source="Controls/DraggableResizeableControl.axaml" />
+        <StyleInclude Source="Controls/Capture/DraggableResizeableControl.axaml" />
         <StyleInclude Source="avares://NodifyM.Avalonia/Styles/ControlStyles.axaml" />
     </Application.Styles>
     

@@ -4,6 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
         xmlns:controls1="clr-namespace:KitopiaAvalonia.Controls"
+        xmlns:capture="clr-namespace:KitopiaAvalonia.Controls.Capture"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="KitopiaAvalonia.Windows.ScreenCaptureWindow"
         Title="ScreenCaptureWindow">
@@ -16,14 +17,14 @@
                 <SolidColorBrush Color="Black" Opacity="0.5" />
             </Rectangle.Fill>
         </Rectangle>
-        <controls1:DraggableResizeableControl ZIndex="2" Name="SelectBox" OnlyShowReSizingBoxOnSelect="False">
+        <capture:DraggableResizeableControl ZIndex="2" Name="SelectBox" OnlyShowReSizingBoxOnSelect="False">
             <Rectangle PointerMoved="SelectBox_OnPointerMoved" PointerReleased="SelectBox_OnPointerReleased"
                        PointerPressed="SelectBox_OnPointerPressed">
                 <Rectangle.Fill>
                     <SolidColorBrush Color="WhiteSmoke" Opacity="0.01" />
                 </Rectangle.Fill>
             </Rectangle>
-        </controls1:DraggableResizeableControl>
+        </capture:DraggableResizeableControl>
 
 
         <Canvas ZIndex="3" Name="Canvas" />
@@ -88,6 +89,11 @@
                           StrokeThickness="1"
                           StartPoint="0.5,0"
                           EndPoint="0.5,32" />
+                    <Button BorderThickness="1" ToolTip.Tip="撤销" Width="32" Height="32" Padding="1,3,0,0" Click="TextButton_OnClick">
+                        <controls:FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" Width="24"
+                                           Height="24"
+                                           FontFamily="{StaticResource FluentFont}" Glyph="&#xecaf;" FontSize="24" />
+                    </Button>
                     <Button BorderThickness="1" ToolTip.Tip="拓展功能" Width="32" Height="32" Padding="1" />
                     <Line Height="32" Width="1" Stroke="{StaticResource TextFillColorSecondaryBrush}"
                           StrokeThickness="1"

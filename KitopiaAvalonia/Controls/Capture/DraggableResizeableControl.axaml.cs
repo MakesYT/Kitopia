@@ -9,7 +9,7 @@ using Avalonia.Media;
 using Avalonia.VisualTree;
 using KitopiaAvalonia.Tools;
 
-namespace KitopiaAvalonia.Controls;
+namespace KitopiaAvalonia.Controls.Capture;
 
 public class LocationOrSizeChangedEventArgs : RoutedEventArgs
 {

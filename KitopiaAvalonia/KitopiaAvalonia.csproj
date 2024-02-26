@@ -59,6 +59,14 @@
             <SubType>Code</SubType>
             <DependentUpon>HotKeyManagerPage.xaml</DependentUpon>
         </Compile>
+        <Compile Update="Controls\Capture\DraggableResizeableControl.axaml.cs">
+          <DependentUpon>DraggableResizeableControl.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Controls\Capture\DraggableArrowControl.axaml.cs">
+          <DependentUpon>DraggableArrowControl.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
     </ItemGroup>
 
 </Project>
