@@ -37,10 +37,6 @@ class Program
             TaskScheduler.UnobservedTaskException += (sender, eventArgs) =>
             {
                 Log.Error(eventArgs.Exception);
-                Dispatcher.UIThread.Invoke(() =>
-                {
-                    new ErrorDialog(null, eventArgs.Exception.ToString()).Show();
-                });
             };
             BuildAvaloniaApp()
                 .StartWithClassicDesktopLifetime(args);

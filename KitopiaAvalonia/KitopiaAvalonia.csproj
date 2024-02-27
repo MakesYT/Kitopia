@@ -67,6 +67,9 @@
           <DependentUpon>DraggableArrowControl.axaml</DependentUpon>
           <SubType>Code</SubType>
         </Compile>
+        <Compile Update="Controls\Capture\CaptureToolBase.cs">
+          <DependentUpon>CaptureToolBase.axaml</DependentUpon>
+        </Compile>
     </ItemGroup>
 
 </Project>

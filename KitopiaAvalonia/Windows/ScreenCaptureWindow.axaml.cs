@@ -123,38 +123,26 @@ public partial class ScreenCaptureWindow : Window
             WindowState = WindowState.Normal;
         }
     }
-    
 
-    protected override void OnPointerPressed(PointerPressedEventArgs e)
+    protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
     {
-        base.OnPointerPressed(e);
-       
-        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed && !IsSelected)
-        {
-            Selecting = true;
-            X.IsVisible = false;
-            Y.IsVisible = false;
-
-            _startPoint = e.GetPosition(this);
-            //endPoint = e.GetPosition(this);
-        }
+        base.OnPointerCaptureLost(e);
+        CompletedSelection();
     }
 
-    protected override void OnPointerReleased(PointerReleasedEventArgs e)
+    private void CompletedSelection()
     {
-        base.OnPointerReleased(e);
-        if (e.InitialPressMouseButton == MouseButton.Right)
-        {
-            if (!IsSelected)
-            {
-                WeakReferenceMessenger.Default.Send<string, string>("Close", "ScreenCapture");
-            }
-            
-        }
-
         if (Selecting)
         {
             Selecting = false;
+            if (SelectBox.Height<10)
+            {
+                SelectBox.Height = 10;
+            }
+            if (SelectBox.Width<10)
+            {
+                SelectBox.Width = 10;
+            }
             SelectBox.IsVisible = true;
             IsSelected = true;
             Cursor = Cursor.Default;
@@ -197,6 +185,42 @@ public partial class ScreenCaptureWindow : Window
         }
     }
 
+    protected override void OnPointerPressed(PointerPressedEventArgs e)
+    {
+        base.OnPointerPressed(e);
+       
+        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed && !IsSelected)
+        {
+            Selecting = true;
+            X.IsVisible = false;
+            Y.IsVisible = false;
+            SelectBox.IsVisible = true;
+            Cursor?.Dispose();
+            Cursor = new Cursor(StandardCursorType.BottomRightCorner);
+            _startPoint = e.GetPosition(this);
+            e.Pointer.Capture(this);
+            //endPoint = e.GetPosition(this);
+        }
+    }
+
+    protected override void OnPointerReleased(PointerReleasedEventArgs e)
+    {
+        base.OnPointerReleased(e);
+        if (e.InitialPressMouseButton == MouseButton.Right)
+        {
+            if (!IsSelected)
+            {
+                WeakReferenceMessenger.Default.Send<string, string>("Close", "ScreenCapture");
+            }
+            
+        }
+
+        if (Selecting)
+        {
+            CompletedSelection();
+        }
+    }
+
     protected override void OnPointerEntered(PointerEventArgs e)
     {
         base.OnPointerEntered(e);
@@ -217,6 +241,7 @@ public partial class ScreenCaptureWindow : Window
         if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed && Selecting)
         {
             var selectBoxHeight = e.GetPosition(this).Y - _startPoint.Y;
+            var selectBoxWidth = e.GetPosition(this).X - _startPoint.X;
             if (selectBoxHeight<0)
             {
                 SelectBox.Height=-selectBoxHeight;
@@ -226,9 +251,6 @@ public partial class ScreenCaptureWindow : Window
                 SelectBox.Height=selectBoxHeight;
                 SelectBox._dragTransform.Y=_startPoint.Y;
             }
-
-            
-            var selectBoxWidth = e.GetPosition(this).X - _startPoint.X;
             if (selectBoxWidth<0)
             {
                 SelectBox.Width=-selectBoxWidth;
@@ -239,7 +261,6 @@ public partial class ScreenCaptureWindow : Window
                 SelectBox.Width=selectBoxWidth;
                 SelectBox._dragTransform.X=_startPoint.X;
             }
-            
             UpdateSelectBox();
         }
 
@@ -263,22 +284,19 @@ public partial class ScreenCaptureWindow : Window
 
     public 截图工具 NowTool = 截图工具.无;
     private bool Adding截图工具 = false;
-    private DraggableResizeableControl Now截图工具;
+    private CaptureToolBase Now截图工具;
   
 
     private void SelectBox_OnPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         foreach (var canvasChild in Canvas.Children)
         {
-            if (canvasChild is DraggableResizeableControl draggableResizeableControl)
+            if (canvasChild is CaptureToolBase draggableResizeableControl)
             {
-                if (draggableResizeableControl.GetVisualChildren().First() is Panel panel)
-                {
-                    var border = panel.GetChildOfType<Border>("ResizeSizeBoxBorder");
-                    border.IsVisible = false;
-                }
+                draggableResizeableControl.IsSelected = false;
             }
         }
+        SelectBox.IsSelected = true;
         if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
         {
             switch (NowTool)
@@ -294,7 +312,7 @@ public partial class ScreenCaptureWindow : Window
                     var dragarea = new DraggableResizeableControl();
                     dragarea._dragTransform.X = position.X;
                     dragarea._dragTransform.Y = position.Y;
-                
+                    dragarea.IsSelected = true;
                     var rectangle = new Avalonia.Controls.Shapes.Rectangle();
                     dragarea.Content = rectangle;
                 
@@ -313,16 +331,50 @@ public partial class ScreenCaptureWindow : Window
                     var dragarea = new DraggableResizeableControl();
                     dragarea._dragTransform.X = position.X;
                     dragarea._dragTransform.Y = position.Y;
-                
+                    
                     var rectangle = new Ellipse();
                     dragarea.Content = rectangle;
-                
+                    dragarea.IsSelected = true;
                     rectangle.Stroke = new SolidColorBrush(Colors.Red);
                     rectangle.StrokeThickness = 1;
                
                     Canvas.Children.Add(dragarea);
                     Adding截图工具 = true;
                     Now截图工具 = dragarea;
+                    break;
+                }
+                case 截图工具.箭头:
+                {
+                    var position = e.GetPosition(this);
+                    _startPoint = position;
+                    var dragarea = new DraggableArrowControl();
+                    dragarea.IsSelected = true;
+                    dragarea.Source = position;
+                    dragarea.Target = position;
+                    dragarea.Stroke=new SolidColorBrush(Colors.Red);
+                    dragarea.Fill=new SolidColorBrush(Colors.Red);
+                    dragarea.StrokeThickness = 2;
+                    dragarea.ArrowSize=new Size(8*dragarea.StrokeThickness, 8*dragarea.StrokeThickness);
+                    Canvas.Children.Add(dragarea);
+                    Adding截图工具 = true;
+                    Now截图工具 = dragarea;
+                    break;
+                }
+                case 截图工具.批准:
+                {
+                    var position = e.GetPosition(this);
+                    _startPoint = position;
+                    
+                    var rectangle = new PenCaptureTool();
+                    rectangle.Points.Add(position);
+                    rectangle.StrokeThickness = 2d;
+                    rectangle.Stroke=new SolidColorBrush(Colors.Red);
+                    rectangle.Fill=new SolidColorBrush(Colors.Red);
+                    rectangle.Width = Width;
+                    rectangle.Height = Height;
+                    Canvas.Children.Add(rectangle);
+                    Adding截图工具 = true;
+                    Now截图工具 = rectangle;
                     break;
                 }
             
@@ -352,29 +404,44 @@ public partial class ScreenCaptureWindow : Window
         {
             return;
         }
-        var selectBoxHeight = e.GetPosition(this).Y - _startPoint.Y;
-        if (selectBoxHeight<0)
-        {
-            Now截图工具.Height=-selectBoxHeight;
-            Now截图工具._dragTransform.Y=_startPoint.Y+selectBoxHeight;
-        }else
-        {
-            Now截图工具.Height=selectBoxHeight;
-            Now截图工具._dragTransform.Y=_startPoint.Y;
-        }
 
-            
-        var selectBoxWidth = e.GetPosition(this).X - _startPoint.X;
-        if (selectBoxWidth<0)
+        if (NowTool == 截图工具.箭头)
         {
-            Now截图工具.Width=-selectBoxWidth;
-            Now截图工具._dragTransform.X=_startPoint.X+selectBoxWidth;
+            ((DraggableArrowControl)Now截图工具).Target = e.GetPosition(this);
+        }else if (NowTool == 截图工具.批准)
+        {
+            ((PenCaptureTool) Now截图工具).Points.Add( e.GetPosition(this));
         }
         else
         {
-            Now截图工具.Width=selectBoxWidth;
-            Now截图工具._dragTransform.X=_startPoint.X;
+            var selectBoxHeight = e.GetPosition(this).Y - _startPoint.Y;
+            var selectBoxWidth = e.GetPosition(this).X - _startPoint.X;
+            
+            if (selectBoxHeight<0)
+            {
+                Now截图工具.Height=-selectBoxHeight;
+                ((DraggableResizeableControl)Now截图工具)._dragTransform.Y=_startPoint.Y+selectBoxHeight;
+            }else
+            {
+                Now截图工具.Height=selectBoxHeight;
+                ((DraggableResizeableControl)Now截图工具)._dragTransform.Y=_startPoint.Y;
+            }
+            
+                        
+           
+            if (selectBoxWidth<0)
+            {
+                Now截图工具.Width=-selectBoxWidth;
+                ((DraggableResizeableControl)Now截图工具)._dragTransform.X=_startPoint.X+selectBoxWidth;
+            }
+            else
+            {
+                Now截图工具.Width=selectBoxWidth;
+                ((DraggableResizeableControl)Now截图工具)._dragTransform.X=_startPoint.X;
+            }
+            
         }
+        
         e.Handled = true;
        
     }
@@ -387,7 +454,14 @@ public partial class ScreenCaptureWindow : Window
             e.Handled = true;
         }
     }
-    
+    private void SelectBox_OnPointerCaptureLost(object? sender, PointerCaptureLostEventArgs e)
+    {
+        if (Adding截图工具)
+        {
+            Adding截图工具 = false;
+            e.Handled = true;
+        }
+    }
 
     
 
@@ -453,20 +527,12 @@ public partial class ScreenCaptureWindow : Window
         {
             foreach (var canvasChild in Canvas.Children)
             {
-                if (canvasChild is DraggableResizeableControl draggableResizeableControl)
+                if (canvasChild is CaptureToolBase draggableResizeableControl)
                 {
-                    if (draggableResizeableControl.GetVisualChildren().First() is Panel panel1)
-                    {
-                        var border = panel1.GetChildOfType<Border>("ResizeSizeBoxBorder");
-                        border.IsVisible = false;
-                    }
+                    draggableResizeableControl.IsSelected = false;
                 }
             }
-            if (SelectBox.GetVisualChildren().First() is Panel panel)
-            {
-                var border = panel.GetChildOfType<Border>("ResizeSizeBoxBorder");
-                border.IsVisible = false;
-            }
+            SelectBox.IsSelected = false;
             var renderTargetBitmap = new RenderTargetBitmap(new PixelSize(bitmap.PixelSize.Width, bitmap.PixelSize.Height),new Vector(96, 96));
             
             renderTargetBitmap.Render(this);
@@ -629,4 +695,6 @@ public partial class ScreenCaptureWindow : Window
         else
             NowTool = 截图工具.无;
     }
+
+    
 }

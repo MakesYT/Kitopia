@@ -8,6 +8,7 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="KitopiaAvalonia.Windows.ScreenCaptureWindow"
         Title="ScreenCaptureWindow">
+   
     <Canvas>
 
         <Image Name="Image" />
@@ -17,9 +18,9 @@
                 <SolidColorBrush Color="Black" Opacity="0.5" />
             </Rectangle.Fill>
         </Rectangle>
-        <capture:DraggableResizeableControl ZIndex="2" Name="SelectBox" OnlyShowReSizingBoxOnSelect="False">
+        <capture:DraggableResizeableControl IsVisible="False" IsSelected="True" ZIndex="2" Name="SelectBox" OnlyShowReSizingBoxOnSelect="False">
             <Rectangle PointerMoved="SelectBox_OnPointerMoved" PointerReleased="SelectBox_OnPointerReleased"
-                       PointerPressed="SelectBox_OnPointerPressed">
+                       PointerPressed="SelectBox_OnPointerPressed" PointerCaptureLost="SelectBox_OnPointerCaptureLost">
                 <Rectangle.Fill>
                     <SolidColorBrush Color="WhiteSmoke" Opacity="0.01" />
                 </Rectangle.Fill>
@@ -27,7 +28,8 @@
         </capture:DraggableResizeableControl>
 
 
-        <Canvas ZIndex="3" Name="Canvas" />
+        <Canvas ZIndex="3" Name="Canvas" Width="{Binding $parent[Canvas].Bounds.Width}"
+                Height="{Binding $parent[Canvas].Bounds.Height}"/>
         <Border ZIndex="3" Padding="5" CornerRadius="4" IsVisible="False" Name="ToolBar">
             <Border.Background>
                 <SolidColorBrush Color="{DynamicResource SolidBackgroundFillColorBase}" Opacity="0.5" />

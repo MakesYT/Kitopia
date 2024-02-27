@@ -15,7 +15,7 @@ public class LocationOrSizeChangedEventArgs : RoutedEventArgs
 {
     
 }
-public class DraggableResizeableControl : ContentControl
+public class DraggableResizeableControl : CaptureToolBase
 {
     public static readonly AvaloniaProperty StartTranslateTransformProperty =
         AvaloniaProperty.Register<DraggableResizeableControl, TranslateTransform>("_dragTransform");
@@ -55,6 +55,7 @@ public class DraggableResizeableControl : ContentControl
         content.PointerPressed += ContentOnPointerPressed;
         content.PointerMoved += ContentOnPointerMoved;
         content.PointerReleased += ContentOnPointerReleased;
+        content.PointerCaptureLost += ContentOnPointerCaptureLost;
         var border = e.NameScope.Find<Border>("ResizeSizeBoxBorder");
         _resizeSizeBoxBorder = border;
         border.PointerPressed += ResizeSizeBoxBorderOnPointerPressed;
@@ -62,13 +63,11 @@ public class DraggableResizeableControl : ContentControl
         border.PointerMoved += ResizeSizeBoxBorderOnPointerMoved;
         border.PointerExited += ResizeSizeBoxBorderOnPointerExited;
         border.PointerEntered += ResizeSizeBoxBorderOnPointerEntered;
-        if (OnlyShowReSizingBoxOnSelect)
-        {
-            border.IsVisible = false;
-        }
+        border.PointerCaptureLost += ResizeSizeBoxBorderOnPointerCaptureLost;
     }
 
-   
+    
+
 
     #region 边框: 调整大小
 
@@ -87,6 +86,7 @@ public class DraggableResizeableControl : ContentControl
         
         if (e.GetCurrentPoint(TopLevel.GetTopLevel(this)).Properties.IsLeftButtonPressed)
         {
+            e.Pointer.Capture((IInputElement?)sender);
             _isResizing = true;
             _isResizingTop = false;
             _isResizingBottom = false;
@@ -186,6 +186,7 @@ public class DraggableResizeableControl : ContentControl
                     this.Width = -w;
                     _dragTransform.X = _resizeStartPoint.X + w;
                 }
+               
                 
             }
             RaiseEvent(new LocationOrSizeChangedEventArgs(){ Source = this, RoutedEvent = LocationOrSizeChangedEvent});
@@ -202,6 +203,10 @@ public class DraggableResizeableControl : ContentControl
         {
             _isResizing = false;
         }
+    }
+    private void ResizeSizeBoxBorderOnPointerCaptureLost(object? sender, PointerCaptureLostEventArgs e)
+    {
+        _isResizing = false;
     }
     private void ResizeSizeBoxBorderOnPointerEntered(object? sender, PointerEventArgs e)
     {
@@ -302,6 +307,10 @@ public class DraggableResizeableControl : ContentControl
 
     #endregion
     #region 内部控件: 拖拽
+    private void ContentOnPointerCaptureLost(object? sender, PointerCaptureLostEventArgs pointerCaptureLostEventArgs)
+    {
+            _isDragging = false;
+    }
     private void ContentOnPointerPressed(object? sender, PointerPressedEventArgs e)
     {
        
@@ -309,30 +318,20 @@ public class DraggableResizeableControl : ContentControl
         var visualParent = (Canvas)this.GetVisualParent();
         foreach (var canvasChild in visualParent.Children)
         {
-            if (canvasChild is DraggableResizeableControl draggableResizeableControl)
+            if (canvasChild is CaptureToolBase captureTool)
             {
-                if (draggableResizeableControl.OnlyShowReSizingBoxOnSelect)
-                {
-                    if (draggableResizeableControl.VisualChildren[0] is Panel panel)
-                    {
-                        var border = panel.GetChildOfType<Border>("ResizeSizeBoxBorder");
-                        border.IsVisible = false;
-                    
-                    }
-                }
-                
+                captureTool.IsSelected = false;
+
             }
         }
-        if (OnlyShowReSizingBoxOnSelect)
-        {
-            _resizeSizeBoxBorder.IsVisible = true;
-        }
+        this.IsSelected = true;
         if (e.Handled)
         {
             return;
         }
         if (e.GetCurrentPoint(TopLevel.GetTopLevel(this)).Properties.IsLeftButtonPressed)
         {
+            e.Pointer.Capture((IInputElement?)sender);
             _isDragging = true;
             _dragStartPoint = e.GetPosition(TopLevel.GetTopLevel(this));
         }
