@@ -44,6 +44,7 @@ class Program
         catch (Exception e)
         {
             Log.Fatal(e);
+            Environment.Exit(0);
         }
         finally
         {

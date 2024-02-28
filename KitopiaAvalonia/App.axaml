@@ -31,6 +31,7 @@
         <StyleInclude Source="Controls/Capture/DraggableResizeableControl.axaml" />
         <StyleInclude Source="Controls/Capture/DraggableArrowControl.axaml" />
         <StyleInclude Source="Controls/Capture/PenCaptureTool.axaml" />
+        <StyleInclude Source="Controls/Capture/TextCaptureTool.axaml" />
         <StyleInclude Source="avares://NodifyM.Avalonia/Styles/ControlStyles.axaml" />
     </Application.Styles>
     

@@ -1,0 +1,20 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:KitopiaAvalonia.Controls.Capture">
+    <Design.PreviewWith>
+        <controls:TextCaptureTool />
+    </Design.PreviewWith>
+
+    <Style Selector="controls|TextCaptureTool">
+        <!-- Set Defaults -->
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Panel>
+                    <TextBlock Text="{TemplateBinding Text}" />
+                    <TextBox ZIndex="1" Text="{Binding RelativeSource={RelativeSource TemplatedParent},Path=Text,Mode=TwoWay}" IsVisible="{TemplateBinding IsSelected}"></TextBox>
+                </Panel>
+
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>

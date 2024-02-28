@@ -175,11 +175,11 @@ public class PenCaptureTool : CaptureToolBase
                 
                 context.SetFillRule( FillRule.EvenOdd);
                 context.BeginFigure(Points.FirstOrDefault(),false);
-                foreach (var point in Points)
+                for (var index = 2; index < Points.Count; index++)
                 {
-                    context.LineTo(point);
+                    context.QuadraticBezierTo(  Points[index-1],Points[index]);
                 }
-                
+
                 context.EndFigure(false);
             }
 

@@ -4,12 +4,14 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using ScreenCapture.NET;
 using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 
 namespace Core.SDKs.Tools;
 
 public static class ScreenCapture
 {
     static Queue<Bitmap> bitmaps = new();
+    public static Queue<Bitmap> mosaics = new();
     static SixLabors.ImageSharp.Configuration customConfig = SixLabors.ImageSharp.Configuration.Default.Clone();
 
     public static Queue<Bitmap> CaptureAllScreen()
@@ -28,6 +30,27 @@ public static class ScreenCapture
             using var loadPixelData = SixLabors.ImageSharp.Image.LoadPixelData<Bgra32>(customConfig,
                 captureZone.RawBuffer,
                 captureZone.Width, captureZone.Height);
+            var clone = loadPixelData.Clone();
+            using (clone)
+            {
+                clone.Mutate( x => x.BoxBlur(10));
+                if (!clone.DangerousTryGetSinglePixelMemory(out Memory<Bgra32> memory1))
+                {
+                    throw new Exception(
+                        "This can only happen with multi-GB images or when PreferContiguousImageBuffers is not set to true.");
+                }
+
+                using (MemoryHandle pinHandle = memory1.Pin())
+                {
+                    unsafe
+                    {
+                        var bitmap1 = new Bitmap(PixelFormat.Bgra8888, AlphaFormat.Unpremul, (IntPtr)pinHandle.Pointer,
+                            new PixelSize(captureZone.Width, captureZone.Height), new Vector(96, 96),
+                            (captureZone.Height * PixelFormat.Bgra8888.BitsPerPixel + 7) / 8);
+                        mosaics.Enqueue(bitmap1);
+                    }
+                }
+            }
             if (!loadPixelData.DangerousTryGetSinglePixelMemory(out Memory<Bgra32> memory))
             {
                 throw new Exception(
@@ -48,4 +71,5 @@ public static class ScreenCapture
 
         return bitmaps;
     }
+    
 }

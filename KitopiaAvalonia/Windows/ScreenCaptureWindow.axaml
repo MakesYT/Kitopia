@@ -12,6 +12,13 @@
     <Canvas>
 
         <Image Name="Image" />
+        <Image Name="MosaicImage" Width="{Binding $parent[Canvas].Bounds.Width}" 
+               Height="{Binding $parent[Canvas].Bounds.Height}">
+          
+        </Image>
+        <capture:PenCaptureTool Name="MosaicCanvas" Width="{Binding $parent[Canvas].Bounds.Width}" ZIndex="-1"
+                  Height="{Binding $parent[Canvas].Bounds.Height}" Stroke="Black" Fill="Black" StrokeThickness="7">
+        </capture:PenCaptureTool>
         <Rectangle ZIndex="1" Name="Rectangle" Width="{Binding $parent[Window].Bounds.Width}"
                    Height="{Binding $parent[Window].Bounds.Height}" PointerEntered="Rectangle_OnPointerEntered">
             <Rectangle.Fill>

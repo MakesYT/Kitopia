@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using KitopiaAvalonia.Windows;
 
 namespace KitopiaAvalonia.Tools;
@@ -29,11 +30,12 @@ public class ScreenCapture
                     CanResize = false,
                     IsVisible = true,
                 };
+                window.MosaicImage.Source = Core.SDKs.Tools.ScreenCapture.mosaics.Count > 0 ? Core.SDKs.Tools.ScreenCapture.mosaics.Dequeue() : null;
                 window.Image.Source = captureAllScreen.Count > 0 ? captureAllScreen.Dequeue() : null;
                 window.Show();
             }
         }
-
+        Core.SDKs.Tools.ScreenCapture.mosaics.Clear();
         captureAllScreen.Clear();
         GC.Collect(2, GCCollectionMode.Aggressive);
     }

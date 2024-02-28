@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Avalonia;
+using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Shapes;
@@ -62,6 +64,11 @@ public partial class ScreenCaptureWindow : Window
                         bitmap.Dispose();
                         Image.Source = null;
                     }
+                    if (MosaicImage is not null && MosaicImage.Source is Bitmap bitmap1)
+                    {
+                        bitmap1.Dispose();
+                        MosaicImage.Source = null;
+                    }
 
 
                     this.Close();
@@ -89,12 +96,18 @@ public partial class ScreenCaptureWindow : Window
     {
         base.OnOpened(e);
         SelectBox.LocationOrSizeChanged += LocationOrSizeChanged;
+        
+        renderTargetBitmap = new RenderTargetBitmap(new PixelSize((int)Width, (int)Height), new Vector(96, 96));
+        
+        var brush = new ImageBrush(renderTargetBitmap);
+        MosaicImage.OpacityMask = brush;
     }
 
     protected override void OnClosed(EventArgs e)
     {
         base.OnClosed(e);
         SelectBox.LocationOrSizeChanged -= LocationOrSizeChanged;
+        renderTargetBitmap.Dispose();
     }
 
     
@@ -377,6 +390,30 @@ public partial class ScreenCaptureWindow : Window
                     Now截图工具 = rectangle;
                     break;
                 }
+                case 截图工具.文本:
+                {
+                    var position = e.GetPosition(this);
+                    _startPoint = position;
+                    var dragarea = new TextCaptureTool();
+                    dragarea._dragTransform.X = position.X;
+                    dragarea._dragTransform.Y = position.Y;
+                    
+                   
+                    dragarea.IsSelected = true;
+                    dragarea.Foreground = new SolidColorBrush(Colors.Red);
+                    dragarea.Text = "dsdsd";
+                    Canvas.Children.Add(dragarea);
+                    break;
+                }
+                case 截图工具.马赛克:
+                {
+                    var position = e.GetPosition(this);
+                    _startPoint = position;
+                    MosaicCanvas.Points.Add(position);
+                    Adding截图工具 = true;
+                    
+                    break;
+                }
             
             }
             e.Handled = true;
@@ -386,6 +423,8 @@ public partial class ScreenCaptureWindow : Window
 
         
     }
+    int count = 0;
+    private RenderTargetBitmap renderTargetBitmap;
     private void SelectBox_OnPointerMoved(object? sender, PointerEventArgs e)
     {
         if (IsSelected)
@@ -410,7 +449,24 @@ public partial class ScreenCaptureWindow : Window
             ((DraggableArrowControl)Now截图工具).Target = e.GetPosition(this);
         }else if (NowTool == 截图工具.批准)
         {
-            ((PenCaptureTool) Now截图工具).Points.Add( e.GetPosition(this));
+            if (count>=4)
+            {
+                ((PenCaptureTool) Now截图工具).Points.Add( e.GetPosition(this));
+                count = 0;
+            }
+            count++;
+        }else if (NowTool == 截图工具.马赛克)
+        {
+            if (count>=5)
+            {
+                
+                
+                MosaicCanvas.Points.Add( e.GetPosition(this));
+                renderTargetBitmap.Render(MosaicCanvas);
+                
+                count = 0;
+            }
+            count++;
         }
         else
         {
