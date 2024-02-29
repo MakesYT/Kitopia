@@ -37,7 +37,7 @@
 
         <Canvas ZIndex="3" Name="Canvas" Width="{Binding $parent[Canvas].Bounds.Width}"
                 Height="{Binding $parent[Canvas].Bounds.Height}"/>
-        <Border ZIndex="3" Padding="5" CornerRadius="4" IsVisible="False" Name="ToolBar">
+        <Border ZIndex="3" Padding="5" CornerRadius="4" IsVisible="False"   d:IsHidden="False" Name="ToolBar">
             <Border.Background>
                 <SolidColorBrush Color="{DynamicResource SolidBackgroundFillColorBase}" Opacity="0.5" />
             </Border.Background>
@@ -121,11 +121,41 @@
                                            FontFamily="{StaticResource FluentFont}" Glyph="&#xf295;" FontSize="24" />
                     </Button>
                 </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="2">
+                    <StackPanel.Styles>
+                        <Style Selector="Button.Selected">
+                            <Setter Property="Background">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="Black" Opacity="0.2"></SolidColorBrush>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="BorderBrush" Value="DimGray"></Setter>
+
+                        </Style>
+                        <Style Selector="Button.Selected:pointerover /template/ controls|FABorder#Root">
+                            <Setter Property="BorderBrush" Value="DimGray" />
+                            <Setter Property="Background">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="Black" Opacity="0.1"></SolidColorBrush>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </StackPanel.Styles>
+                    <controls:NumberBox ToolTip.Tip="画笔大小" Margin="0,2,0,0" Height="37" Name="StrokeWidth" Minimum="1" Maximum="50" SpinButtonPlacementMode="Inline" Value="3">
+                        <controls:NumberBox.Styles>
+                            <Style Selector="controls|NumberBox /template/ TextBox#InputBox">
+                                <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+                            </Style>
+                        </controls:NumberBox.Styles>
+                    </controls:NumberBox> 
+                    <controls:ColorPickerButton ToolTip.Tip="画笔颜色" Name="ColorPicker" UseColorPalette="True"></controls:ColorPickerButton>
+                   
+                </StackPanel>
             </StackPanel>
 
         </Border>
 
-
+        
         <Line ZIndex="2" Name="X" Fill="WhiteSmoke" Stroke="WhiteSmoke" StrokeThickness="1.5" IsVisible="False" />
         <Line ZIndex="2" Name="Y" Fill="WhiteSmoke" Stroke="WhiteSmoke" StrokeThickness="1.5" IsVisible="False" />
 

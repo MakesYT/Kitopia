@@ -90,7 +90,37 @@ public partial class ScreenCaptureWindow : Window
     bool ShowAlignLine => !IsSelected && PointerOver && !Selecting;
 
 
-    
+    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+    {
+        base.OnApplyTemplate(e);
+        ColorPicker.CustomPaletteColors = new[]
+        {
+            Colors.Red,
+            Colors.Yellow,
+            Colors.Purple,
+            Colors.Orange,
+            Colors.Gray,
+            Colors.Black,
+            Colors.White,
+            Colors.Pink,
+            Colors.Cyan,
+            Colors.Lime,
+            Colors.Violet,
+            Colors.Aqua,
+            Colors.Gold,
+            Colors.Chartreuse,
+            Colors.Chocolate,
+            Colors.Coral,
+            Colors.CornflowerBlue,
+            Colors.DeepSkyBlue,
+            Colors.Fuchsia,
+            Colors.Goldenrod,
+            Colors.GreenYellow,
+            Colors.HotPink,
+            Colors.LawnGreen,
+        };
+        ColorPicker.Color = Colors.Red;
+    }
 
     protected override void OnOpened(EventArgs e)
     {
@@ -329,8 +359,8 @@ public partial class ScreenCaptureWindow : Window
                     var rectangle = new Avalonia.Controls.Shapes.Rectangle();
                     dragarea.Content = rectangle;
                 
-                    rectangle.Stroke = new SolidColorBrush(Colors.Red);
-                    rectangle.StrokeThickness = 1;
+                    rectangle.Stroke = new SolidColorBrush(ColorPicker.Color!.Value);
+                    rectangle.StrokeThickness = StrokeWidth.Value;
                
                     Canvas.Children.Add(dragarea);
                     Adding截图工具 = true;
@@ -348,8 +378,8 @@ public partial class ScreenCaptureWindow : Window
                     var rectangle = new Ellipse();
                     dragarea.Content = rectangle;
                     dragarea.IsSelected = true;
-                    rectangle.Stroke = new SolidColorBrush(Colors.Red);
-                    rectangle.StrokeThickness = 1;
+                    rectangle.Stroke = new SolidColorBrush(ColorPicker.Color!.Value);
+                    rectangle.StrokeThickness = StrokeWidth.Value;
                
                     Canvas.Children.Add(dragarea);
                     Adding截图工具 = true;
@@ -364,9 +394,9 @@ public partial class ScreenCaptureWindow : Window
                     dragarea.IsSelected = true;
                     dragarea.Source = position;
                     dragarea.Target = position;
-                    dragarea.Stroke=new SolidColorBrush(Colors.Red);
-                    dragarea.Fill=new SolidColorBrush(Colors.Red);
-                    dragarea.StrokeThickness = 2;
+                    dragarea.Stroke=new SolidColorBrush(ColorPicker.Color!.Value);
+                    dragarea.Fill=new SolidColorBrush(ColorPicker.Color!.Value);
+                    dragarea.StrokeThickness = StrokeWidth.Value;
                     dragarea.ArrowSize=new Size(8*dragarea.StrokeThickness, 8*dragarea.StrokeThickness);
                     Canvas.Children.Add(dragarea);
                     Adding截图工具 = true;
@@ -380,9 +410,9 @@ public partial class ScreenCaptureWindow : Window
                     
                     var rectangle = new PenCaptureTool();
                     rectangle.Points.Add(position);
-                    rectangle.StrokeThickness = 2d;
-                    rectangle.Stroke=new SolidColorBrush(Colors.Red);
-                    rectangle.Fill=new SolidColorBrush(Colors.Red);
+                    rectangle.StrokeThickness = StrokeWidth.Value;
+                    rectangle.Stroke=new SolidColorBrush(ColorPicker.Color!.Value);
+                    rectangle.Fill=new SolidColorBrush(ColorPicker.Color!.Value);
                     rectangle.Width = Width;
                     rectangle.Height = Height;
                     Canvas.Children.Add(rectangle);
@@ -400,8 +430,9 @@ public partial class ScreenCaptureWindow : Window
                     
                    
                     dragarea.IsSelected = true;
-                    dragarea.Foreground = new SolidColorBrush(Colors.Red);
+                    dragarea.Foreground = new SolidColorBrush(ColorPicker.Color!.Value);
                     dragarea.Text = "dsdsd";
+                    dragarea.FontSize = 13+StrokeWidth.Value;
                     Canvas.Children.Add(dragarea);
                     break;
                 }
@@ -410,6 +441,7 @@ public partial class ScreenCaptureWindow : Window
                     var position = e.GetPosition(this);
                     _startPoint = position;
                     MosaicCanvas.Points.Add(position);
+                    MosaicCanvas.StrokeThickness = 5 + StrokeWidth.Value;
                     Adding截图工具 = true;
                     
                     break;
@@ -449,24 +481,16 @@ public partial class ScreenCaptureWindow : Window
             ((DraggableArrowControl)Now截图工具).Target = e.GetPosition(this);
         }else if (NowTool == 截图工具.批准)
         {
-            if (count>=4)
-            {
-                ((PenCaptureTool) Now截图工具).Points.Add( e.GetPosition(this));
-                count = 0;
-            }
-            count++;
+            
+            
+            ((PenCaptureTool) Now截图工具).Points.Add( e.GetPosition(this));
+            
         }else if (NowTool == 截图工具.马赛克)
         {
-            if (count>=5)
-            {
-                
-                
-                MosaicCanvas.Points.Add( e.GetPosition(this));
-                renderTargetBitmap.Render(MosaicCanvas);
-                
-                count = 0;
-            }
-            count++;
+           
+            MosaicCanvas.Points.Add( e.GetPosition(this));
+            renderTargetBitmap.Render(MosaicCanvas);
+             
         }
         else
         {
