@@ -7,7 +7,9 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.VisualTree;
+using KitopiaAvalonia.SDKs;
 using KitopiaAvalonia.Tools;
+using KitopiaAvalonia.Windows;
 
 namespace KitopiaAvalonia.Controls.Capture;
 
@@ -118,6 +120,14 @@ public class DraggableResizeableControl : CaptureToolBase
                 _isResizingLeft = true;
                 _resizeStartPoint =new Point(_dragTransform.X+Width,_resizeStartPoint.Y);
             }
+            this.GetParentOfType<ScreenCaptureWindow>().redoStack.Push(new ScreenCaptureRedoInfo()
+            {
+                EditType = ScreenCaptureEditType.调整大小, 
+                Target = this,
+                startPoint = new Point(_dragTransform.X,_dragTransform.Y),
+                Size = this.DesiredSize,
+                Type = 截图工具.矩形
+            });
         }
         
     }
@@ -334,6 +344,13 @@ public class DraggableResizeableControl : CaptureToolBase
             e.Pointer.Capture((IInputElement?)sender);
             _isDragging = true;
             _dragStartPoint = e.GetPosition(TopLevel.GetTopLevel(this));
+            this.GetParentOfType<ScreenCaptureWindow>().redoStack.Push(new ScreenCaptureRedoInfo()
+            {
+                EditType = ScreenCaptureEditType.移动, 
+                Target = this,
+                startPoint = new Point(_dragTransform.X, _dragTransform.Y),
+                Type = 截图工具.矩形
+            });
         }
     }
     private void ContentOnPointerMoved(object? sender, PointerEventArgs e)

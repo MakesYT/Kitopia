@@ -98,10 +98,10 @@
                           StrokeThickness="1"
                           StartPoint="0.5,0"
                           EndPoint="0.5,32" />
-                    <Button BorderThickness="1" ToolTip.Tip="撤销" Width="32" Height="32" Padding="1,3,0,0" Click="TextButton_OnClick">
+                    <Button BorderThickness="1" ToolTip.Tip="撤销" Width="32" Height="32" Padding="1,3,0,0" Click="RedoButton_OnClick">
                         <controls:FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" Width="24"
                                            Height="24"
-                                           FontFamily="{StaticResource FluentFont}" Glyph="&#xecaf;" FontSize="24" />
+                                           FontFamily="{StaticResource FluentFont}" Glyph="&#xf8e6;" FontSize="24" />
                     </Button>
                     <Button BorderThickness="1" ToolTip.Tip="拓展功能" Width="32" Height="32" Padding="1" />
                     <Line Height="32" Width="1" Stroke="{StaticResource TextFillColorSecondaryBrush}"

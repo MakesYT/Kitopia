@@ -13,6 +13,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceInclude Source="Styles/Icons.axaml" />
                 <ResourceInclude Source="Styles/FluentUiStyles.axaml" />
+                <ResourceInclude Source="Styles/FAColorPicker.axaml" />
             </ResourceDictionary.MergedDictionaries>
             <converter:DoubleQuarterConverter x:Key="doubleQuarterConverter" />
         </ResourceDictionary>

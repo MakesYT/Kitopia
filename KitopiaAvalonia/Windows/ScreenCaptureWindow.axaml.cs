@@ -19,6 +19,7 @@ using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using KitopiaAvalonia.Controls;
 using KitopiaAvalonia.Controls.Capture;
+using KitopiaAvalonia.SDKs;
 using KitopiaAvalonia.Tools;
 using Microsoft.Extensions.DependencyInjection;
 using SixLabors.ImageSharp.PixelFormats;
@@ -29,17 +30,6 @@ using Size = Avalonia.Size;
 
 namespace KitopiaAvalonia.Windows;
 
-public enum 截图工具
-{
-    无,
-    矩形,
-    圆形,
-    箭头,
-    马赛克,
-    文本,
-    批准
-}
-
 public partial class ScreenCaptureWindow : Window
 {
     
@@ -48,7 +38,8 @@ public partial class ScreenCaptureWindow : Window
     private bool Selecting = false;
     private bool PointerOver = false;
     private Point _startPoint;
-    private Stack<Control> redoStack = new();
+    public Stack<ScreenCaptureRedoInfo> redoStack = new();
+    private List<CaptureToolBase> tools = new();
 
     public ScreenCaptureWindow()
     {
@@ -365,6 +356,8 @@ public partial class ScreenCaptureWindow : Window
                     Canvas.Children.Add(dragarea);
                     Adding截图工具 = true;
                     Now截图工具 = dragarea;
+                    
+                    
                     break;
                 }
                 case 截图工具.圆形:
@@ -530,6 +523,15 @@ public partial class ScreenCaptureWindow : Window
     {
         if (e.InitialPressMouseButton == MouseButton.Left&& Adding截图工具)
         {
+            redoStack.Push(new ScreenCaptureRedoInfo
+            {
+                Type = NowTool,
+                Target = Now截图工具,
+                EditType = ScreenCaptureEditType.添加,
+                startPoint = _startPoint,
+                Size = Now截图工具.DesiredSize,
+                points = null
+            });
             Adding截图工具 = false;
             e.Handled = true;
         }
@@ -538,6 +540,15 @@ public partial class ScreenCaptureWindow : Window
     {
         if (Adding截图工具)
         {
+            redoStack.Push(new ScreenCaptureRedoInfo
+            {
+                Type = NowTool,
+                Target = Now截图工具,
+                EditType = ScreenCaptureEditType.添加,
+                startPoint = _startPoint,
+                Size = Now截图工具.DesiredSize,
+                points = null
+            });
             Adding截图工具 = false;
             e.Handled = true;
         }
@@ -776,5 +787,58 @@ public partial class ScreenCaptureWindow : Window
             NowTool = 截图工具.无;
     }
 
-    
+
+    private void RedoButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (redoStack.TryPop(out var item))
+        {
+            switch (item.EditType)
+            {
+                case ScreenCaptureEditType.添加:
+                {
+                    Canvas.Children.Remove((Control)item.Target);
+                    break;
+                }
+                case ScreenCaptureEditType.移动:
+                {
+                    switch (item.Type)
+                    {
+                        case 截图工具.矩形:
+                        {
+                            ((DraggableResizeableControl)Canvas.Children[Canvas.Children.IndexOf((Control)item.Target)])
+                                ._dragTransform.X = item.startPoint.X;
+                            ((DraggableResizeableControl)Canvas.Children[Canvas.Children.IndexOf((Control)item.Target)])
+                                ._dragTransform.Y = item.startPoint.Y;
+                            break;
+                        }
+                    }
+
+                    break;
+                }
+                case ScreenCaptureEditType.调整大小:
+                {
+                    switch (item.Type)
+                    {
+                        case 截图工具.矩形:
+                        {
+                            ((DraggableResizeableControl)Canvas.Children[Canvas.Children.IndexOf((Control)item.Target)])
+                                ._dragTransform.X = item.startPoint.X;
+                            ((DraggableResizeableControl)Canvas.Children[Canvas.Children.IndexOf((Control)item.Target)])
+                                ._dragTransform.Y = item.startPoint.Y;
+                            ((DraggableResizeableControl)Canvas.Children[Canvas.Children.IndexOf((Control)item.Target)])
+                                .Width = item.Size.Width;
+                            ((DraggableResizeableControl)Canvas.Children[Canvas.Children.IndexOf((Control)item.Target)])
+                                .Height = item.Size.Height;
+                            break;
+                        }
+                    }
+                    break;
+                }
+                case ScreenCaptureEditType.画笔:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+    }
 }
