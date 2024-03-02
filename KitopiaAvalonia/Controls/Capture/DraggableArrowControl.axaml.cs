@@ -9,7 +9,9 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Media.Immutable;
 using Avalonia.VisualTree;
+using KitopiaAvalonia.SDKs;
 using KitopiaAvalonia.Tools;
+using KitopiaAvalonia.Windows;
 using NodifyM.Avalonia.Controls;
 
 namespace KitopiaAvalonia.Controls.Capture;
@@ -127,6 +129,14 @@ public class DraggableArrowControl : CaptureToolBase
         if (e.GetCurrentPoint(TopLevel.GetTopLevel(this)).Properties.IsLeftButtonPressed)
         {
             e.Pointer.Capture((IInputElement?)sender);
+            this.GetParentOfType<ScreenCaptureWindow>().redoStack.Push(new ScreenCaptureRedoInfo()
+            {
+                EditType = ScreenCaptureEditType.移动, 
+                Target = this,
+                Point1 = Source,
+                Point2 = Target,
+                Type = 截图工具.箭头
+            });
             _isDragingPoint = true;
             _nowDragPoint = ((Control)sender).Name != "S";
             e.Handled = true;
@@ -173,6 +183,14 @@ public class DraggableArrowControl : CaptureToolBase
             _isDragging = true;
             e.Pointer.Capture((IInputElement?)sender);
             _dragStartPoint = e.GetPosition(TopLevel.GetTopLevel(this));
+            this.GetParentOfType<ScreenCaptureWindow>().redoStack.Push(new ScreenCaptureRedoInfo()
+            {
+                EditType = ScreenCaptureEditType.移动, 
+                Target = this,
+                Point1 = Source,
+                Point2 = Target,
+                Type = 截图工具.箭头
+            });
         }
     }
     private void ContentOnPointerMoved(object? sender, PointerEventArgs e)

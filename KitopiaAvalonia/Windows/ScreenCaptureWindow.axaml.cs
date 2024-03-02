@@ -418,6 +418,7 @@ public partial class ScreenCaptureWindow : Window
                     var position = e.GetPosition(this);
                     _startPoint = position;
                     var dragarea = new TextCaptureTool();
+                    dragarea.IsRedoing = true;
                     dragarea._dragTransform.X = position.X;
                     dragarea._dragTransform.Y = position.Y;
                     
@@ -427,12 +428,38 @@ public partial class ScreenCaptureWindow : Window
                     dragarea.Text = "dsdsd";
                     dragarea.FontSize = 13+StrokeWidth.Value;
                     Canvas.Children.Add(dragarea);
+                    Adding截图工具 = true;
+                    Now截图工具 = dragarea;
                     break;
                 }
                 case 截图工具.马赛克:
                 {
                     var position = e.GetPosition(this);
                     _startPoint = position;
+                    if (redoStack.TryPeek( out var result))
+                    {
+                        if (result.Type!=截图工具.马赛克)
+                        {
+                            redoStack.Push(new ScreenCaptureRedoInfo()
+                            {
+                                EditType = ScreenCaptureEditType.移动,
+                                Type = 截图工具.马赛克,
+                                points = new List<Point>(){position}
+                            });
+                        }else
+                        {
+                            redoStack.Peek().points.Add(position);
+                        }
+                    }
+                    else
+                    {
+                        redoStack.Push(new ScreenCaptureRedoInfo()
+                        {
+                            EditType = ScreenCaptureEditType.移动,
+                            Type = 截图工具.马赛克,
+                            points = new List<Point>(){position}
+                        });
+                    }
                     MosaicCanvas.Points.Add(position);
                     MosaicCanvas.StrokeThickness = 5 + StrokeWidth.Value;
                     Adding截图工具 = true;
@@ -469,18 +496,44 @@ public partial class ScreenCaptureWindow : Window
             return;
         }
 
+        if (NowTool==截图工具.文本)
+        {
+            return;
+        }
         if (NowTool == 截图工具.箭头)
         {
             ((DraggableArrowControl)Now截图工具).Target = e.GetPosition(this);
         }else if (NowTool == 截图工具.批准)
         {
-            
-            
             ((PenCaptureTool) Now截图工具).Points.Add( e.GetPosition(this));
-            
         }else if (NowTool == 截图工具.马赛克)
         {
+            if (redoStack.TryPeek( out var result))
+            {
+                if (result.Type!=截图工具.马赛克)
+                {
+                    redoStack.Push(new ScreenCaptureRedoInfo()
+                    {
+                        EditType = ScreenCaptureEditType.移动,
+                        Type = 截图工具.马赛克,
+                        points = new List<Point>(){e.GetPosition(this)}
+                    });
+                }else
+                {
+                    redoStack.Peek().points.Add(e.GetPosition(this));
+                }
+            }
+            else
+            {
+                redoStack.Push(new ScreenCaptureRedoInfo()
+                {
+                    EditType = ScreenCaptureEditType.移动,
+                    Type = 截图工具.马赛克,
+                    points = new List<Point>(){e.GetPosition(this)}
+                });
+            }
            
+            
             MosaicCanvas.Points.Add( e.GetPosition(this));
             renderTargetBitmap.Render(MosaicCanvas);
              
@@ -523,15 +576,19 @@ public partial class ScreenCaptureWindow : Window
     {
         if (e.InitialPressMouseButton == MouseButton.Left&& Adding截图工具)
         {
-            redoStack.Push(new ScreenCaptureRedoInfo
+            if (NowTool!=截图工具.马赛克)
             {
-                Type = NowTool,
-                Target = Now截图工具,
-                EditType = ScreenCaptureEditType.添加,
-                startPoint = _startPoint,
-                Size = Now截图工具.DesiredSize,
-                points = null
-            });
+                redoStack.Push(new ScreenCaptureRedoInfo
+                {
+                    Type = NowTool,
+                    Target = Now截图工具,
+                    EditType = ScreenCaptureEditType.添加,
+                    startPoint = _startPoint,
+                    Size = Now截图工具.DesiredSize,
+                    points = null
+                });
+            }
+           
             Adding截图工具 = false;
             e.Handled = true;
         }
@@ -540,15 +597,18 @@ public partial class ScreenCaptureWindow : Window
     {
         if (Adding截图工具)
         {
-            redoStack.Push(new ScreenCaptureRedoInfo
+            if (NowTool!=截图工具.马赛克)
             {
-                Type = NowTool,
-                Target = Now截图工具,
-                EditType = ScreenCaptureEditType.添加,
-                startPoint = _startPoint,
-                Size = Now截图工具.DesiredSize,
-                points = null
-            });
+                redoStack.Push(new ScreenCaptureRedoInfo
+                {
+                    Type = NowTool,
+                    Target = Now截图工具,
+                    EditType = ScreenCaptureEditType.添加,
+                    startPoint = _startPoint,
+                    Size = Now截图工具.DesiredSize,
+                    points = null
+                });
+            }
             Adding截图工具 = false;
             e.Handled = true;
         }
@@ -805,12 +865,45 @@ public partial class ScreenCaptureWindow : Window
                     {
                         case 截图工具.矩形:
                         {
-                            ((DraggableResizeableControl)Canvas.Children[Canvas.Children.IndexOf((Control)item.Target)])
-                                ._dragTransform.X = item.startPoint.X;
-                            ((DraggableResizeableControl)Canvas.Children[Canvas.Children.IndexOf((Control)item.Target)])
-                                ._dragTransform.Y = item.startPoint.Y;
+                            if (Equals(item.Target, SelectBox))
+                            {
+                                SelectBox._dragTransform.X=item.startPoint.X;
+                                SelectBox._dragTransform.Y=item.startPoint.Y;
+                                UpdateSelectBox();
+                                UpdateToolBar();
+                            }
+                            else
+                            {
+                                ((DraggableResizeableControl)Canvas.Children[Canvas.Children.IndexOf((Control)item.Target)])
+                                    ._dragTransform.X = item.startPoint.X;
+                                ((DraggableResizeableControl)Canvas.Children[Canvas.Children.IndexOf((Control)item.Target)])
+                                    ._dragTransform.Y = item.startPoint.Y;
+                            }
+                            
                             break;
                         }
+                        case 截图工具.箭头:
+                        {
+                            ((DraggableArrowControl)Canvas.Children[Canvas.Children.IndexOf((Control)item.Target)])
+                                .Source=item.Point1;
+                            ((DraggableArrowControl)Canvas.Children[Canvas.Children.IndexOf((Control)item.Target)])
+                                .Target=item.Point2;
+                            
+                            break;
+                        }
+                        
+                        case 截图工具.马赛克:
+                        {
+                            foreach (var resultPoint in item.points)
+                            {
+                                MosaicCanvas.Points.Remove(resultPoint);
+                            }
+                            item.points.Clear();
+                            item.points = null;
+                            renderTargetBitmap.Render(MosaicCanvas);
+                            break;
+                        }
+                            
                     }
 
                     break;
@@ -821,14 +914,38 @@ public partial class ScreenCaptureWindow : Window
                     {
                         case 截图工具.矩形:
                         {
-                            ((DraggableResizeableControl)Canvas.Children[Canvas.Children.IndexOf((Control)item.Target)])
-                                ._dragTransform.X = item.startPoint.X;
-                            ((DraggableResizeableControl)Canvas.Children[Canvas.Children.IndexOf((Control)item.Target)])
-                                ._dragTransform.Y = item.startPoint.Y;
-                            ((DraggableResizeableControl)Canvas.Children[Canvas.Children.IndexOf((Control)item.Target)])
-                                .Width = item.Size.Width;
-                            ((DraggableResizeableControl)Canvas.Children[Canvas.Children.IndexOf((Control)item.Target)])
-                                .Height = item.Size.Height;
+                            if (Equals(item.Target, SelectBox))
+                            {
+                                SelectBox._dragTransform.X=item.startPoint.X;
+                                SelectBox._dragTransform.Y=item.startPoint.Y;
+                                SelectBox.Width = item.Size.Width;
+                                SelectBox.Height = item.Size.Height;
+                                UpdateSelectBox();
+                                UpdateToolBar();
+                            }
+                            else
+                            {
+                                ((DraggableResizeableControl)Canvas.Children[
+                                        Canvas.Children.IndexOf((Control)item.Target)])
+                                    ._dragTransform.X = item.startPoint.X;
+                                ((DraggableResizeableControl)Canvas.Children[
+                                        Canvas.Children.IndexOf((Control)item.Target)])
+                                    ._dragTransform.Y = item.startPoint.Y;
+                                ((DraggableResizeableControl)Canvas.Children[
+                                        Canvas.Children.IndexOf((Control)item.Target)])
+                                    .Width = item.Size.Width;
+                                ((DraggableResizeableControl)Canvas.Children[
+                                        Canvas.Children.IndexOf((Control)item.Target)])
+                                    .Height = item.Size.Height;
+                            }
+                            break;
+                        }
+                        case 截图工具.文本:
+                        {
+                            ((TextCaptureTool)Canvas.Children[Canvas.Children.IndexOf((Control)item.Target)])
+                                .IsRedoing = true;
+                            ((TextCaptureTool)Canvas.Children[Canvas.Children.IndexOf((Control)item.Target)])
+                                .Text = (string)item.Data;
                             break;
                         }
                     }

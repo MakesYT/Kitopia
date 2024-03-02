@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
@@ -11,6 +13,9 @@ using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Media.Immutable;
 using Avalonia.VisualTree;
+using KitopiaAvalonia.SDKs;
+using KitopiaAvalonia.Tools;
+using KitopiaAvalonia.Windows;
 using Pen = System.Windows.Media.Pen;
 
 namespace KitopiaAvalonia.Controls.Capture;
@@ -211,6 +216,18 @@ public class PenCaptureTool : CaptureToolBase
         if (e.GetCurrentPoint(TopLevel.GetTopLevel(this)).Properties.IsLeftButtonPressed)
         {
             _isDragging = true;
+            var points = new List<Point>();
+            foreach (var point in Points)
+            {
+                points.Add(point);
+            }
+            this.GetParentOfType<ScreenCaptureWindow>().redoStack.Push(new ScreenCaptureRedoInfo()
+            {
+                EditType = ScreenCaptureEditType.移动, 
+                Target = this,
+                points = points,
+                Type = 截图工具.批准
+            });
             e.Pointer.Capture(this);
             _dragStartPoint = e.GetPosition(TopLevel.GetTopLevel(this));
         }

@@ -1,14 +1,20 @@
-﻿using Avalonia;
+﻿using System;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.VisualTree;
+using KitopiaAvalonia.SDKs;
+using KitopiaAvalonia.Tools;
+using KitopiaAvalonia.Windows;
 
 namespace KitopiaAvalonia.Controls.Capture;
 
 public class TextCaptureTool : CaptureToolBase
 {
+    public bool IsRedoing = false;
     //Text属性
     public static readonly StyledProperty<string> TextProperty =
         AvaloniaProperty.Register<TextCaptureTool, string>(nameof(Text));
@@ -22,7 +28,61 @@ public class TextCaptureTool : CaptureToolBase
     {
         _dragTransform = new TranslateTransform();
         RenderTransform = _dragTransform;
+        
+        
+        
     }
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        TextProperty.Changed.Subscribe(TextChange);
+    }
+
+    protected override void OnLostFocus(RoutedEventArgs e)
+    {
+        base.OnLostFocus(e);
+        
+    }
+
+    void TextChange(AvaloniaPropertyChangedEventArgs<string> e)
+    {
+        if (e.Sender==this)
+        {
+            if (IsRedoing)
+            {
+                IsRedoing = false;
+                return;
+            }
+            if (this.GetParentOfType<ScreenCaptureWindow>().redoStack.TryPeek( out var result))
+            {
+                if (result.Type!=截图工具.文本)
+                {
+                    this.GetParentOfType<ScreenCaptureWindow>().redoStack.Push(new ScreenCaptureRedoInfo()
+                    {
+                        EditType = ScreenCaptureEditType.调整大小, 
+                        Target = this,
+                        Type = 截图工具.文本,
+                        Data = e.OldValue.Value
+                    });
+                }else
+                {
+                   
+                }
+            }
+            else
+            {
+                this.GetParentOfType<ScreenCaptureWindow>().redoStack.Push(new ScreenCaptureRedoInfo()
+                {
+                    EditType = ScreenCaptureEditType.调整大小, 
+                    Target = this,
+                    Type = 截图工具.文本,
+                    Data = e.OldValue.Value
+                });
+            }
+           
+        }
+    } 
     
     
     public static readonly AvaloniaProperty StartTranslateTransformProperty =

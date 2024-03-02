@@ -11,5 +11,8 @@ public struct ScreenCaptureRedoInfo
     public ScreenCaptureEditType EditType;
     public Point startPoint;
     public Size Size;
-    public List<Point> points;
+    public IList<Point> points;
+    public Point Point1;
+    public Point Point2;
+    public object Data;
 }
