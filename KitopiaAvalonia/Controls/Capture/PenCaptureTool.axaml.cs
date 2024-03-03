@@ -164,7 +164,7 @@ public class PenCaptureTool : CaptureToolBase
 
                 pen = new ImmutablePen(
                     stroke.ToImmutable(),
-                    StrokeThickness);
+                    StrokeThickness,lineCap: PenLineCap.Round,lineJoin: PenLineJoin.Round);
             }
 
             context.DrawGeometry(Fill, pen, geometry);
@@ -179,10 +179,28 @@ public class PenCaptureTool : CaptureToolBase
             {
                 
                 context.SetFillRule( FillRule.EvenOdd);
+                // context.BeginFigure(Points.FirstOrDefault(),false);
+                // for (var index = 2; index < Points.Count; index++)
+                // {
+                //     context.QuadraticBezierTo(  Points[index-1],Points[index]);
+                // }
                 context.BeginFigure(Points.FirstOrDefault(),false);
-                for (var index = 2; index < Points.Count; index++)
+                for (var index = 0; index < Points.Count; index++)
                 {
-                    context.QuadraticBezierTo(  Points[index-1],Points[index]);
+                    var point = Points[index];
+                    if (point.Y <= 0)
+                    {
+                        context.EndFigure(false);
+                        if (index+1<Points.Count)
+                        {
+                            context.BeginFigure(Points[index+1], false);
+                        }
+                        
+                        index++;
+                        continue;
+                    }
+
+                    context.LineTo(point);
                 }
 
                 context.EndFigure(false);

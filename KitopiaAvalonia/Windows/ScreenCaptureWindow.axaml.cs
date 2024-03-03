@@ -588,6 +588,38 @@ public partial class ScreenCaptureWindow : Window
                     points = null
                 });
             }
+            if (NowTool == 截图工具.马赛克)
+            {
+                if (redoStack.TryPeek( out var result))
+                {
+                    if (result.Type!=截图工具.马赛克)
+                    {
+                        redoStack.Push(new ScreenCaptureRedoInfo()
+                        {
+                            EditType = ScreenCaptureEditType.移动,
+                            Type = 截图工具.马赛克,
+                            points = new List<Point>(){e.GetPosition(this)}
+                        });
+                    }else
+                    {
+                        redoStack.Peek().points.Add(new Point(-1,-1));
+                    }
+                }
+                else
+                {
+                    redoStack.Push(new ScreenCaptureRedoInfo()
+                    {
+                        EditType = ScreenCaptureEditType.移动,
+                        Type = 截图工具.马赛克,
+                        points = new List<Point>(){e.GetPosition(this)}
+                    });
+                }
+           
+            
+                MosaicCanvas.Points.Add( new Point(-1,-1));
+                renderTargetBitmap.Render(MosaicCanvas);
+             
+            }
            
             Adding截图工具 = false;
             e.Handled = true;
@@ -608,6 +640,28 @@ public partial class ScreenCaptureWindow : Window
                     Size = Now截图工具.DesiredSize,
                     points = null
                 });
+            }
+            if (NowTool == 截图工具.马赛克)
+            {
+                if (redoStack.TryPeek( out var result))
+                {
+                    if (result.Type!=截图工具.马赛克)
+                    {
+                       
+                    }else
+                    {
+                        redoStack.Peek().points.Add(new Point(-1,-1));
+                    }
+                }
+                else
+                {
+                    
+                }
+           
+            
+                MosaicCanvas.Points.Add( new Point(-1,-1));
+                renderTargetBitmap.Render(MosaicCanvas);
+             
             }
             Adding截图工具 = false;
             e.Handled = true;
