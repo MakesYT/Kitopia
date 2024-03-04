@@ -141,7 +141,9 @@
                             </Setter>
                         </Style>
                     </StackPanel.Styles>
-                    <controls:NumberBox ToolTip.Tip="画笔大小" Margin="0,2,0,0" Height="37" Name="StrokeWidth" Minimum="1" Maximum="50" SpinButtonPlacementMode="Inline" Value="3">
+                    <controls:NumberBox ToolTip.Tip="画笔大小" Margin="0,2,0,0" Height="37" Name="StrokeWidth" Minimum="1" Maximum="50"  
+                                        PlaceholderText="3"
+                                        SpinButtonPlacementMode="Inline" Value="3" ValidationMode="InvalidInputOverwritten" >
                         <controls:NumberBox.Styles>
                             <Style Selector="controls|NumberBox /template/ TextBox#InputBox">
                                 <Setter Property="VerticalContentAlignment" Value="Center"></Setter>

@@ -151,7 +151,7 @@ public class DraggableResizeableControl : CaptureToolBase
                 else
                 {
                     this.Height = -h;
-                   // _dragTransform.Y = _resizeStartPoint.Y - h;
+                    // _dragTransform.Y = _resizeStartPoint.Y - h;
                 }
                 
             }
@@ -257,69 +257,69 @@ public class DraggableResizeableControl : CaptureToolBase
 
         if (left && top)
         {
-            Cursor?.Dispose();
-            Cursor = new Cursor(StandardCursorType.TopLeftCorner);
+            UpdateCursor("TopLeftCorner");
             return;
         }
 
         if (right && top)
         {
-            Cursor?.Dispose();
-            Cursor = new Cursor(StandardCursorType.TopRightCorner);
+            UpdateCursor("TopRightCorner");
             return;
         }
 
         if (left && bottom)
         {
-            Cursor?.Dispose();
-            Cursor = new Cursor(StandardCursorType.BottomLeftCorner);
+            UpdateCursor("BottomLeftCorner");
+            
             return;
         }
 
         if (right && bottom)
-        {
-            Cursor?.Dispose();
-            Cursor = new Cursor(StandardCursorType.BottomRightCorner);
+        { 
+            UpdateCursor("BottomRightCorner");
             return;
         }
 
         if (left)
-        {
-            Cursor?.Dispose();
-            Cursor = new Cursor(StandardCursorType.LeftSide);
+        { 
+            UpdateCursor("LeftSide");
             return;
         }
 
         if (right)
-        {
-            Cursor?.Dispose();
-            Cursor = new Cursor(StandardCursorType.RightSide);
+        { 
+            UpdateCursor("RightSide");
             return;
         }
 
         if (top)
-        {
-            Cursor?.Dispose();
-            Cursor = new Cursor(StandardCursorType.TopSide);
+        { 
+            UpdateCursor("TopSide");
             return;
         }
 
         if (bottom)
-        {
-            Cursor?.Dispose();
-            Cursor = new Cursor(StandardCursorType.BottomSide);
+        { 
+            UpdateCursor("BottomSide");
             return;
         }
     }
 
-    
-    
+    private void UpdateCursor(string cursor)
+    {
+        if (!Cursor.ToString().Equals(cursor))
+        {
+            Cursor?.Dispose();
+            Cursor = new Cursor(Enum.Parse<StandardCursorType>(cursor));
+                    
+        }
+    }
 
     #endregion
     #region 内部控件: 拖拽
     private void ContentOnPointerCaptureLost(object? sender, PointerCaptureLostEventArgs pointerCaptureLostEventArgs)
     {
-            _isDragging = false;
+        _isDragging = false;
     }
     private void ContentOnPointerPressed(object? sender, PointerPressedEventArgs e)
     {

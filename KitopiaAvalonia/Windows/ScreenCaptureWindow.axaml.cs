@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Avalonia;
@@ -17,6 +18,7 @@ using Avalonia.VisualTree;
 using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
+using FluentAvalonia.UI.Controls;
 using KitopiaAvalonia.Controls;
 using KitopiaAvalonia.Controls.Capture;
 using KitopiaAvalonia.SDKs;
@@ -122,6 +124,8 @@ public partial class ScreenCaptureWindow : Window
         
         var brush = new ImageBrush(renderTargetBitmap);
         MosaicImage.OpacityMask = brush;
+        
+
     }
 
     protected override void OnClosed(EventArgs e)
@@ -179,7 +183,12 @@ public partial class ScreenCaptureWindow : Window
             }
             SelectBox.IsVisible = true;
             IsSelected = true;
-            Cursor = Cursor.Default;
+            if (!Cursor.ToString().Equals("Default"))
+            {
+                Cursor?.Dispose();
+                Cursor = Cursor.Default;
+                    
+            }
             WeakReferenceMessenger.Default.Send<string, string>("Selected", "ScreenCapture");
             UpdateSelectBox();
             if (ConfigManger.Config.截图直接复制到剪贴板)
@@ -333,6 +342,10 @@ public partial class ScreenCaptureWindow : Window
         SelectBox.IsSelected = true;
         if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
         {
+            if (!(StrokeWidth.Value > 1))
+            {
+                StrokeWidth.Value = 1;
+            }
             switch (NowTool)
             {
                 case 截图工具.无:
@@ -481,14 +494,75 @@ public partial class ScreenCaptureWindow : Window
     {
         if (IsSelected)
         {
-            Cursor?.Dispose();
-            if (NowTool == 截图工具.无)
+            if (!(StrokeWidth.Value > 1))
             {
-                SelectBox.Cursor = new Cursor(StandardCursorType.SizeAll);
+                StrokeWidth.Value = 1;
             }
-            else
+            switch (NowTool)
             {
-                SelectBox.Cursor = Avalonia.Input.Cursor.Default;
+                case 截图工具.无:
+                {
+                    if (!SelectBox.Cursor.ToString().Equals("SizeAll"))
+                    {
+                        SelectBox.Cursor?.Dispose();
+                        SelectBox.Cursor = new Cursor(StandardCursorType.SizeAll);
+                    }
+
+                    break;
+                }
+                case 截图工具.马赛克:
+                {
+                    if (!SelectBox.Cursor.ToString().Equals("BitmapCursor"))
+                    {
+                        var round =(int) Math.Round(StrokeWidth.Value,MidpointRounding.AwayFromZero)+7;
+                        var renderTargetBitmap = new RenderTargetBitmap(new PixelSize(round, round));
+                        Ellipse ellipse = new Ellipse();
+                        ellipse.Stroke = new SolidColorBrush(ColorPicker.Color!.Value);
+                        ellipse.StrokeThickness = 2;
+                        ellipse.Width = round;
+                        ellipse.Height = round;
+                        ellipse.Measure(new Size(round, round));
+                        ellipse.Arrange(new Rect(new Point(0, 0), new Size(round, round)));
+                        renderTargetBitmap.Render(ellipse);
+                        SelectBox.Cursor = new Cursor(renderTargetBitmap,
+                            new PixelPoint(round / 2, round / 2));
+                    
+                    }
+
+                    break;
+                }
+                case 截图工具.批准:
+                {
+                    if (!SelectBox.Cursor.ToString().Equals("BitmapCursor"))
+                    {
+                        var round =(int) Math.Round(StrokeWidth.Value,MidpointRounding.AwayFromZero)+2;
+                        var renderTargetBitmap = new RenderTargetBitmap(new PixelSize(round, round));
+                        Ellipse ellipse = new Ellipse();
+                        ellipse.Stroke = new SolidColorBrush(ColorPicker.Color!.Value);
+                        ellipse.StrokeThickness = 2;
+                        ellipse.Width = round;
+                        ellipse.Height = round;
+                        ellipse.Measure(new Size(round, round));
+                        ellipse.Arrange(new Rect(new Point(0, 0), new Size(round, round)));
+                        renderTargetBitmap.Render(ellipse);
+                        SelectBox.Cursor = new Cursor(renderTargetBitmap,
+                            new PixelPoint(round / 2, round / 2));
+                    
+                    }
+
+                    break;
+                }
+                default:
+                {
+                    if (!SelectBox.Cursor.ToString().Equals("SizeAll"))
+                    {
+                        SelectBox.Cursor?.Dispose();
+                        SelectBox.Cursor = Avalonia.Input.Cursor.Default;
+                    
+                    }
+
+                    break;
+                }
             }
         }
         if (!Adding截图工具)
@@ -645,20 +719,13 @@ public partial class ScreenCaptureWindow : Window
             {
                 if (redoStack.TryPeek( out var result))
                 {
-                    if (result.Type!=截图工具.马赛克)
+                    if (result.Type == 截图工具.马赛克)
                     {
-                       
-                    }else
-                    {
-                        redoStack.Peek().points.Add(new Point(-1,-1));
+                        redoStack.Peek().points.Add(new Point(-1, -1));
                     }
                 }
-                else
-                {
-                    
-                }
-           
-            
+
+
                 MosaicCanvas.Points.Add( new Point(-1,-1));
                 renderTargetBitmap.Render(MosaicCanvas);
              
@@ -720,8 +787,12 @@ public partial class ScreenCaptureWindow : Window
     {
         if (IsSelected)
         {
-            Cursor?.Dispose();
-            Cursor = Cursor.Default;
+            if (!Cursor.ToString().Equals("Default"))
+            {
+                Cursor?.Dispose();
+                Cursor = Cursor.Default;
+                    
+            }
         }
     }
 
@@ -1012,4 +1083,5 @@ public partial class ScreenCaptureWindow : Window
             }
         }
     }
+    
 }

@@ -258,8 +258,12 @@ public class PenCaptureTool : CaptureToolBase
         {
             return;
         }
-        Cursor?.Dispose();
-        Cursor=new Cursor(StandardCursorType.SizeAll);
+        if (!Cursor.ToString().Equals("SizeAll"))
+        {
+            Cursor?.Dispose();
+            Cursor = new Cursor(StandardCursorType.SizeAll);
+                    
+        }
         if (_isDragging)
         {
             var dragDelta = e.GetPosition(TopLevel.GetTopLevel(this)) - _dragStartPoint;
