@@ -59,6 +59,7 @@ public class PenCaptureTool : CaptureToolBase
         Points = new();
         Points.CollectionChanged += Update;
         AffectsGeometry<PenCaptureTool>(PointsProperty,StrokeProperty,FillProperty,StrokeThicknessProperty);
+        Focusable = true;
     }
 
     public void Update(object? sender, NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
@@ -196,7 +197,6 @@ public class PenCaptureTool : CaptureToolBase
                             context.BeginFigure(Points[index+1], false);
                         }
                         
-                        index++;
                         continue;
                     }
 
@@ -219,6 +219,7 @@ public class PenCaptureTool : CaptureToolBase
         {
             return;
         }
+        Focus();
         var visualParent = (Canvas)this.GetVisualParent();
         foreach (var canvasChild in visualParent.Children)
         {

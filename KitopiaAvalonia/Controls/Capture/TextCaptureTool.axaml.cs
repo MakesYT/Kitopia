@@ -29,7 +29,7 @@ public class TextCaptureTool : CaptureToolBase
         _dragTransform = new TranslateTransform();
         RenderTransform = _dragTransform;
         
-        
+        Focusable = true;
         
     }
 

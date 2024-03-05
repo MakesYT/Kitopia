@@ -47,6 +47,7 @@ public class DraggableResizeableControl : CaptureToolBase
     public DraggableResizeableControl()
     {
         _dragTransform = new TranslateTransform();
+        Focusable = true;
     }
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
@@ -85,7 +86,7 @@ public class DraggableResizeableControl : CaptureToolBase
         {
             return;
         }
-        
+        Focus();
         if (e.GetCurrentPoint(TopLevel.GetTopLevel(this)).Properties.IsLeftButtonPressed)
         {
             e.Pointer.Capture((IInputElement?)sender);
@@ -323,8 +324,8 @@ public class DraggableResizeableControl : CaptureToolBase
     }
     private void ContentOnPointerPressed(object? sender, PointerPressedEventArgs e)
     {
-       
 
+        Focus();
         var visualParent = (Canvas)this.GetVisualParent();
         foreach (var canvasChild in visualParent.Children)
         {
@@ -362,8 +363,12 @@ public class DraggableResizeableControl : CaptureToolBase
 
         if (OnlyShowReSizingBoxOnSelect)
         {
-            Cursor?.Dispose();
-            Cursor=new Cursor(StandardCursorType.SizeAll);
+            if (!Cursor.ToString().Equals("SizeAll"))
+            {
+                Cursor?.Dispose();
+                Cursor = new Cursor(StandardCursorType.SizeAll);
+                    
+            }
         }
         
         if (_isDragging)

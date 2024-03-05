@@ -19,7 +19,7 @@
         <capture:PenCaptureTool Name="MosaicCanvas" Width="{Binding $parent[Canvas].Bounds.Width}" ZIndex="-1"
                   Height="{Binding $parent[Canvas].Bounds.Height}" Stroke="Black" Fill="Black" StrokeThickness="7">
         </capture:PenCaptureTool>
-        <Rectangle ZIndex="1" Name="Rectangle" Width="{Binding $parent[Window].Bounds.Width}"
+        <Rectangle ZIndex="1" Name="Rectangle" Width="{Binding $parent[Window].Bounds.Width}" Focusable="True"
                    Height="{Binding $parent[Window].Bounds.Height}" PointerEntered="Rectangle_OnPointerEntered">
             <Rectangle.Fill>
                 <SolidColorBrush Color="Black" Opacity="0.5" />
@@ -37,7 +37,7 @@
 
         <Canvas ZIndex="3" Name="Canvas" Width="{Binding $parent[Canvas].Bounds.Width}"
                 Height="{Binding $parent[Canvas].Bounds.Height}"/>
-        <Border ZIndex="3" Padding="5" CornerRadius="4" IsVisible="False"   d:IsHidden="False" Name="ToolBar">
+        <Border ZIndex="3" Padding="5" CornerRadius="4" IsVisible="False"   d:IsHidden="False" Name="ToolBar" Focusable="True">
             <Border.Background>
                 <SolidColorBrush Color="{DynamicResource SolidBackgroundFillColorBase}" Opacity="0.5" />
             </Border.Background>

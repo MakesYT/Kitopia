@@ -360,6 +360,8 @@ public partial class ScreenCaptureWindow : Window
                     dragarea._dragTransform.X = position.X;
                     dragarea._dragTransform.Y = position.Y;
                     dragarea.IsSelected = true;
+                    dragarea.Width = 5;
+                    dragarea.Height = 5;
                     var rectangle = new Avalonia.Controls.Shapes.Rectangle();
                     dragarea.Content = rectangle;
                 
@@ -370,7 +372,7 @@ public partial class ScreenCaptureWindow : Window
                     Adding截图工具 = true;
                     Now截图工具 = dragarea;
                     
-                    
+                    dragarea.Focus();
                     break;
                 }
                 case 截图工具.圆形:
@@ -380,7 +382,8 @@ public partial class ScreenCaptureWindow : Window
                     var dragarea = new DraggableResizeableControl();
                     dragarea._dragTransform.X = position.X;
                     dragarea._dragTransform.Y = position.Y;
-                    
+                    dragarea.Width = 5;
+                    dragarea.Height = 5;
                     var rectangle = new Ellipse();
                     dragarea.Content = rectangle;
                     dragarea.IsSelected = true;
@@ -390,6 +393,7 @@ public partial class ScreenCaptureWindow : Window
                     Canvas.Children.Add(dragarea);
                     Adding截图工具 = true;
                     Now截图工具 = dragarea;
+                    dragarea.Focus();
                     break;
                 }
                 case 截图工具.箭头:
@@ -407,6 +411,7 @@ public partial class ScreenCaptureWindow : Window
                     Canvas.Children.Add(dragarea);
                     Adding截图工具 = true;
                     Now截图工具 = dragarea;
+                    dragarea.Focus();
                     break;
                 }
                 case 截图工具.批准:
@@ -424,6 +429,7 @@ public partial class ScreenCaptureWindow : Window
                     Canvas.Children.Add(rectangle);
                     Adding截图工具 = true;
                     Now截图工具 = rectangle;
+                    rectangle.Focus();
                     break;
                 }
                 case 截图工具.文本:
@@ -438,41 +444,24 @@ public partial class ScreenCaptureWindow : Window
                    
                     dragarea.IsSelected = true;
                     dragarea.Foreground = new SolidColorBrush(ColorPicker.Color!.Value);
-                    dragarea.Text = "dsdsd";
+                    dragarea.Text = "文本1";
                     dragarea.FontSize = 13+StrokeWidth.Value;
                     Canvas.Children.Add(dragarea);
                     Adding截图工具 = true;
                     Now截图工具 = dragarea;
+                    dragarea.Focus();
                     break;
                 }
                 case 截图工具.马赛克:
                 {
                     var position = e.GetPosition(this);
                     _startPoint = position;
-                    if (redoStack.TryPeek( out var result))
+                    redoStack.Push(new ScreenCaptureRedoInfo()
                     {
-                        if (result.Type!=截图工具.马赛克)
-                        {
-                            redoStack.Push(new ScreenCaptureRedoInfo()
-                            {
-                                EditType = ScreenCaptureEditType.移动,
-                                Type = 截图工具.马赛克,
-                                points = new List<Point>(){position}
-                            });
-                        }else
-                        {
-                            redoStack.Peek().points.Add(position);
-                        }
-                    }
-                    else
-                    {
-                        redoStack.Push(new ScreenCaptureRedoInfo()
-                        {
-                            EditType = ScreenCaptureEditType.移动,
-                            Type = 截图工具.马赛克,
-                            points = new List<Point>(){position}
-                        });
-                    }
+                        EditType = ScreenCaptureEditType.移动,
+                        Type = 截图工具.马赛克,
+                        points = new List<Point>(){position}
+                    });
                     MosaicCanvas.Points.Add(position);
                     MosaicCanvas.StrokeThickness = 5 + StrokeWidth.Value;
                     Adding截图工具 = true;
@@ -481,6 +470,7 @@ public partial class ScreenCaptureWindow : Window
                 }
             
             }
+            
             e.Handled = true;
         }
        
@@ -674,9 +664,6 @@ public partial class ScreenCaptureWindow : Window
                             Type = 截图工具.马赛克,
                             points = new List<Point>(){e.GetPosition(this)}
                         });
-                    }else
-                    {
-                        redoStack.Peek().points.Add(new Point(-1,-1));
                     }
                 }
                 else
@@ -691,6 +678,7 @@ public partial class ScreenCaptureWindow : Window
            
             
                 MosaicCanvas.Points.Add( new Point(-1,-1));
+                
                 renderTargetBitmap.Render(MosaicCanvas);
              
             }

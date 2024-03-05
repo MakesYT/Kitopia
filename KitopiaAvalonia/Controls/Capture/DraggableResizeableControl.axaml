@@ -1,7 +1,8 @@
 ﻿<Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="using:KitopiaAvalonia.Controls"
-        xmlns:capture="clr-namespace:KitopiaAvalonia.Controls.Capture">
+        xmlns:capture="clr-namespace:KitopiaAvalonia.Controls.Capture"
+        >
     <Design.PreviewWith>
         <capture:DraggableResizeableControl Width="200" Height="200">
             

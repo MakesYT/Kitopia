@@ -34,7 +34,7 @@ public class DraggableArrowControl : CaptureToolBase
     
     public DraggableArrowControl()
     {
-        
+        Focusable = true;
     }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
@@ -126,6 +126,7 @@ public class DraggableArrowControl : CaptureToolBase
         {
             return;
         }
+        Focus();
         if (e.GetCurrentPoint(TopLevel.GetTopLevel(this)).Properties.IsLeftButtonPressed)
         {
             e.Pointer.Capture((IInputElement?)sender);
@@ -166,6 +167,7 @@ public class DraggableArrowControl : CaptureToolBase
         {
             return;
         }
+        Focus();
         var visualParent = (Canvas)this.GetVisualParent();
         foreach (var canvasChild in visualParent.Children)
         {
@@ -202,7 +204,7 @@ public class DraggableArrowControl : CaptureToolBase
         if (!Cursor.ToString().Equals("SizeAll"))
         {
             Cursor?.Dispose();
-            Cursor = Avalonia.Input.Cursor.Default;
+            Cursor = new Cursor(StandardCursorType.SizeAll);
                     
         }
         if (_isDragging)
