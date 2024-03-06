@@ -22,7 +22,8 @@
                      SizeToContent="Height"
                      ExtendClientAreaChromeHints="SystemChrome"
                      SystemDecorations="BorderOnly"
-                    KeyDown="InputElement_OnKeyDown"
+                     KeyDown="InputElement_OnKeyDown"
+                     Topmost="True"
                      Title="SearchWindow">
     <windowing:AppWindow.Resources>
         <searchWindow:StarBoolToText x:Key="StarBoolToText" />

@@ -219,7 +219,6 @@ public class PenCaptureTool : CaptureToolBase
         {
             return;
         }
-        Focus();
         var visualParent = (Canvas)this.GetVisualParent();
         foreach (var canvasChild in visualParent.Children)
         {
