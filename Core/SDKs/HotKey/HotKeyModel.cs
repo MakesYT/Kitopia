@@ -18,8 +18,7 @@ public class HotKeyModel
 
     public string? MainName
     {
-        get;
-        set;
+        get; set;
     }
 
     /// <summary>
@@ -80,6 +79,7 @@ public class HotKeyModel
     ///     快捷键按键集合
     /// </summary>
     public static Array Keys => Enum.GetValues(typeof(EKey));
+    
 
     [JsonIgnore] public string SignName => $"{this.MainName}_{this.Name}";
 }

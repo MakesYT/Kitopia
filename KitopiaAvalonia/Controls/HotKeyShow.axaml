@@ -14,9 +14,14 @@
         </Style.Resources>
         <Setter Property="Template">
             <ControlTemplate>
-                <Button Name="Button" ToolTip.Tip="修改快捷键" Padding="10" Margin="0"
-                        Command="{TemplateBinding EditHotKey}" CommandParameter="{TemplateBinding HotKeySignName}">
-                    <StackPanel Orientation="Horizontal" Height="{TemplateBinding Height}">
+                <Button Name="Button" ToolTip.Tip="点击激活快捷键" Padding="10" Margin="0" Classes.IsActivated="{TemplateBinding IsActivated}"
+                        Command="{TemplateBinding EditHotKey}">
+                    <Button.Styles>
+                        <Style Selector="Button.IsActivated">
+                            <Setter Property="ToolTip.Tip" Value="修改快捷键"></Setter>
+                        </Style>
+                    </Button.Styles>
+                    <StackPanel Orientation="Horizontal" Height="{TemplateBinding Height}" IsEnabled="{TemplateBinding IsActivated}">
                         <controls:HotKeyShowItme Name="Ctrl" 
                                                  IsVisible="{Binding RelativeSource={RelativeSource TemplatedParent},
                                                  Path=KeyType,Converter={StaticResource HotKey_KeyTypeToVisible},ConverterParameter='Ctrl'}"
@@ -46,17 +51,18 @@
                         <TextBlock
                             IsVisible="{Binding RelativeSource={RelativeSource TemplatedParent},
                                                  Path=KeyType,Converter={StaticResource HotKey_KeyTypeToVisible},ConverterParameter='None'}"
-                            Name="None" Margin="10" Text="未设置" VerticalAlignment="Center" HorizontalAlignment="Center" />
-                        <Button Margin="5,0,5,0" Padding="0"
-                                Height="32" Width="32" FontSize="24" ToolTip.Tip="移除快捷键"
-                                Command="{TemplateBinding RemoveHotKey}"
-                                CommandParameter="{TemplateBinding HotKeyModel}">
-                            <controls1:SymbolIcon Symbol="Dismiss" />
+                            Name="None" Margin="10" Text="快捷键未设置" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                        <Button Margin="5,0,0,0" Padding="0" IsVisible="{TemplateBinding IsActivated}"
+                                Height="32" Width="32" FontSize="24" ToolTip.Tip="禁用快捷键"
+                                Command="{TemplateBinding RemoveHotKey}">
+                            <controls1:FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" Width="24"
+                                               Height="24"
+                                               FontFamily="{StaticResource FluentFont}" Glyph="&#xf36a;" FontSize="24" />
                         </Button>
-                        <controls1:SymbolIcon
-                            Name="ControlChevronIcon"
-                            Foreground="{TemplateBinding Foreground}"
-                            Symbol="Edit" />
+                        <controls1:SymbolIcon Margin="5,0,0,0" 
+                                              Name="ControlChevronIcon"
+                                              Foreground="{TemplateBinding Foreground}"
+                                              Symbol="Edit" />
 
                     </StackPanel>
                 </Button>

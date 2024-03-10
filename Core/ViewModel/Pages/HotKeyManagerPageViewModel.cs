@@ -6,9 +6,5 @@ namespace Core.ViewModel.Pages;
 
 public class HotKeyManagerPageViewModel
 {
-    public ObservableCollection<HotKeyModel> HotKeys {
-    get
-    {
-        return ConfigManger.Config.hotKeys;
-    }}
+   
 }

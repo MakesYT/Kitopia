@@ -29,7 +29,7 @@ using log4net;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using PluginCore;
-using HotKeyManager = KitopiaAvalonia.SDKs.HotKeyManager;
+using HotKeyManager = Core.SDKs.HotKey.HotKeyManager;
 
 namespace KitopiaAvalonia;
 
@@ -71,6 +71,9 @@ public partial class App : Application
 
         services.AddSingleton<ISearchItemChooseService, SearchItemChooseService>();
         services.AddSingleton<IMouseQuickWindowService, MouseQuickWindowService>();
+        services.AddTransient<ISearchWindowService, SearchWindowService>();
+        services.AddTransient<IErrorWindow, ErrorWindow>();
+        services.AddTransient<IScreenCapture, Services.ScreenCapture>();
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             services.AddTransient<IEverythingService, EverythingService>();
@@ -94,9 +97,7 @@ public partial class App : Application
         services.AddTransient<MouseQuickWindowViewModel>();
         services.AddTransient<MouseQuickWindow>(e => new MouseQuickWindow()
             { DataContext = e.GetService<MouseQuickWindowViewModel>() });
-        services.AddSingleton<SettingPageViewModel>(e => new SettingPageViewModel() { IsActive = true });
-        services.AddKeyedSingleton<UserControl, SettingPage>("SettingPage",
-            (e, _) => new SettingPage() { DataContext = e.GetService<SettingPageViewModel>() });
+        
         services.AddSingleton<HomePageViewModel>(e => new HomePageViewModel() { IsActive = true });
         services.AddKeyedSingleton<UserControl, HomePage>("HomePage",
             (e, _) => new HomePage() { DataContext = e.GetService<HomePageViewModel>() });
@@ -146,18 +147,18 @@ public partial class App : Application
         log.Info("场景管理器初始化完成");
         switch (ConfigManger.Config.themeChoice)
         {
-            case "跟随系统":
+            case ThemeEnum.跟随系统:
             {
                 ServiceManager.Services.GetService<IThemeChange>().followSys(true);
                 break;
             }
-            case "深色":
+            case ThemeEnum.深色:
             {
                 ServiceManager.Services.GetService<IThemeChange>().followSys(false);
                 ServiceManager.Services.GetService<IThemeChange>().changeTo("theme_dark");
                 break;
             }
-            case "浅色":
+            case ThemeEnum.浅色:
             {
                 ServiceManager.Services.GetService<IThemeChange>().followSys(false);
                 ServiceManager.Services.GetService<IThemeChange>().changeTo("theme_light");

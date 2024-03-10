@@ -15,6 +15,11 @@
                              BorderThickness="{DynamicResource ButtonBorderThemeThickness}"
                              CornerRadius="{DynamicResource ControlCornerRadius}"
                              Name="Root">
+                    <controls1:FABorder.Styles>
+                        <Style Selector="controls1|FABorder:disabled">
+                            <Setter Property="Background" Value="{DynamicResource AccentButtonBackgroundDisabled}" />
+                        </Style>
+                    </controls1:FABorder.Styles>
                     <Border
                         x:Name="ContentBorder"
                         Width="{TemplateBinding Width}"
@@ -38,14 +43,18 @@
                                     VerticalAlignment="Center"
                                     Content="{TemplateBinding Icon}"
                                     Foreground="{DynamicResource AccentButtonForeground}"
-                                    Focusable="False" />
+                                    Focusable="False">
+                                   
+                                </ContentPresenter>
 
                                 <ContentPresenter
                                     x:Name="ContentPresenter"
                                     Grid.Column="1"
                                     VerticalAlignment="Center"
                                     Content="{TemplateBinding Content}"
-                                    Foreground="{DynamicResource AccentButtonForeground}" />
+                                    Foreground="{DynamicResource AccentButtonForeground}">
+                                    
+                                </ContentPresenter>
                             </Grid>
                         
                     </Border>

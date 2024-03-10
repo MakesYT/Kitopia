@@ -4,6 +4,7 @@ using Core.SDKs.HotKey;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using KitopiaAvalonia;
+using KitopiaAvalonia.SDKs;
 using KitopiaAvalonia.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Window = Avalonia.Controls.Window;
@@ -15,7 +16,7 @@ public class HotKeyEditorService : IHotKeyEditor
 {
     public void EditByName(string name, object? owner)
     {
-        var hotKeyModel = ConfigManger.Config.hotKeys.FirstOrDefault(e =>
+        var hotKeyModel = HotKeyManager.HotKeys.FirstOrDefault(e =>
         {
             if ($"{e.MainName}_{e.Name}".Equals(name))
             {
@@ -52,7 +53,7 @@ public class HotKeyEditorService : IHotKeyEditor
 
     public void RemoveByHotKeyModel(HotKeyModel hotKeyModel)
     {
-        ConfigManger.Config.hotKeys.Remove(hotKeyModel);
+        hotKeyModel.IsUsable = false;
         WeakReferenceMessenger.Default.Send(hotKeyModel.SignName, "hotkey");
     }
 }

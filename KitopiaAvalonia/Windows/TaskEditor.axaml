@@ -562,18 +562,9 @@
                                         <controls:SettingsExpander Header="激活快捷键" Description="修改激活快捷键">
                                             <controls:SettingsExpander.Footer>
                                                 <Panel>
-                                                    <controls1:HotKeyShow x:Name="KeyShow"
+                                                    <controls1:HotKeyShow x:Name="KeyShow" HotKeyModel="{Binding Scenario.RunHotKey}"
                                                                           IsEnabled="{Binding IsSaveInLocal}">
-                                                        <controls1:HotKeyShow.HotKeySignName>
-                                                            <MultiBinding
-                                                                Converter="{StaticResource HotKeySignNameToolCTr}">
-                                                                <MultiBinding.Bindings>
-                                                                    <Binding Source="Kitopia情景" />
-                                                                    <Binding Path="Scenario.UUID" />
-                                                                    <Binding Source="激活快捷键" />
-                                                                </MultiBinding.Bindings>
-                                                            </MultiBinding>
-                                                        </controls1:HotKeyShow.HotKeySignName>
+                                                        
                                                     </controls1:HotKeyShow>
                                                     <Panel Background="{DynamicResource ControlFillColorDisabledBrush}"
                                                            Width="{Binding #KeyShow.Bounds.Width}"
@@ -594,18 +585,9 @@
                                         <controls:SettingsExpander Header="停止快捷键" Description="修改停止快捷键">
                                             <controls:SettingsExpander.Footer>
                                                 <Panel>
-                                                    <controls1:HotKeyShow x:Name="KeyShow1"
+                                                    <controls1:HotKeyShow x:Name="KeyShow1" HotKeyModel="{Binding Scenario.StopHotKey}"
                                                                           IsEnabled="{Binding IsSaveInLocal}">
-                                                        <controls1:HotKeyShow.HotKeySignName>
-                                                            <MultiBinding
-                                                                Converter="{StaticResource HotKeySignNameToolCTr}">
-                                                                <MultiBinding.Bindings>
-                                                                    <Binding Source="Kitopia情景" />
-                                                                    <Binding Path="Scenario.UUID" />
-                                                                    <Binding Source="停止快捷键" />
-                                                                </MultiBinding.Bindings>
-                                                            </MultiBinding>
-                                                        </controls1:HotKeyShow.HotKeySignName>
+                                                       
                                                     </controls1:HotKeyShow>
                                                     <Panel Background="{DynamicResource ControlFillColorDisabledBrush}"
                                                            Width="{Binding #KeyShow1.Bounds.Width}"

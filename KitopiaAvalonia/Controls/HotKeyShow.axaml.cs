@@ -11,6 +11,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.HotKey;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
+using KitopiaAvalonia.SDKs;
 using Vanara.PInvoke;
 
 namespace KitopiaAvalonia.Controls;
@@ -32,24 +33,7 @@ public class HotKeyShow : TemplatedControl
         WinAlt = 0011,
         Shift = 0100
     }
-
-    public static readonly StyledProperty<string> HotKeySignNameProperty =
-        AvaloniaProperty.Register<HotKeyShow, string>(nameof(HotKeySignName), coerce: (o, s) =>
-        {
-            ((HotKeyShow)o).HotKeyModel =
-                ConfigManger.Config.hotKeys.FirstOrDefault(e => ($"{e.MainName}_{e.Name}".Equals(s)));
-            if (((HotKeyShow)o).HotKeyModel is null)
-            {
-                ((HotKeyShow)o).KeyType = KeyTypeE.None;
-            }
-
-            if (((HotKeyShow)o).KeyType is KeyTypeE.NoControlKey)
-            {
-            }
-
-            return s;
-        });
-
+    
     public static readonly StyledProperty<HotKeyModel> HotKeyModelProperty =
         AvaloniaProperty.Register<HotKeyShow, HotKeyModel>(nameof(HotKeyModel), coerce: (o, s) =>
         {
@@ -68,6 +52,15 @@ public class HotKeyShow : TemplatedControl
 
     public static readonly StyledProperty<ICommand> EditHotKeyProperty =
         AvaloniaProperty.Register<HotKeyShow, ICommand>(nameof(EditHotKey));
+    //IsActivated
+    public static readonly StyledProperty<bool> IsActivatedProperty =
+        AvaloniaProperty.Register<HotKeyShow, bool>(nameof(IsActivated), false);
+    public bool IsActivated
+    {
+        get => (bool)GetValue(IsActivatedProperty);
+        set => SetValue(IsActivatedProperty, value);
+    }
+    
 
 
     private HotKeyShow Default;
@@ -77,40 +70,22 @@ public class HotKeyShow : TemplatedControl
         Default = this;
         WeakReferenceMessenger.Default.Register<string, string>(this, "hotkey", (_, s) =>
         {
-            if (s == HotKeySignName)
+            if (s == HotKeyModel.SignName)
             {
-                HotKeyModel = ConfigManger.Config.hotKeys.FirstOrDefault(e => e.SignName == HotKeySignName);
-
-                if (HotKeyModel is null)
-                {
-                    Default.SetValue(HotKeyModelProperty, null);
-                    return;
-                }
-
                 HotKeyModelChanged(HotKeyModel, this);
             }
         });
-
-
-        SetValue(RemoveHotKeyProperty, new RelayCommand<HotKeyModel>(Remove));
-        SetValue(EditHotKeyProperty, new RelayCommand<string>(Edit));
+        SetValue(RemoveHotKeyProperty, new RelayCommand(Remove));
+        SetValue(EditHotKeyProperty, new RelayCommand(Edit));
     }
-
-
-    [Bindable(true)]
-    [Category("KeyName")]
-    public string HotKeySignName
-    {
-        get => (string)GetValue(HotKeySignNameProperty);
-        set => SetValue(HotKeySignNameProperty, value);
-    }
+    
 
     [Bindable(true)]
     [Category("KeyType")]
     public HotKeyModel? HotKeyModel
     {
         get => (HotKeyModel)GetValue(HotKeyModelProperty);
-        private set => SetValue(HotKeyModelProperty, value);
+        set => SetValue(HotKeyModelProperty, value);
     }
 
     [Bindable(true)]
@@ -179,60 +154,52 @@ public class HotKeyShow : TemplatedControl
             type = 10000;
         }
 
+        hotKeyShow.IsActivated = hotKeyModel.IsUsable;
         hotKeyShow.KeyType = (HotKeyShow.KeyTypeE)type;
         hotKeyShow.KeyName = hotKeyModel.SelectKey.ToString();
     }
 
-    private void Remove(HotKeyModel? hotKeyModel)
+    private void Remove()
     {
-        if (hotKeyModel != null)
+        if (HotKeyModel != null)
         {
-            ConfigManger.Config.hotKeys.Remove(hotKeyModel);
-            WeakReferenceMessenger.Default.Send(hotKeyModel.SignName, "hotkey");
+            HotKeyModel.IsUsable = false;
+            IsActivated = false;
+            ConfigManger.Save(ConfigManger.Config.Name);
         }
     }
 
 
-    private void Edit(string? hotKeyModelSignName)
+    private void Edit()
     {
-        if (hotKeyModelSignName is null)
+        if (HotKeyModel is null)
         {
             return;
         }
 
+        if (HotKeyModel.IsUsable == false&& HotKeyModel.SelectKey != EKey.未设置)
+        {
+            IsActivated = true;
+            HotKeyModel.IsUsable = true;
+            return;
+        }
+        
         if (App.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             foreach (var desktopWindow in desktop.Windows)
             {
                 if (desktopWindow.TryGetPlatformHandle().Handle == User32.GetForegroundWindow())
                 {
-                    var hotKeyModel =
-                        ConfigManger.Config.hotKeys.FirstOrDefault(e => (hotKeyModelSignName.Equals(e.SignName)));
-                    if (hotKeyModel is null)
-                    {
-                        var strings = hotKeyModelSignName.Split("_", 2);
-                        hotKeyModel = new HotKeyModel()
-                            { MainName = strings[0], Name = strings[1], IsUsable = true, SelectKey = EKey.未设置 };
-                    }
-
                     ((IHotKeyEditor)ServiceManager.Services.GetService(typeof(IHotKeyEditor))!).EditByHotKeyModel(
-                        hotKeyModel,
+                        HotKeyModel,
                         desktopWindow);
                     return;
                 }
             }
         }
+        
 
-        var hotKeyModel1 =
-            ConfigManger.Config.hotKeys.FirstOrDefault(e => (hotKeyModelSignName.Equals(e.SignName)));
-        if (hotKeyModel1 is null)
-        {
-            var strings = hotKeyModelSignName.Split("_", 2);
-            hotKeyModel1 = new HotKeyModel()
-                { MainName = strings[0], Name = strings[1], IsUsable = true, SelectKey = EKey.未设置 };
-        }
-
-        ((IHotKeyEditor)ServiceManager.Services.GetService(typeof(IHotKeyEditor))!).EditByHotKeyModel(hotKeyModel1,
+        ((IHotKeyEditor)ServiceManager.Services.GetService(typeof(IHotKeyEditor))!).EditByHotKeyModel(HotKeyModel,
             null);
     }
 }

@@ -22,7 +22,7 @@ public class TypeJsonConverter : JsonConverter
             writer.WriteValue($"System {type.FullName}");
             return;
         }
-
+        
         writer.WriteValue($"{plugin.ToPlgString()} {type.FullName}");
     }
 

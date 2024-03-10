@@ -8,6 +8,7 @@ using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Core.SDKs.Services;
+using Core.SDKs.Services.Config;
 using FluentAvalonia.UI.Controls;
 using FluentAvalonia.UI.Navigation;
 using FluentAvalonia.UI.Windowing;
@@ -25,6 +26,10 @@ public class NavigationPageFactory : INavigationPageFactory
     {
         if (target is string s)
         {
+            if (s=="SettingPage")
+            {
+                return new SettingPage(ConfigManger.Config);
+            }
             return ServiceManager.Services.GetKeyedService<UserControl>(s);
         }
 

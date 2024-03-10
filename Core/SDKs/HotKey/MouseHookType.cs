@@ -1,4 +1,6 @@
-﻿namespace Core.SDKs.HotKey;
+﻿using System.ComponentModel;
+
+namespace Core.SDKs.HotKey;
 
 public enum MouseHookType
 {

@@ -11,6 +11,7 @@ using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
+using HotKeyManager = Core.SDKs.HotKey.HotKeyManager;
 using Window = Avalonia.Controls.Window;
 
 namespace KitopiaAvalonia.Windows;
@@ -180,11 +181,7 @@ public partial class HotKeyEditorWindow : Window
         }
 
         _hotKeyModel.SelectKey = selectedKey.Value;
-        if (ConfigManger.Config.hotKeys.All(e2 => e2.SignName != _hotKeyModel.SignName))
-        {
-            ConfigManger.Config.hotKeys.Add(_hotKeyModel);
-        }
-
+        _hotKeyModel.IsUsable = true;
         ConfigManger.Save();
 
         isFinnish = true;

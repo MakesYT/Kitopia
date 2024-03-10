@@ -5,9 +5,11 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Avalonia.Collections;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.CustomType;
+using Core.SDKs.HotKey;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Plugin;
 using Core.SDKs.Tools;
@@ -59,11 +61,41 @@ public partial class CustomScenario : ObservableRecipient
     [JsonIgnore] [ObservableProperty] private double? tickIntervalSecond = 5;
 
     [JsonIgnore] [ObservableProperty] private ObservableDictionary<string, object> values = new();
+    
+    //ActiveHotKey
+    [JsonIgnore] [ObservableProperty] public HotKeyModel runHotKey = new()
+    {
+        MainName = "Kitopia情景", Name = "情景", IsUsable = false, IsSelectCtrl = false, IsSelectAlt = false,
+        IsSelectWin = false,
+        IsSelectShift = false, SelectKey = EKey.未设置,
+    };
+    [JsonIgnore] [ObservableProperty] public HotKeyModel stopHotKey = new()
+    {
+        MainName = "Kitopia情景", Name = "情景", IsUsable = false, IsSelectCtrl = false, IsSelectAlt = false,
+        IsSelectWin = false,
+        IsSelectShift = false, SelectKey = EKey.未设置,
+    };
 
     public CustomScenario()
     {
-        PropertyChanged += (e, s) =>
+        PropertyChanged += PropertyChangedEventHandler();
+        
+        runHotKey.Name = $"{UUID}_激活快捷键";
+        stopHotKey.Name = $"{UUID}_停止快捷键";
+    }
+     ~CustomScenario()
+    {
+        PropertyChanged -= PropertyChangedEventHandler();
+    }
+
+    private PropertyChangedEventHandler? PropertyChangedEventHandler()
+    {
+        return (e, s) =>
         {
+            if (s.PropertyName==nameof(IsRunning))
+            {
+                return;
+            }
             WeakReferenceMessenger.Default.Send(new CustomScenarioChangeMsg()
                 { Type = 1, Name = nameof(e), CustomScenario = this });
         };
@@ -73,7 +105,7 @@ public partial class CustomScenario : ObservableRecipient
     {
         get;
         set;
-    }
+    } = Guid.NewGuid().ToString();
 
     public ObservableCollection<PointItem> nodes
     {

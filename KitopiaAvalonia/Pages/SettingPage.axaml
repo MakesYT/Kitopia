@@ -13,204 +13,204 @@
         <converter:HotKeySignNameToolCTr x:Key="HotKeySignNameToolCTr"/> 
     </UserControl.Resources>
     <ScrollViewer>
-       <StackPanel Margin="42">
-               <Expander  IsExpanded="True" >
-                   <Expander.Header>
-                       <TextBlock FontSize="16" Text="个性化" />
-                   </Expander.Header>
-                   <Expander.Content>
-       
-                       <StackPanel>
-                           <controls:SettingsExpander Header="主题颜色" Description="跟随系统,深色还是浅色?" IconSource="DarkTheme">
-                               <controls:SettingsExpander.Footer>
-                                   <ComboBox  ItemsSource="{Binding ThemeChoiceOptions}" SelectedValue="{Binding ThemeChoice}" />
-                               </controls:SettingsExpander.Footer>
-                               
-                           </controls:SettingsExpander>
-                       </StackPanel>
-                   </Expander.Content>
-               </Expander>
-               <Expander IsExpanded="True">
-                   <Expander.Header>
-                       <TextBlock FontSize="16" Text="通用" />
-                   </Expander.Header>
-                   <Expander.Content>
-                       <StackPanel>
-                           <controls:SettingsExpander Header="开机自动启动" Description="可能被杀毒软件阻止">
-                               <controls:SettingsExpander.Footer>
-                                   <ToggleSwitch IsChecked="{Binding AutoStart}" FlowDirection="RightToLeft" OffContent="关" OnContent="开"/>
-                               </controls:SettingsExpander.Footer>
-                               <controls:SettingsExpander.IconSource>
-                                   <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xE61C;"  />
-                               </controls:SettingsExpander.IconSource>
-                               
-                           </controls:SettingsExpander>
-                           <controls:SettingsExpander Header="截图快捷键" Description="修改截图快捷键">
-                               <controls:SettingsExpander.Footer>
-                                   <controls1:HotKeyShow>
-                                       <controls1:HotKeyShow.HotKeySignName>
-                                           <MultiBinding Converter="{StaticResource HotKeySignNameToolCTr}">
-                                               <MultiBinding.Bindings>
-                                                   <Binding Source="Kitopia" />
-                                                   <Binding Source="截图" />
-                                               </MultiBinding.Bindings>
-                                           </MultiBinding>
-                                       </controls1:HotKeyShow.HotKeySignName>
-                                   </controls1:HotKeyShow>
-                               </controls:SettingsExpander.Footer>
-                               <controls:SettingsExpander.IconSource>
-                                   <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xF4B8;"  />
-                               </controls:SettingsExpander.IconSource>
-                           </controls:SettingsExpander>
-                           <controls:SettingsExpander Header="截图直接复制到剪贴板" Description="截图直接复制到剪贴板,不显示工具栏">
-                               <controls:SettingsExpander.Footer>
-                                   <ToggleSwitch IsChecked="{Binding 截图直接复制到剪贴板}" FlowDirection="RightToLeft" OffContent="关" OnContent="开"/>
-                               </controls:SettingsExpander.Footer>
-                               <controls:SettingsExpander.IconSource>
-                                   <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xE61C;"  />
-                               </controls:SettingsExpander.IconSource>
-                               
-                           </controls:SettingsExpander>
-                       </StackPanel>
-                   </Expander.Content>
-               </Expander>
-           
-               <Expander IsExpanded="True">
-                   <Expander.Header>
-                       <TextBlock FontSize="16" Text="鼠标快捷菜单" />
-                   </Expander.Header>
-                   <Expander.Content>
-                       <StackPanel>
-                           <controls:SettingsExpander Header="激活按键" Description="修改鼠标快捷菜单激活按键">
-                               <controls:SettingsExpander.Footer>
-                                   <ComboBox ItemsSource="{Binding MouseKeyOptions}" SelectedValue="{Binding MouseKey}" />
-                               </controls:SettingsExpander.Footer>
-                               <controls:SettingsExpander.IconSource>
-                                   <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xF4B8;" />
-                               </controls:SettingsExpander.IconSource>
-                           </controls:SettingsExpander>
-                           <controls:SettingsExpander Header="激活所需时间" Description="按下按键指定时间后触发" >
-                               <controls:SettingsExpander.Footer>
-                                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                       <TextBlock Text="{Binding MouseKeyInverval}" FontSize="14"
-                                                  VerticalAlignment="Center" />
-                                       <Slider 
-                                           ToolTip.Placement="Center"
-                                           ToolTip.Tip="{Binding Value, RelativeSource={RelativeSource Self}}"
-                                           Margin="10,0,0,0" TickFrequency="100" IsSnapToTickEnabled="True" Maximum="3000" Width="160"
-                                               Minimum="500" Value="{Binding MouseKeyInverval}"
-                                               VerticalAlignment="Center"/>
-       
-                                   </StackPanel>
-                               </controls:SettingsExpander.Footer>
-                               <controls:SettingsExpander.IconSource>
-                                   <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xED9B;" />
-                               </controls:SettingsExpander.IconSource>
-                           </controls:SettingsExpander>
-                           
-                       </StackPanel>
-                   </Expander.Content>
-               </Expander>
-               <Expander  IsExpanded="True">
-                   <Expander.Header>
-                       <TextBlock FontSize="16" Text="搜索框" />
-                   </Expander.Header>
-                   <Expander.Content>
-                       <StackPanel>
-                           <controls:SettingsExpander Header="激活快捷键" Description="修改搜索框快捷键">
-                               <controls:SettingsExpander.Footer>
-                                   <controls1:HotKeyShow>
-                                       <controls1:HotKeyShow.HotKeySignName>
-                                           <MultiBinding Converter="{StaticResource HotKeySignNameToolCTr}">
-                                               <MultiBinding.Bindings>
-                                                   <Binding Source="Kitopia" />
-                                                   <Binding Source="显示搜索框" />
-                                               </MultiBinding.Bindings>
-                                           </MultiBinding>
-                                       </controls1:HotKeyShow.HotKeySignName>
-                                   </controls1:HotKeyShow>
-                               </controls:SettingsExpander.Footer>
-                               <controls:SettingsExpander.IconSource>
-                                   <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xF4B8;"  />
-                               </controls:SettingsExpander.IconSource>
-                           </controls:SettingsExpander>
-                           <controls:SettingsExpander Header="允许程序调用Everything索引文档" Description="索引文档依赖于此功能">
-                               <controls:SettingsExpander.Footer>
-                                   <ToggleSwitch IsChecked="{Binding UseEverything}" FlowDirection="RightToLeft" OffContent="关" OnContent="开"/>
-                               </controls:SettingsExpander.Footer>
-                               <controls:SettingsExpander.IconSource>
-                                   <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xF3AE;"  />
-                               </controls:SettingsExpander.IconSource>
-                           </controls:SettingsExpander>
-                           <controls:SettingsExpander Header="自动启动Everything" Description="在Everything未启动时自动启动" >
-                               <controls:SettingsExpander.Footer>
-                                   <ToggleSwitch IsChecked="{Binding AutoStartEverything}" FlowDirection="RightToLeft" OffContent="关" OnContent="开"/>
-                               </controls:SettingsExpander.Footer>
-                               <controls:SettingsExpander.IconSource>
-                                   <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xE61C;"  />
-                               </controls:SettingsExpander.IconSource>
-                           </controls:SettingsExpander>
-                           <controls:SettingsExpander Header="允许程序读取剪贴板内容" Description="自动读取剪贴板路径和剪贴板图像保存依赖于此权限" >
-                               <controls:SettingsExpander.Footer>
-                                   <ToggleSwitch IsChecked="{Binding CanReadClipboard}"  FlowDirection="RightToLeft" OffContent="关" OnContent="开"/>
-                               </controls:SettingsExpander.Footer>
-                               <controls:SettingsExpander.IconSource>
-                                   <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xF2D7;"  />
-                               </controls:SettingsExpander.IconSource>
-                           </controls:SettingsExpander>
-                           
-                           <controls:SettingsExpander Header="最大历史数量" Description="决定在搜索框无搜索内容时显示最近打开软件的数量" >
-                               <controls:SettingsExpander.Footer>
-                                   <ComboBox ItemsSource="{Binding MaxHistoryOptions}" SelectedValue="{Binding MaxHistory}" />
-                               </controls:SettingsExpander.Footer>
-                               <controls:SettingsExpander.IconSource>
-                                   <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xF47E;"  />
-                               </controls:SettingsExpander.IconSource>
-                           </controls:SettingsExpander>
-                           <controls:SettingsExpander Header="输入平滑延时" Description="在指定时间内不处理数据以减轻性能消耗">
-                               <controls:SettingsExpander.Footer>
-                                   <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                       <TextBlock Text="{Binding InputSmoothingMilliseconds}" FontSize="14"
-                                                  VerticalAlignment="Center" />
-                                       <Slider 
-                                           ToolTip.Placement="Center"
-                                           ToolTip.Tip="{Binding Value, RelativeSource={RelativeSource Self}}"
-                                           Margin="10,0,0,0" TickFrequency="10" IsSnapToTickEnabled="True" Maximum="1000" Width="160"
-                                               Minimum="0" Value="{Binding InputSmoothingMilliseconds}"
-                                               VerticalAlignment="Center"
-                                               />
-       
-                                   </StackPanel>
-                               </controls:SettingsExpander.Footer>
-                               <controls:SettingsExpander.IconSource>
-                                   <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xED9B;"  />
-                               </controls:SettingsExpander.IconSource>
-                           </controls:SettingsExpander>
-                           <controls:SettingsExpander Header="忽略的项目" Description="指定哪些项目忽略检索" >
-                               
-                               <DataGrid IsReadOnly="True" AutoGenerateColumns="False"
-                                         Margin="0,0,10,0" x:Name="keys" SelectedIndex="-1" MaxHeight="400"
-                                         ItemsSource="{Binding IgnoreItems}">
-                                   <DataGrid.Columns>
-                                       <DataGridTextColumn Binding="{Binding .}" />
-                                       <DataGridTemplateColumn>
-                                           <DataGridTemplateColumn.CellTemplate>
-                                               <DataTemplate>
-                                                   <Button Content="删除"
-                                                              CommandParameter="{Binding .}"
-                                                              Command="{Binding Path=DelKeyCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type pages:SettingPageViewModel}}}" />
-                                               </DataTemplate>
-                                           </DataGridTemplateColumn.CellTemplate>
-                                       </DataGridTemplateColumn>
-                                   </DataGrid.Columns>
-                               </DataGrid>
-                               <controls:SettingsExpander.IconSource>
-                                   <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xF592;"  />
-                               </controls:SettingsExpander.IconSource>
-                           </controls:SettingsExpander>
-                       </StackPanel>
-                   </Expander.Content>
-               </Expander>
+       <StackPanel Margin="42" Name="StackPanel">
+               <!-- <Expander  IsExpanded="True" > -->
+               <!--     <Expander.Header> -->
+               <!--         <TextBlock FontSize="16" Text="个性化" /> -->
+               <!--     </Expander.Header> -->
+               <!--     <Expander.Content> -->
+               <!-- -->
+               <!--         <StackPanel> -->
+               <!--             <controls:SettingsExpander Header="主题颜色" Description="跟随系统,深色还是浅色?" IconSource="DarkTheme"> -->
+               <!--                 <controls:SettingsExpander.Footer> -->
+               <!--                     <ComboBox  ItemsSource="{Binding ThemeChoiceOptions}" SelectedValue="{Binding ThemeChoice}" /> -->
+               <!--                 </controls:SettingsExpander.Footer> -->
+               <!--                  -->
+               <!--             </controls:SettingsExpander> -->
+               <!--         </StackPanel> -->
+               <!--     </Expander.Content> -->
+               <!-- </Expander> -->
+               <!-- <Expander IsExpanded="True"> -->
+               <!--     <Expander.Header> -->
+               <!--         <TextBlock FontSize="16" Text="通用" /> -->
+               <!--     </Expander.Header> -->
+               <!--     <Expander.Content> -->
+               <!--         <StackPanel> -->
+               <!--             <controls:SettingsExpander Header="开机自动启动" Description="可能被杀毒软件阻止"> -->
+               <!--                 <controls:SettingsExpander.Footer> -->
+               <!--                     <ToggleSwitch IsChecked="{Binding AutoStart}" FlowDirection="RightToLeft" OffContent="关" OnContent="开"/> -->
+               <!--                 </controls:SettingsExpander.Footer> -->
+               <!--                 <controls:SettingsExpander.IconSource> -->
+               <!--                     <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xE61C;"  /> -->
+               <!--                 </controls:SettingsExpander.IconSource> -->
+               <!--                  -->
+               <!--             </controls:SettingsExpander> -->
+               <!--             <controls:SettingsExpander Header="截图快捷键" Description="修改截图快捷键"> -->
+               <!--                 <controls:SettingsExpander.Footer> -->
+               <!--                     <controls1:HotKeyShow> -->
+               <!--                         <controls1:HotKeyShow.HotKeySignName> -->
+               <!--                             <MultiBinding Converter="{StaticResource HotKeySignNameToolCTr}"> -->
+               <!--                                 <MultiBinding.Bindings> -->
+               <!--                                     <Binding Source="Kitopia" /> -->
+               <!--                                     <Binding Source="截图" /> -->
+               <!--                                 </MultiBinding.Bindings> -->
+               <!--                             </MultiBinding> -->
+               <!--                         </controls1:HotKeyShow.HotKeySignName> -->
+               <!--                     </controls1:HotKeyShow> -->
+               <!--                 </controls:SettingsExpander.Footer> -->
+               <!--                 <controls:SettingsExpander.IconSource> -->
+               <!--                     <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xF4B8;"  /> -->
+               <!--                 </controls:SettingsExpander.IconSource> -->
+               <!--             </controls:SettingsExpander> -->
+               <!--             <controls:SettingsExpander Header="截图直接复制到剪贴板" Description="截图直接复制到剪贴板,不显示工具栏"> -->
+               <!--                 <controls:SettingsExpander.Footer> -->
+               <!--                     <ToggleSwitch IsChecked="{Binding 截图直接复制到剪贴板}" FlowDirection="RightToLeft" OffContent="关" OnContent="开"/> -->
+               <!--                 </controls:SettingsExpander.Footer> -->
+               <!--                 <controls:SettingsExpander.IconSource> -->
+               <!--                     <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xE61C;"  /> -->
+               <!--                 </controls:SettingsExpander.IconSource> -->
+               <!--                  -->
+               <!--             </controls:SettingsExpander> -->
+               <!--         </StackPanel> -->
+               <!--     </Expander.Content> -->
+               <!-- </Expander> -->
+               <!-- -->
+               <!-- <Expander IsExpanded="True"> -->
+               <!--     <Expander.Header> -->
+               <!--         <TextBlock FontSize="16" Text="鼠标快捷菜单" /> -->
+               <!--     </Expander.Header> -->
+               <!--     <Expander.Content> -->
+               <!--         <StackPanel> -->
+               <!--             <controls:SettingsExpander Header="激活按键" Description="修改鼠标快捷菜单激活按键"> -->
+               <!--                 <controls:SettingsExpander.Footer> -->
+               <!--                     <ComboBox ItemsSource="{Binding MouseKeyOptions}" SelectedValue="{Binding MouseKey}" /> -->
+               <!--                 </controls:SettingsExpander.Footer> -->
+               <!--                 <controls:SettingsExpander.IconSource> -->
+               <!--                     <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xF4B8;" /> -->
+               <!--                 </controls:SettingsExpander.IconSource> -->
+               <!--             </controls:SettingsExpander> -->
+               <!--             <controls:SettingsExpander Header="激活所需时间" Description="按下按键指定时间后触发" > -->
+               <!--                 <controls:SettingsExpander.Footer> -->
+               <!--                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center"> -->
+               <!--                         <TextBlock Text="{Binding MouseKeyInverval}" FontSize="14" -->
+               <!--                                    VerticalAlignment="Center" /> -->
+               <!--                         <Slider  -->
+               <!--                             ToolTip.Placement="Center" -->
+               <!--                             ToolTip.Tip="{Binding Value, RelativeSource={RelativeSource Self}}" -->
+               <!--                             Margin="10,0,0,0" TickFrequency="100" IsSnapToTickEnabled="True" Maximum="3000" Width="160" -->
+               <!--                                 Minimum="500" Value="{Binding MouseKeyInverval}" -->
+               <!--                                 VerticalAlignment="Center"/> -->
+               <!-- -->
+               <!--                     </StackPanel> -->
+               <!--                 </controls:SettingsExpander.Footer> -->
+               <!--                 <controls:SettingsExpander.IconSource> -->
+               <!--                     <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xED9B;" /> -->
+               <!--                 </controls:SettingsExpander.IconSource> -->
+               <!--             </controls:SettingsExpander> -->
+               <!--              -->
+               <!--         </StackPanel> -->
+               <!--     </Expander.Content> -->
+               <!-- </Expander> -->
+               <!-- <Expander  IsExpanded="True"> -->
+               <!--     <Expander.Header> -->
+               <!--         <TextBlock FontSize="16" Text="搜索框" /> -->
+               <!--     </Expander.Header> -->
+               <!--     <Expander.Content> -->
+               <!--         <StackPanel> -->
+               <!--             <controls:SettingsExpander Header="激活快捷键" Description="修改搜索框快捷键"> -->
+               <!--                 <controls:SettingsExpander.Footer> -->
+               <!--                     <controls1:HotKeyShow> -->
+               <!--                         <controls1:HotKeyShow.HotKeySignName> -->
+               <!--                             <MultiBinding Converter="{StaticResource HotKeySignNameToolCTr}"> -->
+               <!--                                 <MultiBinding.Bindings> -->
+               <!--                                     <Binding Source="Kitopia" /> -->
+               <!--                                     <Binding Source="显示搜索框" /> -->
+               <!--                                 </MultiBinding.Bindings> -->
+               <!--                             </MultiBinding> -->
+               <!--                         </controls1:HotKeyShow.HotKeySignName> -->
+               <!--                     </controls1:HotKeyShow> -->
+               <!--                 </controls:SettingsExpander.Footer> -->
+               <!--                 <controls:SettingsExpander.IconSource> -->
+               <!--                     <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xF4B8;"  /> -->
+               <!--                 </controls:SettingsExpander.IconSource> -->
+               <!--             </controls:SettingsExpander> -->
+               <!--             <controls:SettingsExpander Header="允许程序调用Everything索引文档" Description="索引文档依赖于此功能"> -->
+               <!--                 <controls:SettingsExpander.Footer> -->
+               <!--                     <ToggleSwitch IsChecked="{Binding UseEverything}" FlowDirection="RightToLeft" OffContent="关" OnContent="开"/> -->
+               <!--                 </controls:SettingsExpander.Footer> -->
+               <!--                 <controls:SettingsExpander.IconSource> -->
+               <!--                     <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xF3AE;"  /> -->
+               <!--                 </controls:SettingsExpander.IconSource> -->
+               <!--             </controls:SettingsExpander> -->
+               <!--             <controls:SettingsExpander Header="自动启动Everything" Description="在Everything未启动时自动启动" > -->
+               <!--                 <controls:SettingsExpander.Footer> -->
+               <!--                     <ToggleSwitch IsChecked="{Binding AutoStartEverything}" FlowDirection="RightToLeft" OffContent="关" OnContent="开"/> -->
+               <!--                 </controls:SettingsExpander.Footer> -->
+               <!--                 <controls:SettingsExpander.IconSource> -->
+               <!--                     <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xE61C;"  /> -->
+               <!--                 </controls:SettingsExpander.IconSource> -->
+               <!--             </controls:SettingsExpander> -->
+               <!--             <controls:SettingsExpander Header="允许程序读取剪贴板内容" Description="自动读取剪贴板路径和剪贴板图像保存依赖于此权限" > -->
+               <!--                 <controls:SettingsExpander.Footer> -->
+               <!--                     <ToggleSwitch IsChecked="{Binding CanReadClipboard}"  FlowDirection="RightToLeft" OffContent="关" OnContent="开"/> -->
+               <!--                 </controls:SettingsExpander.Footer> -->
+               <!--                 <controls:SettingsExpander.IconSource> -->
+               <!--                     <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xF2D7;"  /> -->
+               <!--                 </controls:SettingsExpander.IconSource> -->
+               <!--             </controls:SettingsExpander> -->
+               <!--              -->
+               <!--             <controls:SettingsExpander Header="最大历史数量" Description="决定在搜索框无搜索内容时显示最近打开软件的数量" > -->
+               <!--                 <controls:SettingsExpander.Footer> -->
+               <!--                     <ComboBox ItemsSource="{Binding MaxHistoryOptions}" SelectedValue="{Binding MaxHistory}" /> -->
+               <!--                 </controls:SettingsExpander.Footer> -->
+               <!--                 <controls:SettingsExpander.IconSource> -->
+               <!--                     <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xF47E;"  /> -->
+               <!--                 </controls:SettingsExpander.IconSource> -->
+               <!--             </controls:SettingsExpander> -->
+               <!--             <controls:SettingsExpander Header="输入平滑延时" Description="在指定时间内不处理数据以减轻性能消耗"> -->
+               <!--                 <controls:SettingsExpander.Footer> -->
+               <!--                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center"> -->
+               <!--                         <TextBlock Text="{Binding InputSmoothingMilliseconds}" FontSize="14" -->
+               <!--                                    VerticalAlignment="Center" /> -->
+               <!--                         <Slider  -->
+               <!--                             ToolTip.Placement="Center" -->
+               <!--                             ToolTip.Tip="{Binding Value, RelativeSource={RelativeSource Self}}" -->
+               <!--                             Margin="10,0,0,0" TickFrequency="10" IsSnapToTickEnabled="True" Maximum="1000" Width="160" -->
+               <!--                                 Minimum="0" Value="{Binding InputSmoothingMilliseconds}" -->
+               <!--                                 VerticalAlignment="Center" -->
+               <!--                                 /> -->
+               <!-- -->
+               <!--                     </StackPanel> -->
+               <!--                 </controls:SettingsExpander.Footer> -->
+               <!--                 <controls:SettingsExpander.IconSource> -->
+               <!--                     <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xED9B;"  /> -->
+               <!--                 </controls:SettingsExpander.IconSource> -->
+               <!--             </controls:SettingsExpander> -->
+               <!--             <controls:SettingsExpander Header="忽略的项目" Description="指定哪些项目忽略检索" > -->
+               <!--                  -->
+               <!--                 <DataGrid IsReadOnly="True" AutoGenerateColumns="False" -->
+               <!--                           Margin="0,0,10,0" x:Name="keys" SelectedIndex="-1" MaxHeight="400" -->
+               <!--                           ItemsSource="{Binding IgnoreItems}"> -->
+               <!--                     <DataGrid.Columns> -->
+               <!--                         <DataGridTextColumn Binding="{Binding .}" /> -->
+               <!--                         <DataGridTemplateColumn> -->
+               <!--                             <DataGridTemplateColumn.CellTemplate> -->
+               <!--                                 <DataTemplate> -->
+               <!--                                     <Button Content="删除" -->
+               <!--                                                CommandParameter="{Binding .}" -->
+               <!--                                                Command="{Binding Path=DelKeyCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type pages:SettingPageViewModel}}}" /> -->
+               <!--                                 </DataTemplate> -->
+               <!--                             </DataGridTemplateColumn.CellTemplate> -->
+               <!--                         </DataGridTemplateColumn> -->
+               <!--                     </DataGrid.Columns> -->
+               <!--                 </DataGrid> -->
+               <!--                 <controls:SettingsExpander.IconSource> -->
+               <!--                     <controls:FontIconSource FontFamily="{StaticResource FluentFont}" Glyph="&#xF592;"  /> -->
+               <!--                 </controls:SettingsExpander.IconSource> -->
+               <!--             </controls:SettingsExpander> -->
+               <!--         </StackPanel> -->
+               <!--     </Expander.Content> -->
+               <!-- </Expander> -->
        
            </StackPanel> 
     </ScrollViewer>

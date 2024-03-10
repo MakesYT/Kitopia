@@ -9,7 +9,7 @@
              xmlns:customScenario="clr-namespace:Core.ViewModel.Pages.customScenario;assembly=Core"
              xmlns:customScenario1="clr-namespace:Core.SDKs.CustomScenario;assembly=Core"
              xmlns:av="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:config="clr-namespace:Core.SDKs.Services.Config;assembly=Core"
+             xmlns:hotkey="clr-namespace:Core.SDKs.HotKey;assembly=Core"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="pages:HotKeyManagerPageViewModel"
              x:Class="KitopiaAvalonia.Pages.HotKeyManagerPage">
@@ -22,23 +22,17 @@
                 <SolidColorBrush Color="{DynamicResource TextFillColorPrimary}" />
             </TextBlock.Foreground>
         </TextBlock>
-        <TextBlock Margin="0" FontSize="15" Text="注意:此页面只显示已设置的快捷键">
-            <TextBlock.Foreground>
-                <SolidColorBrush Color="{DynamicResource TextFillColorPrimary}" />
-            </TextBlock.Foreground>
-        </TextBlock>
-
+       
         <ItemsControl ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                       MaxHeight="385"
-
-                      Margin="0,10,0,0" ItemsSource="{Binding HotKeys,Mode=OneWay}">
+                      Margin="0,10,0,0" ItemsSource="{Binding Source={x:Static hotkey:HotKeyManager.HotKeys},Mode=OneWay}">
             <ItemsControl.ItemTemplate>
-                <DataTemplate>
+                <DataTemplate x:DataType="hotkey:HotKeyModel">
                     <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="4">
                         <StackPanel HorizontalAlignment="Center" Margin="5,0,5,5">
                             <TextBlock Margin="0,5,0,0" Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                        Text="{Binding SignName,Converter={StaticResource HotKeySignNameToStringCtr}}" />
-                            <controls1:HotKeyShow Margin="0,5,0,0" HotKeySignName="{Binding SignName}" />
+                            <controls1:HotKeyShow Margin="0,5,0,0" HotKeyModel="{Binding RelativeSource={RelativeSource AncestorType=StackPanel},Path=DataContext}" />
                         </StackPanel>
 
                     </Border>

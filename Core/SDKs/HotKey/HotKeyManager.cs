@@ -1,14 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
 using Avalonia.Threading;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
-using Core.ViewModel;
 using Kitopia.SDKs;
-using KitopiaAvalonia.Windows;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
 using PluginCore;
@@ -17,7 +12,7 @@ using SharpHook.Native;
 using SharpHook.Reactive;
 using Timer = System.Timers.Timer;
 
-namespace KitopiaAvalonia.SDKs;
+namespace Core.SDKs.HotKey;
 
 public class HotKeyManager
 {
@@ -30,11 +25,21 @@ public class HotKeyManager
     private static Timer keyPressTimer = new(1000);
     private static bool canPress = true;
     public static SimpleReactiveGlobalHook hook;
+    public static event EventHandler<HotKeyModel> OnHotKeyPressed ;
+
+    public static ObservableCollection<HotKeyModel> HotKeys
+    {
+        get;
+        set;
+    } = new();
 
     public static void Init()
     {
+        OnHotKeyPressed += (sender, model) =>
+        {
+            log.Debug($"快捷键{model.MainName} {model.Name}被触发");
+        };
         hook = new SimpleReactiveGlobalHook();
-
         hook.KeyPressed.Subscribe(OnKeyPressed);
         hook.KeyReleased.Subscribe(OnKeyReleased);
         hook.MousePressed.Subscribe(OnMousePressed);
@@ -45,6 +50,11 @@ public class HotKeyManager
             canPress = true;
         };
         hook.RunAsync();
+        foreach (var customScenario in CustomScenarioManger.CustomScenarios)
+        {
+            HotKeys.Add(customScenario.RunHotKey);
+            HotKeys.Add(customScenario.StopHotKey);
+        }
     }
 
     private static void OnKeyPressed(KeyboardHookEventArgs e)
@@ -75,7 +85,7 @@ public class HotKeyManager
         canPress = false;
 
 
-        foreach (var configHotKey in ConfigManger.Config.hotKeys)
+        foreach (var configHotKey in HotKeys)
         {
             if (!configHotKey.IsUsable || configHotKey.IsSelectAlt != AltIsPressed ||
                 configHotKey.IsSelectCtrl != CtrlIsPressed || configHotKey.IsSelectShift != ShiftIsPressed ||
@@ -87,7 +97,8 @@ public class HotKeyManager
             if ((int)configHotKey.SelectKey != (int)e.Data.KeyCode)
             {
                 continue;
-            }
+            } 
+            OnHotKeyPressed.Invoke( new(), configHotKey);
 
             switch (configHotKey.MainName)
             {
@@ -100,46 +111,22 @@ public class HotKeyManager
                             log.Debug("截图热键被触发");
                             Dispatcher.UIThread.InvokeAsync(() =>
                             {
-                                KitopiaAvalonia.Tools.ScreenCapture.StartUserManualCapture();
+                                ServiceManager.Services.GetService<IScreenCapture>()!.CaptureScreen();
                             }).GetTask().ContinueWith((e) =>
                             {
                                 if (e.IsFaulted)
                                 {
                                     log.Error(e.Exception);
-                                    Dispatcher.UIThread.Invoke(() =>
-                                    {
-                                        new ErrorDialog(null, e.Exception.ToString()).Show();
-                                    });
+                                    ServiceManager.Services.GetService<IErrorWindow>()!.ShowErrorWindow("截图失败", e.Exception.Message);
                                 }
                             });
                             break;
                         }
                         case "显示搜索框":
                         {
+                            
                             log.Debug("显示搜索框热键被触发");
-                            Dispatcher.UIThread.InvokeAsync(() =>
-                            {
-                                if (ServiceManager.Services.GetService<SearchWindow>()!.IsVisible)
-                                {
-                                    ServiceManager.Services.GetService<SearchWindow>()!.IsVisible = false;
-                                }
-                                else
-                                {
-                                    ServiceManager.Services.GetService<SearchWindowViewModel>()!.CheckClipboard();
-
-                                    ServiceManager.Services.GetService<SearchWindow>()!.Show();
-
-                                    ServiceManager.Services.GetService<SearchWindow>()!.Focus();
-                                    ServiceManager.Services.GetService<SearchWindow>()!.tx.Focus();
-                                    ServiceManager.Services.GetService<SearchWindow>()!.tx.SelectAll();
-                                    Task.Run(() =>
-                                    {
-                                        Thread.CurrentThread.Priority = ThreadPriority.Lowest;
-                                        ServiceManager.Services.GetService<SearchWindowViewModel>()!.ReloadApps();
-                                    });
-                                }
-                            });
-
+                            ServiceManager.Services.GetService<ISearchWindowService>()!.ShowOrHiddenSearchWindow();
 
                             break;
                         }

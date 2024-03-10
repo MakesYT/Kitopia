@@ -157,6 +157,8 @@ public static class CustomScenarioManger
         if (!CustomScenarios.Contains(scenario))
         {
             CustomScenarios.Add(scenario);
+            HotKeyManager.HotKeys.Add(scenario.RunHotKey);
+            HotKeyManager.HotKeys.Add(scenario.StopHotKey);
         }
 
         if (scenario.ExecutionManual)
@@ -203,7 +205,7 @@ public static class CustomScenarioManger
         }
 
         List<HotKeyModel> toRemove = new();
-        foreach (var item in ConfigManger.Config.hotKeys)
+        foreach (var item in HotKeyManager.HotKeys)
         {
             if (item.MainName == "Kitopia情景")
             {

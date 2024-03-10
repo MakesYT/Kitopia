@@ -73,95 +73,107 @@ public partial class TaskEditorViewModel : ObservableRecipient
             }
         };
         Scenario.nodes.Add(nodify3);
-        if (Scenario.UUID == null)
+        
+        WeakReferenceMessenger.Default.Register<string, string>( this,"hotkey", (HotKey, o) =>
         {
-            Scenario.UUID = Guid.NewGuid().ToString();
-        }
-
-        WeakReferenceMessenger.Default.Register<CustomScenarioChangeMsg>(this, (a, e) =>
-        {
-            IsModified = true;
-            //Console.WriteLine(1);
-            if (e.Type == 1)
+            if (o == Scenario.runHotKey.SignName)
             {
-                if (e.Name == "Name")
-                {
-                    e.CustomScenario.nodes[0].Title = e.CustomScenario.Name;
-                }
-
-                return;
+                Dispatcher.UIThread.InvokeAsync(() => { IsModified = true; });
             }
-
-            if (!Scenario.nodes.Contains(e.PointItem) && !NodeMethods.Any(a => a.Contains(e.PointItem)))
+            else if (o == Scenario.stopHotKey.SignName)
             {
-                return;
+                Dispatcher.UIThread.InvokeAsync(() => { IsModified = true; });
             }
-
-            if (e.ConnectorItem is not { InputObject: not null, SelfInputAble: false })
-            {
-                return;
-            }
-
-            if (e.PointItem.MerthodName == "一对N" && e.ConnectorItem.Title == "输出数量")
-            {
-                int? value = null;
-                if (e.ConnectorItem.InputObject is int inputObject)
+        });
+        WeakReferenceMessenger.Default.Register<CustomScenarioChangeMsg>(this,
+            (a, e) => { 
+                
+                Dispatcher.UIThread.Post(() =>
                 {
-                    value = inputObject;
-                }
-                else
+                    IsModified = true;
+                });
+           
+                //Console.WriteLine(1);
+                if (e.Type == 1)
                 {
-                    value = Convert.ToInt32((double)e.ConnectorItem.InputObject);
-                }
+                    if (e.Name == "Name")
+                    {
+                        e.CustomScenario.nodes[0].Title = e.CustomScenario.Name;
+                    }
 
-                if (value > 10)
-                {
-                    value = 10;
-                    e.ConnectorItem.InputObject = (double)10;
+                    return;
                 }
 
-                if (e.PointItem.Output.Count == value)
+                if (!Scenario.nodes.Contains(e.PointItem) && !NodeMethods.Any(a => a.Contains(e.PointItem)))
                 {
                     return;
                 }
 
-                while (e.PointItem.Output.Count != value)
+                if (e.ConnectorItem is not { InputObject: not null, SelfInputAble: false })
                 {
-                    if (e.PointItem.Output.Count > value)
+                    return;
+                }
+
+                if (e.PointItem.MerthodName == "一对N" && e.ConnectorItem.Title == "输出数量")
+                {
+                    int? value = null;
+                    if (e.ConnectorItem.InputObject is int inputObject)
                     {
-                        var connectorItem = e.PointItem.Output[^1];
-                        var connectionItems = Scenario.connections
-                            .Where(connectionItem => connectionItem.Source == connectorItem).ToList();
-                        foreach (var connectionItem in connectionItems)
-                        {
-                            Scenario.connections.Remove(connectionItem);
-                            if (Scenario.connections.All(item => item.Source != connectionItem.Source))
-                            {
-                                connectionItem.Source.IsConnected = false;
-                            }
-
-                            if (Scenario.connections.All(item => item.Target != connectionItem.Target))
-                            {
-                                connectionItem.Target.IsConnected = false;
-                            }
-                        }
-
-                        e.PointItem.Output.Remove(connectorItem);
+                        value = inputObject;
                     }
                     else
                     {
-                        e.PointItem.Output.Add(new ConnectorItem
+                        value = Convert.ToInt32((double)e.ConnectorItem.InputObject);
+                    }
+
+                    if (value > 10)
+                    {
+                        value = 10;
+                        e.ConnectorItem.InputObject = (double)10;
+                    }
+
+                    if (e.PointItem.Output.Count == value)
+                    {
+                        return;
+                    }
+
+                    while (e.PointItem.Output.Count != value)
+                    {
+                        if (e.PointItem.Output.Count > value)
                         {
-                            Source = e.PointItem,
-                            Type = typeof(NodeConnectorClass),
-                            Title = "流输出",
-                            IsOut = true,
-                            TypeName = "节点"
-                        });
+                            var connectorItem = e.PointItem.Output[^1];
+                            var connectionItems = Scenario.connections
+                                .Where(connectionItem => connectionItem.Source == connectorItem).ToList();
+                            foreach (var connectionItem in connectionItems)
+                            {
+                                Scenario.connections.Remove(connectionItem);
+                                if (Scenario.connections.All(item => item.Source != connectionItem.Source))
+                                {
+                                    connectionItem.Source.IsConnected = false;
+                                }
+
+                                if (Scenario.connections.All(item => item.Target != connectionItem.Target))
+                                {
+                                    connectionItem.Target.IsConnected = false;
+                                }
+                            }
+
+                            e.PointItem.Output.Remove(connectorItem);
+                        }
+                        else
+                        {
+                            e.PointItem.Output.Add(new ConnectorItem
+                            {
+                                Source = e.PointItem,
+                                Type = typeof(NodeConnectorClass),
+                                Title = "流输出",
+                                IsOut = true,
+                                TypeName = "节点"
+                            });
+                        }
                     }
                 }
-            }
-        });
+            });
 
         //nodeMethods.Add("new PointItem(){Title = \"Test\"}");
     }
