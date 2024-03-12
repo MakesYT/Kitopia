@@ -30,42 +30,25 @@ public static class ConfigManger
         }
         Configs.Add("KitopiaCoreConfig",new KitopiaConfig(){Name = "KitopiaCoreConfig"});
         var keyCollection = Configs.Keys.ToList();
-        foreach (var configsKey in keyCollection)
+        var configF =
+            new FileInfo($"{AppDomain.CurrentDomain.BaseDirectory}configs{Path.DirectorySeparatorChar}KitopiaCoreConfig.json");
+        if (!configF.Exists)
         {
-            var configBase = Configs[configsKey];
-            var configF =
-                new FileInfo($"{AppDomain.CurrentDomain.BaseDirectory}configs{Path.DirectorySeparatorChar}{configsKey}.json");
-            if (!configF.Exists)
-            {
-                var j = JsonConvert.SerializeObject(configBase, Formatting.Indented);
-                File.WriteAllText(configF.FullName, j);
-            }
+            var j = JsonConvert.SerializeObject(Config, Formatting.Indented);
+            File.WriteAllText(configF.FullName, j);
+        }
 
-            var json = File.ReadAllText(configF.FullName);
-            try
-            {
-                Configs[configsKey] = JsonConvert.DeserializeObject(json,configBase.GetType())! as ConfigBase ?? configBase;
-            }
-            catch (Exception e)
-            {
-                log.Error(e);
-                log.Error("配置文件加载失败");
-            }
+        var json = File.ReadAllText(configF.FullName);
+        try
+        {
+            Configs["KitopiaCoreConfig"] = JsonConvert.DeserializeObject(json,Config.GetType())! as ConfigBase ?? Config;
+        }
+        catch (Exception e)
+        {
+            log.Error(e);
+            log.Error("配置文件加载失败");
         }
         
-        foreach (var (key, value) in Configs)
-        {
-            value.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public).ToList().ForEach(x =>
-            {
-                if (x.GetCustomAttribute<ConfigField>() is { } configField)
-                {
-                    if (configField.FieldType==ConfigFieldType.快捷键)
-                    {
-                        HotKeyManager.HotKeys.Add(x.GetValue(value) as HotKeyModel);
-                    }
-                }
-            });
-        }
         Config.ConfigChanged += (sender, args) =>
         {
             switch (args.Name)
@@ -150,6 +133,7 @@ public static class ConfigManger
             }
         };
     }
+   
     public static void Save()
     {
         var keyCollection = Configs.Keys.ToList();

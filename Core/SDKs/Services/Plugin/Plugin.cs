@@ -6,6 +6,8 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Core.SDKs.CustomScenario;
+using Core.SDKs.HotKey;
+using Core.SDKs.Services.Config;
 using Core.SDKs.Tools;
 using log4net;
 using Newtonsoft.Json;
@@ -24,7 +26,48 @@ public class Plugin
     private AssemblyLoadContextH? _plugin;
 
     public IServiceProvider? ServiceProvider;
+    public static void AddConfig(string key,ConfigBase configBase)
+    {
+        var configF =
+            new FileInfo($"{AppDomain.CurrentDomain.BaseDirectory}configs{Path.DirectorySeparatorChar}{key}.json");
+        if (!configF.Exists)
+        {
+            var j = JsonConvert.SerializeObject(configBase, Formatting.Indented);
+            File.WriteAllText(configF.FullName, j);
+        }
 
+        var json = File.ReadAllText(key);
+        try
+        {
+            var deserializeObject = JsonConvert.DeserializeObject(json,configBase.GetType())! as ConfigBase ?? configBase;
+            if (!ConfigManger.Configs.TryAdd(key,deserializeObject))
+            {
+                ConfigManger.Configs[key] = deserializeObject;
+            }
+        }
+        catch (Exception e)
+        {
+            Log.Error(e);
+            Log.Error("配置文件加载失败");
+        }
+        configBase.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public).ToList().ForEach(x =>
+        {
+            if (x.GetCustomAttribute<ConfigField>() is { } configField)
+            {
+                if (configField.FieldType==ConfigFieldType.快捷键)
+                {
+                    HotKeyManager.HotKeys.Add(x.GetValue(configBase) as HotKeyModel);
+                }
+            }
+        });
+    }
+    public static void RemoveConfig(string key)
+    {
+        foreach (var (s, value) in ConfigManger.Configs.Where( x=>x.Key.StartsWith(key)))
+        {
+            ConfigManger.Configs.Remove(s);
+        }
+    }
     public Plugin(string path)
     {
         _plugin = new AssemblyLoadContextH(path, path.Split(Path.DirectorySeparatorChar).Last() + "_plugin");
@@ -46,10 +89,19 @@ public class Plugin
                 ((IPlugin)ServiceProvider.GetService(type)).OnEnabled(ServiceProvider);
                 break;
             }
+
+           
+            
         }
 
         foreach (var type in t)
         {
+            if (type.BaseType==typeof(ConfigBase))
+            {
+                var instance =(ConfigBase) Activator.CreateInstance(type);
+                instance.Name = $"{PluginInfo.ToPlgString()}_{type.FullName}";
+                AddConfig($"{PluginInfo.ToPlgString()}_{type.FullName}", instance);
+            }
             if (typeof(CustomScenarioTrigger).IsAssignableFrom(type))
             {
                 var fieldInfo = type.GetField("Info");
@@ -311,11 +363,7 @@ public class Plugin
     public void Unload(out WeakReference weakReference)
     {
         Log.Debug($"卸载插件:{PluginInfo.ToPlgString()}");
-        var config1 = new FileInfo(
-            $"{AppDomain.CurrentDomain.BaseDirectory}configs{Path.DirectorySeparatorChar}{PluginInfo.ToPlgString()}.json");
-
-        File.WriteAllText(config1.FullName,
-            JsonConvert.SerializeObject(GetConfigJObject(), Formatting.Indented));
+        RemoveConfig($"{PluginInfo.ToPlgString()}");
 
         PluginOverall.SearchActions.Remove($"{PluginInfo.ToPlgString()}");
         PluginOverall.CustomScenarioNodeMethods.Remove($"{PluginInfo.ToPlgString()}");
