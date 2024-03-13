@@ -16,6 +16,8 @@ public class AssemblyLoadContextH : AssemblyLoadContext
     {
         _resolver = new AssemblyDependencyResolver(pluginPath);
         _assembly = this.LoadFromAssemblyPath(pluginPath);
+        var assemblyName = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.GetName().Name == "Newtonsoft.Json")?.GetName();
+        LoadFromAssemblyName(assemblyName);
         Unloading += (sender) =>
         {
             _assembly = null;

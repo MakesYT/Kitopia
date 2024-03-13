@@ -38,7 +38,7 @@ public class KitopiaConfig : ConfigBase
     [ConfigField("允许程序调用Everything索引文档","索引文档依赖于此功能", 0xF3AE,ConfigFieldType.布尔 )]
     public bool useEverything = true;
     public List<string> customCollections = new();
-    [ConfigField("最大历史记录","最大历史记录数", 0xF2D7,ConfigFieldType.整数列表 ,null,10,1,2 )]
+    [ConfigField("最大历史记录","最大历史记录数", 0xF2D7,ConfigFieldType.整数列表 ,null,10,1,1 )]
     public int maxHistory = 6;
     [ConfigField("输入平滑延时","在指定时间内不处理数据以减轻性能消耗", 0xED9B,ConfigFieldType.整数滑块 ,null,1000,50,10)]
     public int inputSmoothingMilliseconds = 50;

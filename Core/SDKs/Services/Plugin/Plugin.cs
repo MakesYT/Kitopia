@@ -26,7 +26,7 @@ public class Plugin
     private AssemblyLoadContextH? _plugin;
 
     public IServiceProvider? ServiceProvider;
-    public static void AddConfig(string key,ConfigBase configBase)
+    public  void AddConfig(string key,ConfigBase configBase)
     {
         var configF =
             new FileInfo($"{AppDomain.CurrentDomain.BaseDirectory}configs{Path.DirectorySeparatorChar}{key}.json");
@@ -39,7 +39,8 @@ public class Plugin
         var json = File.ReadAllText(key);
         try
         {
-            var deserializeObject = JsonConvert.DeserializeObject(json,configBase.GetType())! as ConfigBase ?? configBase;
+            var deserializeObject =  _plugin.Assemblies.FirstOrDefault(x => x.GetName().Name == "Newtonsoft.Json")?.GetType("Newtonsoft.Json.JsonConvert").GetMethod("DeserializeObject")?.Invoke(null, new object[] { json, configBase.GetType() })! as ConfigBase ?? configBase;
+            
             if (!ConfigManger.Configs.TryAdd(key,deserializeObject))
             {
                 ConfigManger.Configs[key] = deserializeObject;
@@ -60,13 +61,6 @@ public class Plugin
                 }
             }
         });
-    }
-    public static void RemoveConfig(string key)
-    {
-        foreach (var (s, value) in ConfigManger.Configs.Where( x=>x.Key.StartsWith(key)))
-        {
-            ConfigManger.Configs.Remove(s);
-        }
     }
     public Plugin(string path)
     {
@@ -363,7 +357,7 @@ public class Plugin
     public void Unload(out WeakReference weakReference)
     {
         Log.Debug($"卸载插件:{PluginInfo.ToPlgString()}");
-        RemoveConfig($"{PluginInfo.ToPlgString()}");
+        ConfigManger.RemoveConfig($"{PluginInfo.ToPlgString()}");
 
         PluginOverall.SearchActions.Remove($"{PluginInfo.ToPlgString()}");
         PluginOverall.CustomScenarioNodeMethods.Remove($"{PluginInfo.ToPlgString()}");

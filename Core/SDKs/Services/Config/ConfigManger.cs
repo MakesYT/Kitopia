@@ -133,7 +133,14 @@ public static class ConfigManger
             }
         };
     }
-   
+    
+    public static void RemoveConfig(string key)
+    {
+        foreach (var (s, value) in ConfigManger.Configs.Where( x=>x.Key.StartsWith(key)))
+        {
+            ConfigManger.Configs.Remove(s);
+        }
+    }
     public static void Save()
     {
         var keyCollection = Configs.Keys.ToList();

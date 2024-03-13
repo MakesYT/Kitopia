@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Reflection;
 using Avalonia;
@@ -108,7 +109,20 @@ public partial class SettingPage : UserControl
                         }
                         case ConfigFieldType.整数列表:
                         {
-                            
+                            var comboBox = new ComboBox()
+                            {
+                                ItemsSource = Enumerable.Range(configField.MinValue,configField.MaxValue).Select( x=>(int)x%configField.Step==0?x:0).Where(x=>x!=0).ToList(),
+                                SelectedValue = selectedValue
+                            };
+                            disposables.Add(
+                                comboBox.GetObservable(ComboBox.SelectedValueProperty).Subscribe( (d) =>
+                                {
+                                    _configBase.OnConfigChanged(fieldInfo.Name,d);
+                                    fieldInfo.SetValue(_configBase, d);
+                                    ConfigManger.Save(_configBase.Name);
+                                        
+                                }));
+                            SettingsExpander.Footer = comboBox;
                             break;
                         }
                         case ConfigFieldType.整数滑块:
