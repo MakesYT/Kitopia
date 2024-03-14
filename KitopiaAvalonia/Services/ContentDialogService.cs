@@ -8,6 +8,7 @@ using Core.SDKs;
 using Core.SDKs.Services;
 using FluentAvalonia.UI.Controls;
 using KitopiaAvalonia.Controls;
+using Microsoft.Extensions.DependencyInjection;
 
 #endregion
 
@@ -63,52 +64,59 @@ public class ContentDialogService : IContentDialog
     {
         if (contentPresenter is null)
         {
-            Task.Run(() =>
+            var tcs = new TaskCompletionSource();
+            
+            Dispatcher.UIThread.InvokeAsync( () =>
             {
-                Thread.CurrentThread.IsBackground = false;
-                Dispatcher.UIThread.InvokeAsync(async () =>
+                                   
+                var dialog = new Dialog(dialogContent);
+                dialog.Show();
+                var frame = new DispatcherFrame();
+                dialog.Closed += (sender, args) =>
                 {
-                    var tcs = new TaskCompletionSource();
-                    var dialog = new Dialog(dialogContent);
-                    dialog.Show();
-                    dialog.Closed += (sender, args) =>
-                    {
-                        tcs.SetResult();
-                    };
-                    await tcs.Task;
-                });
+                    tcs.SetResult();
+                };
+                dialog.Show();
+
             }).Wait();
+            tcs.Task.Wait();
+            
+            
+
         }
         else
         {
-            var dialog = new ContentDialog()
+            Dispatcher.UIThread.InvokeAsync(() =>
             {
-                Title = dialogContent.Title,
-                Content = dialogContent.Content,
-                CloseButtonText = dialogContent.CloseButtonText,
-                PrimaryButtonText = dialogContent.PrimaryButtonText,
-                DefaultButton = ContentDialogButton.Primary
-            };
-            dialog.ShowAsync((TopLevel)contentPresenter!).ContinueWith(e =>
-            {
-                switch (e.Result)
+                var dialog = new ContentDialog()
                 {
-                    case ContentDialogResult.Primary:
+                    Title = dialogContent.Title,
+                    Content = dialogContent.Content,
+                    CloseButtonText = dialogContent.CloseButtonText,
+                    PrimaryButtonText = dialogContent.PrimaryButtonText,
+                    DefaultButton = ContentDialogButton.Primary
+                };
+                dialog.ShowAsync((TopLevel)contentPresenter!).ContinueWith(e =>
+                {
+                    switch (e.Result)
                     {
-                        dialogContent.PrimaryAction?.Invoke();
-                        break;
+                        case ContentDialogResult.Primary:
+                        {
+                            dialogContent.PrimaryAction?.Invoke();
+                            break;
+                        }
+                        case ContentDialogResult.Secondary:
+                        {
+                            dialogContent.SecondaryAction?.Invoke();
+                            break;
+                        }
+                        case ContentDialogResult.None:
+                        {
+                            dialogContent.CloseAction?.Invoke();
+                            break;
+                        }
                     }
-                    case ContentDialogResult.Secondary:
-                    {
-                        dialogContent.SecondaryAction?.Invoke();
-                        break;
-                    }
-                    case ContentDialogResult.None:
-                    {
-                        dialogContent.CloseAction?.Invoke();
-                        break;
-                    }
-                }
+                }).Wait();
             }).Wait();
         }
     }

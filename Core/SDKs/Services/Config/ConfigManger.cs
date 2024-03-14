@@ -48,7 +48,16 @@ public static class ConfigManger
             log.Error(e);
             log.Error("配置文件加载失败");
         }
-        
+        Config.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public).ToList().ForEach(x =>
+        {
+            if (x.GetCustomAttribute<ConfigField>() is { } configField)
+            {
+                if (configField.FieldType==ConfigFieldType.快捷键)
+                {
+                    HotKeyManager.HotKeys.Add(x.GetValue(Config) as HotKeyModel);
+                }
+            }
+        });
         Config.ConfigChanged += (sender, args) =>
         {
             switch (args.Name)
