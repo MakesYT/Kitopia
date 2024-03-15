@@ -30,14 +30,16 @@
         <ProjectReference Include="..\Core\Core.csproj"/>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="11.0.9"/>
-        <PackageReference Include="Avalonia.Desktop" Version="11.0.9"/>
-        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.9"/>
+        <PackageReference Include="Avalonia" Version="11.0.10" />
+        <PackageReference Include="Avalonia.Desktop" Version="11.0.10" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.10" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.9"/>
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.10" />
         <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.6"/>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2"/>
-        <PackageReference Include="log4net" Version="2.0.15"/>
+        <PackageReference Include="Irihi.Ursa" Version="0.3.0-beta20240226" />
+        <PackageReference Include="Irihi.Ursa.Themes.Semi" Version="0.3.0-beta20240226" />
+        <PackageReference Include="log4net" Version="2.0.16" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0"/>
         <PackageReference Include="System.Drawing.Common" Version="8.0.1"/>
     </ItemGroup>

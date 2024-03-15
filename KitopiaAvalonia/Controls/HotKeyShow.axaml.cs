@@ -181,6 +181,7 @@ public class HotKeyShow : TemplatedControl
         {
             IsActivated = true;
             HotKeyModel.IsUsable = true;
+            ConfigManger.Save();
             return;
         }
         

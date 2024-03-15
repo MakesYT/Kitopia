@@ -3,6 +3,7 @@
              xmlns:viewModel="clr-namespace:Core.ViewModel;assembly=Core"
              xmlns:styling="clr-namespace:FluentAvalonia.Styling;assembly=FluentAvalonia"
              xmlns:converter="clr-namespace:Kitopia.Converter"
+             xmlns:u-semi="https://irihi.tech/ursa/themes/semi"
              x:Class="KitopiaAvalonia.App"
              x:DataType="viewModel:AppViewModel"
               
@@ -20,6 +21,8 @@
     </Application.Resources>
     <Application.Styles>
         <styling:FluentAvaloniaTheme PreferSystemTheme="True" PreferUserAccentColor="True"/>
+        
+        <u-semi:SemiTheme Locale="zh-CN"/>
         <StyleInclude Source="Styles/Styles.axaml" />
         
         <StyleInclude Source="Controls/SearchItemShow.axaml" />
