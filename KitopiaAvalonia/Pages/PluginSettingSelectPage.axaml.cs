@@ -7,9 +7,9 @@ using Avalonia.Controls;
 
 namespace KitopiaAvalonia.Pages;
 
-public partial class PluginSettingPage : UserControl
+public partial class PluginSettingSelectPage : UserControl
 {
-    public PluginSettingPage()
+    public PluginSettingSelectPage()
     {
         InitializeComponent();
     }

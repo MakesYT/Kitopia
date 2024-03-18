@@ -1,7 +1,7 @@
 ﻿using Core.SDKs.Services;
 using PluginCore;
 
-namespace Core.SDKs.Everything;
+namespace Core.Window.Everything;
 
 public class EverythingService : IEverythingService
 {

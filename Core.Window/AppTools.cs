@@ -5,9 +5,11 @@ using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Text.RegularExpressions;
+using Core.SDKs;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
+using Core.SDKs.Tools;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
 using NPinyin;
@@ -17,7 +19,7 @@ using File = System.IO.File;
 
 #endregion
 
-namespace Core.SDKs.Tools;
+namespace Core.Window;
 
 internal partial class AppTools
 {

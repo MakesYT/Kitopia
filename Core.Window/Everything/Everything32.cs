@@ -5,7 +5,7 @@ using System.Text;
 
 #endregion
 
-namespace Core.SDKs.Everything;
+namespace Core.Window.Everything;
 
 public static class Everything32
 {

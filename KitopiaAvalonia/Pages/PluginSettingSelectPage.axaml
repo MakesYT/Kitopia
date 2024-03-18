@@ -1,0 +1,70 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+             xmlns:converter="clr-namespace:Kitopia.Converter"
+             xmlns:pages="clr-namespace:Core.ViewModel.Pages;assembly=Core"
+             xmlns:controls1="clr-namespace:KitopiaAvalonia.Controls"
+             xmlns:customScenario="clr-namespace:Core.ViewModel.Pages.customScenario;assembly=Core"
+             xmlns:customScenario1="clr-namespace:Core.SDKs.CustomScenario;assembly=Core"
+             xmlns:av="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:config="clr-namespace:Core.SDKs.Services.Config;assembly=Core"
+             xmlns:plugin="clr-namespace:Core.ViewModel.Pages.plugin;assembly=Core"
+             xmlns:plugin1="clr-namespace:Kitopia.View.Pages.Plugin"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="plugin:PluginSettingViewModel"
+             x:Class="KitopiaAvalonia.Pages.PluginSettingSelectPage">
+    <UserControl.Resources>
+        
+    </UserControl.Resources>
+    <StackPanel Margin="42">
+        <TextBlock Margin="0" FontSize="18" FontWeight="DemiBold" Text="{Binding PluginName}" />
+        <ListBox
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+            MaxHeight="385" 
+            ItemsSource="{Binding SettingItems}"
+            Margin="0,10,0,0">
+            <ListBox.ItemContainerTheme>
+                <ControlTheme TargetType="ListBoxItem">
+                    <Setter Property="Template">
+                        <ControlTemplate>
+                            <ContentPresenter Name="PART_ContentPresenter"
+                                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                              Background="{TemplateBinding Background}"
+                                              BorderBrush="{TemplateBinding BorderBrush}"
+                                              BorderThickness="{TemplateBinding BorderThickness}"
+                                              Content="{TemplateBinding Content}"
+                                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                                              CornerRadius="{TemplateBinding CornerRadius}" />
+                        </ControlTemplate>
+
+                    </Setter>
+                </ControlTheme>
+            </ListBox.ItemContainerTheme>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Button HorizontalAlignment="Stretch" x:Name="Button"
+                               Command="{Binding Path=$parent[ListBox].((plugin:PluginSettingViewModel)DataContext).NavigateCommand}"
+                               CommandParameter="{Binding Key }"
+                               Background="Transparent"
+                               Height="72" Margin="0"
+                               Padding="3">
+
+                        <Grid VerticalAlignment="Center"
+                              Width="{Binding Path=$parent.Bounds.Width}" ColumnDefinitions="80,*,*,Auto,Auto">
+                            <TextBlock Grid.Column="1" Text="{Binding Title}" FontSize="18" />
+                            <controls:SymbolIcon Grid.Column="4" Symbol="ChevronRight" FontSize="20"
+                                           Margin="0,0,10,0" />
+                        </Grid>
+
+
+                    </Button>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+
+
+        </ListBox>
+    </StackPanel>
+</UserControl>

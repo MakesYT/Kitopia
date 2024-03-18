@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PluginCore;
 using PluginCore.Attribute;
+using PluginCore.Config;
 
 #endregion
 
@@ -36,7 +37,7 @@ public class Plugin
             File.WriteAllText(configF.FullName, j);
         }
 
-        var json = File.ReadAllText(key);
+        var json = File.ReadAllText(configF.FullName);
         try
         {
             var deserializeObject =  _plugin.Assemblies.FirstOrDefault(x => x.GetName().Name == "Newtonsoft.Json")?.GetType("Newtonsoft.Json.JsonConvert").GetMethod("DeserializeObject")?.Invoke(null, new object[] { json, configBase.GetType() })! as ConfigBase ?? configBase;
@@ -45,6 +46,11 @@ public class Plugin
             {
                 ConfigManger.Configs[key] = deserializeObject;
             }
+
+            var type = deserializeObject.GetType().BaseType;
+            var fieldInfo = type.GetField("Instance");
+            fieldInfo.SetValue(deserializeObject,deserializeObject);
+            deserializeObject.AfterLoad();
         }
         catch (Exception e)
         {
@@ -93,8 +99,8 @@ public class Plugin
             if (type.BaseType==typeof(ConfigBase))
             {
                 var instance =(ConfigBase) Activator.CreateInstance(type);
-                instance.Name = $"{PluginInfo.ToPlgString()}_{type.FullName}";
-                AddConfig($"{PluginInfo.ToPlgString()}_{type.FullName}", instance);
+                instance.Name = $"{PluginInfo.ToPlgString()}#{type.FullName}";
+                AddConfig($"{PluginInfo.ToPlgString()}#{type.FullName}", instance);
             }
             if (typeof(CustomScenarioTrigger).IsAssignableFrom(type))
             {

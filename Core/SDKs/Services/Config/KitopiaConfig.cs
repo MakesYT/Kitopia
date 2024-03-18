@@ -6,9 +6,11 @@ using log4net;
 using Microsoft.Extensions.DependencyInjection;
 using PluginCore;
 using PluginCore.Attribute;
+using PluginCore.Config;
 
 namespace Core.SDKs.Services.Config;
 
+[ConfigName("Kitopia主配置文件")]
 public class KitopiaConfig : ConfigBase
 {
     private static ILog log = LogManager.GetLogger("KitopiaConfig");
@@ -43,7 +45,7 @@ public class KitopiaConfig : ConfigBase
     [ConfigField("输入平滑延时","在指定时间内不处理数据以减轻性能消耗", 0xED9B,ConfigFieldType.整数滑块 ,null,1000,50,10)]
     public int inputSmoothingMilliseconds = 50;
     [ConfigField("忽略项","忽略指定的文件或文件夹", 0xF2D7,ConfigFieldType.字符串列表 )] 
-    public List<string> ignoreItems = new();
+    public ObservableCollection<string> ignoreItems = new();
     public Dictionary<string, int> lastOpens = new();
 
     public List<string> errorLnk = new();

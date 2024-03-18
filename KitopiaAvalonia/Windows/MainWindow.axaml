@@ -71,7 +71,7 @@
                     <Setter Property="FontFamily" Value="{StaticResource SymbolThemeFontFamily}"/>
                 </Style>
             </ui:NavigationView.Styles>
-            <ui:Frame Name="FrameView" Navigated="FrameView_OnNavigated" />
+            <ui:Frame Name="FrameView" CacheSize="0" Navigated="FrameView_OnNavigated" />
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem Classes="SampleAppNav" Content="主页"  FontSize="30" Cursor="Hand" Tag="HomePage" />
                 <ui:NavigationViewItem Classes="SampleAppNav" Content="插件"  FontSize="30" Cursor="Hand"

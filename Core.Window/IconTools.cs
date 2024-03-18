@@ -11,7 +11,7 @@ using Size = System.Drawing.Size;
 
 #endregion
 
-namespace Core.SDKs.Tools;
+namespace Core.Window;
 
 internal class IconTools
 {

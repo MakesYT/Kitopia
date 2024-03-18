@@ -111,8 +111,7 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
         }
 
         ((INavigationPageService)ServiceManager.Services!.GetService(typeof(INavigationPageService))).Navigate(
-            "PluginSetting");
-        ((PluginSettingViewModel)ServiceManager.Services!.GetService(typeof(PluginSettingViewModel)))
-            .ChangePlugin(pluginInfoEx);
+            $"PluginSettingSelectPage_{pluginInfoEx.ToPlgString()}");
+        
     }
 }

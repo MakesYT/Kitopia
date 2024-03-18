@@ -11,7 +11,7 @@ using Vanara.Windows.Shell;
 
 #endregion
 
-namespace Core.SDKs.Tools;
+namespace Core.Window;
 
 internal static class UwpTools
 {
@@ -87,7 +87,7 @@ internal static class UwpTools
         }
 
         List<string> keys = new();
-        await AppTools.NameSolver(keys, fileName);
+        await Window.AppTools.NameSolver(keys, fileName);
         var xmlDocument = new XmlDocument();
         if (File.Exists($"{appContainer.workingDirectory}{Path.DirectorySeparatorChar}AppxManifest.xml"))
         {

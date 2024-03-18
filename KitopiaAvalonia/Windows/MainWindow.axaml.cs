@@ -20,6 +20,7 @@ using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
 using Core.ViewModel;
+using Core.ViewModel.Pages.plugin;
 using FluentAvalonia.UI.Controls;
 using FluentAvalonia.UI.Navigation;
 using FluentAvalonia.UI.Windowing;
@@ -42,8 +43,26 @@ public class NavigationPageFactory : INavigationPageFactory
         {
             if (s=="SettingPage")
             {
-                return new SettingPage(ConfigManger.Config);
+                var settingPage = ServiceManager.Services.GetService<SettingPage>();
+                settingPage.ChangeConfig(ConfigManger.Config);
+                return settingPage;
             }
+            if (s.StartsWith("PluginSettingSelectPage_"))
+            {
+                var keyedService = ServiceManager.Services.GetKeyedService<UserControl>("PluginSettingSelectPage");
+                ((PluginSettingViewModel)keyedService.DataContext).LoadByPluginInfo( s.Split("_",2)[1]);
+                return keyedService;
+            }
+            if (s.StartsWith("PluginSetting_"))
+            {
+                var settingPage = ServiceManager.Services.GetService<SettingPage>();
+                if (ConfigManger.Configs.TryGetValue( s.Split("_",2)[1], out var config))
+                {
+                    settingPage.ChangeConfig(config);
+                }
+                return settingPage;
+            }
+
             return ServiceManager.Services.GetKeyedService<UserControl>(s);
         }
 

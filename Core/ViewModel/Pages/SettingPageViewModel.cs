@@ -12,6 +12,7 @@ using log4net;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using PluginCore;
+using PluginCore.Config;
 
 #endregion
 

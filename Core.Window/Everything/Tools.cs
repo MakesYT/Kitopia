@@ -3,12 +3,11 @@
 using System.IO;
 using System.Text;
 using Core.SDKs.Services.Config;
-using Core.SDKs.Tools;
 using PluginCore;
 
 #endregion
 
-namespace Core.SDKs.Everything;
+namespace Core.Window.Everything;
 
 public class Tools
 {

@@ -22,10 +22,11 @@
     <Application.Styles>
         <styling:FluentAvaloniaTheme PreferSystemTheme="True" PreferUserAccentColor="True"/>
         
-        <u-semi:SemiTheme Locale="zh-CN"/>
+        
         <StyleInclude Source="Styles/Styles.axaml" />
         
         <StyleInclude Source="Controls/SearchItemShow.axaml" />
+        <StyleInclude Source="Controls/ListShow.axaml" />
         <StyleInclude Source="Styles/NavigationViewItemStyles.axaml" />
         <StyleInclude Source="Controls/HotKeyShow.axaml" />
         <StyleInclude Source="Controls/HotKeyShowItme.axaml" />

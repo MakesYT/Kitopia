@@ -11,6 +11,7 @@ using Microsoft.Win32;
 using Newtonsoft.Json;
 using PluginCore;
 using PluginCore.Attribute;
+using PluginCore.Config;
 
 #endregion
 
@@ -19,7 +20,7 @@ namespace Core.SDKs.Services.Config;
 public static class ConfigManger
 {
     public static Dictionary<string,ConfigBase> Configs = new();
-    public static KitopiaConfig? Config => Configs["KitopiaCoreConfig"] as KitopiaConfig ?? null;
+    public static KitopiaConfig? Config => Configs["KitopiaConfig"] as KitopiaConfig ?? null;
     private static readonly ILog log = LogManager.GetLogger(nameof(ConfigManger));
 
     public static void Init()
@@ -28,10 +29,9 @@ public static class ConfigManger
         {
             Directory.CreateDirectory($"{AppDomain.CurrentDomain.BaseDirectory}configs");
         }
-        Configs.Add("KitopiaCoreConfig",new KitopiaConfig(){Name = "KitopiaCoreConfig"});
-        var keyCollection = Configs.Keys.ToList();
+        Configs.Add("KitopiaConfig",new KitopiaConfig(){Name = "KitopiaConfig"});
         var configF =
-            new FileInfo($"{AppDomain.CurrentDomain.BaseDirectory}configs{Path.DirectorySeparatorChar}KitopiaCoreConfig.json");
+            new FileInfo($"{AppDomain.CurrentDomain.BaseDirectory}configs{Path.DirectorySeparatorChar}KitopiaConfig.json");
         if (!configF.Exists)
         {
             var j = JsonConvert.SerializeObject(Config, Formatting.Indented);
@@ -41,7 +41,7 @@ public static class ConfigManger
         var json = File.ReadAllText(configF.FullName);
         try
         {
-            Configs["KitopiaCoreConfig"] = JsonConvert.DeserializeObject(json,Config.GetType())! as ConfigBase ?? Config;
+            Configs["KitopiaConfig"] = JsonConvert.DeserializeObject(json,Config.GetType())! as ConfigBase ?? Config;
         }
         catch (Exception e)
         {
