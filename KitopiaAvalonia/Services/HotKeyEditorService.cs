@@ -51,9 +51,14 @@ public class HotKeyEditorService : IHotKeyEditor
         }
     }
 
-    public void RemoveByHotKeyModel(HotKeyModel hotKeyModel)
+    public void UnuseByHotKeyModel(HotKeyModel hotKeyModel)
     {
         hotKeyModel.IsUsable = false;
         WeakReferenceMessenger.Default.Send(hotKeyModel.SignName, "hotkey");
+    }
+
+    public void RemoveByHotKeyModel(HotKeyModel hotKeyModel)
+    {
+        HotKeyManager.HotKeys.Remove(hotKeyModel);
     }
 }

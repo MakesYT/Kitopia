@@ -209,7 +209,7 @@ public static class CustomScenarioManger
         {
             if (item.MainName == "Kitopia情景")
             {
-                if (CustomScenarios.All(e => e.UUID != item.Name!.Split("_")[0]))
+                if (scenario.UUID==item.Name!.Split("_")[0])
                 {
                     toRemove.Add(item);
                 }

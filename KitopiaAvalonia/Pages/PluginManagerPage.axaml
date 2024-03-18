@@ -15,6 +15,7 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="plugin:PluginManagerPageViewModel"
              x:Class="KitopiaAvalonia.Pages.PluginManagerPage">
+    
     <UserControl.Resources>
         <plugin1:PluginInfoToInfo x:Key="PluginInfoToInfo" />
         
