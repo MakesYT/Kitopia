@@ -147,6 +147,7 @@ public static class ConfigManger
     {
         foreach (var (s, value) in ConfigManger.Configs.Where( x=>x.Key.StartsWith(key)))
         {
+            value.GetType().BaseType.GetField("Instance").SetValue(value,null);
             ConfigManger.Configs.Remove(s);
         }
     }

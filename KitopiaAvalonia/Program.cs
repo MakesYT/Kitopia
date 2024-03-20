@@ -40,6 +40,10 @@ class Program
             };
             BuildAvaloniaApp()
                 .StartWithClassicDesktopLifetime(args);
+            Dispatcher.UIThread.UnhandledException += (sender, e) =>
+            {
+                Log.Fatal(e.Exception);
+            };
         }
         catch (Exception e)
         {

@@ -33,24 +33,32 @@ public class Plugin
             new FileInfo($"{AppDomain.CurrentDomain.BaseDirectory}configs{Path.DirectorySeparatorChar}{key}.json");
         if (!configF.Exists)
         {
-            var j = JsonConvert.SerializeObject(configBase, Formatting.Indented);
+           
+            var j =  _plugin.Assemblies.
+                             FirstOrDefault(x => x.GetName().Name == "Newtonsoft.Json")?.
+                             GetType("Newtonsoft.Json.JsonConvert")?.
+                             GetMethod("SerializeObject")?.
+                             Invoke(null, [configBase, Formatting.Indented])! as string;
+            
             File.WriteAllText(configF.FullName, j);
         }
 
         var json = File.ReadAllText(configF.FullName);
         try
         {
-            var deserializeObject =  _plugin.Assemblies.FirstOrDefault(x => x.GetName().Name == "Newtonsoft.Json")?.GetType("Newtonsoft.Json.JsonConvert").GetMethod("DeserializeObject")?.Invoke(null, new object[] { json, configBase.GetType() })! as ConfigBase ?? configBase;
+            var deserializeObject =  _plugin.Assemblies.
+                                             FirstOrDefault(x => x.GetName().Name == "Newtonsoft.Json")?.
+                                             GetType("Newtonsoft.Json.JsonConvert")!.GetMethod("DeserializeObject")?.
+                                             Invoke(null, [json, configBase.GetType()])! as ConfigBase ?? configBase;
             
             if (!ConfigManger.Configs.TryAdd(key,deserializeObject))
             {
                 ConfigManger.Configs[key] = deserializeObject;
             }
-
-            var type = deserializeObject.GetType().BaseType;
-            var fieldInfo = type.GetField("Instance");
-            fieldInfo.SetValue(deserializeObject,deserializeObject);
+            deserializeObject.GetType().BaseType.GetField("Instance").SetValue(deserializeObject,deserializeObject);
             deserializeObject.AfterLoad();
+          
+            
         }
         catch (Exception e)
         {
@@ -165,7 +173,7 @@ public class Plugin
         foreach (var genericArgument in methodInfo.GetParameters())
         {
             var plugin = PluginManager.EnablePlugin
-                .FirstOrDefault((e) => e.Value._dll == genericArgument.ParameterType.Assembly).Value;
+                                      .FirstOrDefault((e) => e.Value._dll == genericArgument.ParameterType.Assembly).Value;
             // type.Assembly.
             // var a = PluginManager.GetPlugnNameByTypeName(type.FullName);
             if (plugin is null)
@@ -329,14 +337,7 @@ public class Plugin
 
         return pointItem;
     }
-
-    public JObject GetConfigJObject()
-    {
-        var jObject = new JObject();
-
-
-        return jObject;
-    }
+    
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void UnloadByPluginInfo(string pluginInfoEx, out WeakReference weakReference)

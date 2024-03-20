@@ -2,6 +2,7 @@
 
 using System.Reflection;
 using System.Runtime.Loader;
+using Avalonia;
 
 #endregion
 
@@ -21,6 +22,7 @@ public class AssemblyLoadContextH : AssemblyLoadContext
         Unloading += (sender) =>
         {
             _assembly = null;
+            AvaloniaPropertyRegistry.Instance.UnregisterByModule(sender.Assemblies.First().DefinedTypes);
         };
     }
 

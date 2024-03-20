@@ -13,7 +13,7 @@ public class PluginManager
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(PluginManager));
 
-    public static Dictionary<string, Plugin> EnablePlugin = new();
+    public readonly static Dictionary<string, Plugin> EnablePlugin = new();
 
     public static void Init()
     {

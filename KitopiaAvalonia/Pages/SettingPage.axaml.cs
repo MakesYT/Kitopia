@@ -45,13 +45,14 @@ public partial class SettingPage : UserControl
      ~SettingPage()
     {
         disposables.Dispose();
+        StackPanel.Children.Clear();
     }
 
     private StackPanel nowControl;
     protected override void OnUnloaded(RoutedEventArgs e)
     {
         base.OnUnloaded(e);
-        
+        StackPanel.Children.Clear();
     }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)

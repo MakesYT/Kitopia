@@ -223,7 +223,7 @@ public partial class MainWindow : AppWindow
 
         log.Info("主题初始化完成");
         log.Debug("注册热键");
-        HotKeyManager.Init();
+        //HotKeyManager.Init();
 
 
         ServicePointManager.DefaultConnectionLimit = 10240;
