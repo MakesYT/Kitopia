@@ -1,6 +1,9 @@
 ﻿#region
 
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
+using System.Xml;
 using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.HotKey;
 using Core.SDKs.Services.Plugin;
@@ -8,7 +11,6 @@ using Core.ViewModel;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
-using Newtonsoft.Json;
 using PluginCore;
 using PluginCore.Attribute;
 using PluginCore.Config;
@@ -22,7 +24,14 @@ public static class ConfigManger
     public static Dictionary<string,ConfigBase> Configs = new();
     public static KitopiaConfig? Config => Configs["KitopiaConfig"] as KitopiaConfig ?? null;
     private static readonly ILog log = LogManager.GetLogger(nameof(ConfigManger));
-
+    public static JsonSerializerOptions DefaultOptions = new JsonSerializerOptions
+    {
+        
+        IncludeFields = true,
+        WriteIndented = true,
+       
+        
+    };
     public static void Init()
     {
         if (!Directory.Exists($"{AppDomain.CurrentDomain.BaseDirectory}configs"))
@@ -34,14 +43,16 @@ public static class ConfigManger
             new FileInfo($"{AppDomain.CurrentDomain.BaseDirectory}configs{Path.DirectorySeparatorChar}KitopiaConfig.json");
         if (!configF.Exists)
         {
-            var j = JsonConvert.SerializeObject(Config, Formatting.Indented);
+           
+            var j =JsonSerializer.Serialize(Config, ConfigManger.DefaultOptions);
             File.WriteAllText(configF.FullName, j);
         }
 
         var json = File.ReadAllText(configF.FullName);
         try
         {
-            Configs["KitopiaConfig"] = JsonConvert.DeserializeObject(json,Config.GetType())! as ConfigBase ?? Config;
+           
+            Configs["KitopiaConfig"] = JsonSerializer.Deserialize(json,Config.GetType(),ConfigManger.DefaultOptions)! as ConfigBase ?? Config;
         }
         catch (Exception e)
         {
@@ -160,7 +171,9 @@ public static class ConfigManger
             var configF =
                 new FileInfo($"{AppDomain.CurrentDomain.BaseDirectory}configs{Path.DirectorySeparatorChar}{configsKey}.json");
             
-            var j = JsonConvert.SerializeObject(configBase, Formatting.Indented);
+            
+            
+            var j =JsonSerializer.Serialize(configBase,configBase.GetType(), ConfigManger.DefaultOptions);
             File.WriteAllText(configF.FullName, j);
             
 
@@ -177,7 +190,8 @@ public static class ConfigManger
         }
         var configF =
             new FileInfo($"{AppDomain.CurrentDomain.BaseDirectory}configs{Path.DirectorySeparatorChar}{key}.json");
-        var j = JsonConvert.SerializeObject(configBase, Formatting.Indented);
+       
+        var j =JsonSerializer.Serialize(configBase,configBase.GetType(), ConfigManger.DefaultOptions);
         File.WriteAllText(configF.FullName, j);
         WeakReferenceMessenger.Default.Send<string, string>("ConfigSave", "ConfigSave");
     }

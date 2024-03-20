@@ -5,13 +5,12 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.HotKey;
 using Core.SDKs.Services.Config;
 using Core.SDKs.Tools;
 using log4net;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using PluginCore;
 using PluginCore.Attribute;
 using PluginCore.Config;
@@ -33,24 +32,14 @@ public class Plugin
             new FileInfo($"{AppDomain.CurrentDomain.BaseDirectory}configs{Path.DirectorySeparatorChar}{key}.json");
         if (!configF.Exists)
         {
-           
-            var j =  _plugin.Assemblies.
-                             FirstOrDefault(x => x.GetName().Name == "Newtonsoft.Json")?.
-                             GetType("Newtonsoft.Json.JsonConvert")?.
-                             GetMethod("SerializeObject")?.
-                             Invoke(null, [configBase, Formatting.Indented])! as string;
-            
+            var j =JsonSerializer.Serialize(configBase,configBase.GetType(), ConfigManger.DefaultOptions);
             File.WriteAllText(configF.FullName, j);
         }
 
         var json = File.ReadAllText(configF.FullName);
         try
         {
-            var deserializeObject =  _plugin.Assemblies.
-                                             FirstOrDefault(x => x.GetName().Name == "Newtonsoft.Json")?.
-                                             GetType("Newtonsoft.Json.JsonConvert")!.GetMethod("DeserializeObject")?.
-                                             Invoke(null, [json, configBase.GetType()])! as ConfigBase ?? configBase;
-            
+            var deserializeObject = JsonSerializer.Deserialize(json,configBase.GetType(),ConfigManger.DefaultOptions)! as ConfigBase ?? configBase;
             if (!ConfigManger.Configs.TryAdd(key,deserializeObject))
             {
                 ConfigManger.Configs[key] = deserializeObject;

@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 using Avalonia.Collections;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -14,7 +15,6 @@ using Core.SDKs.Services;
 using Core.SDKs.Services.Plugin;
 using Core.SDKs.Tools;
 using log4net;
-using Newtonsoft.Json;
 using PluginCore;
 using PluginCore.Attribute;
 

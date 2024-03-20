@@ -1,5 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Text;
+using System.Text.Json;
+using System.Xml;
 using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.HotKey;
 using Core.SDKs.Services;
@@ -7,8 +9,8 @@ using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
 using Core.ViewModel;
 using log4net;
-using Newtonsoft.Json;
 using PluginCore;
+using PluginCore.Config;
 
 namespace Core.SDKs.CustomScenario;
 
@@ -85,7 +87,7 @@ public static class CustomScenarioManger
         var json = File.ReadAllText(fileInfo.FullName);
         try
         {
-            var deserializeObject = JsonConvert.DeserializeObject<CustomScenario>(json)!;
+            var deserializeObject = JsonSerializer.Deserialize<CustomScenario>(json);
 
 
             foreach (var node in deserializeObject.nodes)
@@ -122,15 +124,9 @@ public static class CustomScenarioManger
             // Log.Error(e1);
             Log.Error($"情景文件\"{fileInfo.FullName}\"加载失败");
             var pluginName = ((CustomScenarioLoadFromJsonException)e1).PluginName.Split("_");
-            var deserializeObject = JsonConvert.DeserializeObject<CustomScenario>(json,
-                new JsonSerializerSettings()
-                {
-                    Error = (sender, args) =>
-                    {
-                        // 忽略错误并继续反序列化
-                        args.ErrorContext.Handled = true;
-                    }
-                })!;
+            
+            
+            var deserializeObject = JsonSerializer.Deserialize<CustomScenario>(json)!;
             deserializeObject.HasInit = false;
             deserializeObject.IsRunning = false;
 
@@ -187,14 +183,14 @@ public static class CustomScenarioManger
         }
 
         var configF = new FileInfo(AppDomain.CurrentDomain.BaseDirectory + $"customScenarios{Path.DirectorySeparatorChar}{scenario.UUID}.json");
-
-        var setting = new JsonSerializerSettings();
-        setting.PreserveReferencesHandling = PreserveReferencesHandling.Objects;
-        setting.ReferenceLoopHandling = ReferenceLoopHandling.Serialize;
-        setting.TypeNameHandling = TypeNameHandling.None;
-        setting.Formatting = Formatting.Indented;
-
-        File.WriteAllText(configF.FullName, JsonConvert.SerializeObject(scenario, setting));
+        
+        var jsonSerializerOptions = new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            IncludeFields = true
+        };
+        var j =JsonSerializer.Serialize(scenario, jsonSerializerOptions);
+        File.WriteAllText(configF.FullName, j);
     }
 
     public static void Remove(CustomScenario scenario, bool deleteFile = true)

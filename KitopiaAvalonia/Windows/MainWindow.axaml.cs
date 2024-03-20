@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
@@ -189,6 +190,7 @@ public partial class MainWindow : AppWindow
         }
         
         LockFile=lockFile.Create();
+        
         CheckAndDeleteLogFiles();
         log.Info("启动");
 

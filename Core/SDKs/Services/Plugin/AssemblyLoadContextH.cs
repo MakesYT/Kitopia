@@ -1,8 +1,12 @@
 ﻿#region
 
+using System.Collections;
+using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.Loader;
+using System.Text.Json;
 using Avalonia;
+using Core.SDKs.Services.Config;
 
 #endregion
 
@@ -17,13 +21,27 @@ public class AssemblyLoadContextH : AssemblyLoadContext
     {
         _resolver = new AssemblyDependencyResolver(pluginPath);
         _assembly = this.LoadFromAssemblyPath(pluginPath);
-        var assemblyName = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.GetName().Name == "Newtonsoft.Json")?.GetName();
-        LoadFromAssemblyName(assemblyName);
+        
         Unloading += (sender) =>
         {
+            AppDomain.CurrentDomain.GetAssemblies().
+                      FirstOrDefault(x=>x.GetName().Name=="System.Text.Json")?.
+                      GetType("System.Text.Json.Serialization.Metadata.ReflectionEmitCachingMemberAccessor")?.
+                      GetMethod("Clear")?.Invoke(null, null);
+            // var fieldInfo = ConfigManger.DefaultOptions.GetType().GetField("_cachingContext", BindingFlags.NonPublic | BindingFlags.Instance);
+            // fieldInfo.FieldType.GetMethod("Clear")?.Invoke(fieldInfo.GetValue(ConfigManger.DefaultOptions), null);
+            ConfigManger.DefaultOptions = new JsonSerializerOptions
+            {
+        
+                IncludeFields = true,
+                WriteIndented = true,
+       
+        
+            };
             _assembly = null;
             AvaloniaPropertyRegistry.Instance.UnregisterByModule(sender.Assemblies.First().DefinedTypes);
         };
+        
     }
 
     public Assembly Assembly => _assembly;

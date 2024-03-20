@@ -22,7 +22,7 @@ public static class PluginInfoTool
         var alc = new AssemblyLoadContextH(assemblyPath, $"{assemblyPath}_pluginInfo");
 
         // Create a weak reference to the AssemblyLoadContext that will allow us to detect
-        // when the unload completes.
+        // when to unload completes.
         alcWeakRef = new WeakReference(alc);
 
         // Load the plugin assembly into the HostAssemblyLoadContext.
