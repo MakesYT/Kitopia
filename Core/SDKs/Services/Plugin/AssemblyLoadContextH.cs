@@ -5,8 +5,10 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Avalonia;
 using Core.SDKs.Services.Config;
+using Microsoft.Extensions.DependencyInjection;
 
 #endregion
 
@@ -35,11 +37,12 @@ public class AssemblyLoadContextH : AssemblyLoadContext
         
                 IncludeFields = true,
                 WriteIndented = true,
-       
+                ReferenceHandler = ReferenceHandler.Preserve
         
             };
             _assembly = null;
             AvaloniaPropertyRegistry.Instance.UnregisterByModule(sender.Assemblies.First().DefinedTypes);
+            ServiceManager.Services.GetService<IPluginToolService>()!.RequestUninstallPlugin(pluginPath);
         };
         
     }

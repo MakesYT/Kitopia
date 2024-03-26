@@ -13,16 +13,20 @@ public class Tools
 {
     public static void main(Dictionary<string, SearchViewItem> Items)
     {
-        if (IntPtr.Size == 8)
-            // 64-bit
+        Task.Run(() =>
         {
-            amd64(Items);
-        }
-        else
-            // 32-bit
-        {
-            amd32(Items);
-        }
+            if (IntPtr.Size == 8)
+                // 64-bit
+            {
+                amd64(Items);
+            }
+            else
+                // 32-bit
+            {
+                amd32(Items);
+            }
+        });
+        
     }
 
     public static void amd32(Dictionary<string, SearchViewItem> Items)

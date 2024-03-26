@@ -2,6 +2,7 @@
 
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using System.Xml;
 using CommunityToolkit.Mvvm.Messaging;
@@ -29,7 +30,7 @@ public static class ConfigManger
         
         IncludeFields = true,
         WriteIndented = true,
-       
+       ReferenceHandler = ReferenceHandler.Preserve
         
     };
     public static void Init()

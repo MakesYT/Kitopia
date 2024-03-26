@@ -46,7 +46,6 @@ public partial class PluginSettingViewModel : ObservableRecipient
     [RelayCommand]
     public void Navigate(string na)
     {
-        SettingItems.Clear();
         ((INavigationPageService)ServiceManager.Services!.GetService(typeof(INavigationPageService))).Navigate(
             $"PluginSetting_{na}");
     }

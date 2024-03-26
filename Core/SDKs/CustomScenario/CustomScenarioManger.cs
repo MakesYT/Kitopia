@@ -87,7 +87,7 @@ public static class CustomScenarioManger
         var json = File.ReadAllText(fileInfo.FullName);
         try
         {
-            var deserializeObject = JsonSerializer.Deserialize<CustomScenario>(json);
+            var deserializeObject = JsonSerializer.Deserialize<CustomScenario>(json,ConfigManger.DefaultOptions);
 
 
             foreach (var node in deserializeObject.nodes)
@@ -126,7 +126,7 @@ public static class CustomScenarioManger
             var pluginName = ((CustomScenarioLoadFromJsonException)e1).PluginName.Split("_");
             
             
-            var deserializeObject = JsonSerializer.Deserialize<CustomScenario>(json)!;
+            var deserializeObject = JsonSerializer.Deserialize<CustomScenario>(json,ConfigManger.DefaultOptions)!;
             deserializeObject.HasInit = false;
             deserializeObject.IsRunning = false;
 
@@ -184,12 +184,8 @@ public static class CustomScenarioManger
 
         var configF = new FileInfo(AppDomain.CurrentDomain.BaseDirectory + $"customScenarios{Path.DirectorySeparatorChar}{scenario.UUID}.json");
         
-        var jsonSerializerOptions = new JsonSerializerOptions
-        {
-            WriteIndented = true,
-            IncludeFields = true
-        };
-        var j =JsonSerializer.Serialize(scenario, jsonSerializerOptions);
+       
+        var j =JsonSerializer.Serialize(scenario, ConfigManger.DefaultOptions);
         File.WriteAllText(configF.FullName, j);
     }
 

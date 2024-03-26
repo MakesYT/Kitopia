@@ -10,7 +10,7 @@
                      TransparencyLevelHint="AcrylicBlur"
                      xmlns:sty="using:FluentAvalonia.Styling"
                      Icon="/Assets/icon.png"
-                     Title="Avalonia">
+                     Title="Kitopia">
 
     <windowing:AppWindow.Background>
         <SolidColorBrush Color="{DynamicResource SolidBackgroundFillColorBase}" Opacity="0.65" />

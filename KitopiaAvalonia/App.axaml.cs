@@ -60,6 +60,7 @@ public partial class App : Application
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
         {
+            
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -80,6 +81,7 @@ public partial class App : Application
         services.AddTransient<ISearchWindowService, SearchWindowService>();
         services.AddTransient<IErrorWindow, ErrorWindow>();
         services.AddTransient<IScreenCapture, Services.ScreenCapture>();
+        services.AddTransient<IPluginToolService, PluginToolService>();
         
         services.AddTransient<INavigationPageService, NavigationPageService>();
         #if WINDOWS

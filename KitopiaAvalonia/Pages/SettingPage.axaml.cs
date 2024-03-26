@@ -42,24 +42,21 @@ public partial class SettingPage : UserControl
         StackPanel.Children.Clear();
         LoadConfig();
     }
-     ~SettingPage()
+    ~SettingPage()
     {
         disposables.Dispose();
-        StackPanel.Children.Clear();
     }
 
     private StackPanel nowControl;
     protected override void OnUnloaded(RoutedEventArgs e)
     {
         base.OnUnloaded(e);
+        disposables.Clear();
+        nowControl = null;
         StackPanel.Children.Clear();
+        Console.WriteLine("Unloaded");
     }
-
-    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
-    {
-        base.OnApplyTemplate(e);
-        
-    }
+    
 
     private void LoadConfig()
     {
@@ -180,7 +177,7 @@ public partial class SettingPage : UserControl
                             };
                             textBox.SetValue(ToolTip.TipProperty,binding);
                             textBox.SetValue(ToolTip.PlacementProperty,PlacementMode.Center);
-                            textBox.Bind(TextBlock.TextProperty,binding, BindingPriority.StyleTrigger);
+                            disposables.Add(textBox.Bind(TextBlock.TextProperty,binding, BindingPriority.StyleTrigger));
                             
                             disposables.Add(
                                 slider.GetObservable(Slider.ValueProperty).Subscribe( (d) =>

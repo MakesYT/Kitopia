@@ -127,8 +127,10 @@ public class ClipboardWindow : IClipboardService
                 Array.Copy(result, 40, img, 0, img.Length);
                 Array.Copy(result, 0, imgInfo, 0, imgInfo.Length);
                 Gdi32.BITMAPINFO info = BytesToStructure<Gdi32.BITMAPINFO>(imgInfo);
-
-                var image = SixLabors.ImageSharp.Image.LoadPixelData<Rgba32>(img, info.bmiHeader.biWidth,
+                SixLabors.ImageSharp.Configuration configuration= Configuration.Default;
+                configuration.PreferContiguousImageBuffers = true;
+                
+                var image = SixLabors.ImageSharp.Image.LoadPixelData<Rgba32>(configuration,img, info.bmiHeader.biWidth,
                     info.bmiHeader.biHeight);
                 image.Mutate(x => x.Flip(FlipMode.Vertical));
                 if (!image.DangerousTryGetSinglePixelMemory(out Memory<Rgba32> memory))
@@ -141,7 +143,7 @@ public class ClipboardWindow : IClipboardService
                 {
                     unsafe
                     {
-                        var pixelFormat = PixelFormat.Rgba8888;
+                        var pixelFormat = PixelFormat.Bgra8888;
                         var bitmap1 = new Bitmap(pixelFormat, AlphaFormat.Unpremul, (IntPtr)pinHandle.Pointer,
                             new PixelSize(info.bmiHeader.biWidth, info.bmiHeader.biHeight), new Vector(96, 96),
                             ((((info.bmiHeader.biWidth * pixelFormat.BitsPerPixel) + 31) & ~31) >> 3));

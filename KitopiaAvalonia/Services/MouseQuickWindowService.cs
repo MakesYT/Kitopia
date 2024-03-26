@@ -11,7 +11,8 @@ public class MouseQuickWindowService : IMouseQuickWindowService
     {
         Dispatcher.UIThread.InvokeAsync(() =>
         {
-            ServiceManager.Services.GetService<MouseQuickWindow>()!.Show();
+            var mouseQuickWindow = ServiceManager.Services.GetService<MouseQuickWindow>();
+            mouseQuickWindow.Show();
         });
     }
 }

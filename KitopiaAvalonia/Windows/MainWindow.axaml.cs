@@ -86,6 +86,7 @@ public partial class MainWindow : AppWindow
         TitleBar.ExtendsContentIntoTitleBar = true;
         TitleBar.TitleBarHitTestType = TitleBarHitTestType.Complex;
         FrameView.NavigationPageFactory = new NavigationPageFactory();
+        
         foreach (NavigationViewItem nvi in NavView.MenuItems)
         {
             if (nvi.Tag == FrameView.Tag)
@@ -164,32 +165,10 @@ public partial class MainWindow : AppWindow
         this.Opened -= FirstOpenEventHandler;
     }
     
-    public FileStream LockFile { get; set; }
     public void OnStartup()
     {
         log.Info("启动");
-        this.Opened += FirstOpenEventHandler;
-        
-        FileInfo lockFile = new FileInfo("Kitopia.lock");
-        if (lockFile.Exists)
-        {
-            try
-            {
-                lockFile.Delete();
-            }
-            catch (Exception e)
-            {
-                var content = new DialogContent("Kitopia", "不能同时开启两个应用", null, null, "确定", () =>
-                    {
-                        Environment.Exit(0);
-                    },
-                    null, null);
-                ServiceManager.Services.GetService<IContentDialog>()!.ShowDialog(null, content);
-                return;
-            }
-        }
-        
-        LockFile=lockFile.Create();
+        //this.Opened += FirstOpenEventHandler;
         
         CheckAndDeleteLogFiles();
         log.Info("启动");
@@ -225,7 +204,7 @@ public partial class MainWindow : AppWindow
 
         log.Info("主题初始化完成");
         log.Debug("注册热键");
-        //HotKeyManager.Init();
+        HotKeyManager.Init();
 
 
         ServicePointManager.DefaultConnectionLimit = 10240;

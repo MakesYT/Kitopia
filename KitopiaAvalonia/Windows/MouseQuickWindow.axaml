@@ -67,7 +67,7 @@
                             </Grid.RowDefinitions>
                             <Image HorizontalAlignment="Center" Focusable="False" Width="32"
                                    Height="32"
-                                   Source="{Binding ., Converter={StaticResource PathToImageConverter}}" />
+                                   Source="{Binding Icon, Converter={StaticResource PathToImageConverter},ConverterParameter={Binding .}}" />
                             <controls:FontIcon Height="48" Width="48" FontSize="48"
                                                FontFamily="{StaticResource FluentFont}"
                                                IsVisible="{Binding IconSymbol,Converter={StaticResource SymbolToVisible}}"
