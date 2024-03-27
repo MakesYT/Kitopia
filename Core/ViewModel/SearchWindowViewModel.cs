@@ -25,7 +25,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
     private static readonly ILog Log = LogManager.GetLogger(nameof(SearchWindowViewModel));
     private static readonly List<SearchViewItem> TempList = new(1000);
 
-    public readonly Dictionary<string, SearchViewItem> _collection = new(400); //存储本机所有软件
+    public readonly ConcurrentDictionary<string, SearchViewItem> _collection = new(); //存储本机所有软件
     private readonly TaskScheduler _scheduler = TaskScheduler.FromCurrentSynchronizationContext();
 
     private readonly DelayAction _searchDelayAction = new();
@@ -45,7 +45,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
     public SearchWindowViewModel()
     {
-        ReloadApps(true);
+        ReloadApps(false);
         LoadLast();
     }
 
@@ -57,7 +57,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
     public void ReloadApps(bool logging = false)
     {
         ServiceManager.Services.GetService<IAppToolService>()!.DelNullFile(_collection);
-        ServiceManager.Services.GetService<IAppToolService>()!.GetAllApps(_collection, logging);
+        ServiceManager.Services.GetService<IAppToolService>()!.GetAllApps(_collection, logging,ConfigManger.Config.useEverything);
 
         if (ConfigManger.Config.useEverything && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
@@ -74,18 +74,10 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     Thread.Sleep(1500);
                     var everythingService = ServiceManager.Services.GetService<IEverythingService>()!;
                     EverythingIsOk = everythingService.isRun();
-
-                    if (EverythingIsOk != null && EverythingIsOk.Value)
-                    {
-                        everythingService.GetItem(_collection); //Everything文档检索
-                    }
+                    
                 });
             }
-
-            if (EverythingIsOk != null && EverythingIsOk.Value)
-            {
-                service.GetItem(_collection); //Everything文档检索
-            }
+            
         }
     }
 
@@ -118,7 +110,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 if (text.Contains("\\") || text.Contains("/"))
                 {
                     Log.Debug("检测路径");
-                    Dictionary<string, SearchViewItem> a = new();
+                    ConcurrentDictionary<string, SearchViewItem> a = new();
                     ServiceManager.Services.GetService<IAppToolService>()!.AppSolverA(a, text).Wait();
                     foreach (var (key, value) in a)
                     {
@@ -404,7 +396,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 .ToDictionary(p => p.Key, p => p.Value);
             foreach (var (searchViewItem, i) in sortedDict)
             {
-                Log.Debug("添加搜索结果" + searchViewItem.OnlyKey);
+                //Log.Debug("添加搜索结果" + searchViewItem.OnlyKey);
                 if (ConfigManger.Config.alwayShows.Contains(searchViewItem.OnlyKey))
                 {
                     searchViewItem.IsPined = true;
@@ -425,7 +417,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
                 var searchViewItem = (SearchViewItem)x.Item;
                 {
-                    Log.Debug("添加搜索结果" + x.Item.OnlyKey);
+                    //Log.Debug("添加搜索结果" + x.Item.OnlyKey);
 
 
                     if (ConfigManger.Config.alwayShows.Contains(searchViewItem.OnlyKey))

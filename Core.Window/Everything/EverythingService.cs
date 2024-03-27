@@ -20,9 +20,5 @@ public class EverythingService : IEverythingService
             return Everything32.Everything_QueryW(true);
         }
     }
-
-    public void GetItem(Dictionary<string, SearchViewItem> _collection)
-    {
-        Tools.main(_collection);
-    }
+    
 }

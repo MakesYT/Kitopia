@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Core.SDKs.Services;
 using PluginCore;
 
@@ -5,22 +6,24 @@ namespace Core.Linux;
 
 public class AppToolLinuxService: IAppToolService
 {
-    public Task AppSolverA(Dictionary<string, SearchViewItem> _collection, string search, bool isSearch = false)
+    public Task AppSolverA(ConcurrentDictionary<string, SearchViewItem> _collection, string search,
+        bool isSearch = false)
     {
         return Task.CompletedTask;
     }
 
-    public void DelNullFile(Dictionary<string, SearchViewItem> _collection)
+    public void DelNullFile(ConcurrentDictionary<string, SearchViewItem> _collection)
     {
         
     }
 
-    public void GetAllApps(Dictionary<string, SearchViewItem> _collection, bool logging)
+    public void GetAllApps(ConcurrentDictionary<string, SearchViewItem> _collection, bool logging,
+        bool useEverything = false)
     {
        
     }
 
-    public void AutoStartEverything(Dictionary<string, SearchViewItem> _collection, Action action)
+    public void AutoStartEverything(ConcurrentDictionary<string, SearchViewItem> _collection, Action action)
     {
         
     }

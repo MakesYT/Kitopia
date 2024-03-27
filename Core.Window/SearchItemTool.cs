@@ -123,7 +123,7 @@ public class SearchItemTool : ISearchItemTool
         {
             ConfigManger.Config.ignoreItems.Add(item.OnlyKey);
             ConfigManger.Save();
-            ServiceManager.Services.GetService<SearchWindowViewModel>()!._collection.Remove(item.OnlyKey);
+            ServiceManager.Services.GetService<SearchWindowViewModel>()!._collection.TryRemove(item.OnlyKey, out _);
         });
     }
 
@@ -241,7 +241,7 @@ public class SearchItemTool : ISearchItemTool
                     e.Value.OnlyKey != null && e.Value.OnlyKey.Equals(item.OnlyKey));
                 foreach (var keyValuePair in keyValuePairs)
                 {
-                    _collection.Remove(keyValuePair.Key);
+                    _collection.TryRemove(keyValuePair.Key,out _);
                 }
             }
         }

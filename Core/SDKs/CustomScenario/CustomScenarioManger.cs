@@ -178,7 +178,7 @@ public static class CustomScenarioManger
             else
             {
                 ((SearchWindowViewModel)ServiceManager.Services.GetService(typeof(SearchWindowViewModel))!)
-                    ._collection.Remove(onlyKey);
+                    ._collection.TryRemove(onlyKey,out _);
             }
         }
 
@@ -216,7 +216,7 @@ public static class CustomScenarioManger
 
         toRemove = null;
         ((SearchWindowViewModel)ServiceManager.Services.GetService(typeof(SearchWindowViewModel))!)
-            ._collection.Remove($"{nameof(CustomScenario)}:{scenario.UUID}");
+            ._collection.TryRemove($"{nameof(CustomScenario)}:{scenario.UUID}",out _);
         ConfigManger.Save();
         if (deleteFile)
         {

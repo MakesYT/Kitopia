@@ -168,7 +168,7 @@ public partial class MainWindow : AppWindow
     public void OnStartup()
     {
         log.Info("启动");
-        //this.Opened += FirstOpenEventHandler;
+        this.Opened += FirstOpenEventHandler;
         
         CheckAndDeleteLogFiles();
         log.Info("启动");

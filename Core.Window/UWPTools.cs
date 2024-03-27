@@ -1,5 +1,6 @@
 ﻿#region
 
+using System.Collections.Concurrent;
 using System.IO;
 using System.Xml;
 using Core.SDKs.Services.Config;
@@ -36,7 +37,7 @@ internal static class UwpTools
         return null;
     }
 
-    internal static async Task GetAll(Dictionary<string, SearchViewItem> items)
+    internal static async Task GetAll(ConcurrentDictionary<string, SearchViewItem> items)
     {
         List<Task> list = new();
         FirewallApi.NetworkIsolationEnumAppContainers(FirewallApi.NETISO_FLAG.NETISO_FLAG_FORCE_COMPUTE_BINARIES,
@@ -55,7 +56,7 @@ internal static class UwpTools
     }
 
     private static async Task AppContainerAnalyse(FirewallApi.INET_FIREWALL_APP_CONTAINER appContainer,
-        Dictionary<string, SearchViewItem> items)
+        ConcurrentDictionary<string, SearchViewItem> items)
     {
         if (ConfigManger.Config.ignoreItems.Contains(appContainer.appContainerName))
         {
@@ -167,8 +168,7 @@ internal static class UwpTools
                 IsVisible = true
             };
 
-            Log.Debug(
-                $"完成索引UWP应用{fileName},ID:{searchViewItem.OnlyKey}");
+           
             //Console.WriteLine(searchViewItem);
             items.TryAdd(searchViewItem.OnlyKey, searchViewItem);
             return;
@@ -188,8 +188,6 @@ internal static class UwpTools
                         IconPath = enumerateFile.FullName,
                         IsVisible = true
                     };
-                    Log.Debug(
-                        $"完成索引UWP应用{fileName},ID:{searchViewItem.OnlyKey}");
                     //Console.WriteLine(searchViewItem);
                     items.TryAdd(appContainer.appContainerName, searchViewItem);
                     break;

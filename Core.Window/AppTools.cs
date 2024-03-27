@@ -1,5 +1,6 @@
 ﻿#region
 
+using System.Collections.Concurrent;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
@@ -10,6 +11,7 @@ using Core.SDKs.CustomScenario;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using Core.SDKs.Tools;
+using Core.Window.Everything;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
 using NPinyin;
@@ -26,7 +28,7 @@ internal partial class AppTools
     private static readonly ILog log = LogManager.GetLogger(nameof(AppTools));
     private static readonly List<string> ErrorLnkList = new();
 
-    internal static void AutoStartEverything(Dictionary<string, SearchViewItem> collection, Action action)
+    internal static void AutoStartEverything(ConcurrentDictionary<string, SearchViewItem> collection, Action action)
     {
         if (ConfigManger.Config.autoStartEverything)
         {
@@ -117,7 +119,7 @@ internal partial class AppTools
         }
     }
 
-    internal static void DelNullFile(Dictionary<string, SearchViewItem> collection)
+    internal static void DelNullFile(ConcurrentDictionary<string, SearchViewItem> collection)
     {
         var toRemove = new List<string>();
         foreach (var (key, searchViewItem) in collection)
@@ -153,12 +155,12 @@ internal partial class AppTools
 
         foreach (var searchViewItem in toRemove)
         {
-            collection.Remove(searchViewItem);
+            collection.TryRemove(searchViewItem, out _);
         }
     }
 
-    internal static void GetAllApps(Dictionary<string, SearchViewItem> collection,
-        bool logging = false)
+    internal static void GetAllApps(ConcurrentDictionary<string, SearchViewItem> collection,
+        bool logging = false,bool useEverything = false)
     {
         log.Debug("索引全部软件及收藏项目");
         foreach (var customScenario in CustomScenarioManger.CustomScenarios)
@@ -215,18 +217,19 @@ internal partial class AppTools
                 "*.url", SearchOption.AllDirectories));
         }
 
+        if (useEverything)
+        {
+            Tools.main(filePaths);
+        }
+        
+        
         var options = new ParallelOptions();
-        options.MaxDegreeOfParallelism = 256;
+        options.MaxDegreeOfParallelism = 512;
 // 使用Parallel.ForEach并行执行AppSolverA方法
         List<Task> list = new();
 
         Parallel.ForEach(filePaths, options, file =>
         {
-            if (logging)
-            {
-                log.Debug("索引:" + file);
-            }
-
             list.Add(AppSolverA(collection, file, logging: logging));
         });
 
@@ -292,7 +295,7 @@ internal partial class AppTools
         }
     }
 
-    internal static async Task AppSolverA(Dictionary<string, SearchViewItem> collection, string file,
+    internal static async Task AppSolverA(ConcurrentDictionary<string, SearchViewItem> collection, string file,
         bool star = false, bool logging = false)
     {
         //log.Debug(Thread.CurrentThread.ManagedThreadId);
@@ -380,12 +383,6 @@ internal partial class AppTools
                     {
                         if (collection.ContainsKey(fullName))
                         {
-                            if (logging)
-                            {
-                                log.Debug($"重复索引:{file}");
-                            }
-
-
                             return;
                         }
 
@@ -431,11 +428,11 @@ internal partial class AppTools
                             });
                         }
 
-                        log.Debug($"完成索引:{file}");
+                        //log.Debug($"完成索引:{file}");
                     }
                     else
                     {
-                        log.Debug($"不符合要求跳过索引:{file}");
+                       // log.Debug($"不符合要求跳过索引:{file}");
                     }
 
                     break;
@@ -455,11 +452,6 @@ internal partial class AppTools
                     var onlyKey = url;
                     if (collection.ContainsKey(onlyKey))
                     {
-                        if (logging)
-                        {
-                            log.Debug($"重复索引:{file}");
-                        }
-
                         return;
                     }
 
@@ -499,7 +491,7 @@ internal partial class AppTools
                         });
                     }
 
-                    log.Debug($"完成索引:{file}");
+                    
                     break;
                 }
                 default:
