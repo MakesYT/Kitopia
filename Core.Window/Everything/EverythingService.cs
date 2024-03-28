@@ -11,13 +11,28 @@ public class EverythingService : IEverythingService
         {
             // 64-bit
             Everything64.Everything_SetMax(1);
-            return Everything64.Everything_QueryW(true);
+            
+            try
+            {
+                return Task.Run(()=> Everything64.Everything_QueryW(true)).Wait(TimeSpan.FromSeconds(1));
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
         else
         {
             // 32-bit
             Everything32.Everything_SetMax(1);
-            return Everything32.Everything_QueryW(true);
+            try
+            {
+                return Task.Run(()=> Everything32.Everything_QueryW(true)).Wait(TimeSpan.FromSeconds(1));
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
     }
     

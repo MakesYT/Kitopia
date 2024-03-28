@@ -12,6 +12,7 @@ using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using Core.SDKs.Tools;
 using Core.Window.Everything;
+using IWshRuntimeLibrary;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
 using NPinyin;
@@ -76,16 +77,16 @@ internal partial class AppTools
                                     $"/create /tn \"{程序名称}\" /xml \"{@TempFileName}\"", "",
                                     ShowWindowCommand.SW_HIDE);
 
-                                // var shell = new WshShell();
-                                // var shortcut =
-                                //     (IWshShortcut)shell.CreateShortcut(
-                                //         $"{AppDomain.CurrentDomain.BaseDirectory}noUAC\\{程序名称}.lnk");
-                                // //Debug.Print(Path.GetDirectoryName(Application.ExecutablePath) + @"\" + TextBox_程序名称.Text + ".lnk");
-                                // shortcut.TargetPath = "schtasks.exe";
-                                // shortcut.Arguments = $"/run /tn \"{程序名称}\"";
-                                // shortcut.IconLocation = searchViewItem.OnlyKey + ", 0";
-                                // shortcut.WindowStyle = 7;
-                                // shortcut.Save();
+                                var shell = new WshShell();
+                                var shortcut =
+                                    (IWshShortcut)shell.CreateShortcut(
+                                        $"{AppDomain.CurrentDomain.BaseDirectory}noUAC\\{程序名称}.lnk");
+                                //Debug.Print(Path.GetDirectoryName(Application.ExecutablePath) + @"\" + TextBox_程序名称.Text + ".lnk");
+                                shortcut.TargetPath = "schtasks.exe";
+                                shortcut.Arguments = $"/run /tn \"{程序名称}\"";
+                                shortcut.IconLocation = searchViewItem.OnlyKey + ", 0";
+                                shortcut.WindowStyle = 7;
+                                shortcut.Save();
                                 Thread.Sleep(200);
                                 File.Delete(TempFileName);
                                 log.Debug("创建Everything的noUAC任务计划完成");
@@ -230,7 +231,11 @@ internal partial class AppTools
 
         Parallel.ForEach(filePaths, options, file =>
         {
-            list.Add(AppSolverA(collection, file, logging: logging));
+            if (!collection.ContainsKey(file))
+            {
+                list.Add(AppSolverA(collection, file, logging: logging));
+            }
+            
         });
 
         try
@@ -299,18 +304,14 @@ internal partial class AppTools
         bool star = false, bool logging = false)
     {
         //log.Debug(Thread.CurrentThread.ManagedThreadId);
-        var localizedName = "";
-
-        try
+       
+        var localizedName = file.Split("\\").Last();
+        var lastIndexOf = localizedName.LastIndexOf(".");
+        if (lastIndexOf!=-1)
         {
-            localizedName = Shell32.SHCreateItemFromParsingName<Shell32.IShellItem>(file)
-                .GetDisplayName(Shell32.SIGDN.SIGDN_NORMALDISPLAY);
+           localizedName= localizedName.Remove(lastIndexOf);
         }
-        catch (Exception e)
-        {
-            localizedName = "f";
-        }
-
+        
         if (Path.HasExtension(file))
         {
             var fileInfo = new FileInfo(file);
@@ -318,6 +319,8 @@ internal partial class AppTools
             {
                 case ".lnk":
                 {
+                    localizedName = Shell32.SHCreateItemFromParsingName<Shell32.IShellItem>(file)
+                                           .GetDisplayName(Shell32.SIGDN.SIGDN_NORMALDISPLAY);
                     //var sb = new StringBuilder(260);
                     // var shellLink = new ShellLink(file, LinkResolution.None);
                     var link = new Shell32.IShellLinkW();
