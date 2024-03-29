@@ -167,7 +167,7 @@ public static class CustomScenarioManger
                     ItemDisplayName = "执行自定义情景:" + scenario.Name,
                     FileType = FileType.自定义情景,
                     OnlyKey = onlyKey,
-                    Keys = scenario.Keys.ToList(),
+                    Keys = scenario.Keys.AsReadOnly(),
                     Icon = null,
                     IconSymbol = 0xF78B,
                     IsVisible = true

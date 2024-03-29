@@ -164,28 +164,7 @@ internal partial class AppTools
         bool logging = false,bool useEverything = false)
     {
         log.Debug("索引全部软件及收藏项目");
-        foreach (var customScenario in CustomScenarioManger.CustomScenarios)
-        {
-            if (customScenario.ExecutionManual)
-            {
-                if (customScenario.Keys.Any())
-                {
-                    var onlyKey = $"CustomScenario:{customScenario.UUID}";
-                    var viewItem1 = new SearchViewItem()
-                    {
-                        ItemDisplayName = $"执行自定义情景:{customScenario.Name}",
-                        FileType = FileType.自定义情景,
-                        OnlyKey = onlyKey,
-                        Keys = customScenario.Keys.ToList(),
-                        Icon = null,
-                        IconSymbol = 0xF78B,
-                        IsVisible = true
-                    };
-
-                    collection.TryAdd(onlyKey, viewItem1);
-                }
-            }
-        }
+        
 
 
         UwpTools.GetAll(collection);
@@ -425,7 +404,7 @@ internal partial class AppTools
                         {
                             collection.TryAdd(fullName, new SearchViewItem
                             {
-                                Keys = keys, IsVisible = true, ItemDisplayName = localName,
+                                Keys = keys.AsReadOnly(), IsVisible = true, ItemDisplayName = localName,
                                 OnlyKey = fullName, IsStared = star, Arguments = arg,
                                 FileType = FileType.应用程序, Icon = null
                             });
@@ -487,7 +466,7 @@ internal partial class AppTools
                     {
                         collection.TryAdd(onlyKey, new SearchViewItem
                         {
-                            Keys = keys, IsVisible = true, ItemDisplayName = localName,
+                            Keys = keys.AsReadOnly(), IsVisible = true, ItemDisplayName = localName,
                             OnlyKey = onlyKey, IsStared = star,
                             IconPath = relFile,
                             FileType = FileType.URL, Icon = null
@@ -508,7 +487,7 @@ internal partial class AppTools
                             FileType = FileType.文件,
 
                             OnlyKey = file,
-                            Keys = keys,
+                            Keys = keys.AsReadOnly(),
                             IsStared = star,
                             IsVisible = true
                         });
@@ -530,7 +509,7 @@ internal partial class AppTools
                     FileType = FileType.文件夹,
                     IsStared = star,
                     OnlyKey = file,
-                    Keys = keys,
+                    Keys = keys.AsReadOnly(),
                     Icon = null,
                     IsVisible = true
                 });

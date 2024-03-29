@@ -9,6 +9,7 @@ using PluginCore;
 using Vanara.Extensions;
 using Vanara.PInvoke;
 using Vanara.Windows.Shell;
+using WinRT;
 
 #endregion
 
@@ -163,7 +164,7 @@ internal static class UwpTools
                 ItemDisplayName = fileName,
                 OnlyKey = $"{appContainer.appContainerName}!{id}",
                 FileType = FileType.UWP应用,
-                Keys = keys,
+                Keys = keys.AsReadOnly(),
                 IconPath = pa,
                 IsVisible = true
             };
@@ -184,7 +185,7 @@ internal static class UwpTools
                         ItemDisplayName = fileName,
                         OnlyKey = $"{appContainer.appContainerName}!{id}",
                         FileType = FileType.UWP应用,
-                        Keys = keys,
+                        Keys = keys.AsReadOnly(),
                         IconPath = enumerateFile.FullName,
                         IsVisible = true
                     };

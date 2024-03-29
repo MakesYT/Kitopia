@@ -735,6 +735,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
 
         KeyValue = null;
         Scenario.Keys.Add(key);
+        
         IsModified = true;
     }
 

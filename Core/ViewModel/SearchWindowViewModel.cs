@@ -8,6 +8,7 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using Core.SDKs.CustomScenario;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
@@ -372,8 +373,53 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     filtered.Add((item.Value, weight));
                 }
             }
+            foreach (var item in CustomScenarioManger.CustomScenarios)
+            {
+                var onlyKey = $"CustomScenario:{item.UUID}";
+                var weight = 0;
+                foreach (var key in item.Keys)
+                {
+                    if (string.IsNullOrEmpty(key))
+                    {
+                        continue;
+                    }
 
+                    if (key.Contains(value))
+                    {
+                        weight += 2;
+                    }
 
+                    if (key.StartsWith(value))
+                    {
+                        weight += 5;
+                    }
+
+                    if (key.Equals(value, StringComparison.Ordinal))
+                    {
+                        weight += 10;
+                    }
+                }
+
+                if (onlyKey == lastItem.OnlyKey)
+                {
+                    weight -= 4;
+                }
+
+                if (weight > 0)
+                {
+                   
+                    var viewItem1 = new SearchViewItem()
+                    {
+                        ItemDisplayName = $"执行自定义情景:{item.Name}",
+                        FileType = FileType.自定义情景,
+                        OnlyKey = onlyKey,
+                        Icon = null,
+                        IconSymbol = 0xF78B,
+                        IsVisible = true
+                    };
+                    filtered.Add((viewItem1, weight));
+                }
+            }
             var sorted = filtered.OrderByDescending(x => x.Weight).ToList();
 
             #endregion
@@ -543,7 +589,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
         for (var index = Items.Count - 1; index >= 0; index--)
         {
             var searchViewItem = Items[index];
-            if (!searchViewItem.Keys.Exists((e) => e.Contains(value)))
+            if (!searchViewItem.Keys!.Any(e => e.Contains(value)))
             {
                 Items.RemoveAt(index);
             }
