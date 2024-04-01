@@ -72,13 +72,13 @@ public class SearchItemTool : ISearchItemTool
                     default:
                         if (searchViewItem.Arguments == null)
                         {
-                            Shell32.ShellExecute(IntPtr.Zero, "open", searchViewItem.OnlyKey, "", "",
+                            Shell32.ShellExecute(IntPtr.Zero, "open", "explorer.exe", searchViewItem.OnlyKey, searchViewItem.OnlyKey.Remove(searchViewItem.OnlyKey.LastIndexOf('\\')),
                                 ShowWindowCommand.SW_NORMAL);
                         }
                         else
                         {
-                            Shell32.ShellExecute(IntPtr.Zero, "open", searchViewItem.OnlyKey, searchViewItem.Arguments,
-                                "",
+                            Shell32.ShellExecute(IntPtr.Zero, "open", "explorer.exe",
+                                $"{searchViewItem.OnlyKey} {searchViewItem.Arguments}", searchViewItem.OnlyKey.Remove(searchViewItem.OnlyKey.LastIndexOf('\\')),
                                 ShowWindowCommand.SW_SHOWNORMAL);
                         }
 
