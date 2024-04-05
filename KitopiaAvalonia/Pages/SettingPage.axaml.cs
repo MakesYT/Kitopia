@@ -45,6 +45,7 @@ public partial class SettingPage : UserControl
     ~SettingPage()
     {
         disposables.Dispose();
+        
     }
 
     private StackPanel nowControl;
@@ -52,9 +53,9 @@ public partial class SettingPage : UserControl
     {
         base.OnUnloaded(e);
         disposables.Clear();
+        _configBase = null;
         nowControl = null;
         StackPanel.Children.Clear();
-        Console.WriteLine("Unloaded");
     }
     
 

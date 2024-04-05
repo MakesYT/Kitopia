@@ -80,7 +80,7 @@ internal static class UwpTools
         }
         catch (Exception e)
         {
-            Log.Error($"{appContainer.displayName},{e.Message},{e.StackTrace}");
+            Log.Error($"错误的UWP应用{appContainer.displayName}:{e.Message}");
         }
 
         if (string.IsNullOrWhiteSpace(fileName))
