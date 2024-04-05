@@ -60,6 +60,9 @@
                      KeyDown="DataGrid_OnKeyDown"
                      PointerMoved="DataGrid_OnPointerMoved"
                      Margin="0,0,0,0">
+                <ListBox.Resources>
+                    <SolidColorBrush x:Key="Brush" Color="DimGray" Opacity="0.1" />
+                </ListBox.Resources>
                 <ListBox.Styles>
                     <Style Selector="ListBoxItem:selected > Button#Item">
                         <Setter Property="BorderBrush" Value="DimGray" />
@@ -79,6 +82,9 @@
                                     <Button.Styles>
                                         <Style Selector="Button#Item:pointerover /template/ controls|FABorder#Root">
                                             <Setter Property="BorderBrush" Value="DimGray" />
+                                            <Setter Property="Background" Value="{StaticResource Brush}" >
+                                            </Setter>
+                                            
                                         </Style>
                                     </Button.Styles>
                                     <Button.ContextFlyout>

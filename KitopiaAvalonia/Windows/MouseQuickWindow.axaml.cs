@@ -8,6 +8,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
+using Avalonia.Xaml.Interactivity;
 using Core.ViewModel;
 using Desktop.Robot;
 using PluginCore;
@@ -46,22 +47,23 @@ public partial class MouseQuickWindow : Window
         User32.GetWindowInfo(TryGetPlatformHandle().Handle, ref windowinfo);
 
         int Left, Top;
-        if (monitorInfo.rcMonitor.Width < pos.X + windowinfo.rcClient.Width)
-        {
-            Left = pos.X - windowinfo.rcClient.Width;
-        }
-        else
+        if (pos.X + windowinfo.rcClient.Width<monitorInfo.rcMonitor.Right)
         {
             Left = pos.X;
         }
-
-        if (monitorInfo.rcMonitor.Height < pos.Y + windowinfo.rcClient.Height)
+        else
         {
-            Top = pos.Y - windowinfo.rcClient.Height;
+            Left = pos.X - windowinfo.rcClient.Width;
+        }
+        
+       
+        if (pos.Y + windowinfo.rcClient.Height < monitorInfo.rcMonitor.Bottom)
+        {
+            Top = pos.Y;
         }
         else
         {
-            Top = pos.Y;
+            Top = pos.Y - windowinfo.rcClient.Height;
         }
 
         Position = new PixelPoint(Left, Top);

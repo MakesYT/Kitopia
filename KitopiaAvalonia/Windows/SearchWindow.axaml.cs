@@ -51,6 +51,7 @@ public partial class SearchWindow : Window
     private void w_Activated(object sender, EventArgs e)
     {
         this.Focus();
+        
     }
 
     private void tx_KeyDown(object? sender, KeyEventArgs e)
@@ -69,7 +70,7 @@ public partial class SearchWindow : Window
         else if (e.Key == Key.Down)
         {
             var realizedContainers = dataGrid.GetRealizedContainers();
-            dataGrid.SelectedItem = ((SearchWindowViewModel)DataContext).Items[0];
+            dataGrid.SelectedItem = (object)((SearchWindowViewModel)DataContext).Items[0];
             foreach (var realizedContainer in realizedContainers)
             {
                 if (realizedContainer.DataContext == dataGrid.SelectedItem)
@@ -79,9 +80,6 @@ public partial class SearchWindow : Window
                 }
             }
         }
-
-
-        Debug.WriteLine("Key Down");
     }
 
     private void DataGrid_OnKeyDown(object? sender, KeyEventArgs e)

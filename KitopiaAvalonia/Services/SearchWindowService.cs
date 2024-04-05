@@ -14,19 +14,21 @@ public class SearchWindowService : ISearchWindowService
     {
         Dispatcher.UIThread.InvokeAsync(() =>
         {
-            if (ServiceManager.Services.GetService<SearchWindow>()!.IsVisible)
+            var searchWindow = ServiceManager.Services.GetService<SearchWindow>();
+            if (searchWindow!.IsVisible)
             {
-                ServiceManager.Services.GetService<SearchWindow>()!.IsVisible = false;
+                searchWindow!.IsVisible = false;
             }
             else
             {
                 ServiceManager.Services.GetService<SearchWindowViewModel>()!.CheckClipboard();
-
-                ServiceManager.Services.GetService<SearchWindow>()!.Show();
-                ServiceManager.Services.GetService<IWindowTool>()!.SetForegroundWindow(ServiceManager.Services.GetService<SearchWindow>()!.TryGetPlatformHandle()!.Handle);
-                ServiceManager.Services.GetService<SearchWindow>()!.Focus();
-                ServiceManager.Services.GetService<SearchWindow>()!.tx.Focus();
-                ServiceManager.Services.GetService<SearchWindow>()!.tx.SelectAll();
+                ServiceManager.Services.GetService<IWindowTool>()!.MoveWindowToMouseScreenCenter(searchWindow);
+                searchWindow.Show();
+                ServiceManager.Services.GetService<IWindowTool>()!.SetForegroundWindow(searchWindow!.TryGetPlatformHandle()!.Handle);
+                
+                searchWindow.Focus();
+                searchWindow.tx.Focus();
+                searchWindow.tx.SelectAll();
                 Task.Run(() =>
                 {
                     Thread.CurrentThread.Priority = ThreadPriority.Lowest;

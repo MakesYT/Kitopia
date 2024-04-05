@@ -56,6 +56,7 @@ public class HotKeyManager
             HotKeys.Add(customScenario.StopHotKey);
         }
     }
+  
 
     private static void OnKeyPressed(KeyboardHookEventArgs e)
     {
