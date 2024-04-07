@@ -12,12 +12,13 @@ using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using Core.SDKs.Tools;
 using Core.Window.Everything;
-using IWshRuntimeLibrary;
+
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
 using NPinyin;
 using PluginCore;
 using Vanara.PInvoke;
+using Vanara.Windows.Shell;
 using File = System.IO.File;
 
 #endregion
@@ -76,17 +77,10 @@ internal partial class AppTools
                                 Shell32.ShellExecute(IntPtr.Zero, "runas", "schtasks.exe",
                                     $"/create /tn \"{程序名称}\" /xml \"{@TempFileName}\"", "",
                                     ShowWindowCommand.SW_HIDE);
-
-                                var shell = new WshShell();
-                                var shortcut =
-                                    (IWshShortcut)shell.CreateShortcut(
-                                        $"{AppDomain.CurrentDomain.BaseDirectory}noUAC\\{程序名称}.lnk");
-                                //Debug.Print(Path.GetDirectoryName(Application.ExecutablePath) + @"\" + TextBox_程序名称.Text + ".lnk");
-                                shortcut.TargetPath = "schtasks.exe";
-                                shortcut.Arguments = $"/run /tn \"{程序名称}\"";
-                                shortcut.IconLocation = searchViewItem.OnlyKey + ", 0";
-                                shortcut.WindowStyle = 7;
-                                shortcut.Save();
+                                var shellLink = ShellLink.Create($"{AppDomain.CurrentDomain.BaseDirectory}noUAC\\{程序名称}.lnk",
+                                    "schtasks.exe", null, null, $"/run /tn \"{程序名称}\"");
+                                shellLink.IconLocation = new IconLocation(searchViewItem.OnlyKey, 0);
+                                
                                 Thread.Sleep(200);
                                 File.Delete(TempFileName);
                                 log.Debug("创建Everything的noUAC任务计划完成");
@@ -203,12 +197,11 @@ internal partial class AppTools
         }
         
         
-        var options = new ParallelOptions();
-        options.MaxDegreeOfParallelism = 512;
+        
 // 使用Parallel.ForEach并行执行AppSolverA方法
         List<Task> list = new();
 
-        Parallel.ForEach(filePaths, options, file =>
+        Parallel.ForEach(filePaths, file =>
         {
             if (!collection.ContainsKey(file))
             {
@@ -221,7 +214,7 @@ internal partial class AppTools
         {
             Task.WaitAll(list.ToArray());
         }
-        catch (Exception e)
+        catch (Exception _)
         {
         }
 

@@ -14,7 +14,10 @@ public class EverythingService : IEverythingService
             
             try
             {
-                return Task.Run(()=> Everything64.Everything_QueryW(true)).Wait(TimeSpan.FromSeconds(1));
+                var task = Task.Run<bool>(()=> Everything64.Everything_QueryW(true));
+                task.Wait(TimeSpan.FromSeconds(1));
+
+                return task.Result;
             }
             catch (Exception)
             {
@@ -24,10 +27,12 @@ public class EverythingService : IEverythingService
         else
         {
             // 32-bit
-            Everything32.Everything_SetMax(1);
             try
             {
-                return Task.Run(()=> Everything32.Everything_QueryW(true)).Wait(TimeSpan.FromSeconds(1));
+                var task = Task.Run<bool>(()=> Everything32.Everything_QueryW(true));
+                task.Wait(TimeSpan.FromSeconds(1));
+
+                return task.Result;
             }
             catch (Exception)
             {

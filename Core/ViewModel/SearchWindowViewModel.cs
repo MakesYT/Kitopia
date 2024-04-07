@@ -44,6 +44,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
     private bool nowInSelectMode = false;
     private Action<SearchViewItem?>? selectAction;
 
+    private bool _reloading = false;
     public SearchWindowViewModel()
     {
         ReloadApps(false);
@@ -57,6 +58,11 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
     public void ReloadApps(bool logging = false)
     {
+        if (_reloading)
+        {
+            return;
+        }
+        _reloading = true;
         ServiceManager.Services.GetService<IAppToolService>()!.DelNullFile(_collection);
         ServiceManager.Services.GetService<IAppToolService>()!.GetAllApps(_collection, logging,ConfigManger.Config.useEverything);
 
@@ -80,6 +86,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
             }
             
         }
+        _reloading = false;
     }
 
 

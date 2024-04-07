@@ -43,12 +43,9 @@ internal static class UwpTools
         List<Task> list = new();
         FirewallApi.NetworkIsolationEnumAppContainers(FirewallApi.NETISO_FLAG.NETISO_FLAG_FORCE_COMPUTE_BINARIES,
             out var pdwNuminternalAppCs, out var ppinternalAppCs);
-        var options = new ParallelOptions
-        {
-            MaxDegreeOfParallelism = 256
-        };
+       
         Parallel.ForEach(ppinternalAppCs.ToIEnum<FirewallApi.INET_FIREWALL_APP_CONTAINER>(
-            (int)pdwNuminternalAppCs), options, file =>
+            (int)pdwNuminternalAppCs), file =>
         {
             list.Add(AppContainerAnalyse(file, items));
         });
