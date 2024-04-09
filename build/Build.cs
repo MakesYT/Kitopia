@@ -27,7 +27,7 @@ using Project = Nuke.Common.ProjectModel.Project;
     GitHubActionsImage.WindowsLatest,
     On = new[] { GitHubActionsTrigger.Push },
     ImportSecrets = new[] { nameof(GitHubToken) },
-    InvokedTargets = new[] { nameof(Compile) })]
+    InvokedTargets = new[] { nameof(Clean) })]
 class Build : NukeBuild
 {
     /// Support plugins are available for:
