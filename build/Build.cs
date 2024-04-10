@@ -54,9 +54,11 @@ class Build : NukeBuild
         {
             Log.Debug( "Restoring solution {0}", Solution);
             Log.Debug("Restoring project {0}", AvaloniaProject);
+            GitTasks.Git("rm KitopiaWeb");
            GitTasks.Git("submodule foreach git pull");
-           GitTasks.Git("submodule update --init --recursive --remote");
            
+           GitTasks.Git("submodule update --init --recursive --remote");
+          
             DotNetRestore(c => new DotNetRestoreSettings()
                .SetProjectFile(AvaloniaProject.Path));
             DotNetRestore(c => new DotNetRestoreSettings()
@@ -91,6 +93,7 @@ class Build : NukeBuild
                             {
                                 Credentials = new Credentials(GitHubToken)
                             };
+                            
                             var readOnlyList = _gitHubClient.Repository.GetAllTags(gitRepository.GetGitHubOwner(), gitRepository.GetGitHubName()).Result;
                             if (readOnlyList.Any(e=>e.Name==AvaloniaProject.GetProperty("Version")))
                             {
