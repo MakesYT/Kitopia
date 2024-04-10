@@ -57,12 +57,12 @@ class Build : NukeBuild
             GitTasks.Git("rm KitopiaWeb");
            GitTasks.Git("submodule foreach git pull");
            
-           GitTasks.Git("submodule update --init --recursive --remote");
+           GitTasks.Git("submodule update --recursive --remote");
           
             DotNetRestore(c => new DotNetRestoreSettings()
-               .SetProjectFile(AvaloniaProject.Path));
+               .SetProjectFile(AvaloniaProject.Path).SetRuntime( "win-x64"));
             DotNetRestore(c => new DotNetRestoreSettings()
-               .SetProjectFile("KitopiaEx"));
+               .SetProjectFile("KitopiaEx").SetRuntime( "win-x64"));
 
         });
 
