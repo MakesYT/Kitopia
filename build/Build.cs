@@ -54,8 +54,8 @@ class Build : NukeBuild
         {
             Log.Debug( "Restoring solution {0}", Solution);
             Log.Debug("Restoring project {0}", AvaloniaProject);
-           GitTasks.Git("git submodule foreach git pull");
-           GitTasks.Git("git submodule update --init --recursive --remote");
+           GitTasks.Git("submodule foreach git pull");
+           GitTasks.Git("submodule update --init --recursive --remote");
            
             DotNetRestore(c => new DotNetRestoreSettings()
                .SetProjectFile(AvaloniaProject.Path));
