@@ -13,3 +13,6 @@
 [submodule "DesktopNotifications"]
 	path = DesktopNotifications
 	url = https://github.com/pr8x/DesktopNotifications
+[submodule "ScreenCapture.NET"]
+	path = ScreenCapture.NET
+	url = https://github.com/MakesYT/ScreenCapture.NET.git

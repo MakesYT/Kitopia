@@ -55,7 +55,6 @@ class Build : NukeBuild
             Log.Debug( "Restoring solution {0}", Solution);
             Log.Debug("Restoring project {0}", AvaloniaProject);
             GitTasks.Git("rm KitopiaWeb");
-            GitTasks.Git("clone https://github.com/MakesYT/ScreenCapture.NET.git");
            GitTasks.Git("submodule foreach git pull");
            
            GitTasks.Git("submodule update --init --recursive --remote");
