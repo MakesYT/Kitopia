@@ -12,7 +12,9 @@ using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
+using Nuke.Common.Tools.Git;
 using Nuke.Common.Tools.GitHub;
+using Nuke.Common.Tools.GitVersion;
 using Nuke.Common.Utilities.Collections;
 using Octokit;
 using Serilog;
@@ -52,7 +54,7 @@ class Build : NukeBuild
         {
             Log.Debug( "Restoring solution {0}", Solution);
             Log.Debug("Restoring project {0}", AvaloniaProject);
-           
+           GitTasks.Git("submodule update --init --recursive");
             DotNetRestore(c => new DotNetRestoreSettings()
                .SetProjectFile(AvaloniaProject.Path));
             DotNetRestore(c => new DotNetRestoreSettings()
