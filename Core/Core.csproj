@@ -54,8 +54,8 @@
 
 
     <ItemGroup>
-        <ProjectReference Include="..\..\ScreenCapture.NET\ScreenCapture.NET.DX11\ScreenCapture.NET.DX11.csproj"/>
-        <ProjectReference Include="..\..\ScreenCapture.NET\ScreenCapture.NET\ScreenCapture.NET.csproj"/>
+        <ProjectReference Include="..\ScreenCapture.NET\ScreenCapture.NET.DX11\ScreenCapture.NET.DX11.csproj"/>
+        <ProjectReference Include="..\ScreenCapture.NET\ScreenCapture.NET\ScreenCapture.NET.csproj"/>
         <ProjectReference Include="..\DesktopNotifications\DesktopNotifications.Avalonia\DesktopNotifications.Avalonia.csproj"/>
         <ProjectReference Include="..\PluginCore\PluginCore.csproj"/>
     </ItemGroup>
