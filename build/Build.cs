@@ -184,7 +184,7 @@ class Build : NukeBuild
                                         {
                                             Object = GitTasks.GitCurrentCommit(),
                                             Tag = AvaloniaProject.GetProperty("Version"),
-                                            Message = "Test",
+                                            Message = AvaloniaProject.GetProperty("Version"),
                                         }).Result;
                                     var reference = _gitHubClient.Git.Reference.Create(gitRepository.GetGitHubOwner(),
                                         gitRepository.GetGitHubName(),
@@ -193,7 +193,7 @@ class Build : NukeBuild
                                     {
                                         Name = AvaloniaProject.GetProperty("Version"),
                                         Prerelease = true,
-                                        Draft = true,
+                                        Draft = false,
                                         Body = body.ToString()
                                     };
                                     var release = _gitHubClient.Repository.Release.Create(gitRepository.GetGitHubOwner(), gitRepository.GetGitHubName(),
