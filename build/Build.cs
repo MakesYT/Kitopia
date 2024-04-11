@@ -174,7 +174,7 @@ class Build : NukeBuild
                                             }
                                     
                                             lastCommit = gitHubCommit.Parents.First().Sha;
-                                            Console.WriteLine(lastCommit);
+                                            Log.Debug(lastCommit);
                                         }
                                 
                                     }
