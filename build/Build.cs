@@ -50,15 +50,16 @@ class Build : NukeBuild
     
 
     Target Restore => _ => _
-        .Executes(() =>
+       .Executes(() =>
         {
             Log.Debug( "Restoring solution {0}", Solution);
             Log.Debug("Restoring project {0}", AvaloniaProject);
-            GitTasks.Git("rm KitopiaWeb");
-           GitTasks.Git("submodule foreach git pull");
-           
-           GitTasks.Git("submodule update --init --recursive --remote");
-          
+            if (!IsLocalBuild)
+            {
+                GitTasks.Git("rm KitopiaWeb");
+            }
+            GitTasks.Git("submodule foreach git pull");
+            GitTasks.Git("submodule update --init --recursive --remote");
             DotNetRestore(c => new DotNetRestoreSettings()
                .SetProjectFile(AvaloniaProject.Path));
             DotNetRestore(c => new DotNetRestoreSettings()
@@ -67,16 +68,16 @@ class Build : NukeBuild
         });
 
     Target Compile => _ => _
-        .DependsOn(Restore)
-        .Executes(() =>
-        {
-            // DotNetBuild(c =>
-            // {
-            //     return new DotNetBuildSettings()
-            //           .SetProjectFile(AvaloniaProject.Path)
-            //           .SetOutputDirectory(RootDirectory / "output");
-            // });
-        });
+                          .DependsOn(Restore)
+                          .Executes(() =>
+                           {
+                               // DotNetBuild(c =>
+                               // {
+                               //     return new DotNetBuildSettings()
+                               //           .SetProjectFile(AvaloniaProject.Path)
+                               //           .SetOutputDirectory(RootDirectory / "output");
+                               // });
+                           });
 
     
     
@@ -97,12 +98,12 @@ class Build : NukeBuild
                             var readOnlyList = _gitHubClient.Repository.GetAllTags(gitRepository.GetGitHubOwner(), gitRepository.GetGitHubName()).Result;
                             if (readOnlyList.Any(e=>e.Name==AvaloniaProject.GetProperty("Version")))
                             {
-                                    return false;
+                                return false;
                             }
                             return true;
                         })
-        .DependsOn(Compile)
-        .Executes(() =>
+                       .DependsOn(Compile)
+                       .Executes(() =>
                             {
                                 var rootDirectory = RootDirectory / "Publish";
                                 rootDirectory.DeleteDirectory();
@@ -123,7 +124,7 @@ class Build : NukeBuild
                                                   .SetFramework("net8.0-windows10.0.17763.0")
                                                   .SetConfiguration("Release")
                                                   .SetSelfContained(false)
-                                                  );
+                                );
                                 
                                 var gitRepository = GitRepository.FromUrl("https://github.com/MakesYT/Kitopia");
                                 var result = GitHubTasks.GetLatestRelease(gitRepository,true).Result;
