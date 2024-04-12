@@ -25,7 +25,7 @@ using File = System.IO.File;
 
 namespace Core.Window;
 
-internal partial class AppTools
+public partial class AppTools
 {
     private static readonly ILog log = LogManager.GetLogger(nameof(AppTools));
     private static readonly List<string> ErrorLnkList = new();
@@ -198,10 +198,12 @@ internal partial class AppTools
         
         
         
-// 使用Parallel.ForEach并行执行AppSolverA方法
         List<Task> list = new();
-
-        Parallel.ForEach(filePaths, file =>
+        var options = new ParallelOptions
+        {
+            MaxDegreeOfParallelism = 256
+        };
+        Parallel.ForEach(filePaths, options,file =>
         {
             if (!collection.ContainsKey(file))
             {
@@ -510,36 +512,38 @@ internal partial class AppTools
         }
     }
 
+    [GeneratedRegex("[\u4e00-\u9fa5]")]
+    private static partial Regex ChineseRegex();
 
     //Console.WriteLine();
-    private static void CreateCombinations(List<string> keys, int startIndex, string pair, string[] initialArray)
+    public static void CreateCombinations(List<string> keys, int startIndex, StringBuilder pair, string[] initialArray)
     {
+        
         // 遍历初始数组中的元素
-        for (var i = startIndex; i < initialArray.Length; i++)
+        var lowerInvariant = initialArray[startIndex].ToLowerInvariant();
+       
+        var name = pair.ToString();
+        AddUtil(keys, $"{name}{lowerInvariant}");
+        if (ChineseRegex().IsMatch(lowerInvariant))
         {
-            // 使用StringBuilder来拼接字符串
-            var value = new StringBuilder(pair).Append(initialArray[i]).ToString();
-
-            // 使用ToLowerInvariant方法来统一字符串的大小写
-            var lowerValue = value.ToLowerInvariant();
-
-            // 添加原始字符串、拼音首字母、拼音全拼和去除非字母字符后的字符串到HashSet中
-            AddUtil(keys, lowerValue);
-            AddUtil(keys, Pinyin.GetInitials(value).Replace(" ", "").ToLowerInvariant());
-            AddUtil(keys, Pinyin.GetPinyin(value).Replace(" ", "").ToLowerInvariant());
-            AddUtil(keys, MyRegex().Replace(lowerValue, ""));
-
-            // 递归调用自身方法，生成更长的字符串组合
-            CreateCombinations(keys, i + 1, value, initialArray);
+            AddUtil(keys, $"{name}{Pinyin.GetInitials(lowerInvariant).Replace(" ", "").ToLowerInvariant()}");
+            AddUtil(keys, $"{name}{Pinyin.GetPinyin(lowerInvariant).Replace(" ", "").ToLowerInvariant()}");
         }
+        AddUtil(keys, $"{name}{MyRegex().Replace(lowerInvariant, "")}");
+        pair.Append(lowerInvariant);
+        if (startIndex > initialArray.Length-2)
+        {
+            return;
+        }
+        CreateCombinations(keys, startIndex + 1, pair, initialArray);
     }
 
 
     // 使用const或readonly修饰符来声明pattern字符串
     internal static async Task NameSolver(List<string> keys, string name)
     {
-        var initials = name.Split(" ");
-        CreateCombinations(keys, 0, "", initials);
+        var initials = name.Split(" ",StringSplitOptions.RemoveEmptyEntries);
+        CreateCombinations(keys, 0, new StringBuilder(), initials);
         AddUtil(keys, Pinyin.GetInitials(name).Replace(" ", "").ToLowerInvariant());
         AddUtil(keys, Pinyin.GetPinyin(name).Replace(" ", "").ToLowerInvariant());
         AddUtil(keys,

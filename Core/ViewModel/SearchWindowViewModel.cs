@@ -34,6 +34,8 @@ public partial class SearchWindowViewModel : ObservableRecipient
     [ObservableProperty] private bool? _everythingIsOk = true;
     [ObservableProperty] private ObservableCollection<SearchViewItem> _items = new(TempList); //搜索界面显示的软件
 
+    private bool _reloading = false;
+
 
     [ObservableProperty] private string? _search;
 
@@ -44,7 +46,6 @@ public partial class SearchWindowViewModel : ObservableRecipient
     private bool nowInSelectMode = false;
     private Action<SearchViewItem?>? selectAction;
 
-    private bool _reloading = false;
     public SearchWindowViewModel()
     {
         ReloadApps(false);
@@ -343,7 +344,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
             #region 从文件索引检索并排序
 
-            var filtered = new ConcurrentBag<(SearchViewItem Item, int Weight)>();
+            var filtered = new ConcurrentBag<(SearchViewItem Item, double Weight)>();
             foreach (var item in _collection)
             {
                 var weight = 0;
@@ -366,7 +367,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
                     if (key.Equals(value, StringComparison.Ordinal))
                     {
-                        weight += 10;
+                        weight += 100;
                     }
                 }
 
@@ -377,13 +378,13 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
                 if (weight > 0)
                 {
-                    filtered.Add((item.Value, weight));
+                    filtered.Add((item.Value, weight/item.Value.Keys.Count));
                 }
             }
             foreach (var item in CustomScenarioManger.CustomScenarios)
             {
                 var onlyKey = $"CustomScenario:{item.UUID}";
-                var weight = 0;
+                double weight = 0;
                 foreach (var key in item.Keys)
                 {
                     if (string.IsNullOrEmpty(key))
@@ -405,6 +406,8 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     {
                         weight += 10;
                     }
+
+                    
                 }
 
                 if (onlyKey == lastItem.OnlyKey)
@@ -424,7 +427,8 @@ public partial class SearchWindowViewModel : ObservableRecipient
                         IconSymbol = 0xF78B,
                         IsVisible = true
                     };
-                    filtered.Add((viewItem1, weight));
+                    
+                    filtered.Add((viewItem1, weight/viewItem1.Keys.Count));
                 }
             }
             var sorted = filtered.OrderByDescending(x => x.Weight).ToList();

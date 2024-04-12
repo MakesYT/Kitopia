@@ -40,13 +40,16 @@ internal static class UwpTools
 
     internal static async Task GetAll(ConcurrentDictionary<string, SearchViewItem> items)
     {
+        
         List<Task> list = new();
         FirewallApi.NetworkIsolationEnumAppContainers(FirewallApi.NETISO_FLAG.NETISO_FLAG_FORCE_COMPUTE_BINARIES,
             out var pdwNuminternalAppCs, out var ppinternalAppCs);
-       
-        Parallel.ForEach(ppinternalAppCs.ToIEnum<FirewallApi.INET_FIREWALL_APP_CONTAINER>(
-            (int)pdwNuminternalAppCs), file =>
+        var options = new ParallelOptions
         {
+            MaxDegreeOfParallelism = 256
+        };
+        Parallel.ForEach(ppinternalAppCs.ToIEnum<FirewallApi.INET_FIREWALL_APP_CONTAINER>(
+            (int)pdwNuminternalAppCs), options,file => {
             list.Add(AppContainerAnalyse(file, items));
         });
 
