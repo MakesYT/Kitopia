@@ -1,5 +1,4 @@
 {
   "$schema": "./build.schema.json",
-  "Solution": "Kitopia.sln",
-  "GitHubToken": "v1:QVQpMM/i2Bvo6wrlvwaX2ih1Q0wvQfcu31S6+399WEwfenQKddKpzPXtr0alow3U"
+  "Solution": "Kitopia.sln"
 }
