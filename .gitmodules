@@ -16,3 +16,6 @@
 [submodule "ScreenCapture.NET"]
 	path = ScreenCapture.NET
 	url = https://github.com/MakesYT/ScreenCapture.NET.git
+[submodule "PinyinM.NET"]
+	path = PinyinM.NET
+	url = https://github.com/MakesYT/Pinyin.NET

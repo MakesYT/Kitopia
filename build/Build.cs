@@ -33,22 +33,16 @@ using Project = Nuke.Common.ProjectModel.Project;
     InvokedTargets = new[] { nameof(Clean) })]
 class Build : NukeBuild
 {
-    /// Support plugins are available for:
-    ///   - JetBrains ReSharper        https://nuke.build/resharper
-    ///   - JetBrains Rider            https://nuke.build/rider
-    ///   - Microsoft VisualStudio     https://nuke.build/visualstudio
-    ///   - Microsoft VSCode           https://nuke.build/vscode
-
-    public static int Main () => Execute<Build>(x => x.Compile);
-    [Solution]
-    readonly Solution Solution;
-    
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
-    
+
     [Parameter][Secret]readonly string GitHubToken;
+
+    [Solution]
+    readonly Solution Solution;
+
     Project AvaloniaProject => Solution.GetProject("KitopiaAvalonia");
-    
+
 
     Target Restore => _ => _
        .Executes(() =>
@@ -79,9 +73,6 @@ class Build : NukeBuild
                                // });
                            });
 
-    
-    
-   
 
     Target Pack => _ => _
                        .OnlyWhenDynamic(() =>
@@ -212,12 +203,14 @@ class Build : NukeBuild
                                 
                             }
                         );
+
     Target Clean => _ => _
                         .DependsOn(Pack)
                         .Executes(() =>
                          {
                              
                          });
+
     Target Test => _ => _
                        .Executes(() =>
                         {
@@ -228,6 +221,10 @@ class Build : NukeBuild
                             var gitRepository = GitRepository.FromUrl("https://github.com/MakesYT/Kitopia");
                             StringBuilder body = new StringBuilder();
                             var repositoryTags = _gitHubClient.Repository.GetAllTags(gitRepository.GetGitHubOwner(), gitRepository.GetGitHubName()).Result;
+                            foreach (var repositoryTag in repositoryTags)
+                            {
+                                Log.Debug(repositoryTag.Name);
+                            }
                             if (repositoryTags.Count<=0)
                             {
                                 body.AppendLine("Initial release");
@@ -237,6 +234,7 @@ class Build : NukeBuild
                                 Log.Debug("Last commit {0}", lastCommit);
                                 var repositoryTag = repositoryTags.First();
                                 Log.Debug("First commit {0}", repositoryTag.Commit.Sha);
+                                Log.Debug("First commit {0}", repositoryTag.Name);
                                 while (lastCommit != repositoryTag.Commit.Sha)
                                 {
                                     var gitHubCommit = _gitHubClient.Repository.Commit.Get(gitRepository.GetGitHubOwner(), gitRepository.GetGitHubName(), lastCommit).Result;
@@ -253,4 +251,12 @@ class Build : NukeBuild
                             Log.Debug("Creating release {0}", AvaloniaProject.GetProperty("Version"));
                             Log.Debug("body {0}", body);
                         });
+
+    /// Support plugins are available for:
+    ///   - JetBrains ReSharper        https://nuke.build/resharper
+    ///   - JetBrains Rider            https://nuke.build/rider
+    ///   - Microsoft VisualStudio     https://nuke.build/visualstudio
+    ///   - Microsoft VSCode           https://nuke.build/vscode
+
+    public static int Main () => Execute<Build>(x => x.Compile);
 }

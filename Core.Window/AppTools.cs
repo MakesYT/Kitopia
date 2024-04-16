@@ -15,7 +15,7 @@ using Core.Window.Everything;
 
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
-using NPinyin;
+using Pinyin.NET;
 using PluginCore;
 using Vanara.PInvoke;
 using Vanara.Windows.Shell;
@@ -29,6 +29,11 @@ public partial class AppTools
 {
     private static readonly ILog log = LogManager.GetLogger(nameof(AppTools));
     private static readonly List<string> ErrorLnkList = new();
+
+    //Console.WriteLine();
+
+
+    private static PinyinProcessor _pinyinProcessor = new();
 
     internal static void AutoStartEverything(ConcurrentDictionary<string, SearchViewItem> collection, Action action)
     {
@@ -388,7 +393,7 @@ public partial class AppTools
                         !fileInfo.Name.Contains("install") &&
                         !fileInfo.Name.Contains("安装") && !fileInfo.Name.Contains("卸载"))
                     {
-                        var keys = new List<string>();
+                        var keys = new List<IEnumerable<string>>();
 
                         //collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = fileInfo.Name.Replace(".lnk", ""), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
                         var localName = localizedName;
@@ -399,7 +404,7 @@ public partial class AppTools
                         {
                             collection.TryAdd(fullName, new SearchViewItem
                             {
-                                Keys = keys.AsReadOnly(), IsVisible = true, ItemDisplayName = localName,
+                                Keys = keys, IsVisible = true, ItemDisplayName = localName,
                                 OnlyKey = fullName, IsStared = star, Arguments = arg,
                                 FileType = FileType.应用程序, Icon = null
                             });
@@ -450,7 +455,7 @@ public partial class AppTools
                         return;
                     }
 
-                    var keys = new List<string>();
+                    var keys = new List<IEnumerable<string>>();
 
                     //collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = fileInfo.Name.Replace(".lnk", ""), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
                     var localName = localizedName;
@@ -474,7 +479,7 @@ public partial class AppTools
                 default:
                     if (File.Exists(file))
                     {
-                        var keys = new List<string>();
+                        var keys = new List<IEnumerable<string>>();
                         await NameSolver(keys, localizedName);
                         collection.TryAdd(file, new SearchViewItem()
                         {
@@ -495,7 +500,7 @@ public partial class AppTools
         {
             if (Directory.Exists(file))
             {
-                var keys = new List<string>();
+                var keys = new List<IEnumerable<string>>();
                 await NameSolver(keys, file.Split(Path.DirectorySeparatorChar).Last());
 
                 collection.TryAdd(file, new SearchViewItem()
@@ -515,39 +520,12 @@ public partial class AppTools
     [GeneratedRegex("[\u4e00-\u9fa5]")]
     private static partial Regex ChineseRegex();
 
-    //Console.WriteLine();
-    public static void CreateCombinations(List<string> keys, int startIndex, StringBuilder pair, string[] initialArray)
-    {
-        
-        // 遍历初始数组中的元素
-        var lowerInvariant = initialArray[startIndex].ToLowerInvariant();
-       
-        var name = pair.ToString();
-        AddUtil(keys, $"{name}{lowerInvariant}");
-        if (ChineseRegex().IsMatch(lowerInvariant))
-        {
-            AddUtil(keys, $"{name}{Pinyin.GetInitials(lowerInvariant).Replace(" ", "").ToLowerInvariant()}");
-            AddUtil(keys, $"{name}{Pinyin.GetPinyin(lowerInvariant).Replace(" ", "").ToLowerInvariant()}");
-        }
-        AddUtil(keys, $"{name}{MyRegex().Replace(lowerInvariant, "")}");
-        pair.Append(lowerInvariant);
-        if (startIndex > initialArray.Length-2)
-        {
-            return;
-        }
-        CreateCombinations(keys, startIndex + 1, pair, initialArray);
-    }
-
-
     // 使用const或readonly修饰符来声明pattern字符串
-    internal static async Task NameSolver(List<string> keys, string name)
+    internal static async Task NameSolver(List<IEnumerable<string>> keys, string name)
     {
-        var initials = name.Split(" ",StringSplitOptions.RemoveEmptyEntries);
-        CreateCombinations(keys, 0, new StringBuilder(), initials);
-        AddUtil(keys, Pinyin.GetInitials(name).Replace(" ", "").ToLowerInvariant());
-        AddUtil(keys, Pinyin.GetPinyin(name).Replace(" ", "").ToLowerInvariant());
-        AddUtil(keys,
-            string.Concat(MyRegex().Replace(name, "").ToLowerInvariant(), name.Last().ToString().ToLowerInvariant()));
+        var initials = name.Replace(" ","");
+        keys.AddRange(_pinyinProcessor.GetPinyin(initials));
+       
     }
 
     private static void AddUtil(List<string> keys, string name)

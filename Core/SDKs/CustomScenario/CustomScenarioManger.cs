@@ -162,12 +162,17 @@ public static class CustomScenarioManger
             var onlyKey = $"{nameof(CustomScenario)}:{scenario.UUID}";
             if (scenario.Keys.Any())
             {
+                var keys = new List<IEnumerable<string>>();
+                foreach (var key in scenario.Keys)
+                {
+                    keys.Add([key]);
+                }
                 var viewItem1 = new SearchViewItem()
                 {
                     ItemDisplayName = "执行自定义情景:" + scenario.Name,
                     FileType = FileType.自定义情景,
                     OnlyKey = onlyKey,
-                    Keys = scenario.Keys.AsReadOnly(),
+                    Keys = keys.AsReadOnly(),
                     Icon = null,
                     IconSymbol = 0xF78B,
                     IsVisible = true

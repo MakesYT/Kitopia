@@ -88,7 +88,7 @@ internal static class UwpTools
             return;
         }
 
-        List<string> keys = new();
+        List<IEnumerable<string>> keys = new();
         await Window.AppTools.NameSolver(keys, fileName);
         var xmlDocument = new XmlDocument();
         if (File.Exists($"{appContainer.workingDirectory}{Path.DirectorySeparatorChar}AppxManifest.xml"))

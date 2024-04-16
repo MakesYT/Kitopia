@@ -45,6 +45,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KitopiaTest", "KitopiaTest\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KitopiaBenchmark", "KitopiaBenchmark\KitopiaBenchmark.csproj", "{E175C03A-AF27-43DB-8BE5-669339A7B5D7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pinyin.NET", "PinyinM.NET\Pinyin.NET\Pinyin.NET.csproj", "{540A78AF-B178-4E8D-914B-4C67D9B92DEC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -421,6 +423,26 @@ Global
 		{E175C03A-AF27-43DB-8BE5-669339A7B5D7}.Release|x86.Build.0 = Release|Any CPU
 		{E175C03A-AF27-43DB-8BE5-669339A7B5D7}.Debug|Any CPU.ActiveCfg = Release|Any CPU
 		{E175C03A-AF27-43DB-8BE5-669339A7B5D7}.Debug|Any CPU.Build.0 = Release|Any CPU
+		{540A78AF-B178-4E8D-914B-4C67D9B92DEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{540A78AF-B178-4E8D-914B-4C67D9B92DEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{540A78AF-B178-4E8D-914B-4C67D9B92DEC}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{540A78AF-B178-4E8D-914B-4C67D9B92DEC}.Debug|ARM.Build.0 = Debug|Any CPU
+		{540A78AF-B178-4E8D-914B-4C67D9B92DEC}.Debug|arm64.ActiveCfg = Debug|Any CPU
+		{540A78AF-B178-4E8D-914B-4C67D9B92DEC}.Debug|arm64.Build.0 = Debug|Any CPU
+		{540A78AF-B178-4E8D-914B-4C67D9B92DEC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{540A78AF-B178-4E8D-914B-4C67D9B92DEC}.Debug|x64.Build.0 = Debug|Any CPU
+		{540A78AF-B178-4E8D-914B-4C67D9B92DEC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{540A78AF-B178-4E8D-914B-4C67D9B92DEC}.Debug|x86.Build.0 = Debug|Any CPU
+		{540A78AF-B178-4E8D-914B-4C67D9B92DEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{540A78AF-B178-4E8D-914B-4C67D9B92DEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{540A78AF-B178-4E8D-914B-4C67D9B92DEC}.Release|ARM.ActiveCfg = Release|Any CPU
+		{540A78AF-B178-4E8D-914B-4C67D9B92DEC}.Release|ARM.Build.0 = Release|Any CPU
+		{540A78AF-B178-4E8D-914B-4C67D9B92DEC}.Release|arm64.ActiveCfg = Release|Any CPU
+		{540A78AF-B178-4E8D-914B-4C67D9B92DEC}.Release|arm64.Build.0 = Release|Any CPU
+		{540A78AF-B178-4E8D-914B-4C67D9B92DEC}.Release|x64.ActiveCfg = Release|Any CPU
+		{540A78AF-B178-4E8D-914B-4C67D9B92DEC}.Release|x64.Build.0 = Release|Any CPU
+		{540A78AF-B178-4E8D-914B-4C67D9B92DEC}.Release|x86.ActiveCfg = Release|Any CPU
+		{540A78AF-B178-4E8D-914B-4C67D9B92DEC}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

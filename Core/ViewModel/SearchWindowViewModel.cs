@@ -15,6 +15,7 @@ using Core.SDKs.Services.Plugin;
 using Core.SDKs.Tools;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
+using Pinyin.NET;
 using PluginCore;
 
 #endregion
@@ -33,6 +34,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
     [ObservableProperty] private bool? _everythingIsOk = true;
     [ObservableProperty] private ObservableCollection<SearchViewItem> _items = new(TempList); //搜索界面显示的软件
+    private  PinyinSearcher<SearchViewItem> _pinyinSearcher ;
 
     private bool _reloading = false;
 
@@ -260,6 +262,11 @@ public partial class SearchWindowViewModel : ObservableRecipient
     // ReSharper disable once RedundantAssignment
     partial void OnSearchChanged(string? value)
     {
+        if (_pinyinSearcher is null)
+        {
+            _pinyinSearcher = new PinyinSearcher<SearchViewItem>(source: _collection,nameof(SearchViewItem.Keys),true);
+        }
+        
         _searchDelayAction.Debounce(ConfigManger.Config.inputSmoothingMilliseconds, _scheduler, () =>
         {
             if (string.IsNullOrEmpty(Search))
@@ -344,47 +351,12 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
             #region 从文件索引检索并排序
 
-            var filtered = new ConcurrentBag<(SearchViewItem Item, double Weight)>();
-            foreach (var item in _collection)
-            {
-                var weight = 0;
-                foreach (var key in item.Value.Keys)
-                {
-                    if (string.IsNullOrEmpty(key))
-                    {
-                        continue;
-                    }
 
-                    if (key.Contains(value))
-                    {
-                        weight += 2;
-                    }
-
-                    if (key.StartsWith(value))
-                    {
-                        weight += 5;
-                    }
-
-                    if (key.Equals(value, StringComparison.Ordinal))
-                    {
-                        weight += 100;
-                    }
-                }
-
-                if (item.Value == lastItem)
-                {
-                    weight -= 4;
-                }
-
-                if (weight > 0)
-                {
-                    filtered.Add((item.Value, weight/item.Value.Keys.Count));
-                }
-            }
+            var filtered = _pinyinSearcher.Search(value).ToList();
             foreach (var item in CustomScenarioManger.CustomScenarios)
             {
                 var onlyKey = $"CustomScenario:{item.UUID}";
-                double weight = 0;
+                int weight = 0;
                 foreach (var key in item.Keys)
                 {
                     if (string.IsNullOrEmpty(key))
@@ -428,7 +400,11 @@ public partial class SearchWindowViewModel : ObservableRecipient
                         IsVisible = true
                     };
                     
-                    filtered.Add((viewItem1, weight/viewItem1.Keys.Count));
+                    filtered.Add(new SearchResults<SearchViewItem>
+                    {
+                        Source = viewItem1,
+                        Weight = weight
+                    });
                 }
             }
             var sorted = filtered.OrderByDescending(x => x.Weight).ToList();
@@ -442,9 +418,9 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
             for (var i = sorted.Count - 1; i >= 0; i--)
             {
-                if (ConfigManger.Config.lastOpens.TryGetValue(sorted[i].Item.OnlyKey, out var open))
+                if (ConfigManger.Config.lastOpens.TryGetValue(sorted[i].Source.OnlyKey, out var open))
                 {
-                    nowHasLastOpens.Add((SearchViewItem)sorted[i].Item, open);
+                    nowHasLastOpens.Add((SearchViewItem)sorted[i].Source, open);
                     sorted.RemoveAt(i);
                 }
             }
@@ -472,7 +448,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     break; // 跳出循环
                 }
 
-                var searchViewItem = (SearchViewItem)x.Item;
+                var searchViewItem = (SearchViewItem)x.Source;
                 {
                     //Log.Debug("添加搜索结果" + x.Item.OnlyKey);
 
