@@ -69,6 +69,21 @@ public class SearchItemTool : ISearchItemTool
                     case FileType.自定义:
                         searchViewItem.Action?.Invoke(searchViewItem);
                         break;
+                    case FileType.文件夹:
+                    {
+                        if (searchViewItem.Arguments == null)
+                        {
+                            Shell32.ShellExecute(IntPtr.Zero, "open", searchViewItem.OnlyKey, "", searchViewItem.OnlyKey.Remove(searchViewItem.OnlyKey.LastIndexOf('\\')),
+                                ShowWindowCommand.SW_NORMAL);
+                        }
+                        else
+                        {
+                            Shell32.ShellExecute(IntPtr.Zero, "open", searchViewItem.OnlyKey,
+                                searchViewItem.Arguments, searchViewItem.OnlyKey.Remove(searchViewItem.OnlyKey.LastIndexOf('\\')),
+                                ShowWindowCommand.SW_SHOWNORMAL);
+                        }
+                        break;
+                    }
                     default:
                         if (searchViewItem.Arguments == null)
                         {

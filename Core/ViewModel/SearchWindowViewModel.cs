@@ -295,7 +295,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
             }
 
             #endregion
-
+            string originalValue = Search;
             value = Search.ToLowerInvariant().Split(" ").First();
             var pluginItem = 0;
             foreach (var searchAction in PluginOverall.SearchActions)
@@ -465,99 +465,134 @@ public partial class SearchWindowViewModel : ObservableRecipient
             //Items.RaiseListChangedEvents = true;
 
 
-            if (Items.Count <= pluginItem && !(Path.HasExtension(value) && File.Exists(value)) &&
-                !Directory.Exists(value))
+            if (Items.Count <= pluginItem)
             {
-                Log.Debug("无搜索项目,添加网页搜索");
-
-                if (value.Contains(".") || value.Contains("file://"))
+                if (originalValue.StartsWith("\""))
                 {
-                    var temp = value;
-                    if (!temp.StartsWith("http") && !value.Contains("file://"))
+                    originalValue = originalValue.Replace("\"", "");
+                }
+                if (Path.HasExtension(originalValue) && File.Exists(originalValue)||Directory.Exists(originalValue))
+                {
+                    
+
+                    //检测路径
+                    if (originalValue.Contains("\\") || originalValue.Contains("/"))
                     {
-                        temp = "https://" + temp;
-                        var viewItem = new SearchViewItem()
+                        Log.Debug("检测路径");
+                        ConcurrentDictionary<string, SearchViewItem> a = new();
+                        ServiceManager.Services.GetService<IAppToolService>()!.AppSolverA(a, originalValue).Wait();
+                        foreach (var (key, value) in a)
                         {
-                            ItemDisplayName = "打开网页:" + temp,
-                            FileType = FileType.URL,
-                            OnlyKey = temp,
-                            Icon = null,
-                            IconSymbol = 62555,
-                            IsVisible = true
-                        };
-                        Items.Add(viewItem);
-                        temp = "http://" + value;
-                        var viewItem1 = new SearchViewItem()
-                        {
-                            ItemDisplayName = "打开网页:" + temp,
-                            FileType = FileType.URL,
-                            OnlyKey = temp,
-                            Icon = null,
-                            IconSymbol = 62555,
-                            IsVisible = true
-                        };
-                        Items.Add(viewItem1);
-                    }
-                    else if (value.Contains("file://"))
-                    {
-                        var viewItem1 = new SearchViewItem()
-                        {
-                            ItemDisplayName = "打开路径:" + value,
-                            FileType = FileType.URL,
-                            OnlyKey = value,
-                            Icon = null,
-                            IconSymbol = 62555,
-                            IsVisible = true
-                        };
-                        Items.Add(viewItem1);
-                    }
-                    else
-                    {
-                        var viewItem1 = new SearchViewItem()
-                        {
-                            ItemDisplayName = "打开网页:" + value,
-                            FileType = FileType.URL,
-                            OnlyKey = value,
-                            Icon = null,
-                            IconSymbol = 62555,
-                            IsVisible = true
-                        };
-                        Items.Add(viewItem1);
+                            if (value.FileType == FileType.文件夹)
+                            {
+                                value.ItemDisplayName = $"打开文件夹: {value.ItemDisplayName} ?";
+                            }
+                            else
+                            {
+                                value.ItemDisplayName = $"打开文件: {value.ItemDisplayName} ?";
+                            }
+
+                            Items.Insert(0, value);
+                            //GetIconInItemsAsync(value);
+                        }
                     }
                 }
-
-                var searchViewItem3 = new SearchViewItem()
+                else
                 {
-                    ItemDisplayName = "将内容添加至便签" + value,
-                    FileType = FileType.便签,
-                    OnlyKey = value,
-                    Icon = null,
-                    IconSymbol = 0xF6EC,
-                    IsVisible = true
-                };
-                Items.Add(searchViewItem3);
-                var searchViewItem = new SearchViewItem()
-                {
-                    ItemDisplayName = "在网页中搜索" + value,
-                    FileType = FileType.URL,
-                    OnlyKey = "https://www.bing.com/search?q=" + value,
-                    Icon = null,
-                    IconSymbol = 62555,
-                    IsVisible = true
-                };
-                Items.Add(searchViewItem);
+                    
+                    {
+                        Log.Debug("无搜索项目,添加网页搜索");
+
+                        if (value.Contains(".") || value.Contains("file://"))
+                        {
+                            var temp = value;
+                            if (!temp.StartsWith("http") && !value.Contains("file://"))
+                            {
+                                temp = "https://" + temp;
+                                var viewItem = new SearchViewItem()
+                                {
+                                    ItemDisplayName = "打开网页:" + temp,
+                                    FileType = FileType.URL,
+                                    OnlyKey = temp,
+                                    Icon = null,
+                                    IconSymbol = 62555,
+                                    IsVisible = true
+                                };
+                                Items.Add(viewItem);
+                                temp = "http://" + value;
+                                var viewItem1 = new SearchViewItem()
+                                {
+                                    ItemDisplayName = "打开网页:" + temp,
+                                    FileType = FileType.URL,
+                                    OnlyKey = temp,
+                                    Icon = null,
+                                    IconSymbol = 62555,
+                                    IsVisible = true
+                                };
+                                Items.Add(viewItem1);
+                            }
+                            else if (value.Contains("file://"))
+                            {
+                                var viewItem1 = new SearchViewItem()
+                                {
+                                    ItemDisplayName = "打开路径:" + value,
+                                    FileType = FileType.URL,
+                                    OnlyKey = value,
+                                    Icon = null,
+                                    IconSymbol = 62555,
+                                    IsVisible = true
+                                };
+                                Items.Add(viewItem1);
+                            }
+                            else
+                            {
+                                var viewItem1 = new SearchViewItem()
+                                {
+                                    ItemDisplayName = "打开网页:" + value,
+                                    FileType = FileType.URL,
+                                    OnlyKey = value,
+                                    Icon = null,
+                                    IconSymbol = 62555,
+                                    IsVisible = true
+                                };
+                                Items.Add(viewItem1);
+                            }
+                        }
+
+                        var searchViewItem3 = new SearchViewItem()
+                        {
+                            ItemDisplayName = "将内容添加至便签" + value,
+                            FileType = FileType.便签,
+                            OnlyKey = value,
+                            Icon = null,
+                            IconSymbol = 0xF6EC,
+                            IsVisible = true
+                        };
+                        Items.Add(searchViewItem3);
+                        var searchViewItem = new SearchViewItem()
+                        {
+                            ItemDisplayName = "在网页中搜索" + value,
+                            FileType = FileType.URL,
+                            OnlyKey = "https://www.bing.com/search?q=" + value,
+                            Icon = null,
+                            IconSymbol = 62555,
+                            IsVisible = true
+                        };
+                        Items.Add(searchViewItem);
 
 
-                var item = new SearchViewItem()
-                {
-                    ItemDisplayName = "执行命令:" + value,
-                    FileType = FileType.命令,
-                    OnlyKey = value,
-                    Icon = null,
-                    IconSymbol = 61039,
-                    IsVisible = true
-                };
-                Items.Add(item);
+                        var item = new SearchViewItem()
+                        {
+                            ItemDisplayName = "执行命令:" + value,
+                            FileType = FileType.命令,
+                            OnlyKey = value,
+                            Icon = null,
+                            IconSymbol = 61039,
+                            IsVisible = true
+                        };
+                        Items.Add(item);
+                    }
+                }
             }
 
             var strings = Search.Split(" ");
