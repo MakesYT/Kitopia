@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Windows.Documents;
 using Core.SDKs;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.Services;
@@ -170,62 +171,72 @@ public partial class AppTools
 
 
         // 创建一个空的文件路径集合
-        List<string> filePaths = new();
-
-// 把桌面上的.lnk文件路径添加到集合中
-        filePaths.AddRange(Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)));
-        filePaths.AddRange(
-            Directory.EnumerateDirectories(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)));
-
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+       
+        
+        foreach (var enumerateFile in Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)))
         {
-            filePaths.AddRange(Directory.EnumerateFiles(@"C:\ProgramData\Microsoft\Windows\Start Menu\Programs",
-                "*.lnk",
-                SearchOption.AllDirectories));
-            filePaths.AddRange(Directory.EnumerateFiles(@"C:\ProgramData\Microsoft\Windows\Start Menu\Programs",
-                "*.url",
-                SearchOption.AllDirectories));
-            filePaths.AddRange(Directory.EnumerateFiles(@"C:\ProgramData\Microsoft\Windows\Start Menu\Programs",
-                "*.appref-ms", SearchOption.AllDirectories));
-            filePaths.AddRange(ConfigManger.Config.customCollections);
-            filePaths.AddRange(Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Programs),
-                "*.lnk", SearchOption.AllDirectories));
-            filePaths.AddRange(Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Programs),
-                "*.appref-ms", SearchOption.AllDirectories));
-            filePaths.AddRange(Directory.EnumerateFiles(Environment.GetFolderPath(Environment.SpecialFolder.Programs),
-                "*.url", SearchOption.AllDirectories));
+            AppSolverA(collection, enumerateFile, logging: logging);
         }
+        foreach (var enumerateFile in Directory.EnumerateDirectories(Environment.GetFolderPath(Environment.SpecialFolder.Desktop)))
+        {
+            AppSolverA(collection, enumerateFile, logging: logging);
+        }
+        foreach (var enumerateFile in Directory.EnumerateFiles(@"C:\ProgramData\Microsoft\Windows\Start Menu\Programs",
+                     "*", SearchOption.AllDirectories))
+        {
+            switch (enumerateFile.Split(".").Last())
+            {
+                case "lnk":
+                case "url":
+                case "appref-ms":
+                    break;
+                default:
+                    continue;
+            }
+            AppSolverA(collection, enumerateFile, logging: logging);
+        }
+
+        var folderPath = Environment.GetFolderPath(Environment.SpecialFolder.Programs);
+        foreach (var enumerateFile in 
+                 Directory.EnumerateFiles(folderPath
+                     ,"*", SearchOption.AllDirectories))
+        {
+            switch (enumerateFile.Split(".").Last())
+            {
+                case "lnk":
+                case "url":
+                case "appref-ms":
+                    break;
+                default:
+                    continue;
+            }
+            AppSolverA(collection, enumerateFile, logging: logging);
+        }
+        foreach (var configCustomCollection in ConfigManger.Config.customCollections)
+        {
+            AppSolverA(collection, configCustomCollection, logging: logging);
+        }
+        
+        
+     
+        
+        
 
         if (useEverything)
         {
+            List<string> filePaths = new();
             Tools.main(filePaths);
-        }
-        
-        
-        
-        List<Task> list = new();
-        var options = new ParallelOptions
-        {
-            MaxDegreeOfParallelism = 256
-        };
-        Parallel.ForEach(filePaths, options,file =>
-        {
-            if (!collection.ContainsKey(file))
+            foreach (var filePath in filePaths)
             {
-                list.Add(AppSolverA(collection, file, logging: logging));
+                AppSolverA(collection, filePath, logging: logging);
             }
-            
-        });
-
-        try
-        {
-            Task.WaitAll(list.ToArray());
+            filePaths.Clear();
         }
-        catch (Exception _)
-        {
-        }
-
-
+        
+        
+       
+        
+        
         //AutoStartEverything(collection);
         if (ErrorLnkList.Any())
         {
@@ -279,17 +290,18 @@ public partial class AppTools
         }
     }
 
-    internal static async Task AppSolverA(ConcurrentDictionary<string, SearchViewItem> collection, string file,
+    internal static void AppSolverA(ConcurrentDictionary<string, SearchViewItem> collection, string file,
         bool star = false, bool logging = false)
     {
         //log.Debug(Thread.CurrentThread.ManagedThreadId);
        
         var localizedName = file.Split("\\").Last();
-        var lastIndexOf = localizedName.LastIndexOf(".");
+        var lastIndexOf = localizedName.LastIndexOf(".", StringComparison.Ordinal);
         if (lastIndexOf!=-1)
         {
-           localizedName= localizedName.Remove(lastIndexOf);
+            localizedName= localizedName.Remove(lastIndexOf);
         }
+        
         
         if (Path.HasExtension(file))
         {
@@ -397,9 +409,9 @@ public partial class AppTools
 
                         //collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = fileInfo.Name.Replace(".lnk", ""), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
                         var localName = localizedName;
-                        await NameSolver(keys, localName);
-                        //nameSolver(keys, fileInfo.Name.Replace(".lnk", ""));
-                        await NameSolver(keys, refFileInfo.Name.Replace(".exe", ""));
+                        keys.AddRange(_pinyinProcessor.GetPinyin(localName));
+                        keys.AddRange(_pinyinProcessor.GetPinyin(refFileInfo.Name.Replace(".exe", "")));
+                        
 
                         {
                             collection.TryAdd(fullName, new SearchViewItem
@@ -414,7 +426,7 @@ public partial class AppTools
                     }
                     else
                     {
-                       // log.Debug($"不符合要求跳过索引:{file}");
+                        // log.Debug($"不符合要求跳过索引:{file}");
                     }
 
                     break;
@@ -459,9 +471,8 @@ public partial class AppTools
 
                     //collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = fileInfo.Name.Replace(".lnk", ""), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
                     var localName = localizedName;
-                    await NameSolver(keys, localName);
-                    //nameSolver(keys, fileInfo.Name.Replace(".lnk", ""));
-                    await NameSolver(keys, fileInfo.Name.Replace(".url", ""));
+                    keys.AddRange(_pinyinProcessor.GetPinyin(localName));
+                    keys.AddRange(_pinyinProcessor.GetPinyin(fileInfo.Name.Replace(".url", "")));
 
                     {
                         collection.TryAdd(onlyKey, new SearchViewItem
@@ -480,7 +491,7 @@ public partial class AppTools
                     if (File.Exists(file))
                     {
                         var keys = new List<IEnumerable<string>>();
-                        await NameSolver(keys, localizedName);
+                        keys.AddRange(_pinyinProcessor.GetPinyin(localizedName));
                         collection.TryAdd(file, new SearchViewItem()
                         {
                             ItemDisplayName = localizedName,
@@ -498,22 +509,18 @@ public partial class AppTools
         }
         else
         {
-            if (Directory.Exists(file))
+            if (!Directory.Exists(file)) return;
+            
+            collection.TryAdd(file, new SearchViewItem()
             {
-                var keys = new List<IEnumerable<string>>();
-                await NameSolver(keys, file.Split(Path.DirectorySeparatorChar).Last());
-
-                collection.TryAdd(file, new SearchViewItem()
-                {
-                    ItemDisplayName = file.Split(Path.DirectorySeparatorChar).Last(),
-                    FileType = FileType.文件夹,
-                    IsStared = star,
-                    OnlyKey = file,
-                    Keys = keys.AsReadOnly(),
-                    Icon = null,
-                    IsVisible = true
-                });
-            }
+                ItemDisplayName = file.Split(Path.DirectorySeparatorChar).Last(),
+                FileType = FileType.文件夹,
+                IsStared = star,
+                OnlyKey = file,
+                Keys = _pinyinProcessor.GetPinyin(file.Split(Path.DirectorySeparatorChar).Last()),
+                Icon = null,
+                IsVisible = true
+            });
         }
     }
 
@@ -521,10 +528,10 @@ public partial class AppTools
     private static partial Regex ChineseRegex();
 
     // 使用const或readonly修饰符来声明pattern字符串
-    internal static async Task NameSolver(List<IEnumerable<string>> keys, string name)
+    internal static void NameSolver(List<IEnumerable<string>> keys, string name)
     {
-        var initials = name.Replace(" ","");
-        keys.AddRange(_pinyinProcessor.GetPinyin(initials));
+        
+        keys.AddRange(_pinyinProcessor.GetPinyin(name));
        
     }
 

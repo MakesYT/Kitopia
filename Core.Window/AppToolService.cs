@@ -9,7 +9,7 @@ public class AppToolService : IAppToolService
     public async Task AppSolverA(ConcurrentDictionary<string, SearchViewItem> _collection, string search,
         bool isSearch = false)
     {
-        await Window.AppTools.AppSolverA(_collection, search, isSearch);
+         Window.AppTools.AppSolverA(_collection, search, isSearch);
     }
 
     public void DelNullFile(ConcurrentDictionary<string, SearchViewItem> _collection)
