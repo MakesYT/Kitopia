@@ -33,6 +33,7 @@
         <searchWindow:CanIgnoreCtr x:Key="CanIgnoreCtr" />
         <converter:IntToIconSymbol x:Key="IntToIconSymbol" />
         <searchWindow:SymbolToVisible x:Key="SymbolToVisible" />
+        <searchWindow:ItemNameMatchCtr x:Key="ItemNameMatchCtr" />
     </windowing:AppWindow.Resources>
     <Panel>
         <Panel.Background>
@@ -82,9 +83,8 @@
                                     <Button.Styles>
                                         <Style Selector="Button#Item:pointerover /template/ controls|FABorder#Root">
                                             <Setter Property="BorderBrush" Value="DimGray" />
-                                            <Setter Property="Background" Value="{StaticResource Brush}" >
-                                            </Setter>
-                                            
+                                            <Setter Property="Background" Value="{StaticResource Brush}" />
+
                                         </Style>
                                     </Button.Styles>
                                     <Button.ContextFlyout>
@@ -116,7 +116,8 @@
 
                                         <Image Grid.Column="1" HorizontalAlignment="Left" Focusable="False" Width="48"
                                                Height="48" ZIndex="1"
-                                               Source="{Binding Icon, Converter={StaticResource PathToImageConverter},ConverterParameter={Binding .}}" />
+                                               Source="{Binding Icon, Converter={StaticResource PathToImageConverter},
+                                               ConverterParameter={Binding .}}" />
                                         <controls:FontIcon Height="48" Width="48" FontSize="48" Grid.Column="1"
                                                            FontFamily="{StaticResource FluentFont}"
                                                            IsVisible="{Binding IconSymbol,Converter={StaticResource SymbolToVisible}}"
@@ -125,10 +126,14 @@
 
                                         <StackPanel Grid.Column="2" Margin="5" VerticalAlignment="Top">
                                             <TextBlock VerticalAlignment="Center" Margin="0" Focusable="False"
-                                                       Text="{Binding Path=ItemDisplayName}"
-
+                                                       FontFamily="HarmonyOS Sans"
+                                                        Inlines="{Binding Path=., 
+                                                                    Converter={StaticResource ItemNameMatchCtr},
+                                                                    ConverterParameter={ReflectionBinding #Item}}">
                                                        Background="{x:Null}"
-                                                       FontWeight="Normal" FontSize="18" />
+                                                       FontWeight="Normal" FontSize="18">
+                                                <Run />
+                                            </TextBlock>
                                             <TextBlock VerticalAlignment="Top" Margin="0"
                                                        Text="{Binding Path=FileType}" />
                                         </StackPanel>

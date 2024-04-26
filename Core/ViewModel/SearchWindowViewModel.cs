@@ -253,10 +253,10 @@ public partial class SearchWindowViewModel : ObservableRecipient
             }
         }
 
-        //Items.RaiseListChangedEvents = true;
-
-
-        // GetItemsIcon();
+        foreach (var searchViewItem in Items)
+        {
+            searchViewItem.CharMatchResults = [];
+        }
     }
 
     // ReSharper disable once RedundantAssignment
@@ -264,7 +264,9 @@ public partial class SearchWindowViewModel : ObservableRecipient
     {
         if (_pinyinSearcher is null)
         {
-            _pinyinSearcher = new PinyinSearcher<SearchViewItem>(source: _collection,nameof(SearchViewItem.Keys),true);
+            _pinyinSearcher = new PinyinSearcher<SearchViewItem>(source: _collection,
+                nameof(SearchViewItem.Keys),
+                nameof(SearchViewItem.CharMatchResults),true);
         }
         
         _searchDelayAction.Debounce(ConfigManger.Config.inputSmoothingMilliseconds, _scheduler, () =>

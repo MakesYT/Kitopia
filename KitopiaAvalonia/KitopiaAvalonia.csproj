@@ -28,7 +28,7 @@
         <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
         <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
         <DebugType Condition="'$(Configuration)' == 'Release'">none</DebugType>
-        <Version>0.0.2.040</Version>
+        <Version>0.0.2.041</Version>
     </PropertyGroup>
     <ItemGroup>
         <AvaloniaResource Include="Assets\FluentSystemIcons-Filled.ttf"/>

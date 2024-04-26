@@ -88,8 +88,8 @@ internal static class UwpTools
             return;
         }
 
-        List<IEnumerable<string>> keys = new();
-        Window.AppTools.NameSolver(keys, fileName);
+       
+        var nameSolver = Window.AppTools.NameSolver(fileName);
         var xmlDocument = new XmlDocument();
         if (File.Exists($"{appContainer.workingDirectory}{Path.DirectorySeparatorChar}AppxManifest.xml"))
         {
@@ -164,7 +164,8 @@ internal static class UwpTools
                 ItemDisplayName = fileName,
                 OnlyKey = $"{appContainer.appContainerName}!{id}",
                 FileType = FileType.UWP应用,
-                Keys = keys.AsReadOnly(),
+                Keys = nameSolver.Item2,
+                SplitWords = nameSolver.Item1.ToArray(),
                 IconPath = pa,
                 IsVisible = true
             };
@@ -185,7 +186,8 @@ internal static class UwpTools
                         ItemDisplayName = fileName,
                         OnlyKey = $"{appContainer.appContainerName}!{id}",
                         FileType = FileType.UWP应用,
-                        Keys = keys.AsReadOnly(),
+                        Keys = nameSolver.Item2,
+                        SplitWords = nameSolver.Item1.ToArray(),
                         IconPath = enumerateFile.FullName,
                         IsVisible = true
                     };

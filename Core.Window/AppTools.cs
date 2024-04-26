@@ -405,18 +405,17 @@ public partial class AppTools
                         !fileInfo.Name.Contains("install") &&
                         !fileInfo.Name.Contains("安装") && !fileInfo.Name.Contains("卸载"))
                     {
-                        var keys = new List<IEnumerable<string>>();
-
-                        //collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = fileInfo.Name.Replace(".lnk", ""), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
-                        var localName = localizedName;
-                        keys.AddRange(_pinyinProcessor.GetPinyin(localName));
-                        keys.AddRange(_pinyinProcessor.GetPinyin(refFileInfo.Name.Replace(".exe", "")));
                         
+                        //collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = fileInfo.Name.Replace(".lnk", ""), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
+                        //var localName = $"{localizedName}_{refFileInfo.Name.Replace(".exe", "")}";
+                        var valueTuple = _pinyinProcessor.GetPinyin(localizedName);
+
 
                         {
                             collection.TryAdd(fullName, new SearchViewItem
                             {
-                                Keys = keys, IsVisible = true, ItemDisplayName = localName,
+                                Keys = valueTuple.Item2, SplitWords = valueTuple.Item1.ToArray(),
+                                IsVisible = true, ItemDisplayName = localizedName,
                                 OnlyKey = fullName, IsStared = star, Arguments = arg,
                                 FileType = FileType.应用程序, Icon = null
                             });
@@ -467,17 +466,19 @@ public partial class AppTools
                         return;
                     }
 
-                    var keys = new List<IEnumerable<string>>();
+                   
+                    
 
                     //collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = fileInfo.Name.Replace(".lnk", ""), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
-                    var localName = localizedName;
-                    keys.AddRange(_pinyinProcessor.GetPinyin(localName));
-                    keys.AddRange(_pinyinProcessor.GetPinyin(fileInfo.Name.Replace(".url", "")));
+                    //var localName = $"{localizedName}_{fileInfo.Name.Replace(".url", "")}";
+                    var valueTuple = _pinyinProcessor.GetPinyin(localizedName);
+
 
                     {
                         collection.TryAdd(onlyKey, new SearchViewItem
                         {
-                            Keys = keys.AsReadOnly(), IsVisible = true, ItemDisplayName = localName,
+                            Keys = valueTuple.Item2, SplitWords = valueTuple.Item1.ToArray(),
+                            IsVisible = true, ItemDisplayName = localizedName,
                             OnlyKey = onlyKey, IsStared = star,
                             IconPath = relFile,
                             FileType = FileType.URL, Icon = null
@@ -490,15 +491,15 @@ public partial class AppTools
                 default:
                     if (File.Exists(file))
                     {
-                        var keys = new List<IEnumerable<string>>();
-                        keys.AddRange(_pinyinProcessor.GetPinyin(localizedName));
+                        var valueTuple = _pinyinProcessor.GetPinyin(localizedName);
                         collection.TryAdd(file, new SearchViewItem()
                         {
                             ItemDisplayName = localizedName,
                             FileType = FileType.文件,
 
                             OnlyKey = file,
-                            Keys = keys.AsReadOnly(),
+                            Keys = valueTuple.Item2,
+                            SplitWords = valueTuple.Item1.ToArray(),
                             IsStared = star,
                             IsVisible = true
                         });
@@ -510,14 +511,15 @@ public partial class AppTools
         else
         {
             if (!Directory.Exists(file)) return;
-            
+            var valueTuple = _pinyinProcessor.GetPinyin(file.Split(Path.DirectorySeparatorChar).Last());
             collection.TryAdd(file, new SearchViewItem()
             {
                 ItemDisplayName = file.Split(Path.DirectorySeparatorChar).Last(),
                 FileType = FileType.文件夹,
                 IsStared = star,
                 OnlyKey = file,
-                Keys = _pinyinProcessor.GetPinyin(file.Split(Path.DirectorySeparatorChar).Last()),
+                Keys = valueTuple.Item2,
+                SplitWords = valueTuple.Item1.ToArray(),
                 Icon = null,
                 IsVisible = true
             });
@@ -528,10 +530,10 @@ public partial class AppTools
     private static partial Regex ChineseRegex();
 
     // 使用const或readonly修饰符来声明pattern字符串
-    internal static void NameSolver(List<IEnumerable<string>> keys, string name)
+    internal static (IEnumerable<string>,IEnumerable<IEnumerable<string>>) NameSolver( string name)
     {
         
-        keys.AddRange(_pinyinProcessor.GetPinyin(name));
+        return  (_pinyinProcessor.GetPinyin(name));
        
     }
 
