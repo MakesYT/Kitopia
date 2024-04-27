@@ -97,6 +97,8 @@ class Build : NukeBuild
                        .Executes(() =>
                             {
                                 var rootDirectory = RootDirectory / "Publish";
+                                var rootDirectory_self = RootDirectory / "Publish_SelfContained";
+                                rootDirectory_self.DeleteDirectory();
                                 rootDirectory.DeleteDirectory();
                                 DotNetPublish(c => new DotNetPublishSettings()
                                                   .SetProject("KitopiaEx")
@@ -105,6 +107,14 @@ class Build : NukeBuild
                                                   .SetFramework("net8.0")
                                                   .SetConfiguration("Release")
                                                   .SetSelfContained(false)
+                                );
+                                DotNetPublish(c => new DotNetPublishSettings()
+                                                  .SetProject("KitopiaEx")
+                                                  .SetOutput(RootDirectory / "Publish_SelfContained" / "plugins" / "KitopiaEx")
+                                                  .SetRuntime( "win-x64")
+                                                  .SetFramework("net8.0")
+                                                  .SetConfiguration("Release")
+                                                  .SetSelfContained(true)
                                 );
                                 DotNetPublish(c => new DotNetPublishSettings()
                                                   .SetProject(AvaloniaProject.Name)
@@ -116,7 +126,16 @@ class Build : NukeBuild
                                                   .SetConfiguration("Release")
                                                   .SetSelfContained(false)
                                 );
-                                
+                                DotNetPublish(c => new DotNetPublishSettings()
+                                                  .SetProject(AvaloniaProject.Name)
+                                                  .SetOutput(RootDirectory / "Publish_SelfContained")
+                                                  .SetPublishSingleFile(true)
+                                                  
+                                                  .SetRuntime( "win-x64")
+                                                  .SetFramework("net8.0-windows10.0.17763.0")
+                                                  .SetConfiguration("Release")
+                                                  .SetSelfContained(true)
+                                );
                                 var gitRepository = GitRepository.FromUrl("https://github.com/MakesYT/Kitopia");
                                 var result = GitHubTasks.GetLatestRelease(gitRepository,true).Result;
                                 Log.Debug("Packing project {0}", AvaloniaProject);
@@ -130,9 +149,12 @@ class Build : NukeBuild
                                     }
                                 }
 
-                                var archiveFile = RootDirectory / "Kitopia"+AvaloniaProject.GetProperty("Version")+".zip";
+                                var archiveFile = RootDirectory / "Kitopia"+AvaloniaProject.GetProperty("Version")+"_WithoutContained.zip";
+                                var archiveFile_self = RootDirectory / "Kitopia"+AvaloniaProject.GetProperty("Version")+"_SelfContained.zip";
                                 archiveFile.DeleteFile();
+                                archiveFile_self.DeleteFile();
                                 rootDirectory.ZipTo(archiveFile);
+                                rootDirectory_self.ZipTo(archiveFile_self);
                                 
                                 if (IsLocalBuild)
                                 {
@@ -190,14 +212,21 @@ class Build : NukeBuild
                                     var release = _gitHubClient.Repository.Release.Create(gitRepository.GetGitHubOwner(), gitRepository.GetGitHubName(),
                                         newRelease).Result;
                                     using var artifactStream = File.OpenRead(archiveFile);
-                                    var fileName = Path.GetFileName( "Kitopia"+AvaloniaProject.GetProperty("Version")+".zip");
+                                   
                                     var assetUpload = new ReleaseAssetUpload
                                     {
-                                        FileName = fileName,
+                                        FileName = archiveFile.Name,
                                         ContentType =  "application/octet-stream",
                                         RawData = artifactStream,
                                     };
+                                    var assetUpload_self = new ReleaseAssetUpload
+                                    {
+                                        FileName = archiveFile_self.Name,
+                                        ContentType =  "application/octet-stream",
+                                        RawData = File.OpenRead(archiveFile_self),
+                                    };
                                     _gitHubClient.Repository.Release.UploadAsset(release,assetUpload).Wait();
+                                    _gitHubClient.Repository.Release.UploadAsset(release,assetUpload_self).Wait();
                                     Log.Debug(result);
                                 }
                                 
