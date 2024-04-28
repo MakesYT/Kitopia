@@ -39,6 +39,8 @@ public class SearchItemToInfo : IValueConverter
                 info.Append(item.OnlyKey);
                 break;
             case FileType.数学运算:
+                info.Append($"点击将{item.ItemDisplayName.Remove(0,1)}复制到剪贴板");
+                break;
             case FileType.剪贴板图像:
             case FileType.None:
                 break;

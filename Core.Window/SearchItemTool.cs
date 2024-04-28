@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO;
+using System.Windows;
 using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.Services;
@@ -80,6 +81,18 @@ public class SearchItemTool : ISearchItemTool
                         });
                         break;
                     }
+                    case FileType.数学运算:
+                    {
+                        var tcs = new TaskCompletionSource<bool>();
+                        var thread = new Thread(() =>
+                        {
+                            Clipboard.SetText(searchViewItem.ItemDisplayName.Remove(0,1));
+                        });
+                        thread.SetApartmentState(ApartmentState.STA);
+                        thread.Start();
+                        break;
+                    }
+                        
                     case FileType.文件夹:
                     {
                         if (searchViewItem.Arguments == null)
