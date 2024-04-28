@@ -69,6 +69,17 @@ public class SearchItemTool : ISearchItemTool
                     case FileType.自定义:
                         searchViewItem.Action?.Invoke(searchViewItem);
                         break;
+                    case FileType.命令:
+                    {
+                        Process.Start(new ProcessStartInfo
+                        {
+                            FileName = "cmd.exe",
+                            Arguments = $"/c {searchViewItem.OnlyKey} & pause",
+                            UseShellExecute = false,
+                            CreateNoWindow = false,
+                        });
+                        break;
+                    }
                     case FileType.文件夹:
                     {
                         if (searchViewItem.Arguments == null)

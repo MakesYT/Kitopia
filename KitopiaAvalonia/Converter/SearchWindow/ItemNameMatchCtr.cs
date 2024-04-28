@@ -23,11 +23,12 @@ public class ItemNameMatchCtr : IValueConverter
             return new InlineCollection();
         }
         InlineCollection list = new();
-        if (str.CharMatchResults.Length !=str.SplitWords.Length)
+        if (str.CharMatchResults.Length !=str.SplitWords.Length|| str.CharMatchResults.Length==0)
         {
             list.Add(new Run(str.ItemDisplayName));
             return list;
         }
+        
         
         for (int i = 0; i < str.SplitWords.Length; i++)
         {

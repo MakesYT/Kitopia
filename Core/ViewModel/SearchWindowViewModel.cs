@@ -44,6 +44,13 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
     [ObservableProperty] private int? _selectedIndex = -1;
 
+    private string[] knownCommand =
+    [
+        "cmd", "powershell", "wsl", "bash", "ping", "ipconfig", "nslookup", "tracert", "netstat", "arp", "route",
+        "telnet", "ftp", "ssh", "scp", "sftp", "rsync", "nmap", "nc", "curl", "wget", "git", "svn", "hg", "docker", 
+        "docker-compose", "kubectl", "helm", "minikube"
+    ];
+
 
     private bool nowInSelectMode = false;
     private Action<SearchViewItem?>? selectAction;
@@ -219,7 +226,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
         {
             Log.Debug("加载历史");
             var sortedDict = ConfigManger.Config.lastOpens.OrderByDescending(p => p.Value)
-                .ToDictionary(p => p.Key, p => p.Value);
+                                         .ToDictionary(p => p.Key, p => p.Value);
             foreach (var (key, value) in sortedDict)
             {
                 if (limit >= ConfigManger.Config.maxHistory)
@@ -268,9 +275,10 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 nameof(SearchViewItem.Keys),
                 nameof(SearchViewItem.CharMatchResults),true);
         }
-        
+        //Log.Debug("搜索");
         _searchDelayAction.Debounce(ConfigManger.Config.inputSmoothingMilliseconds, _scheduler, () =>
         {
+            //Log.Debug("搜索开始");
             if (string.IsNullOrEmpty(Search))
             {
                 LoadLast();
@@ -298,7 +306,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
             #endregion
             string originalValue = Search;
-            value = Search.ToLowerInvariant().Split(" ").First();
+            value = Search.ToLowerInvariant();
             var pluginItem = 0;
             foreach (var searchAction in PluginOverall.SearchActions)
             {
@@ -422,13 +430,13 @@ public partial class SearchWindowViewModel : ObservableRecipient
             {
                 if (ConfigManger.Config.lastOpens.TryGetValue(sorted[i].Source.OnlyKey, out var open))
                 {
-                    nowHasLastOpens.Add((SearchViewItem)sorted[i].Source, open);
+                    nowHasLastOpens.Add((SearchViewItem)sorted[i].Source, (int)(sorted[i].Weight));
                     sorted.RemoveAt(i);
                 }
             }
 
             var sortedDict = nowHasLastOpens.OrderByDescending(p => p.Value)
-                .ToDictionary(p => p.Key, p => p.Value);
+                                            .ToDictionary(p => p.Key, p => p.Value);
             foreach (var (searchViewItem, i) in sortedDict)
             {
                 //Log.Debug("添加搜索结果" + searchViewItem.OnlyKey);
@@ -582,29 +590,32 @@ public partial class SearchWindowViewModel : ObservableRecipient
                         };
                         Items.Add(searchViewItem);
 
-
-                        var item = new SearchViewItem()
-                        {
-                            ItemDisplayName = "执行命令:" + value,
-                            FileType = FileType.命令,
-                            OnlyKey = value,
-                            Icon = null,
-                            IconSymbol = 61039,
-                            IsVisible = true
-                        };
-                        Items.Add(item);
+                       
+                        
+                       
                     }
                 }
             }
-
-            var strings = Search.Split(" ");
-            if (strings.Length > 1)
+            
+            var first = value.Split(" ").First();
+            foreach (var se in knownCommand)
             {
-                for (var index = 1; index < strings.Length; index++)
+                if (se.Equals(first))
                 {
-                    ReSearch(strings[index]);
+                    var item = new SearchViewItem()
+                    {
+                        ItemDisplayName = "执行命令:" + value,
+                        FileType = FileType.命令,
+                        OnlyKey = value,
+                        Icon = null,
+                        IconSymbol = 61039,
+                        IsVisible = true
+                    };
+                    Items.Insert(0,item);
                 }
             }
+              
+            
         });
     }
 

@@ -19,6 +19,7 @@
                      ShowInTaskbar="False"
                      ExtendClientAreaToDecorationsHint="True"
                      Width="800"
+                    
                      SizeToContent="Height"
                      ExtendClientAreaChromeHints="SystemChrome"
                      SystemDecorations="BorderOnly"
@@ -56,7 +57,7 @@
                               IsOpen="{Binding EverythingIsOk, Converter={StaticResource ReverseBool}}"
                               IsVisible="{Binding EverythingIsOk}"
                               IsClosable="False" />
-            <ListBox Name="dataGrid" MaxHeight="415"
+            <ListBox Name="dataGrid" MaxHeight="427"
                      ItemsSource="{Binding Items,Mode=OneWay }"
                      KeyDown="DataGrid_OnKeyDown"
                      PointerMoved="DataGrid_OnPointerMoved"
