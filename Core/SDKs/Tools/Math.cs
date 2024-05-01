@@ -31,7 +31,7 @@ public static class Math
             var match = Regex.Match(expression, @"(-?\d+(\.\d+)?)\^(-?\d+(\.\d+)?)");
             // 获取操作数和运算符
             var left = decimal.Parse(match.Groups[1].Value);
-            var right = decimal.Parse(match.Groups[4].Value);
+            var right = decimal.Parse(match.Groups[3].Value);
             // 计算幂运算结果
             var subResult = (decimal)System.Math.Pow((double)left, (double)right);
             // 用幂运算结果替换原来的子表达式

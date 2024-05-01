@@ -416,21 +416,9 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     });
                 }
             }
-            foreach (var searchResultse in filtered)
-            {
-                if (searchResultse.Source is null)
-                {
-                    
-                }
-            }
+            
             var sorted = filtered.OrderByDescending(x => x.Weight).ToList();
-            foreach (var searchResultse in sorted)
-            {
-                if (searchResultse.Source is null)
-                {
-                    
-                }
-            }
+           
             #endregion
 
 
