@@ -47,6 +47,7 @@
                                 <DockPanel Margin="15,0,0,0">
                                     <TextBlock VerticalAlignment="Center" Text="{ReflectionBinding}" />
                                     <Button Name="Button" Width="24" Height="24" 
+                                            ToolTip.Tip="删除"
                                             HorizontalAlignment="Right" 
                                             Command="{Binding $parent[controls:ListShow].DelCommand}"
                                             CommandParameter="{ReflectionBinding}"

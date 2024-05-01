@@ -27,8 +27,11 @@ namespace KitopiaAvalonia.Pages;
 
 public partial class SettingPage : UserControl
 {
-    private CompositeDisposable disposables = new CompositeDisposable();
     private ConfigBase? _configBase;
+    private CompositeDisposable disposables = new CompositeDisposable();
+
+    private StackPanel nowControl;
+
     public SettingPage()
     {
         InitializeComponent();
@@ -42,13 +45,13 @@ public partial class SettingPage : UserControl
         StackPanel.Children.Clear();
         LoadConfig();
     }
+
     ~SettingPage()
     {
         disposables.Dispose();
         
     }
 
-    private StackPanel nowControl;
     protected override void OnUnloaded(RoutedEventArgs e)
     {
         base.OnUnloaded(e);
@@ -57,7 +60,7 @@ public partial class SettingPage : UserControl
         nowControl = null;
         StackPanel.Children.Clear();
     }
-    
+
 
     private void LoadConfig()
     {
@@ -116,6 +119,7 @@ public partial class SettingPage : UserControl
                                 Value = (double)selectedValue,
                                 Maximum = configField.MaxValue,
                                 Minimum = configField.MinValue,
+                                SimpleNumberFormat = "F0"
                             };
                             
                             disposables.Add(
@@ -196,6 +200,25 @@ public partial class SettingPage : UserControl
                         }
                             
                         case ConfigFieldType.浮点数:
+                            var textBox1= new NumberBox()
+                            {
+                                
+                                Value = (double)selectedValue,
+                                Maximum = configField.MaxValue,
+                                Minimum = configField.MinValue,
+                                SimpleNumberFormat = "F2"
+                            };
+                            
+                            disposables.Add(
+                                textBox1.GetObservable(NumberBox.ValueProperty).Subscribe( (d) =>
+                                {
+                                    _configBase.OnConfigChanged(this,fieldInfo.Name,d);
+                                    fieldInfo.SetValue(_configBase, d);
+                                    ConfigManger.Save(_configBase.Name);
+                                
+                                }));
+                            
+                            SettingsExpander.Footer = textBox1;
                             break;
                         case ConfigFieldType.布尔:
                         {
@@ -314,10 +337,12 @@ public partial class SettingPage : UserControl
 public class AnonymousDisposable : IDisposable
 {
     private readonly Action _onDispose;
+
     public AnonymousDisposable(Action onDispose)
     {
         _onDispose = onDispose;
     }
+
     public void Dispose()
     {
         _onDispose.Invoke();
