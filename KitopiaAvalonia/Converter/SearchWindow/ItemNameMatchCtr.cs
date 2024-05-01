@@ -23,19 +23,19 @@ public class ItemNameMatchCtr : IValueConverter
             return new InlineCollection();
         }
         InlineCollection list = new();
-        if (str.CharMatchResults.Length !=str.SplitWords.Length|| str.CharMatchResults.Length==0)
+        if (str.PinyinItem ==null||str.PinyinItem.CharMatchResults.Length-str.PinyinItem.ZhongWenCount !=str.PinyinItem.SplitWords.Length|| str.PinyinItem.CharMatchResults.Length==0)
         {
             list.Add(new Run(str.ItemDisplayName));
             return list;
         }
         
         
-        for (int i = 0; i < str.SplitWords.Length; i++)
+        for (int i = 0; i < str.PinyinItem.SplitWords.Length; i++)
         {
             
-            list.Add(new Run(str.SplitWords[i].ToString())
+            list.Add(new Run(str.PinyinItem.SplitWords[i].ToString())
             {
-                Foreground = str.CharMatchResults[i] ? Brushes.OrangeRed : Brushes.Black,
+                Foreground = str.PinyinItem.CharMatchResults[i+str.PinyinItem.ZhongWenCount] ? Brushes.OrangeRed : Brushes.Black,
             });
             
             

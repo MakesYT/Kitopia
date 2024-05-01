@@ -9,6 +9,7 @@ using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
 using Core.ViewModel;
 using log4net;
+using Pinyin.NET;
 using PluginCore;
 using PluginCore.Config;
 
@@ -162,7 +163,7 @@ public static class CustomScenarioManger
             var onlyKey = $"{nameof(CustomScenario)}:{scenario.UUID}";
             if (scenario.Keys.Any())
             {
-                var keys = new List<IEnumerable<string>>();
+                var keys = new List<List<string>>();
                 foreach (var key in scenario.Keys)
                 {
                     keys.Add([key]);
@@ -172,7 +173,10 @@ public static class CustomScenarioManger
                     ItemDisplayName = "执行自定义情景:" + scenario.Name,
                     FileType = FileType.自定义情景,
                     OnlyKey = onlyKey,
-                    Keys = keys.AsReadOnly(),
+                    PinyinItem = new PinyinItem()
+                    {
+                        Keys = keys
+                    },
                     Icon = null,
                     IconSymbol = 0xF78B,
                     IsVisible = true

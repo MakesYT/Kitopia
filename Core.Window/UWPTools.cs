@@ -89,7 +89,7 @@ internal static class UwpTools
         }
 
        
-        var nameSolver = Window.AppTools.NameSolver(fileName);
+        
         var xmlDocument = new XmlDocument();
         if (File.Exists($"{appContainer.workingDirectory}{Path.DirectorySeparatorChar}AppxManifest.xml"))
         {
@@ -164,8 +164,7 @@ internal static class UwpTools
                 ItemDisplayName = fileName,
                 OnlyKey = $"{appContainer.appContainerName}!{id}",
                 FileType = FileType.UWP应用,
-                Keys = nameSolver.Item2,
-                SplitWords = nameSolver.Item1.ToArray(),
+                PinyinItem =  Window.AppTools.NameSolver(fileName),
                 IconPath = pa,
                 IsVisible = true
             };
@@ -186,8 +185,7 @@ internal static class UwpTools
                         ItemDisplayName = fileName,
                         OnlyKey = $"{appContainer.appContainerName}!{id}",
                         FileType = FileType.UWP应用,
-                        Keys = nameSolver.Item2,
-                        SplitWords = nameSolver.Item1.ToArray(),
+                        PinyinItem =  Window.AppTools.NameSolver(fileName),
                         IconPath = enumerateFile.FullName,
                         IsVisible = true
                     };

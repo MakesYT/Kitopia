@@ -262,7 +262,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
         foreach (var searchViewItem in Items)
         {
-            searchViewItem.CharMatchResults = [];
+            searchViewItem.PinyinItem.CharMatchResults = [];
         }
     }
 
@@ -272,8 +272,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
         if (_pinyinSearcher is null)
         {
             _pinyinSearcher = new PinyinSearcher<SearchViewItem>(source: _collection,
-                nameof(SearchViewItem.Keys),
-                nameof(SearchViewItem.CharMatchResults),true);
+                nameof(SearchViewItem.PinyinItem), true);
         }
         //Log.Debug("搜索");
         _searchDelayAction.Debounce(ConfigManger.Config.inputSmoothingMilliseconds, _scheduler, () =>
@@ -417,8 +416,21 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     });
                 }
             }
+            foreach (var searchResultse in filtered)
+            {
+                if (searchResultse.Source is null)
+                {
+                    
+                }
+            }
             var sorted = filtered.OrderByDescending(x => x.Weight).ToList();
-
+            foreach (var searchResultse in sorted)
+            {
+                if (searchResultse.Source is null)
+                {
+                    
+                }
+            }
             #endregion
 
 
@@ -624,7 +636,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
         for (var index = Items.Count - 1; index >= 0; index--)
         {
             var searchViewItem = Items[index];
-            if (!searchViewItem.Keys!.Any(e => e.Contains(value)))
+            if (!searchViewItem.PinyinItem.Keys!.Any(e => e.Contains(value)))
             {
                 Items.RemoveAt(index);
             }

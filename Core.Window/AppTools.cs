@@ -408,13 +408,13 @@ public partial class AppTools
                         
                         //collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = fileInfo.Name.Replace(".lnk", ""), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
                         //var localName = $"{localizedName}_{refFileInfo.Name.Replace(".exe", "")}";
-                        var valueTuple = _pinyinProcessor.GetPinyin(localizedName);
+                       
 
-
+                        
                         {
                             collection.TryAdd(fullName, new SearchViewItem
                             {
-                                Keys = valueTuple.Item2, SplitWords = valueTuple.Item1.ToArray(),
+                                PinyinItem = _pinyinProcessor.GetPinyin(localizedName,true),
                                 IsVisible = true, ItemDisplayName = localizedName,
                                 OnlyKey = fullName, IsStared = star, Arguments = arg,
                                 FileType = FileType.应用程序, Icon = null
@@ -465,19 +465,11 @@ public partial class AppTools
                     {
                         return;
                     }
-
-                   
                     
-
-                    //collection.Add(new SearchViewItem { keys = keys, IsVisible = true, fileInfo = refFileInfo, fileName = fileInfo.Name.Replace(".lnk", ""), fileType = FileType.App, icon = GetIconFromFile.GetIcon(refFileInfo.FullName) });
-                    //var localName = $"{localizedName}_{fileInfo.Name.Replace(".url", "")}";
-                    var valueTuple = _pinyinProcessor.GetPinyin(localizedName);
-
-
                     {
                         collection.TryAdd(onlyKey, new SearchViewItem
                         {
-                            Keys = valueTuple.Item2, SplitWords = valueTuple.Item1.ToArray(),
+                            PinyinItem = _pinyinProcessor.GetPinyin(localizedName,true),
                             IsVisible = true, ItemDisplayName = localizedName,
                             OnlyKey = onlyKey, IsStared = star,
                             IconPath = relFile,
@@ -491,15 +483,13 @@ public partial class AppTools
                 default:
                     if (File.Exists(file))
                     {
-                        var valueTuple = _pinyinProcessor.GetPinyin(localizedName);
                         collection.TryAdd(file, new SearchViewItem()
                         {
                             ItemDisplayName = localizedName,
                             FileType = FileType.文件,
 
                             OnlyKey = file,
-                            Keys = valueTuple.Item2,
-                            SplitWords = valueTuple.Item1.ToArray(),
+                            PinyinItem = _pinyinProcessor.GetPinyin(localizedName,true),
                             IsStared = star,
                             IsVisible = true
                         });
@@ -511,15 +501,13 @@ public partial class AppTools
         else
         {
             if (!Directory.Exists(file)) return;
-            var valueTuple = _pinyinProcessor.GetPinyin(file.Split(Path.DirectorySeparatorChar).Last());
             collection.TryAdd(file, new SearchViewItem()
             {
                 ItemDisplayName = file.Split(Path.DirectorySeparatorChar).Last(),
                 FileType = FileType.文件夹,
                 IsStared = star,
                 OnlyKey = file,
-                Keys = valueTuple.Item2,
-                SplitWords = valueTuple.Item1.ToArray(),
+                PinyinItem = _pinyinProcessor.GetPinyin(file.Split(Path.DirectorySeparatorChar).Last(),true),
                 Icon = null,
                 IsVisible = true
             });
@@ -530,10 +518,10 @@ public partial class AppTools
     private static partial Regex ChineseRegex();
 
     // 使用const或readonly修饰符来声明pattern字符串
-    internal static (IEnumerable<string>,IEnumerable<IEnumerable<string>>) NameSolver( string name)
+    internal static PinyinItem NameSolver( string name)
     {
         
-        return  (_pinyinProcessor.GetPinyin(name));
+        return  (_pinyinProcessor.GetPinyin(name,true));
        
     }
 
