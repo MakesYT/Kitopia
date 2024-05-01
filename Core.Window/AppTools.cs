@@ -322,6 +322,8 @@ public partial class AppTools
                     ((Shell32.IShellLinkW)link).GetPath(sb, sb.Capacity, out data, 0);
                     var argSb = new StringBuilder(260);
                     link.GetArguments(argSb, argSb.Capacity);
+                    var workingDirectorySb = new StringBuilder(260);
+                    link.GetWorkingDirectory(workingDirectorySb, workingDirectorySb.Capacity);
                     var arg = argSb.Length > 0 ? argSb.ToString() : null;
                     if (arg != null && arg.Contains('%'))
                     {
@@ -417,7 +419,8 @@ public partial class AppTools
                                 PinyinItem = _pinyinProcessor.GetPinyin(localizedName,true),
                                 IsVisible = true, ItemDisplayName = localizedName,
                                 OnlyKey = fullName, IsStared = star, Arguments = arg,
-                                FileType = FileType.应用程序, Icon = null
+                                FileType = FileType.应用程序, Icon = null,
+                                StartDirectory = workingDirectorySb.ToString()
                             });
                         }
 

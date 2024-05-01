@@ -28,7 +28,7 @@ public class SearchItemTool : ISearchItemTool
                 try
                 {
                     var bitmap = ((IClipboardService)ServiceManager.Services!.GetService(typeof(IClipboardService))!)
-                        .GetImage();
+                       .GetImage();
                     var ts = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0);
                     var timeStamp = Convert.ToInt64(ts.TotalMilliseconds);
                     var f = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads\\Kitopia" +
@@ -43,7 +43,7 @@ public class SearchItemTool : ISearchItemTool
                 {
                     Log.Error("剪贴板图片保存失败");
                     ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!)
-                        .Show("剪贴板", "剪贴板图片保存失败");
+                       .Show("剪贴板", "剪贴板图片保存失败");
                     return;
                 }
 
@@ -61,11 +61,11 @@ public class SearchItemTool : ISearchItemTool
                         break;
                     case FileType.自定义情景:
                         CustomScenarioManger.CustomScenarios
-                            .FirstOrDefault((e) => $"CustomScenario:{e.UUID}" == searchViewItem.OnlyKey)?.Run();
+                                            .FirstOrDefault((e) => $"CustomScenario:{e.UUID}" == searchViewItem.OnlyKey)?.Run();
                         break;
                     case FileType.便签:
                         ((ILabelWindowService)ServiceManager.Services.GetService(typeof(ILabelWindowService))!)
-                            .Show(searchViewItem.OnlyKey);
+                           .Show(searchViewItem.OnlyKey);
                         break;
                     case FileType.自定义:
                         searchViewItem.Action?.Invoke(searchViewItem);
@@ -109,17 +109,10 @@ public class SearchItemTool : ISearchItemTool
                         break;
                     }
                     default:
-                        if (searchViewItem.Arguments == null)
-                        {
-                            Shell32.ShellExecute(IntPtr.Zero, "open", "explorer.exe", searchViewItem.OnlyKey, searchViewItem.OnlyKey.Remove(searchViewItem.OnlyKey.LastIndexOf('\\')),
-                                ShowWindowCommand.SW_NORMAL);
-                        }
-                        else
-                        {
-                            Shell32.ShellExecute(IntPtr.Zero, "open", "explorer.exe",
-                                $"{searchViewItem.OnlyKey} {searchViewItem.Arguments}", searchViewItem.OnlyKey.Remove(searchViewItem.OnlyKey.LastIndexOf('\\')),
-                                ShowWindowCommand.SW_SHOWNORMAL);
-                        }
+                      
+                        Shell32.ShellExecute(IntPtr.Zero, "open", searchViewItem.OnlyKey, searchViewItem.Arguments, searchViewItem.StartDirectory,
+                            ShowWindowCommand.SW_NORMAL);
+                        Log.Debug($"打开指定内容{searchViewItem.OnlyKey}_{searchViewItem.Arguments}_{searchViewItem.StartDirectory}");
 
                         break;
                 }
@@ -365,7 +358,7 @@ public class SearchItemTool : ISearchItemTool
     public void OpenSearchItemByOnlyKey(string onlyKey)
     {
         if (((SearchWindowViewModel)ServiceManager.Services!.GetService(typeof(SearchWindowViewModel))!)._collection
-            .TryGetValue(onlyKey, out var item))
+           .TryGetValue(onlyKey, out var item))
         {
             OpenFile(item);
         }
