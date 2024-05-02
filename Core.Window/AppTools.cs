@@ -133,6 +133,7 @@ public partial class AppTools
                 case FileType.PDF文档:
                 case FileType.PPT文档:
                 {
+                    
                     if (!File.Exists(searchViewItem.OnlyKey))
                     {
                         toRemove.Add(key);

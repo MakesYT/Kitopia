@@ -31,7 +31,7 @@ public class Tools
     public static void amd32(List<string> Items)
     {
         Everything32.Everything_Reset();
-        Everything32.Everything_SetSearchW("*.docx|*.doc|*.xls|*.xlsx|*.pdf|*.ppt|*.pptx");
+        Everything32.Everything_SetSearchW(String.Join("|",ConfigManger.Config!.everythingSearchExtensions));
         Everything32.Everything_SetMatchCase(true);
         Everything32.Everything_QueryW(true);
         const int bufsize = 260;
@@ -48,7 +48,7 @@ public class Tools
     public static void amd64(List<string> Items)
     {
         Everything64.Everything_Reset();
-        Everything64.Everything_SetSearchW("*.docx|*.doc|*.xls|*.xlsx|*.pdf|*.ppt|*.pptx");
+        Everything64.Everything_SetSearchW(String.Join("|",ConfigManger.Config!.everythingSearchExtensions));
         Everything64.Everything_SetMatchCase(true);
         Everything64.Everything_QueryW(true);
         const int bufsize = 260;

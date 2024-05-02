@@ -23,7 +23,7 @@ public class ItemNameMatchCtr : IValueConverter
             return new InlineCollection();
         }
         InlineCollection list = new();
-        if (str.PinyinItem ==null||str.PinyinItem.CharMatchResults.Length-str.PinyinItem.ZhongWenCount !=str.PinyinItem.SplitWords.Length|| str.PinyinItem.CharMatchResults.Length==0)
+        if (str.PinyinItem ==null||str.PinyinItem.CharMatchResults ==null||str.PinyinItem.CharMatchResults.Length-str.PinyinItem.ZhongWenCount !=str.PinyinItem.SplitWords.Length|| str.PinyinItem.CharMatchResults.Length==0)
         {
             list.Add(new Run(str.ItemDisplayName));
             return list;

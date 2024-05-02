@@ -26,7 +26,7 @@ using Core.ViewModel.Pages;
 using Core.ViewModel.Pages.customScenario;
 using Core.ViewModel.Pages.plugin;
 using Core.ViewModel.TaskEditor;
-
+using HotAvalonia;
 using Kitopia.Services;
 using KitopiaAvalonia.Pages;
 using KitopiaAvalonia.Services;
@@ -45,6 +45,7 @@ public partial class App : Application
 
     public override void Initialize()
     {
+        //this.EnableHotReload();
         AvaloniaXamlLoader.Load(this);
     }
 
@@ -129,9 +130,4 @@ public partial class App : Application
 
         return services.BuildServiceProvider();
     }
-
-    
-
-
-   
 }

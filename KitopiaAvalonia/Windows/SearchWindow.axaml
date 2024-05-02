@@ -19,7 +19,7 @@
                      ShowInTaskbar="False"
                      ExtendClientAreaToDecorationsHint="True"
                      Width="800"
-                    
+                     CanResize="False"
                      SizeToContent="Height"
                      ExtendClientAreaChromeHints="SystemChrome"
                      SystemDecorations="BorderOnly"
@@ -63,18 +63,18 @@
                      PointerMoved="DataGrid_OnPointerMoved"
                      Margin="0,0,0,0">
                 <ListBox.Resources>
-                    <SolidColorBrush x:Key="Brush" Color="DimGray" Opacity="0.1" />
+                    <SolidColorBrush x:Key="Brush" Color="DimGray" Opacity="0.15" />
                 </ListBox.Resources>
                 <ListBox.Styles>
-                    <Style Selector="ListBoxItem:selected > Button#Item">
-                        <Setter Property="BorderBrush" Value="DimGray" />
+                    <Style Selector="ListBoxItem:selected > Button#Item /template/ ContentPresenter#PART_ContentPresenter">
+                        <Setter Property="Background" Value="{StaticResource Brush}" />
                     </Style>
 
                     <Style Selector="ListBoxItem">
-                       
+
                         <Setter Property="Template">
-                             <ControlTemplate x:DataType="pluginCore:SearchViewItem">
-                                
+                            <ControlTemplate x:DataType="pluginCore:SearchViewItem">
+
                                 <Button ToolTip.Tip="{Binding Path=. ,Converter={StaticResource SearchItemToInfo}}"
                                         IsTabStop="True"
                                         Name="Item"
@@ -82,8 +82,7 @@
                                         CommandParameter="{Binding .}"
                                         Background="Transparent">
                                     <Button.Styles>
-                                        <Style Selector="Button#Item:pointerover /template/ controls|FABorder#Root">
-                                            <Setter Property="BorderBrush" Value="DimGray" />
+                                        <Style Selector="Button#Item:pointerover /template/ ContentPresenter#PART_ContentPresenter">
                                             <Setter Property="Background" Value="{StaticResource Brush}" />
 
                                         </Style>
@@ -128,11 +127,11 @@
                                         <StackPanel Grid.Column="2" Margin="5" VerticalAlignment="Top">
                                             <TextBlock VerticalAlignment="Center" Margin="0" Focusable="False"
                                                        FontFamily="HarmonyOS Sans"
-                                                        Inlines="{Binding Path=., 
+                                                       Inlines="{Binding Path=., 
                                                                     Converter={StaticResource ItemNameMatchCtr},
                                                                     ConverterParameter={ReflectionBinding #Item}}">
-                                                       Background="{x:Null}"
-                                                       FontWeight="Normal" FontSize="18">
+                                                Background="{x:Null}"
+                                                FontWeight="Normal" FontSize="18">
                                                 <Run />
                                             </TextBlock>
                                             <TextBlock VerticalAlignment="Top" Margin="0"
@@ -185,7 +184,7 @@
                                         </StackPanel>
                                     </Grid>
                                 </Button>
-                            
+
                             </ControlTemplate>
                         </Setter>
                     </Style>

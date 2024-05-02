@@ -225,11 +225,11 @@ internal class IconTools
 
         await Task.Run(() =>
         {
-            retry:
+            
             var iconBase = GetIconBase(path, cacheKey);
             if (iconBase == null)
             {
-                goto retry;
+                return;
             }
 
             var clone = ((Bitmap)iconBase.ToBitmap()).ToAvaloniaBitmap();

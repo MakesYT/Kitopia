@@ -20,16 +20,59 @@ public class ListShow : ListBox
 
     //DelCommand
     public static readonly StyledProperty<ICommand> DelCommandProperty = AvaloniaProperty.Register<ListShow, ICommand>(nameof(DelCommand));
+    public static readonly StyledProperty<bool> WithAddProperty = AvaloniaProperty.Register<ListShow, bool>(nameof(WithAdd),false);
+    public static readonly StyledProperty<ICommand> AddCommandProperty = AvaloniaProperty.Register<ListShow, ICommand>(nameof(AddCommand));
+
+    public static readonly StyledProperty<string> TextValueProperty = AvaloniaProperty.Register<ListShow, string>(nameof(TextValue));
+
+    //设置默认DelCommand
+    public ListShow()
+    {
+        SetValue(DelCommandProperty, new RelayCommand<string>(OnDel));
+        SetValue(AddCommandProperty, new RelayCommand<string>(OnAdd));
+    }
+
     public ICommand DelCommand
     {
         get => GetValue(DelCommandProperty);
         set => SetValue(DelCommandProperty, value);
     }
-    //设置默认DelCommand
-    public ListShow()
+
+    public bool WithAdd
     {
-        SetValue(DelCommandProperty, new RelayCommand<string>(OnDel));
+        get => GetValue(WithAddProperty);
+        set => SetValue(WithAddProperty, value);
     }
+
+    public ICommand AddCommand
+    {
+        get => GetValue(AddCommandProperty);
+        set => SetValue(AddCommandProperty, value);
+    }
+
+    public string TextValue
+    {
+        get => GetValue(TextValueProperty);
+        set => SetValue(TextValueProperty, value);
+    }
+
+    //AddCommand执行方法
+    private void OnAdd(string? obj)
+    {
+        if (string.IsNullOrWhiteSpace(obj))
+        {
+            return;
+        }
+
+        if (ItemsSource is IList list)
+        {
+            list.Add(obj);
+            TextValue = "";
+        }
+        
+           
+    }
+
     //DelCommand执行方法
     private void OnDel(string? obj)
     {
@@ -46,5 +89,4 @@ public class ListShow : ListBox
         
            
     }
-    
 }

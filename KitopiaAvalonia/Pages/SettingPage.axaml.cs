@@ -304,16 +304,32 @@ public partial class SettingPage : UserControl
                                     }));
                             }
                             listShow.ItemsSource= enumerable;
-                            
-                                
-                                
-                            
-                            /*listShowItemsSource.WhenChanged((d) =>
+                            SettingsExpander.ItemsSource=new[] { listShow };
+                            break;
+                        }
+                        case ConfigFieldType.字符串列表支持添加:
+                        {
+                            var listShow = new ListShow();
+                            listShow.WithAdd = true;
+                            SettingsExpander.Bind(Expander.WidthProperty, new Binding("Bounds.Width")
+                            {
+                                RelativeSource = new RelativeSource(RelativeSourceMode.FindAncestor)
                                 {
-                                    _configBase.OnConfigChanged(fieldInfo.Name,d);
-                                    ConfigManger.Save(_configBase.Name);
-                                })*/
-                                
+                                    AncestorType = typeof(SettingsExpander)
+                                },
+                                Mode = BindingMode.OneWay,
+                            });
+                            var enumerable = (IEnumerable?)selectedValue;
+                            if (enumerable is ObservableCollection<string> observableCollection)
+                            {
+                                observableCollection.CollectionChanged += ObservableCollectionChange;
+                                disposables.Add(
+                                    new AnonymousDisposable(() =>
+                                    {
+                                        observableCollection.CollectionChanged -= ObservableCollectionChange;
+                                    }));
+                            }
+                            listShow.ItemsSource= enumerable;
                             SettingsExpander.ItemsSource=new[] { listShow };
                             break;
                         }

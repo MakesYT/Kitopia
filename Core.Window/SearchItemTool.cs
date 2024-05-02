@@ -165,8 +165,8 @@ public class SearchItemTool : ISearchItemTool
         {
             WeakReferenceMessenger.Default.Send("a", "SearchWindowClose");
             var item = (SearchViewItem)searchViewItem;
-            Log.Debug("打开指定内容文件夹" + item.OnlyKey);
-            Shell32.ShellExecute(IntPtr.Zero, "open", "explorer.exe", "/select," + item.OnlyKey, "",
+            Log.Debug($"打开指定内容文件夹{item.OnlyKey}_{item.StartDirectory}");
+            Shell32.ShellExecute(IntPtr.Zero, "open", "explorer.exe", "/select," + item.OnlyKey, item.StartDirectory,
                 ShowWindowCommand.SW_SHOW);
 
             switch (item.FileType)
