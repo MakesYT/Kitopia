@@ -1,12 +1,11 @@
 ﻿#region
 
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
-using Avalonia.Collections;
-using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.CustomType;
@@ -17,7 +16,6 @@ using Core.SDKs.Tools;
 using log4net;
 using PluginCore;
 using PluginCore.Attribute;
-
 
 #endregion
 
@@ -49,7 +47,7 @@ public partial class CustomScenario : ObservableRecipient
 
     [JsonIgnore] [ObservableProperty] private bool hasInit = true;
     [JsonIgnore] [ObservableProperty] private string? initError;
-    [JsonIgnore] [ObservableProperty] private object? inputValue = null;
+    [JsonIgnore] [ObservableProperty] private ObservableDictionary<string, object> inputValue = new();
 
     private bool InTick;
 
@@ -61,7 +59,7 @@ public partial class CustomScenario : ObservableRecipient
     [JsonIgnore] [ObservableProperty] private double? tickIntervalSecond = 5;
 
     [JsonIgnore] [ObservableProperty] private ObservableDictionary<string, object> values = new();
-    
+
     //ActiveHotKey
     [JsonIgnore] [ObservableProperty] public HotKeyModel runHotKey = new()
     {
@@ -69,6 +67,7 @@ public partial class CustomScenario : ObservableRecipient
         IsSelectWin = false,
         IsSelectShift = false, SelectKey = EKey.未设置,
     };
+
     [JsonIgnore] [ObservableProperty] public HotKeyModel stopHotKey = new()
     {
         MainName = "Kitopia情景", Name = "情景", IsUsable = false, IsSelectCtrl = false, IsSelectAlt = false,
@@ -79,45 +78,65 @@ public partial class CustomScenario : ObservableRecipient
     public CustomScenario()
     {
         PropertyChanged += PropertyChangedEventHandler();
-        
+
         runHotKey.Name = $"{UUID}_激活快捷键";
         stopHotKey.Name = $"{UUID}_停止快捷键";
+
+
+        InputValue.CollectionChanged += OnInputValueOnCollectionChanged;
     }
-     ~CustomScenario()
+
+    ~CustomScenario()
     {
         PropertyChanged -= PropertyChangedEventHandler();
+        InputValue.CollectionChanged -= OnInputValueOnCollectionChanged;
+    }
+
+    void OnInputValueOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs args)
+    {
+        var outputs = nodes.First()
+                           .Output;
+        for (var i = outputs.Count - 1; i >= 1; i--)
+        {
+            outputs.RemoveAt(i);
+        }
+
+        if (sender is ObservableDictionary<string, object> dictionary)
+        {
+            foreach (var (key, value) in dictionary)
+            {
+                outputs.Add(new()
+                {
+                    IsOut = true,
+                    Source = nodes.First(),
+                    Type = value.GetType(),
+                    TypeName = BaseNodeMethodsGen.GetI18N(value.GetType()
+                                                               .FullName),
+                    Title = key
+                });
+            }
+        }
     }
 
     private PropertyChangedEventHandler? PropertyChangedEventHandler()
     {
-        return (e, s) =>
-        {
-            if (s.PropertyName==nameof(IsRunning))
+        return (e, s) => {
+            if (s.PropertyName == nameof(IsRunning))
             {
                 return;
             }
+
             WeakReferenceMessenger.Default.Send(new CustomScenarioChangeMsg()
                 { Type = 1, Name = nameof(e), CustomScenario = this });
         };
     }
 
-    public string UUID
-    {
-        get;
-        set;
-    } = Guid.NewGuid().ToString();
+    public string UUID { get; set; } = Guid.NewGuid()
+                                           .ToString();
 
-    public ObservableCollection<PointItem> nodes
-    {
-        get;
-        set;
-    } = new();
+    public ObservableCollection<PointItem> nodes { get; set; } = new();
 
-    public ObservableCollection<ConnectionItem> connections
-    {
-        get;
-        set;
-    } = new();
+    public ObservableCollection<ConnectionItem> connections { get; set; } = new();
 
     public void Dispose()
     {
@@ -138,12 +157,20 @@ public partial class CustomScenario : ObservableRecipient
     }
 
 
-    public void Run(bool realTime = false, bool onExit = false)
+    public void Run(bool realTime = false, bool onExit = false, params object[] inputValues)
     {
-        StartRun(!realTime, onExit);
+        if (IsHaveInputValue)
+        {
+            if (inputValues.Length != InputValue.Count)
+            {
+                return;
+            }
+        }
+
+        StartRun(!realTime, onExit, inputValues);
     }
 
-    private void StartRun(bool notRealTime, bool onExit = false)
+    private void StartRun(bool notRealTime, bool onExit = false, params object[] inputValues)
     {
         if (IsRunning || !HasInit)
         {
@@ -195,9 +222,11 @@ public partial class CustomScenario : ObservableRecipient
 
         for (var i = nodes.Count - 1; i >= 1; i--)
         {
-            var toRemove = nodes[i].Input.All(connectorItem => !connectorItem.IsConnected);
+            var toRemove = nodes[i]
+                          .Input.All(connectorItem => !connectorItem.IsConnected);
 
-            if (nodes[i].Output.Any(connectorItem => connectorItem.IsConnected))
+            if (nodes[i]
+               .Output.Any(connectorItem => connectorItem.IsConnected))
             {
                 toRemove = false;
             }
@@ -210,7 +239,8 @@ public partial class CustomScenario : ObservableRecipient
 
         _initTasks.Add(nodes[0], null);
         nodes[0].Status = s节点状态.已验证;
-        var connectionItem = connections.FirstOrDefault((e) => e.Source == nodes[0].Output[0]);
+        var connectionItem = connections.FirstOrDefault((e) => e.Source == nodes[0]
+           .Output[0]);
         if (connectionItem == null)
         {
             if (notRealTime)
@@ -237,8 +267,7 @@ public partial class CustomScenario : ObservableRecipient
         //监听任务是否结束
         if (notRealTime)
         {
-            new Task(() =>
-            {
+            new Task(() => {
                 while (true)
                 {
                     Thread.Sleep(100);
@@ -269,7 +298,8 @@ public partial class CustomScenario : ObservableRecipient
                         return;
                     }
 
-                    var connectionItem = connections.FirstOrDefault((e) => e.Source == nodes[1].Output[0]);
+                    var connectionItem = connections.FirstOrDefault((e) => e.Source == nodes[1]
+                       .Output[0]);
                     if (connectionItem == null || onExit)
                     {
                         //当没有tick时直接结束
@@ -311,7 +341,8 @@ public partial class CustomScenario : ObservableRecipient
             return;
         }
 
-        var connectionItem = connections.FirstOrDefault((e) => e.Source == nodes[1].Output[0]);
+        var connectionItem = connections.FirstOrDefault((e) => e.Source == nodes[1]
+           .Output[0]);
         var firstNodes = connectionItem.Target.Source;
         nodes[1].Status = s节点状态.已验证;
         _tickTasks.Add(nodes[0], null);
@@ -457,8 +488,7 @@ public partial class CustomScenario : ObservableRecipient
                     }
                     else
                     {
-                        var task = new Thread(() =>
-                        {
+                        var task = new Thread(() => {
                             ParsePointItem(threads, sourceSource, true, notRealTime, cancellationToken);
                         });
 
@@ -559,7 +589,8 @@ public partial class CustomScenario : ObservableRecipient
                                     nowPointItem.Input[1].InputObject!.Equals(nowPointItem.Input[2].InputObject);
                             }
 
-                            foreach (var item in nowPointItem.Output[0].GetSourceOrNextConnectorItems(connections))
+                            foreach (var item in nowPointItem.Output[0]
+                                                             .GetSourceOrNextConnectorItems(connections))
                             {
                                 item.InputObject = nowPointItem.Output[0].InputObject;
                                 MakeSourcePointState(item, nowPointItem);
@@ -581,7 +612,8 @@ public partial class CustomScenario : ObservableRecipient
                         {
                             if (Values.ContainsKey(nowPointItem.ValueRef!))
                             {
-                                foreach (var item in nowPointItem.Output[0].GetSourceOrNextConnectorItems(connections))
+                                foreach (var item in nowPointItem.Output[0]
+                                                                 .GetSourceOrNextConnectorItems(connections))
                                 {
                                     item.InputObject = Values[nowPointItem.ValueRef!];
                                     MakeSourcePointState(item, nowPointItem);
@@ -610,7 +642,8 @@ public partial class CustomScenario : ObservableRecipient
                             }
 
                             nowPointItem.Output[0].InputObject = userInputData;
-                            foreach (var item in nowPointItem.Output[0].GetSourceOrNextConnectorItems(connections))
+                            foreach (var item in nowPointItem.Output[0]
+                                                             .GetSourceOrNextConnectorItems(connections))
                             {
                                 item.InputObject = userInputData;
                                 MakeSourcePointState(item, nowPointItem);
@@ -654,7 +687,7 @@ public partial class CustomScenario : ObservableRecipient
                             }
 
                             var instance = parameterInfo.ParameterType.GetConstructor(parameterTypesList.ToArray())
-                                ?.Invoke(parameterList.ToArray());
+                                                       ?.Invoke(parameterList.ToArray());
                             if (instance != null)
                             {
                                 list.Add(instance);
@@ -700,8 +733,12 @@ public partial class CustomScenario : ObservableRecipient
                             {
                                 if (connectorItem.Type == memberInfo.PropertyType)
                                 {
-                                    var value = invoke.GetType().InvokeMember(memberInfo.Name,BindingFlags.Instance| BindingFlags.IgnoreCase| BindingFlags.Public | BindingFlags.NonPublic| BindingFlags.GetProperty, null, invoke, null);
-                                    
+                                    var value = invoke.GetType()
+                                                      .InvokeMember(memberInfo.Name,
+                                                           BindingFlags.Instance | BindingFlags.IgnoreCase |
+                                                           BindingFlags.Public | BindingFlags.NonPublic |
+                                                           BindingFlags.GetProperty, null, invoke, null);
+
                                     connectorItem.InputObject = value;
                                     foreach (var item in connectorItem.GetSourceOrNextConnectorItems(connections))
                                     {
@@ -718,7 +755,8 @@ public partial class CustomScenario : ObservableRecipient
                         if (nowPointItem.Output.Any())
                         {
                             nowPointItem.Output[0].InputObject = invoke;
-                            foreach (var item in nowPointItem.Output[0].GetSourceOrNextConnectorItems(connections))
+                            foreach (var item in nowPointItem.Output[0]
+                                                             .GetSourceOrNextConnectorItems(connections))
                             {
                                 item.InputObject = invoke;
                             }
@@ -746,7 +784,7 @@ public partial class CustomScenario : ObservableRecipient
             foreach (var outputConnector in nowPointItem.Output)
             {
                 foreach (var nextPointItem in outputConnector.GetSourceOrNextPointItems(connections)
-                             .Where(_ => !outputConnector.IsNotUsed))
+                                                             .Where(_ => !outputConnector.IsNotUsed))
                 {
                     lock (threads)
                     {
@@ -755,8 +793,7 @@ public partial class CustomScenario : ObservableRecipient
                             return;
                         }
 
-                        var task = new Thread(() =>
-                        {
+                        var task = new Thread(() => {
                             ParsePointItem(threads, nextPointItem, false, notRealTime, cancellationToken);
                         });
 

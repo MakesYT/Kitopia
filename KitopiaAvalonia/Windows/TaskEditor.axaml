@@ -125,7 +125,90 @@
                             <controls:FontIconSource FontFamily="{StaticResource FluentFont}"
                                                      Glyph="&#xf226;" />
                         </controls:SettingsExpander.IconSource>
-                        <StackPanel />
+                        <StackPanel>
+                            <ListBox Margin="0,0,10,0" x:Name="inputvalues"
+                                     ItemsSource="{Binding Scenario.InputValue }">
+                                <ListBox.ItemContainerTheme>
+                                    <ControlTheme TargetType="ListBoxItem">
+                                        <Setter Property="Template">
+                                            <ControlTemplate>
+                                                <ContentPresenter Name="PART_ContentPresenter"
+                                                                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                                  Background="{TemplateBinding Background}"
+                                                                  BorderBrush="{TemplateBinding BorderBrush}"
+                                                                  BorderThickness="{TemplateBinding BorderThickness}"
+                                                                  Content="{TemplateBinding Content}"
+                                                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                                  DataContext="{TemplateBinding DataContext}"
+                                                                  CornerRadius="{TemplateBinding CornerRadius}" />
+                                            </ControlTemplate>
+
+                                        </Setter>
+                                    </ControlTheme>
+                                </ListBox.ItemContainerTheme>
+                                <ListBox.ItemTemplate>
+
+                                    <DataTemplate>
+                                        <Button Width="{Binding $parent.Bounds.Width, Mode=OneWay}"
+                                                HorizontalContentAlignment="Stretch">
+                                            <DockPanel Margin="15,0,0,0">
+                                                <TextBlock VerticalAlignment="Center" Text="{ReflectionBinding Key}" />
+                                                <Button Name="Button" Width="24" Height="24"
+                                                        ToolTip.Tip="删除"
+                                                        HorizontalAlignment="Right"
+                                                        Command="{Binding $parent[StackPanel].((taskEditor1:TaskEditorViewModel)DataContext).DelInputValueCommand}"
+                                                        CommandParameter="{ReflectionBinding Key}"
+                                                        VerticalContentAlignment="Center"
+                                                        HorizontalContentAlignment="Center">
+                                                    <controls:FontIcon VerticalAlignment="Center"
+                                                                       HorizontalAlignment="Center"
+                                                                       Margin="0,2,0,0"
+                                                                       Width="24"
+                                                                       Height="24"
+                                                                       FontFamily="{StaticResource FluentFont}"
+                                                                       Glyph="&#xf36a;"
+                                                                       FontSize="24" />
+                                                    <Button.Styles>
+
+                                                        <Style
+                                                            Selector="Button#Button:pointerover /template/ controls|FABorder#Root">
+
+                                                            <Setter Property="Background">
+                                                                <SolidColorBrush
+                                                                    Color="{DynamicResource TextFillColorSecondary}"
+                                                                    Opacity="0.2" />
+                                                            </Setter>
+                                                        </Style>
+
+                                                    </Button.Styles>
+                                                </Button>
+                                            </DockPanel>
+                                        </Button>
+
+                                    </DataTemplate>
+
+
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                            <Grid Margin="0,10,10,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="40" />
+                                </Grid.ColumnDefinitions>
+                                <Button Command="{Binding AddInputValueCommand}"
+                                        CommandParameter="{Binding InputValueValue}"
+                                        Grid.Column="1" Height="40" Width="40">
+                                    <controls:FontIcon FontFamily="{StaticResource FluentFont}"
+                                                       Glyph="&#xf107;" />
+                                </Button>
+                                <DockPanel Grid.Column="0" Margin="0,0,0,0" Height="40">
+                                    <TextBox Watermark="变量名称"
+                                             Text="{Binding InputValueValue}" />
+                                </DockPanel>
+                            </Grid>
+                        </StackPanel>
+
 
                     </controls:SettingsExpander>
 
@@ -188,7 +271,8 @@
                                                     <Border.ContextFlyout>
                                                         <MenuFlyout>
                                                             <!-- ReSharper disable once Xaml.RedundantResource -->
-                                                            <MenuItem Header="删除此变量"  Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                                            <MenuItem Header="删除此变量"
+                                                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                                                       Command="{Binding $parent[Border].((taskEditor1:TaskEditorViewModel)DataContext).DelValueCommand}"
                                                                       CommandParameter="{Binding $parent[Border].((sdKs:KeyValuePairBindingTool)DataContext).Key }" />
                                                         </MenuFlyout>
@@ -563,9 +647,10 @@
                                         <controls:SettingsExpander Header="激活快捷键" Description="修改激活快捷键">
                                             <controls:SettingsExpander.Footer>
                                                 <Panel>
-                                                    <controls1:HotKeyShow x:Name="KeyShow" HotKeyModel="{Binding Scenario.RunHotKey}"
+                                                    <controls1:HotKeyShow x:Name="KeyShow"
+                                                                          HotKeyModel="{Binding Scenario.RunHotKey}"
                                                                           IsEnabled="{Binding IsSaveInLocal}">
-                                                        
+
                                                     </controls1:HotKeyShow>
                                                     <Panel Background="{DynamicResource ControlFillColorDisabledBrush}"
                                                            Width="{Binding #KeyShow.Bounds.Width}"
@@ -586,9 +671,10 @@
                                         <controls:SettingsExpander Header="停止快捷键" Description="修改停止快捷键">
                                             <controls:SettingsExpander.Footer>
                                                 <Panel>
-                                                    <controls1:HotKeyShow x:Name="KeyShow1" HotKeyModel="{Binding Scenario.StopHotKey}"
+                                                    <controls1:HotKeyShow x:Name="KeyShow1"
+                                                                          HotKeyModel="{Binding Scenario.StopHotKey}"
                                                                           IsEnabled="{Binding IsSaveInLocal}">
-                                                       
+
                                                     </controls1:HotKeyShow>
                                                     <Panel Background="{DynamicResource ControlFillColorDisabledBrush}"
                                                            Width="{Binding #KeyShow1.Bounds.Width}"
@@ -998,7 +1084,7 @@
                             </controls2:LargeGridLine>
                         </DataTemplate>
                     </controls2:NodifyEditor.GridLineTemplate>
-                    
+
 
                     <controls2:NodifyEditor.ConnectionTemplate>
                         <DataTemplate DataType="{x:Type customScenario:ConnectionItem}">
@@ -1008,7 +1094,8 @@
                                     <controls2:Connection.ContextFlyout>
                                         <MenuFlyout>
                                             <!-- ReSharper disable once Xaml.RedundantResource -->
-                                            <MenuItem Header="删除此连接"  Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                            <MenuItem Header="删除此连接"
+                                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                                       Command="{Binding $parent[Window].((taskEditor1:TaskEditorViewModel)DataContext).DelConnectionCommand}"
                                                       CommandParameter="{Binding }" />
                                         </MenuFlyout>
@@ -1059,11 +1146,13 @@
                                 <controls2:Node.ContextFlyout>
                                     <MenuFlyout>
                                         <!-- ReSharper disable once Xaml.RedundantResource -->
-                                        <MenuItem Header="复制节点"  Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                        <MenuItem Header="复制节点"
+                                                  Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                                   Command="{Binding $parent[Grid].((taskEditor1:TaskEditorViewModel)DataContext).CopyNodeCommand}"
                                                   CommandParameter="{Binding }" />
                                         <!-- ReSharper disable once Xaml.RedundantResource -->
-                                        <MenuItem Header="删除此节点"  Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                        <MenuItem Header="删除此节点"
+                                                  Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                                   Command="{Binding $parent[Grid].((taskEditor1:TaskEditorViewModel)DataContext).DelNodeCommand}"
                                                   CommandParameter="{Binding }" />
 
@@ -1133,7 +1222,7 @@
                                                                     </Setter.Value>
                                                                 </Setter>
                                                             </Style>
-                                                            <Style  Selector="TextBlock.IsNotUsed">
+                                                            <Style Selector="TextBlock.IsNotUsed">
                                                                 <Setter Property="Background">
                                                                     <Setter.Value>
                                                                         <SolidColorBrush
@@ -1328,20 +1417,24 @@
                             Command="{Binding CleanUnusedNodeCommand}">
                         <controls:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xf34c;" />
                     </Button>
-                    <Button FontSize="25" ToolTip.Tip="运行测试" ToolTip.ShowDelay="100"
-                            IsVisible="{Binding Scenario.IsRunning,Converter={StaticResource reverseBoolToVisibilityConverter}}"
-                            Foreground="GreenYellow"
-                            Command="{Binding VerifyNodeCommand}">
-                        <controls:FontIcon Foreground="GreenYellow" FontFamily="{StaticResource FluentFont}"
-                                           Glyph="&#xf605;" />
-                    </Button>
-                    <Button FontSize="25" ToolTip.Tip="停止测试" ToolTip.ShowDelay="100"
-                            IsVisible="{Binding Scenario.IsRunning}"
+                    <ItemsControl Grid.Column="4"
+                                  IsVisible="{Binding Scenario.IsHaveInputValue,Converter={StaticResource reverseBoolToVisibilityConverter}}">
+                        <Button FontSize="25" ToolTip.Tip="运行测试" ToolTip.ShowDelay="100"
+                                IsVisible="{Binding Scenario.IsRunning,Converter={StaticResource reverseBoolToVisibilityConverter}}"
+                                Foreground="GreenYellow"
+                                Command="{Binding VerifyNodeCommand}">
+                            <controls:FontIcon Foreground="GreenYellow" FontFamily="{StaticResource FluentFont}"
+                                               Glyph="&#xf605;" />
+                        </Button>
+                        <Button FontSize="25" ToolTip.Tip="停止测试" ToolTip.ShowDelay="100"
+                                IsVisible="{Binding Scenario.IsRunning}"
 
-                            Command="{Binding StopCustomScenarioCommand}">
-                        <controls:FontIcon Foreground="OrangeRed" FontFamily="{StaticResource FluentFont}"
-                                           Glyph="&#xf72a;" />
-                    </Button>
+                                Command="{Binding StopCustomScenarioCommand}">
+                            <controls:FontIcon Foreground="OrangeRed" FontFamily="{StaticResource FluentFont}"
+                                               Glyph="&#xf72a;" />
+                        </Button>
+                    </ItemsControl>
+
                     <Button FontSize="25" ToolTip.Tip="保存" ToolTip.ShowDelay="100"
                             Command="{Binding SaveCustomScenarioCommand}">
                         <controls:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xf67f;" />

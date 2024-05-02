@@ -73,9 +73,8 @@ public partial class TaskEditorViewModel : ObservableRecipient
             }
         };
         Scenario.nodes.Add(nodify3);
-        
-        WeakReferenceMessenger.Default.Register<string, string>( this,"hotkey", (HotKey, o) =>
-        {
+
+        WeakReferenceMessenger.Default.Register<string, string>(this, "hotkey", (HotKey, o) => {
             if (o == Scenario.runHotKey.SignName)
             {
                 Dispatcher.UIThread.InvokeAsync(() => { IsModified = true; });
@@ -86,13 +85,9 @@ public partial class TaskEditorViewModel : ObservableRecipient
             }
         });
         WeakReferenceMessenger.Default.Register<CustomScenarioChangeMsg>(this,
-            (a, e) => { 
-                
-                Dispatcher.UIThread.Post(() =>
-                {
-                    IsModified = true;
-                });
-           
+            (a, e) => {
+                Dispatcher.UIThread.Post(() => { IsModified = true; });
+
                 //Console.WriteLine(1);
                 if (e.Type == 1)
                 {
@@ -143,7 +138,9 @@ public partial class TaskEditorViewModel : ObservableRecipient
                         {
                             var connectorItem = e.PointItem.Output[^1];
                             var connectionItems = Scenario.connections
-                                .Where(connectionItem => connectionItem.Source == connectorItem).ToList();
+                                                          .Where(connectionItem =>
+                                                               connectionItem.Source == connectorItem)
+                                                          .ToList();
                             foreach (var connectionItem in connectionItems)
                             {
                                 Scenario.connections.Remove(connectionItem);
@@ -173,6 +170,13 @@ public partial class TaskEditorViewModel : ObservableRecipient
                         }
                     }
                 }
+
+                if (e.PointItem.MerthodName == "本地项目")
+                {
+                    if (e.ConnectorItem.InputObject is string inputObject)
+                    {
+                    }
+                }
             });
 
         //nodeMethods.Add("new PointItem(){Title = \"Test\"}");
@@ -180,16 +184,9 @@ public partial class TaskEditorViewModel : ObservableRecipient
 
     public bool IsSaveInLocal => CustomScenarioManger.CustomScenarios.Contains(Scenario);
 
-    public object ContentPresenter
-    {
-        get;
-        set;
-    }
+    public object ContentPresenter { get; set; }
 
-    public PendingConnectionViewModel PendingConnection
-    {
-        get;
-    }
+    public PendingConnectionViewModel PendingConnection { get; }
 
     [RelayCommand]
     private void VerifyNode()
@@ -222,7 +219,8 @@ public partial class TaskEditorViewModel : ObservableRecipient
         if (connector.IsSelf)
         {
             var connectionItems = Scenario.connections
-                .Where(e => e.Source == connector || e.Target == connector).ToList();
+                                          .Where(e => e.Source == connector || e.Target == connector)
+                                          .ToList();
             foreach (var connectionItem in connectionItems)
             {
                 Scenario.connections.Remove(connectionItem);
@@ -277,14 +275,15 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 IsOut = connectorItem.IsOut
             });
             var plugin = PluginManager.EnablePlugin.FirstOrDefault((e) => e.Value._dll == connectorItem.Type.Assembly)
-                .Value;
+                                      .Value;
             if (plugin is not null)
             {
                 Scenario._plugs.AddOrIncrease(plugin.ToPlgString());
             }
 
             var plugin2 = PluginManager.EnablePlugin
-                .FirstOrDefault((e) => e.Value._dll == connectorItem.RealType.Assembly).Value;
+                                       .FirstOrDefault((e) => e.Value._dll == connectorItem.RealType.Assembly)
+                                       .Value;
             if (plugin2 is not null)
             {
                 Scenario._plugs.AddOrIncrease(plugin2.ToPlgString());
@@ -318,14 +317,15 @@ public partial class TaskEditorViewModel : ObservableRecipient
             }
 
             var plugin = PluginManager.EnablePlugin.FirstOrDefault((e) => e.Value._dll == connectorItem.Type.Assembly)
-                .Value;
+                                      .Value;
             if (plugin is not null)
             {
                 Scenario._plugs.AddOrIncrease(plugin.ToPlgString());
             }
 
             var plugin2 = PluginManager.EnablePlugin
-                .FirstOrDefault((e) => e.Value._dll == connectorItem.RealType.Assembly).Value;
+                                       .FirstOrDefault((e) => e.Value._dll == connectorItem.RealType.Assembly)
+                                       .Value;
             if (plugin2 is not null)
             {
                 Scenario._plugs.AddOrIncrease(plugin2.ToPlgString());
@@ -420,7 +420,8 @@ public partial class TaskEditorViewModel : ObservableRecipient
         }
 
         var connectionItems = Scenario.connections
-            .Where(e => e.Source.Source == pointItem || e.Target.Source == pointItem).ToList();
+                                      .Where(e => e.Source.Source == pointItem || e.Target.Source == pointItem)
+                                      .ToList();
         foreach (var connectionItem in connectionItems)
         {
             Scenario.connections.Remove(connectionItem);
@@ -439,14 +440,15 @@ public partial class TaskEditorViewModel : ObservableRecipient
         foreach (var connectorItem in pointItem.Input)
         {
             var plugin = PluginManager.EnablePlugin.FirstOrDefault((e) => e.Value._dll == connectorItem.Type.Assembly)
-                .Value;
+                                      .Value;
             if (plugin is not null)
             {
                 Scenario._plugs.DelOrDecrease(plugin.ToPlgString());
             }
 
             var plugin2 = PluginManager.EnablePlugin
-                .FirstOrDefault((e) => e.Value._dll == connectorItem.RealType.Assembly).Value;
+                                       .FirstOrDefault((e) => e.Value._dll == connectorItem.RealType.Assembly)
+                                       .Value;
             if (plugin2 is not null)
             {
                 Scenario._plugs.DelOrDecrease(plugin2.ToPlgString());
@@ -456,14 +458,15 @@ public partial class TaskEditorViewModel : ObservableRecipient
         foreach (var connectorItem in pointItem.Output)
         {
             var plugin = PluginManager.EnablePlugin.FirstOrDefault((e) => e.Value._dll == connectorItem.Type.Assembly)
-                .Value;
+                                      .Value;
             if (plugin is not null)
             {
                 Scenario._plugs.DelOrDecrease(plugin.ToPlgString());
             }
 
             var plugin2 = PluginManager.EnablePlugin
-                .FirstOrDefault((e) => e.Value._dll == connectorItem.RealType.Assembly).Value;
+                                       .FirstOrDefault((e) => e.Value._dll == connectorItem.RealType.Assembly)
+                                       .Value;
             if (plugin2 is not null)
             {
                 Scenario._plugs.DelOrDecrease(plugin2.ToPlgString());
@@ -513,10 +516,8 @@ public partial class TaskEditorViewModel : ObservableRecipient
             Title = "保存并退出?",
             PrimaryButtonText = "确定",
             CloseButtonText = "取消",
-            PrimaryAction = () =>
-            {
-                Dispatcher.UIThread.InvokeAsync(() =>
-                {
+            PrimaryAction = () => {
+                Dispatcher.UIThread.InvokeAsync(() => {
                     CustomScenarioManger.Save(Scenario);
                     OnPropertyChanged(nameof(IsSaveInLocal));
                     IsModified = false;
@@ -569,7 +570,8 @@ public partial class TaskEditorViewModel : ObservableRecipient
     [RelayCommand]
     private void DisconnectConnector(ConnectorItem connector)
     {
-        var connections = Scenario.connections.Where(e => e.Source == connector || e.Target == connector).ToList();
+        var connections = Scenario.connections.Where(e => e.Source == connector || e.Target == connector)
+                                  .ToList();
         for (var i = connections.Count - 1; i >= 0; i--)
         {
             var connection = connections[i];
@@ -631,10 +633,8 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 PrimaryButtonText = "保存并退出",
                 SecondaryButtonText = "不保存",
                 CloseButtonText = "取消",
-                PrimaryAction = () =>
-                {
-                    Dispatcher.UIThread.InvokeAsync(() =>
-                    {
+                PrimaryAction = () => {
+                    Dispatcher.UIThread.InvokeAsync(() => {
                         CustomScenarioManger.Save(Scenario);
                         IsModified = false;
 
@@ -642,10 +642,8 @@ public partial class TaskEditorViewModel : ObservableRecipient
                         _window.Close();
                     });
                 },
-                SecondaryAction = () =>
-                {
-                    Dispatcher.UIThread.InvokeAsync(() =>
-                    {
+                SecondaryAction = () => {
+                    Dispatcher.UIThread.InvokeAsync(() => {
                         CustomScenarioManger.Reload(Scenario);
                         IsModified = false;
 
@@ -653,13 +651,10 @@ public partial class TaskEditorViewModel : ObservableRecipient
                         _window.Close();
                     });
                 },
-                CloseAction = () =>
-                {
-                    e.Cancel = true;
-                }
+                CloseAction = () => { e.Cancel = true; }
             };
             ((IContentDialog)ServiceManager.Services!.GetService(typeof(IContentDialog))!)
-                .ShowDialogAsync(null, dialog);
+               .ShowDialogAsync(null, dialog);
         }
     }
 
@@ -668,7 +663,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
         if (source.IsConnected)
         {
             if (Scenario.connections
-                .Any(e => e.Source == source && e.Target == target))
+                        .Any(e => e.Source == source && e.Target == target))
             {
                 return;
             }
@@ -679,8 +674,8 @@ public partial class TaskEditorViewModel : ObservableRecipient
             if (source.IsConnected)
             {
                 var connectionsToRemove = Scenario.connections
-                    .Where(e => e.Source == source)
-                    .ToList();
+                                                  .Where(e => e.Source == source)
+                                                  .ToList();
 
                 foreach (var connection in connectionsToRemove)
                 {
@@ -735,7 +730,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
 
         KeyValue = null;
         Scenario.Keys.Add(key);
-        
+
         IsModified = true;
     }
 
@@ -770,6 +765,43 @@ public partial class TaskEditorViewModel : ObservableRecipient
         if (Scenario.Values.ContainsKey(key))
         {
             Scenario.Values.Remove(key);
+        }
+
+        IsModified = true;
+    }
+
+    #endregion
+
+    #region 入参
+
+    [NotifyPropertyChangedFor(nameof(inputValueCanAdd))]
+    [NotifyCanExecuteChangedFor(nameof(AddInputValueCommand))]
+    [ObservableProperty]
+    private string? _inputValueValue = String.Empty;
+
+    private bool inputValueCanAdd => !string.IsNullOrEmpty(_inputValueValue);
+
+    [RelayCommand(CanExecute = nameof(inputValueCanAdd))]
+    private void AddInputValue(string key)
+    {
+        if (Scenario.InputValue.ContainsKey(key))
+        {
+            return;
+        }
+
+        ValueValue = null;
+        Scenario.InputValue.Add(key, new object());
+        OnPropertyChanged(CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs
+                                          .InputValue);
+        IsModified = true;
+    }
+
+    [RelayCommand]
+    private void DelInputValue(string key)
+    {
+        if (Scenario.InputValue.ContainsKey(key))
+        {
+            Scenario.InputValue.Remove(key);
         }
 
         IsModified = true;
