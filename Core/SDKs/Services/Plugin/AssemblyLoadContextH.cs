@@ -1,7 +1,5 @@
 ﻿#region
 
-using System.Collections;
-using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Text.Json;
@@ -23,28 +21,27 @@ public class AssemblyLoadContextH : AssemblyLoadContext
     {
         _resolver = new AssemblyDependencyResolver(pluginPath);
         _assembly = this.LoadFromAssemblyPath(pluginPath);
-        
-        Unloading += (sender) =>
-        {
-            AppDomain.CurrentDomain.GetAssemblies().
-                      FirstOrDefault(x=>x.GetName().Name=="System.Text.Json")?.
-                      GetType("System.Text.Json.Serialization.Metadata.ReflectionEmitCachingMemberAccessor")?.
-                      GetMethod("Clear")?.Invoke(null, null);
+
+        Unloading += (sender) => {
+            AppDomain.CurrentDomain.GetAssemblies()
+                     .FirstOrDefault(x => x.GetName()
+                                           .Name == "System.Text.Json")
+                    ?.GetType("System.Text.Json.Serialization.Metadata.ReflectionEmitCachingMemberAccessor")
+                    ?.GetMethod("Clear")
+                    ?.Invoke(null, null);
             // var fieldInfo = ConfigManger.DefaultOptions.GetType().GetField("_cachingContext", BindingFlags.NonPublic | BindingFlags.Instance);
             // fieldInfo.FieldType.GetMethod("Clear")?.Invoke(fieldInfo.GetValue(ConfigManger.DefaultOptions), null);
             ConfigManger.DefaultOptions = new JsonSerializerOptions
             {
-        
                 IncludeFields = true,
                 WriteIndented = true,
-                ReferenceHandler = ReferenceHandler.Preserve
-        
+                ReferenceHandler = ReferenceHandler.Preserve,
             };
             _assembly = null;
-            AvaloniaPropertyRegistry.Instance.UnregisterByModule(sender.Assemblies.First().DefinedTypes);
+            AvaloniaPropertyRegistry.Instance.UnregisterByModule(sender.Assemblies.First()
+                                                                       .DefinedTypes);
             ServiceManager.Services.GetService<IPluginToolService>()!.RequestUninstallPlugin(pluginPath);
         };
-        
     }
 
     public Assembly Assembly => _assembly;

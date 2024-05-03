@@ -1,7 +1,6 @@
 ﻿#region
 
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using Core.SDKs.CustomScenario;
 using PluginCore;
 
@@ -82,18 +81,17 @@ public class BaseNodeMethodsGen
         };
         ObservableCollection<ConnectorItem> pointOutItems = new()
         {
-            new ConnectorItem()
-            {
-                Source = point,
-                Type = typeof(string),
-                Title = "本地项目",
-                TypeName = "字符串",
-                IsOut = true
-            }
         };
         point.Output = pointOutItems;
         ObservableCollection<ConnectorItem> pointInItems = new()
         {
+            new ConnectorItem()
+            {
+                Source = point,
+                Type = typeof(NodeConnectorClass),
+                Title = "流输入",
+                TypeName = "节点"
+            },
             new ConnectorItem()
             {
                 Source = point,

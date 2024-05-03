@@ -86,17 +86,11 @@ public partial class CustomScenario : ObservableRecipient
         InputValue.CollectionChanged += OnInputValueOnCollectionChanged;
     }
 
-    ~CustomScenario()
-    {
-        PropertyChanged -= PropertyChangedEventHandler();
-        InputValue.CollectionChanged -= OnInputValueOnCollectionChanged;
-    }
-
     void OnInputValueOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs args)
     {
         var outputs = nodes.First()
                            .Output;
-        for (var i = outputs.Count - 1; i >= 1; i--)
+        for (var i = outputs.Count - 1; i >= 2; i--)
         {
             outputs.RemoveAt(i);
         }
@@ -237,27 +231,10 @@ public partial class CustomScenario : ObservableRecipient
             }
         }
 
-        _initTasks.Add(nodes[0], null);
-        nodes[0].Status = s节点状态.已验证;
-        var connectionItem = connections.FirstOrDefault((e) => e.Source == nodes[0]
-           .Output[0]);
-        if (connectionItem == null)
-        {
-            if (notRealTime)
-            {
-                IsRunning = false;
-                ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show("情景", $"情景{Name}运行完成");
-                Log.Debug($"情景运行完成:{Name}");
-            }
-
-            return;
-        }
-
-        var firstNodes = connectionItem.Target.Source;
         try
         {
-            _initTasks.Add(firstNodes, null);
-            ParsePointItem(_initTasks, firstNodes, false, notRealTime, _cancellationTokenSource.Token);
+            //_initTasks.Add( nodes[0], null);
+            ParsePointItem(_initTasks, nodes[0], false, notRealTime, _cancellationTokenSource.Token);
         }
         catch (Exception e)
         {
@@ -620,6 +597,10 @@ public partial class CustomScenario : ObservableRecipient
                                 }
                             }
 
+                            break;
+                        }
+                        case "本地项目":
+                        {
                             break;
                         }
                         default:

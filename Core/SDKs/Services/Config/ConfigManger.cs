@@ -3,11 +3,8 @@
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Text.Json.Serialization.Metadata;
-using System.Xml;
 using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.HotKey;
-using Core.SDKs.Services.Plugin;
 using Core.ViewModel;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,56 +19,60 @@ namespace Core.SDKs.Services.Config;
 
 public static class ConfigManger
 {
-    public static Dictionary<string,ConfigBase> Configs = new();
+    public static Dictionary<string, ConfigBase> Configs = new();
     public static KitopiaConfig? Config => Configs["KitopiaConfig"] as KitopiaConfig ?? null;
     private static readonly ILog log = LogManager.GetLogger(nameof(ConfigManger));
+
     public static JsonSerializerOptions DefaultOptions = new JsonSerializerOptions
     {
-        
         IncludeFields = true,
         WriteIndented = true,
-       ReferenceHandler = ReferenceHandler.Preserve
-        
+        ReferenceHandler = ReferenceHandler.Preserve
     };
+
     public static void Init()
     {
         if (!Directory.Exists($"{AppDomain.CurrentDomain.BaseDirectory}configs"))
         {
             Directory.CreateDirectory($"{AppDomain.CurrentDomain.BaseDirectory}configs");
         }
-        Configs.Add("KitopiaConfig",new KitopiaConfig(){Name = "KitopiaConfig"});
+
+        Configs.Add("KitopiaConfig", new KitopiaConfig() { Name = "KitopiaConfig" });
         var configF =
-            new FileInfo($"{AppDomain.CurrentDomain.BaseDirectory}configs{Path.DirectorySeparatorChar}KitopiaConfig.json");
+            new FileInfo(
+                $"{AppDomain.CurrentDomain.BaseDirectory}configs{Path.DirectorySeparatorChar}KitopiaConfig.json");
         if (!configF.Exists)
         {
-           
-            var j =JsonSerializer.Serialize(Config, ConfigManger.DefaultOptions);
+            var j = JsonSerializer.Serialize(Config, ConfigManger.DefaultOptions);
             File.WriteAllText(configF.FullName, j);
         }
 
         var json = File.ReadAllText(configF.FullName);
         try
         {
-           
-            Configs["KitopiaConfig"] = JsonSerializer.Deserialize(json,Config.GetType(),ConfigManger.DefaultOptions)! as ConfigBase ?? Config;
+            Configs["KitopiaConfig"] =
+                JsonSerializer.Deserialize(json, Config.GetType(), ConfigManger.DefaultOptions)! as ConfigBase ??
+                Config;
         }
         catch (Exception e)
         {
             log.Error(e);
             log.Error("配置文件加载失败");
         }
-        Config.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public).ToList().ForEach(x =>
-        {
-            if (x.GetCustomAttribute<ConfigField>() is { } configField)
-            {
-                if (configField.FieldType==ConfigFieldType.快捷键)
-                {
-                    HotKeyManager.HotKeys.Add(x.GetValue(Config) as HotKeyModel);
-                }
-            }
-        });
-        Config.ConfigChanged += (sender, args) =>
-        {
+
+        Config.GetType()
+              .GetFields(BindingFlags.Instance | BindingFlags.Public)
+              .ToList()
+              .ForEach(x => {
+                   if (x.GetCustomAttribute<ConfigField>() is { } configField)
+                   {
+                       if (configField.FieldType == ConfigFieldType.快捷键)
+                       {
+                           HotKeyManager.HotKeys.Add(x.GetValue(Config) as HotKeyModel);
+                       }
+                   }
+               });
+        Config.ConfigChanged += (sender, args) => {
             switch (args.Name)
             {
                 case "autoStart":
@@ -85,7 +86,8 @@ public static class ConfigManger
                         }
 
                         var registry =
-                            Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run", true); //检索指定的子项
+                            Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                                true); //检索指定的子项
                         if (registry == null) //若指定的子项不存在
                         {
                             registry = Registry.CurrentUser.CreateSubKey(
@@ -96,13 +98,15 @@ public static class ConfigManger
                         try
                         {
                             registry.SetValue("Kitopia", $"\"{strName}\""); //设置该子项的新的“键值对”
-                            ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))).Show("开机自启", "开机自启设置成功");
+                            ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))).Show("开机自启",
+                                "开机自启设置成功");
                         }
                         catch (Exception exception)
                         {
                             log.Error("开机自启设置失败");
                             log.Error(exception.StackTrace);
-                            ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))).Show("开机自启", "开机自启设置失败");
+                            ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))).Show("开机自启",
+                                "开机自启设置失败");
                         }
                     }
                     else
@@ -118,12 +122,13 @@ public static class ConfigManger
                         {
                         }
                     }
+
                     break;
                 }
                 case "autoStartEverything":
                 {
-                    
-                    ((SearchWindowViewModel)ServiceManager.Services.GetService(typeof(SearchWindowViewModel))).EverythingIsOk =
+                    ((SearchWindowViewModel)ServiceManager.Services.GetService(typeof(SearchWindowViewModel)))
+                       .EverythingIsOk =
                         !(bool)args.Value;
                     break;
                 }
@@ -133,36 +138,45 @@ public static class ConfigManger
                     {
                         case ThemeEnum.跟随系统:
                         {
-                            ServiceManager.Services.GetService<IThemeChange>().followSys(true);
+                            ServiceManager.Services.GetService<IThemeChange>()
+                                          .followSys(true);
                             break;
                         }
                         case ThemeEnum.深色:
                         {
-                            ServiceManager.Services.GetService<IThemeChange>().followSys(false);
-                            ServiceManager.Services.GetService<IThemeChange>().changeTo("theme_dark");
+                            ServiceManager.Services.GetService<IThemeChange>()
+                                          .followSys(false);
+                            ServiceManager.Services.GetService<IThemeChange>()
+                                          .changeTo("theme_dark");
                             break;
                         }
                         case ThemeEnum.浅色:
                         {
-                            ServiceManager.Services.GetService<IThemeChange>().followSys(false);
-                            ServiceManager.Services.GetService<IThemeChange>().changeTo("theme_light");
+                            ServiceManager.Services.GetService<IThemeChange>()
+                                          .followSys(false);
+                            ServiceManager.Services.GetService<IThemeChange>()
+                                          .changeTo("theme_light");
                             break;
                         }
                     }
+
                     break;
                 }
             }
         };
     }
-    
+
     public static void RemoveConfig(string key)
     {
-        foreach (var (s, value) in ConfigManger.Configs.Where( x=>x.Key.StartsWith(key)))
+        foreach (var (s, value) in ConfigManger.Configs.Where(x => x.Key.StartsWith(key)))
         {
-            value.GetType().BaseType.GetField("Instance").SetValue(value,null);
+            value.GetType()
+                 .BaseType.GetField("Instance")
+                 .SetValue(value, null);
             ConfigManger.Configs.Remove(s);
         }
     }
+
     public static void Save()
     {
         var keyCollection = Configs.Keys.ToList();
@@ -170,18 +184,17 @@ public static class ConfigManger
         {
             var configBase = Configs[configsKey];
             var configF =
-                new FileInfo($"{AppDomain.CurrentDomain.BaseDirectory}configs{Path.DirectorySeparatorChar}{configsKey}.json");
-            
-            
-            
-            var j =JsonSerializer.Serialize(configBase,configBase.GetType(), ConfigManger.DefaultOptions);
-            File.WriteAllText(configF.FullName, j);
-            
+                new FileInfo(
+                    $"{AppDomain.CurrentDomain.BaseDirectory}configs{Path.DirectorySeparatorChar}{configsKey}.json");
 
-            
+
+            var j = JsonSerializer.Serialize(configBase, configBase.GetType(), ConfigManger.DefaultOptions);
+            File.WriteAllText(configF.FullName, j);
         }
+
         WeakReferenceMessenger.Default.Send<string, string>("ConfigSave", "ConfigSave");
     }
+
     public static void Save(string key)
     {
         var configBase = Configs[key];
@@ -189,10 +202,11 @@ public static class ConfigManger
         {
             return;
         }
+
         var configF =
             new FileInfo($"{AppDomain.CurrentDomain.BaseDirectory}configs{Path.DirectorySeparatorChar}{key}.json");
-       
-        var j =JsonSerializer.Serialize(configBase,configBase.GetType(), ConfigManger.DefaultOptions);
+
+        var j = JsonSerializer.Serialize(configBase, configBase.GetType(), ConfigManger.DefaultOptions);
         File.WriteAllText(configF.FullName, j);
         WeakReferenceMessenger.Default.Send<string, string>("ConfigSave", "ConfigSave");
     }

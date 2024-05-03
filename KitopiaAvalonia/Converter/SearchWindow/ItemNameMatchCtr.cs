@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
-using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
 using PluginCore;
 
@@ -22,24 +19,28 @@ public class ItemNameMatchCtr : IValueConverter
         {
             return new InlineCollection();
         }
+
         InlineCollection list = new();
-        if (str.PinyinItem ==null||str.PinyinItem.CharMatchResults ==null||str.PinyinItem.CharMatchResults.Length-str.PinyinItem.ZhongWenCount !=str.PinyinItem.SplitWords.Length|| str.PinyinItem.CharMatchResults.Length==0)
+        if (str.PinyinItem == null || str.PinyinItem.CharMatchResults == null || str.PinyinItem.SplitWords == null ||
+            str.PinyinItem.CharMatchResults.Length - str.PinyinItem.ZhongWenCount != str.PinyinItem.SplitWords.Length ||
+            str.PinyinItem.CharMatchResults.Length == 0)
         {
             list.Add(new Run(str.ItemDisplayName));
             return list;
         }
-        
-        
+
+
         for (int i = 0; i < str.PinyinItem.SplitWords.Length; i++)
         {
-            
-            list.Add(new Run(str.PinyinItem.SplitWords[i].ToString())
+            list.Add(new Run(str.PinyinItem.SplitWords[i]
+                                .ToString())
             {
-                Foreground = str.PinyinItem.CharMatchResults[i+str.PinyinItem.ZhongWenCount] ? Brushes.OrangeRed : Brushes.Black,
+                Foreground = str.PinyinItem.CharMatchResults[i + str.PinyinItem.ZhongWenCount]
+                    ? Brushes.OrangeRed
+                    : Brushes.Black,
             });
-            
-            
         }
+
         return list;
     }
 

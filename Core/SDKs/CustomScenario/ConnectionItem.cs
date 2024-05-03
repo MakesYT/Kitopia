@@ -11,15 +11,11 @@ public class ConnectionItem
         Target.IsConnected = true;
     }
 
-    public ConnectorItem Source
+    public ConnectionItem()
     {
-        get;
-        set;
     }
 
-    public ConnectorItem Target
-    {
-        get;
-        set;
-    }
+    public ConnectorItem Source { get; set; }
+
+    public ConnectorItem Target { get; set; }
 }

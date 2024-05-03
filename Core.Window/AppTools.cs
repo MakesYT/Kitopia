@@ -29,7 +29,7 @@ public partial class AppTools
     //Console.WriteLine();
 
 
-    private static PinyinProcessor _pinyinProcessor = new();
+    public static PinyinProcessor _pinyinProcessor = new();
 
     internal static void AutoStartEverything(ConcurrentDictionary<string, SearchViewItem> collection, Action action)
     {

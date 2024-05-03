@@ -104,7 +104,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                     return;
                 }
 
-                if (e.ConnectorItem is not { InputObject: not null, SelfInputAble: false })
+                if (e.ConnectorItem is not { InputObject: not null })
                 {
                     return;
                 }
@@ -175,6 +175,32 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 {
                     if (e.ConnectorItem.InputObject is string inputObject)
                     {
+                        for (var i = e.PointItem.Input.Count - 1; i >= 2; i--)
+                        {
+                            e.PointItem.Input.RemoveAt(i);
+                        }
+
+                        if (inputObject.StartsWith("CustomScenario:"))
+                        {
+                            var replace = inputObject.Replace("CustomScenario:", "");
+                            var customScenario = CustomScenarioManger.CustomScenarios.First(e => e.UUID == replace);
+
+                            if (customScenario.IsHaveInputValue)
+                            {
+                                foreach (var (key, value) in customScenario.InputValue)
+                                {
+                                    e.PointItem.Input.Add(new()
+                                    {
+                                        IsOut = false,
+                                        Source = e.PointItem,
+                                        Type = value.GetType(),
+                                        TypeName = BaseNodeMethodsGen.GetI18N(value.GetType()
+                                           .FullName),
+                                        Title = key
+                                    });
+                                }
+                            }
+                        }
                     }
                 }
             });
@@ -789,7 +815,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
             return;
         }
 
-        ValueValue = null;
+        InputValueValue = null;
         Scenario.InputValue.Add(key, new object());
         OnPropertyChanged(CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs
                                           .InputValue);

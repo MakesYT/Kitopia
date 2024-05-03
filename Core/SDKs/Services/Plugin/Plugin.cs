@@ -1,7 +1,6 @@
 ﻿#region
 
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -26,48 +25,57 @@ public class Plugin
     private AssemblyLoadContextH? _plugin;
 
     public IServiceProvider? ServiceProvider;
-    public  void AddConfig(string key,ConfigBase configBase)
+
+    public void AddConfig(string key, ConfigBase configBase)
     {
         var configF =
             new FileInfo($"{AppDomain.CurrentDomain.BaseDirectory}configs{Path.DirectorySeparatorChar}{key}.json");
         if (!configF.Exists)
         {
-            var j =JsonSerializer.Serialize(configBase,configBase.GetType(), ConfigManger.DefaultOptions);
+            var j = JsonSerializer.Serialize(configBase, configBase.GetType(), ConfigManger.DefaultOptions);
             File.WriteAllText(configF.FullName, j);
         }
 
         var json = File.ReadAllText(configF.FullName);
         try
         {
-            var deserializeObject = JsonSerializer.Deserialize(json,configBase.GetType(),ConfigManger.DefaultOptions)! as ConfigBase ?? configBase;
-            if (!ConfigManger.Configs.TryAdd(key,deserializeObject))
+            var deserializeObject =
+                JsonSerializer.Deserialize(json, configBase.GetType(), ConfigManger.DefaultOptions)! as ConfigBase ??
+                configBase;
+            if (!ConfigManger.Configs.TryAdd(key, deserializeObject))
             {
                 ConfigManger.Configs[key] = deserializeObject;
             }
-            deserializeObject.GetType().BaseType.GetField("Instance").SetValue(deserializeObject,deserializeObject);
+
+            deserializeObject.GetType()
+                             .BaseType.GetField("Instance")
+                             .SetValue(deserializeObject, deserializeObject);
             deserializeObject.AfterLoad();
-          
-            
         }
         catch (Exception e)
         {
             Log.Error(e);
             Log.Error("配置文件加载失败");
         }
-        configBase.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public).ToList().ForEach(x =>
-        {
-            if (x.GetCustomAttribute<ConfigField>() is { } configField)
-            {
-                if (configField.FieldType==ConfigFieldType.快捷键)
-                {
-                    HotKeyManager.HotKeys.Add(x.GetValue(configBase) as HotKeyModel);
-                }
-            }
-        });
+
+        configBase.GetType()
+                  .GetFields(BindingFlags.Instance | BindingFlags.Public)
+                  .ToList()
+                  .ForEach(x => {
+                       if (x.GetCustomAttribute<ConfigField>() is { } configField)
+                       {
+                           if (configField.FieldType == ConfigFieldType.快捷键)
+                           {
+                               HotKeyManager.HotKeys.Add(x.GetValue(configBase) as HotKeyModel);
+                           }
+                       }
+                   });
     }
+
     public Plugin(string path)
     {
-        _plugin = new AssemblyLoadContextH(path, path.Split(Path.DirectorySeparatorChar).Last() + "_plugin");
+        _plugin = new AssemblyLoadContextH(path, path.Split(Path.DirectorySeparatorChar)
+                                                     .Last() + "_plugin");
         Log.Debug($"加载插件:{path}");
         var t = _dll.GetExportedTypes();
         Dictionary<string, (MethodInfo, object)> methodInfos = new();
@@ -76,29 +84,29 @@ public class Plugin
         {
             if (type.GetInterface("IPlugin") != null)
             {
-                var PluginInfo = (PluginInfo)type.GetField("PluginInfo").GetValue(null);
+                var PluginInfo = (PluginInfo)type.GetField("PluginInfo")
+                                                 .GetValue(null);
                 PluginInfo.Path = path;
                 this.PluginInfo = PluginInfo;
                 Log.Debug($"加载插件:{PluginInfo.ToPlgString()}");
                 //var instance = Activator.CreateInstance(type);
-                ServiceProvider = (IServiceProvider)type.GetMethod("GetServiceProvider").Invoke(null, null);
+                ServiceProvider = (IServiceProvider)type.GetMethod("GetServiceProvider")
+                                                        .Invoke(null, null);
 
                 ((IPlugin)ServiceProvider.GetService(type)).OnEnabled(ServiceProvider);
                 break;
             }
-
-           
-            
         }
 
         foreach (var type in t)
         {
-            if (type.BaseType==typeof(ConfigBase))
+            if (type.BaseType == typeof(ConfigBase))
             {
-                var instance =(ConfigBase) Activator.CreateInstance(type);
+                var instance = (ConfigBase)Activator.CreateInstance(type);
                 instance.Name = $"{PluginInfo.ToPlgString()}#{type.FullName}";
                 AddConfig($"{PluginInfo.ToPlgString()}#{type.FullName}", instance);
             }
+
             if (typeof(CustomScenarioTrigger).IsAssignableFrom(type))
             {
                 var fieldInfo = type.GetField("Info");
@@ -112,7 +120,8 @@ public class Plugin
 
             foreach (var methodInfo in type.GetMethods())
             {
-                if (methodInfo.GetCustomAttributes(typeof(PluginMethod)).Any()) //情景的可用节点
+                if (methodInfo.GetCustomAttributes(typeof(PluginMethod))
+                              .Any()) //情景的可用节点
                 {
                     if (methodInfo.GetParameters()[^1].ParameterType.FullName != "System.Threading.CancellationToken")
                     {
@@ -123,10 +132,10 @@ public class Plugin
                         (methodInfo, GetPointItemByMethodInfo(methodInfo)));
                 }
 
-                if (methodInfo.GetCustomAttributes(typeof(SearchMethod)).Any()) //搜索的切入方法
+                if (methodInfo.GetCustomAttributes(typeof(SearchMethod))
+                              .Any()) //搜索的切入方法
                 {
-                    searchViews.Add(e =>
-                    {
+                    searchViews.Add(e => {
                         var invoke = methodInfo.Invoke(
                             ServiceProvider!.GetService(methodInfo.DeclaringType!),
                             new object?[] { e });
@@ -147,11 +156,7 @@ public class Plugin
 
     public Assembly? _dll => _plugin.Assembly;
 
-    public PluginInfo PluginInfo
-    {
-        set;
-        get;
-    }
+    public PluginInfo PluginInfo { set; get; }
 
     public string ToPlgString() => $"{PluginInfo.Author}_{PluginInfo.PluginId}";
 
@@ -162,7 +167,8 @@ public class Plugin
         foreach (var genericArgument in methodInfo.GetParameters())
         {
             var plugin = PluginManager.EnablePlugin
-                                      .FirstOrDefault((e) => e.Value._dll == genericArgument.ParameterType.Assembly).Value;
+                                      .FirstOrDefault((e) => e.Value._dll == genericArgument.ParameterType.Assembly)
+                                      .Value;
             // type.Assembly.
             // var a = PluginManager.GetPlugnNameByTypeName(type.FullName);
             if (plugin is null)
@@ -211,7 +217,10 @@ public class Plugin
             TypeName = "节点"
         });
         int autoUnboxIndex = 0;
-        for (var index = 0; index < methodInfo.GetParameters().Length; index++)
+        for (var index = 0;
+             index < methodInfo.GetParameters()
+                               .Length;
+             index++)
         {
             var parameterInfo = methodInfo.GetParameters()[index];
             if (parameterInfo.ParameterType.FullName == "System.Threading.CancellationToken")
@@ -219,7 +228,8 @@ public class Plugin
                 continue;
             }
 
-            bool IsSelf = parameterInfo.GetCustomAttributes(typeof(SelfInput)).Any();
+            bool IsSelf = parameterInfo.GetCustomAttributes(typeof(SelfInput))
+                                       .Any();
 
             if (parameterInfo.ParameterType.GetCustomAttribute(typeof(AutoUnbox)) is not null)
             {
@@ -326,7 +336,7 @@ public class Plugin
 
         return pointItem;
     }
-    
+
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void UnloadByPluginInfo(string pluginInfoEx, out WeakReference weakReference)
@@ -334,7 +344,8 @@ public class Plugin
         if (PluginManager.EnablePlugin.ContainsKey(pluginInfoEx))
         {
             {
-                PluginManager.EnablePlugin[pluginInfoEx].Unload(out weakReference);
+                PluginManager.EnablePlugin[pluginInfoEx]
+                             .Unload(out weakReference);
 
                 return;
             }
