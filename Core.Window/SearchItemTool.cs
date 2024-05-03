@@ -17,7 +17,7 @@ public class SearchItemTool : ISearchItemTool
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(SearchItemTool));
 
-    public void OpenFile(SearchViewItem? searchViewItem)
+    public void OpenFile(SearchViewItem? searchViewItem, params object[] inputValues)
     {
         WeakReferenceMessenger.Default.Send("a", "SearchWindowClose");
         Log.Debug("打开指定内容" + searchViewItem.OnlyKey);
@@ -61,7 +61,8 @@ public class SearchItemTool : ISearchItemTool
                         break;
                     case FileType.自定义情景:
                         CustomScenarioManger.CustomScenarios
-                                            .FirstOrDefault((e) => $"CustomScenario:{e.UUID}" == searchViewItem.OnlyKey)?.Run();
+                                            .FirstOrDefault((e) => $"CustomScenario:{e.UUID}" == searchViewItem.OnlyKey)
+                                           ?.Run(inputValues: inputValues);
                         break;
                     case FileType.便签:
                         ((ILabelWindowService)ServiceManager.Services.GetService(typeof(ILabelWindowService))!)
@@ -84,35 +85,39 @@ public class SearchItemTool : ISearchItemTool
                     case FileType.数学运算:
                     {
                         var tcs = new TaskCompletionSource<bool>();
-                        var thread = new Thread(() =>
-                        {
-                            Clipboard.SetText(searchViewItem.ItemDisplayName.Remove(0,1));
+                        var thread = new Thread(() => {
+                            Clipboard.SetText(searchViewItem.ItemDisplayName.Remove(0, 1));
                         });
                         thread.SetApartmentState(ApartmentState.STA);
                         thread.Start();
                         break;
                     }
-                        
+
                     case FileType.文件夹:
                     {
                         if (searchViewItem.Arguments == null)
                         {
-                            Shell32.ShellExecute(IntPtr.Zero, "open", searchViewItem.OnlyKey, "", searchViewItem.OnlyKey.Remove(searchViewItem.OnlyKey.LastIndexOf('\\')),
+                            Shell32.ShellExecute(IntPtr.Zero, "open", searchViewItem.OnlyKey, "",
+                                searchViewItem.OnlyKey.Remove(searchViewItem.OnlyKey.LastIndexOf('\\')),
                                 ShowWindowCommand.SW_NORMAL);
                         }
                         else
                         {
                             Shell32.ShellExecute(IntPtr.Zero, "open", searchViewItem.OnlyKey,
-                                searchViewItem.Arguments, searchViewItem.OnlyKey.Remove(searchViewItem.OnlyKey.LastIndexOf('\\')),
+                                searchViewItem.Arguments,
+                                searchViewItem.OnlyKey.Remove(searchViewItem.OnlyKey.LastIndexOf('\\')),
                                 ShowWindowCommand.SW_SHOWNORMAL);
                         }
+
                         break;
                     }
                     default:
-                      
-                        Shell32.ShellExecute(IntPtr.Zero, "open", searchViewItem.OnlyKey, searchViewItem.Arguments, searchViewItem.StartDirectory,
+
+                        Shell32.ShellExecute(IntPtr.Zero, "open", searchViewItem.OnlyKey, searchViewItem.Arguments,
+                            searchViewItem.StartDirectory,
                             ShowWindowCommand.SW_NORMAL);
-                        Log.Debug($"打开指定内容{searchViewItem.OnlyKey}_{searchViewItem.Arguments}_{searchViewItem.StartDirectory}");
+                        Log.Debug(
+                            $"打开指定内容{searchViewItem.OnlyKey}_{searchViewItem.Arguments}_{searchViewItem.StartDirectory}");
 
                         break;
                 }
@@ -151,8 +156,7 @@ public class SearchItemTool : ISearchItemTool
 
     public void IgnoreItem(SearchViewItem? item)
     {
-        Task.Run(() =>
-        {
+        Task.Run(() => {
             ConfigManger.Config.ignoreItems.Add(item.OnlyKey);
             ConfigManger.Save();
             ServiceManager.Services.GetService<SearchWindowViewModel>()!._collection.TryRemove(item.OnlyKey, out _);
@@ -161,8 +165,7 @@ public class SearchItemTool : ISearchItemTool
 
     public void OpenFolder(SearchViewItem? searchViewItem)
     {
-        Task.Run(() =>
-        {
+        Task.Run(() => {
             WeakReferenceMessenger.Default.Send("a", "SearchWindowClose");
             var item = (SearchViewItem)searchViewItem;
             Log.Debug($"打开指定内容文件夹{item.OnlyKey}_{item.StartDirectory}");
@@ -202,8 +205,7 @@ public class SearchItemTool : ISearchItemTool
 
     public void RunAsAdmin(SearchViewItem? item)
     {
-        Task.Run(() =>
-        {
+        Task.Run(() => {
             WeakReferenceMessenger.Default.Send("a", "SearchWindowClose");
             Log.Debug("以管理员身份打开指定内容" + item.OnlyKey);
             if (item.FileType == FileType.UWP应用)
@@ -273,7 +275,7 @@ public class SearchItemTool : ISearchItemTool
                     e.Value.OnlyKey != null && e.Value.OnlyKey.Equals(item.OnlyKey));
                 foreach (var keyValuePair in keyValuePairs)
                 {
-                    _collection.TryRemove(keyValuePair.Key,out _);
+                    _collection.TryRemove(keyValuePair.Key, out _);
                 }
             }
         }
@@ -298,8 +300,7 @@ public class SearchItemTool : ISearchItemTool
 
     public void OpenFolderInTerminal(SearchViewItem? item)
     {
-        Task.Run(() =>
-        {
+        Task.Run(() => {
             WeakReferenceMessenger.Default.Send("a", "SearchWindowClose");
             Log.Debug("打开指定内容在终端中" + item.OnlyKey);
             var startInfo = new ProcessStartInfo
@@ -355,12 +356,12 @@ public class SearchItemTool : ISearchItemTool
         });
     }
 
-    public void OpenSearchItemByOnlyKey(string onlyKey)
+    public void OpenSearchItemByOnlyKey(string onlyKey, params object[] inputValues)
     {
         if (((SearchWindowViewModel)ServiceManager.Services!.GetService(typeof(SearchWindowViewModel))!)._collection
            .TryGetValue(onlyKey, out var item))
         {
-            OpenFile(item);
+            OpenFile(item, inputValues: inputValues);
         }
     }
 }

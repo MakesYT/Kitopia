@@ -42,7 +42,8 @@ public partial class TaskEditorViewModel : ObservableRecipient
         GetAllMethods();
         var nodify2 = new PointItem
         {
-            Title = "任务1"
+            Title = "任务1",
+            Plugin = "Kitopia"
         };
         nodify2.Output = new ObservableCollection<ConnectorItem>
         {
@@ -59,6 +60,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
         var nodify3 = new PointItem
         {
             Title = "Tick",
+            Plugin = "Kitopia",
             Location = new Point(0, 100)
         };
         nodify3.Output = new ObservableCollection<ConnectorItem>

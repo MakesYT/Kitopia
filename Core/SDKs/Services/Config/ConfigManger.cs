@@ -27,7 +27,8 @@ public static class ConfigManger
     {
         IncludeFields = true,
         WriteIndented = true,
-        ReferenceHandler = ReferenceHandler.Preserve
+        ReferenceHandler = ReferenceHandler.Preserve,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 
     public static void Init()

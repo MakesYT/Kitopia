@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Reflection;
-using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
@@ -14,6 +13,7 @@ using Core.SDKs.Services;
 using Core.SDKs.Services.Plugin;
 using Core.SDKs.Tools;
 using log4net;
+using Microsoft.Extensions.DependencyInjection;
 using PluginCore;
 using PluginCore.Attribute;
 
@@ -47,7 +47,7 @@ public partial class CustomScenario : ObservableRecipient
 
     [JsonIgnore] [ObservableProperty] private bool hasInit = true;
     [JsonIgnore] [ObservableProperty] private string? initError;
-    [JsonIgnore] [ObservableProperty] private ObservableDictionary<string, object> inputValue = new();
+    [JsonIgnore] [ObservableProperty] private ObservableDictionary<string, object?> inputValue = new();
 
     private bool InTick;
 
@@ -86,11 +86,12 @@ public partial class CustomScenario : ObservableRecipient
         InputValue.CollectionChanged += OnInputValueOnCollectionChanged;
     }
 
+
     void OnInputValueOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs args)
     {
         var outputs = nodes.First()
                            .Output;
-        for (var i = outputs.Count - 1; i >= 2; i--)
+        for (var i = outputs.Count - 1; i >= 1; i--)
         {
             outputs.RemoveAt(i);
         }
@@ -422,10 +423,6 @@ public partial class CustomScenario : ObservableRecipient
         var valid = true;
         List<Thread> sourceDataTask = new();
         var indexOf = nodes.IndexOf(nowPointItem);
-        if (indexOf is 0 or 1)
-        {
-            goto finnish;
-        }
 
         foreach (var connectorItem in nowPointItem.Input)
         {
@@ -601,6 +598,24 @@ public partial class CustomScenario : ObservableRecipient
                         }
                         case "本地项目":
                         {
+                            if (nowPointItem.Input.Count() >= 3)
+                            {
+                                List<object> parameterList = new();
+                                for (var index = 2; index < nowPointItem.Input.Count; index++)
+                                {
+                                    parameterList.Add(nowPointItem.Input[index].InputObject);
+                                }
+
+                                ServiceManager.Services.GetService<ISearchItemTool>()
+                                              .OpenSearchItemByOnlyKey((string)nowPointItem.Input[1].InputObject,
+                                                   parameterList.ToArray());
+                            }
+                            else
+                            {
+                                ServiceManager.Services.GetService<ISearchItemTool>()
+                                              .OpenSearchItemByOnlyKey((string)nowPointItem.Input[1].InputObject);
+                            }
+
                             break;
                         }
                         default:
@@ -608,7 +623,7 @@ public partial class CustomScenario : ObservableRecipient
                             var userInputConnector = nowPointItem.Input.FirstOrDefault();
                             if (userInputConnector is null)
                             {
-                                throw new NullReferenceException();
+                                break;
                             }
 
                             var userInputData = userInputConnector.InputObject;
@@ -798,10 +813,10 @@ public partial class CustomScenario : ObservableRecipient
         }
     }
 
-    [OnDeserializing]
-    // ReSharper disable once UnusedMember.Local
-    // ReSharper disable once UnusedParameter.Local
-    private void OnDeserializing(StreamingContext context) //反序列化时hotkeys的默认值会被添加,需要先清空
+
+    public void OnDeserialized() //反序列化时hotkeys的默认值会被添加,需要先清空
     {
+        PropertyChanged += PropertyChangedEventHandler();
+        InputValue.CollectionChanged += OnInputValueOnCollectionChanged;
     }
 }

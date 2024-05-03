@@ -8,6 +8,7 @@ using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
 using Core.ViewModel;
 using log4net;
+using Microsoft.Extensions.DependencyInjection;
 using Pinyin.NET;
 using PluginCore;
 
@@ -83,7 +84,33 @@ public static class CustomScenarioManger
         try
         {
             var deserializeObject = JsonSerializer.Deserialize<CustomScenario>(json, ConfigManger.DefaultOptions);
+            for (var index = 0; index < deserializeObject.InputValue.Count; index++)
+            {
+                var (key, value) = deserializeObject.InputValue[index];
+                if (value is JsonElement jsonElement)
+                {
+                    if (jsonElement.ValueKind == JsonValueKind.Object)
+                    {
+                        deserializeObject.InputValue.SetValueWithoutNotify(deserializeObject.InputValue[index].Key,
+                            new object());
+                    }
+                }
+            }
 
+            for (var index = 0; index < deserializeObject.Values.Count; index++)
+            {
+                var (key, value) = deserializeObject.Values[index];
+                if (value is JsonElement jsonElement)
+                {
+                    if (jsonElement.ValueKind == JsonValueKind.Object)
+                    {
+                        deserializeObject.Values.SetValueWithoutNotify(deserializeObject.Values[index].Key,
+                            new object());
+                    }
+                }
+            }
+
+            deserializeObject.OnDeserialized();
 
             foreach (var node in deserializeObject.nodes)
             {
@@ -167,39 +194,34 @@ public static class CustomScenarioManger
             HotKeyManager.HotKeys.Add(scenario.StopHotKey);
         }
 
-        if (scenario.ExecutionManual)
-        {
-            var onlyKey = $"{nameof(CustomScenario)}:{scenario.UUID}";
-            if (scenario.Keys.Any())
-            {
-                var keys = new List<List<string>>();
-                foreach (var key in scenario.Keys)
-                {
-                    keys.Add([key]);
-                }
 
-                var viewItem1 = new SearchViewItem()
-                {
-                    ItemDisplayName = "执行自定义情景:" + scenario.Name,
-                    FileType = FileType.自定义情景,
-                    OnlyKey = onlyKey,
-                    PinyinItem = new PinyinItem()
-                    {
-                        Keys = keys
-                    },
-                    Icon = null,
-                    IconSymbol = 0xF78B,
-                    IsVisible = true
-                };
-                ((SearchWindowViewModel)ServiceManager.Services.GetService(typeof(SearchWindowViewModel))!)
-                   ._collection.TryAdd(onlyKey, viewItem1);
-            }
-            else
-            {
-                ((SearchWindowViewModel)ServiceManager.Services.GetService(typeof(SearchWindowViewModel))!)
-                   ._collection.TryRemove(onlyKey, out _);
-            }
+        var onlyKey = $"{nameof(CustomScenario)}:{scenario.UUID}";
+
+        var keys = new List<List<string>>();
+        foreach (var key in scenario.Keys)
+        {
+            keys.Add([key]);
         }
+
+        keys.AddRange(ServiceManager.Services.GetService<IAppToolService>()
+                                    .GetPinyin(scenario.Name)
+                                    .Keys);
+        var viewItem1 = new SearchViewItem()
+        {
+            ItemDisplayName = "执行自定义情景:" + scenario.Name,
+            FileType = FileType.自定义情景,
+            OnlyKey = onlyKey,
+            PinyinItem = new PinyinItem()
+            {
+                Keys = keys
+            },
+            Icon = null,
+            IconSymbol = 0xF78B,
+            IsVisible = true
+        };
+        ((SearchWindowViewModel)ServiceManager.Services.GetService(typeof(SearchWindowViewModel))!)
+           ._collection.TryAdd(onlyKey, viewItem1);
+
 
         var configF = new FileInfo(AppDomain.CurrentDomain.BaseDirectory +
                                    $"customScenarios{Path.DirectorySeparatorChar}{scenario.UUID}.json");
