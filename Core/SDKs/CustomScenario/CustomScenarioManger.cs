@@ -84,31 +84,31 @@ public static class CustomScenarioManger
         try
         {
             var deserializeObject = JsonSerializer.Deserialize<CustomScenario>(json, ConfigManger.DefaultOptions);
-            for (var index = 0; index < deserializeObject.InputValue.Count; index++)
-            {
-                var (key, value) = deserializeObject.InputValue[index];
-                if (value is JsonElement jsonElement)
-                {
-                    if (jsonElement.ValueKind == JsonValueKind.Object)
-                    {
-                        deserializeObject.InputValue.SetValueWithoutNotify(deserializeObject.InputValue[index].Key,
-                            new object());
-                    }
-                }
-            }
-
-            for (var index = 0; index < deserializeObject.Values.Count; index++)
-            {
-                var (key, value) = deserializeObject.Values[index];
-                if (value is JsonElement jsonElement)
-                {
-                    if (jsonElement.ValueKind == JsonValueKind.Object)
-                    {
-                        deserializeObject.Values.SetValueWithoutNotify(deserializeObject.Values[index].Key,
-                            new object());
-                    }
-                }
-            }
+            // for (var index = 0; index < deserializeObject.InputValue.Count; index++)
+            // {
+            //     var (key, value) = deserializeObject.InputValue[index];
+            //     if (value is JsonElement jsonElement)
+            //     {
+            //         if (jsonElement.ValueKind == JsonValueKind.Object)
+            //         {
+            //             deserializeObject.InputValue[deserializeObject.InputValue[index].Key]= new object();
+            //            
+            //         }
+            //     }
+            // }
+            //
+            // for (var index = 0; index < deserializeObject.Values.Count; index++)
+            // {
+            //     var (key, value) = deserializeObject.Values[index];
+            //     if (value is JsonElement jsonElement)
+            //     {
+            //         if (jsonElement.ValueKind == JsonValueKind.Object)
+            //         {
+            //             deserializeObject.Values[deserializeObject.Values[index].Key]= new object();
+            //             
+            //         }
+            //     }
+            // }
 
             deserializeObject.OnDeserialized();
 

@@ -28,7 +28,8 @@ public static class ConfigManger
         IncludeFields = true,
         WriteIndented = true,
         ReferenceHandler = ReferenceHandler.Preserve,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        Converters = { new ObjectJsonConverter() }
+        // DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 
     public static void Init()

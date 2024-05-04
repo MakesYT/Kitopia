@@ -36,7 +36,8 @@ public class AssemblyLoadContextH : AssemblyLoadContext
                 IncludeFields = true,
                 WriteIndented = true,
                 ReferenceHandler = ReferenceHandler.Preserve,
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+                Converters = { new ObjectJsonConverter() }
+                //DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
             _assembly = null;
             AvaloniaPropertyRegistry.Instance.UnregisterByModule(sender.Assemblies.First()
