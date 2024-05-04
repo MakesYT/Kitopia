@@ -213,6 +213,12 @@ public partial class CustomScenario : ObservableRecipient
                     }
                 }
             }
+
+            for (var i = 0; i < inputValues.Length; i++)
+            {
+                nodes[0]
+                   .Output[i + 1].InputObject = inputValues[i];
+            }
         }
 
         for (var i = nodes.Count - 1; i >= 1; i--)
@@ -422,7 +428,6 @@ public partial class CustomScenario : ObservableRecipient
         Log.Debug($"解析节点:{nowPointItem.Title}");
         var valid = true;
         List<Thread> sourceDataTask = new();
-        var indexOf = nodes.IndexOf(nowPointItem);
 
         foreach (var connectorItem in nowPointItem.Input)
         {
@@ -614,6 +619,19 @@ public partial class CustomScenario : ObservableRecipient
                             {
                                 ServiceManager.Services.GetService<ISearchItemTool>()
                                               .OpenSearchItemByOnlyKey((string)nowPointItem.Input[1].InputObject);
+                            }
+
+                            break;
+                        }
+                        case "Main":
+                        {
+                            for (var i = 1; i < nowPointItem.Output.Count; i++)
+                            {
+                                foreach (var sourceOrNextConnectorItem in nowPointItem.Output[i]
+                                            .GetSourceOrNextConnectorItems(connections))
+                                {
+                                    sourceOrNextConnectorItem.InputObject = nowPointItem.Output[i].InputObject;
+                                }
                             }
 
                             break;

@@ -43,6 +43,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
         var nodify2 = new PointItem
         {
             Title = "任务1",
+            MerthodName = "Main",
             Plugin = "Kitopia"
         };
         nodify2.Output = new ObservableCollection<ConnectorItem>
@@ -175,32 +176,52 @@ public partial class TaskEditorViewModel : ObservableRecipient
 
                 if (e.PointItem.MerthodName == "本地项目")
                 {
-                    if (e.ConnectorItem.InputObject is string inputObject)
+                    var o = e.PointItem.Input[1].InputObject;
+                    if (o is string inputObject)
                     {
-                        for (var i = e.PointItem.Input.Count - 1; i >= 2; i--)
-                        {
-                            e.PointItem.Input.RemoveAt(i);
-                        }
-
                         if (inputObject.StartsWith("CustomScenario:"))
                         {
                             var replace = inputObject.Replace("CustomScenario:", "");
                             var customScenario = CustomScenarioManger.CustomScenarios.First(e => e.UUID == replace);
-
                             if (customScenario.IsHaveInputValue)
                             {
-                                foreach (var (key, value) in customScenario.InputValue)
+                                for (var index = 0; index < customScenario.InputValue.Count; index++)
                                 {
-                                    e.PointItem.Input.Add(new()
+                                    var (key, value) = customScenario.InputValue[index];
+                                    if (e.PointItem.Input.Count() < index + 2)
                                     {
-                                        IsOut = false,
-                                        Source = e.PointItem,
-                                        Type = value.GetType(),
-                                        TypeName = BaseNodeMethodsGen.GetI18N(value.GetType()
-                                           .FullName),
-                                        Title = key
-                                    });
+                                        e.PointItem.Input.Add(new()
+                                        {
+                                            IsOut = false,
+                                            Source = e.PointItem,
+                                            Type = value.GetType(),
+                                            TypeName = BaseNodeMethodsGen.GetI18N(value.GetType()
+                                               .FullName),
+                                            Title = key
+                                        });
+                                    }
+
+                                    if (e.PointItem.Input[index + 2].Title != key)
+                                    {
+                                        e.PointItem.Input[index + 2].Title = key;
+                                        e.PointItem.Input[index + 2].Type = value.GetType();
+                                        e.PointItem.Input[index + 2].TypeName = BaseNodeMethodsGen.GetI18N(value
+                                           .GetType()
+                                           .FullName);
+                                    }
                                 }
+
+                                for (var i = e.PointItem.Input.Count - 1; i >= customScenario.InputValue.Count + 2; i--)
+                                {
+                                    e.PointItem.Input.RemoveAt(i);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            for (var i = e.PointItem.Input.Count - 1; i >= 2; i--)
+                            {
+                                e.PointItem.Input.RemoveAt(i);
                             }
                         }
                     }
