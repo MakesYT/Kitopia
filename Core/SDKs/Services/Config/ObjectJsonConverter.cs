@@ -14,7 +14,7 @@ public class ObjectJsonConverter : JsonConverter<object>
             JsonTokenType.StartObject)
         {
             JsonSerializer.Deserialize<ExpandoObject>(ref reader, options);
-            return new object();
+            return null;
         }
 
         if (reader.TokenType == JsonTokenType.Number)
