@@ -7,7 +7,6 @@ using Avalonia.Threading;
 using DesktopNotifications;
 using DesktopNotifications.Avalonia;
 using KitopiaAvalonia.Services;
-using KitopiaAvalonia.Windows;
 using log4net;
 using log4net.Config;
 using ReactiveUI;
@@ -34,16 +33,10 @@ class Program
         try
         {
             RxApp.DefaultExceptionHandler = new MyCoolObservableExceptionHandler();
-            TaskScheduler.UnobservedTaskException += (sender, eventArgs) =>
-            {
-                Log.Error(eventArgs.Exception);
-            };
+            TaskScheduler.UnobservedTaskException += (sender, eventArgs) => { Log.Error(eventArgs.Exception); };
             BuildAvaloniaApp()
-                .StartWithClassicDesktopLifetime(args);
-            Dispatcher.UIThread.UnhandledException += (sender, e) =>
-            {
-                Log.Fatal(e.Exception);
-            };
+               .StartWithClassicDesktopLifetime(args);
+            Dispatcher.UIThread.UnhandledException += (sender, e) => { Log.Fatal(e.Exception); };
         }
         catch (Exception e)
         {

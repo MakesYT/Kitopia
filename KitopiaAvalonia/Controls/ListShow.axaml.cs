@@ -1,29 +1,27 @@
 ﻿using System.Collections;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
-using Avalonia.Data;
-using Avalonia.Interactivity;
 using CommunityToolkit.Mvvm.Input;
-using FluentAvalonia.Core;
-using ReactiveUI;
 
 namespace KitopiaAvalonia.Controls;
 
-public class ListShow : ListBox 
+public class ListShow : ListBox
 {
     //ObservableCollection
 
     //DelCommand
-    public static readonly StyledProperty<ICommand> DelCommandProperty = AvaloniaProperty.Register<ListShow, ICommand>(nameof(DelCommand));
-    public static readonly StyledProperty<bool> WithAddProperty = AvaloniaProperty.Register<ListShow, bool>(nameof(WithAdd),false);
-    public static readonly StyledProperty<ICommand> AddCommandProperty = AvaloniaProperty.Register<ListShow, ICommand>(nameof(AddCommand));
+    public static readonly StyledProperty<ICommand> DelCommandProperty =
+        AvaloniaProperty.Register<ListShow, ICommand>(nameof(DelCommand));
 
-    public static readonly StyledProperty<string> TextValueProperty = AvaloniaProperty.Register<ListShow, string>(nameof(TextValue));
+    public static readonly StyledProperty<bool> WithAddProperty =
+        AvaloniaProperty.Register<ListShow, bool>(nameof(WithAdd), false);
+
+    public static readonly StyledProperty<ICommand> AddCommandProperty =
+        AvaloniaProperty.Register<ListShow, ICommand>(nameof(AddCommand));
+
+    public static readonly StyledProperty<string> TextValueProperty =
+        AvaloniaProperty.Register<ListShow, string>(nameof(TextValue));
 
     //设置默认DelCommand
     public ListShow()
@@ -69,8 +67,6 @@ public class ListShow : ListBox
             list.Add(obj);
             TextValue = "";
         }
-        
-           
     }
 
     //DelCommand执行方法
@@ -84,9 +80,6 @@ public class ListShow : ListBox
         if (ItemsSource is IList list)
         {
             list.Remove(obj);
-
         }
-        
-           
     }
 }

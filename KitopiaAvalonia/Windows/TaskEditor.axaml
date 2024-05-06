@@ -1191,150 +1191,177 @@
                                                HorizontalAlignment="Center" />
                                 </controls2:Node.Header>
                                 <controls2:Node.InputConnectorTemplate>
+                                    <DataTemplate DataType="{x:Type customScenario:ConnectorItem}">
+
+                                        <ContentPresenter Content="{Binding}">
+                                            <ContentPresenter.ContextFlyout>
+                                                <MenuFlyout>
+                                                    <!-- ReSharper disable once Xaml.RedundantResource -->
+                                                    <MenuItem Header="切换自输入/连接器"
+                                                              Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                                              Command="{Binding $parent[Grid].((taskEditor1:TaskEditorViewModel)DataContext).SwitchConnectorCommand}"
+                                                              CommandParameter="{Binding }" />
+                                                </MenuFlyout>
+                                            </ContentPresenter.ContextFlyout>
+                                            <ContentPresenter.DataTemplates>
+                                                <plugin:MyDataTemplateSelector>
+                                                    <DataTemplate x:Key="InputTemplate"
+                                                                  DataType="{x:Type customScenario:ConnectorItem}">
+                                                        <controls2:NodeInput
+                                                            ToolTip.Tip="{Binding InputObject}"
+                                                            ToolTip.ShowDelay="0"
+                                                            IsConnected="{Binding IsConnected}"
+                                                            Anchor="{Binding Anchor, Mode=TwoWay}">
+                                                            <controls2:NodeInput.Header>
+
+                                                                <StackPanel Orientation="Horizontal"
+                                                                            VerticalAlignment="Center"
+                                                                            HorizontalAlignment="Right">
+                                                                    <StackPanel.Styles>
+                                                                        <Style
+                                                                            Selector="TextBlock#TypeNametextBlock">
+                                                                            <Setter Property="Background">
+                                                                                <Setter.Value>
+                                                                                    <SolidColorBrush
+                                                                                        Color="{DynamicResource TextFillColorPrimary}"
+                                                                                        Opacity="0.6" />
+                                                                                </Setter.Value>
+                                                                            </Setter>
+                                                                            <Setter Property="Foreground">
+                                                                                <Setter.Value>
+                                                                                    <SolidColorBrush
+                                                                                        Color="{DynamicResource TextFillColorInverse}" />
+                                                                                </Setter.Value>
+                                                                            </Setter>
+                                                                        </Style>
+                                                                        <Style Selector="TextBlock.IsNotUsed">
+                                                                            <Setter Property="Background">
+                                                                                <Setter.Value>
+                                                                                    <SolidColorBrush
+                                                                                        Color="{DynamicResource ControlFillColorDisabled}"
+                                                                                        Opacity="0.6" />
+                                                                                </Setter.Value>
+                                                                            </Setter>
+                                                                            <Setter Property="Foreground">
+                                                                                <Setter.Value>
+                                                                                    <SolidColorBrush
+                                                                                        Color="{DynamicResource TextFillColorTertiary}" />
+                                                                                </Setter.Value>
+                                                                            </Setter>
+                                                                        </Style>
+                                                                    </StackPanel.Styles>
+                                                                    <TextBlock VerticalAlignment="Center"
+                                                                               FontSize="12"
+                                                                               x:Name="TypeNametextBlock"
+                                                                               Classes.IsNotUsed="{Binding IsNotUsed}"
+                                                                               Text="{Binding TypeName}" />
+                                                                    <TextBlock VerticalAlignment="Center"
+                                                                               x:Name="textBlock"
+                                                                               Classes.IsNotUsed="{Binding IsNotUsed}"
+                                                                               Text="{Binding Title}" />
+                                                                </StackPanel>
+                                                            </controls2:NodeInput.Header>
+                                                            <controls2:NodeInput.BorderBrush>
+                                                                <SolidColorBrush
+                                                                    Color="{DynamicResource SystemAccentColor}"
+                                                                    Opacity="0.5" />
+                                                            </controls2:NodeInput.BorderBrush>
+                                                        </controls2:NodeInput>
 
 
-                                    <plugin:MyDataTemplateSelector>
-                                        <DataTemplate x:Key="InputTemplate"
-                                                      DataType="{x:Type customScenario:ConnectorItem}">
+                                                    </DataTemplate>
+                                                    <DataTemplate x:Key="StringTemplate"
+                                                                  DataType="{x:Type customScenario:ConnectorItem}">
+                                                        <StackPanel Margin="10,0,0,0" Orientation="Horizontal"
+                                                                    VerticalAlignment="Center"
+                                                                    IsHitTestVisible="True"
 
-                                            <controls2:NodeInput
-                                                ToolTip.Tip="{Binding InputObject}"
-                                                ToolTip.ShowDelay="0"
-                                                IsConnected="{Binding IsConnected}"
-                                                Anchor="{Binding Anchor, Mode=TwoWay}">
-                                                <controls2:NodeInput.Header>
+                                                                    HorizontalAlignment="Right">
+                                                            <TextBlock VerticalAlignment="Center"
+                                                                       x:Name="textBlock"
+                                                                       Text="{Binding Title}"
+                                                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                            <TextBox Margin="10,5,10,5" MinWidth="40"
+                                                                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                                                     Text="{Binding InputObject}" Watermark="字符串" />
+                                                        </StackPanel>
 
-                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
-                                                                HorizontalAlignment="Right">
-                                                        <StackPanel.Styles>
-                                                            <Style Selector="TextBlock#TypeNametextBlock">
-                                                                <Setter Property="Background">
-                                                                    <Setter.Value>
-                                                                        <SolidColorBrush
-                                                                            Color="{DynamicResource TextFillColorPrimary}"
-                                                                            Opacity="0.6" />
-                                                                    </Setter.Value>
-                                                                </Setter>
-                                                                <Setter Property="Foreground">
-                                                                    <Setter.Value>
-                                                                        <SolidColorBrush
-                                                                            Color="{DynamicResource TextFillColorInverse}" />
-                                                                    </Setter.Value>
-                                                                </Setter>
-                                                            </Style>
-                                                            <Style Selector="TextBlock.IsNotUsed">
-                                                                <Setter Property="Background">
-                                                                    <Setter.Value>
-                                                                        <SolidColorBrush
-                                                                            Color="{DynamicResource ControlFillColorDisabled}"
-                                                                            Opacity="0.6" />
-                                                                    </Setter.Value>
-                                                                </Setter>
-                                                                <Setter Property="Foreground">
-                                                                    <Setter.Value>
-                                                                        <SolidColorBrush
-                                                                            Color="{DynamicResource TextFillColorTertiary}" />
-                                                                    </Setter.Value>
-                                                                </Setter>
-                                                            </Style>
-                                                        </StackPanel.Styles>
-                                                        <TextBlock VerticalAlignment="Center" FontSize="12"
-                                                                   x:Name="TypeNametextBlock"
-                                                                   Classes.IsNotUsed="{Binding IsNotUsed}"
-                                                                   Text="{Binding TypeName}" />
-                                                        <TextBlock VerticalAlignment="Center" x:Name="textBlock"
-                                                                   Classes.IsNotUsed="{Binding IsNotUsed}"
-                                                                   Text="{Binding Title}" />
-                                                    </StackPanel>
-                                                </controls2:NodeInput.Header>
-                                                <controls2:NodeInput.BorderBrush>
-                                                    <SolidColorBrush
-                                                        Color="{DynamicResource SystemAccentColor}"
-                                                        Opacity="0.5" />
-                                                </controls2:NodeInput.BorderBrush>
-                                            </controls2:NodeInput>
+                                                    </DataTemplate>
+                                                    <DataTemplate x:Key="IntTemplate"
+                                                                  DataType="{x:Type customScenario:ConnectorItem}">
+                                                        <StackPanel Margin="10,0,0,0" Orientation="Horizontal"
+                                                                    VerticalAlignment="Center"
+                                                                    HorizontalAlignment="Right">
+                                                            <TextBlock VerticalAlignment="Center"
+                                                                       x:Name="textBlock"
+                                                                       Text="{Binding Title}"
+                                                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                            <controls:NumberBox Margin="10,5,10,5" MinWidth="40"
+                                                                ValidationMode="InvalidInputOverwritten"
+                                                                SpinButtonPlacementMode="Inline"
+                                                                Maximum="2147483647" Minimum="-2147483648"
+                                                                Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                                                Value="{Binding InputObject, Mode=TwoWay }"
+                                                                PlaceholderText="整型" />
+                                                        </StackPanel>
+
+                                                    </DataTemplate>
+                                                    <DataTemplate x:Key="DoubleTemplate"
+                                                                  DataType="{x:Type customScenario:ConnectorItem}">
+                                                        <StackPanel Margin="10,0,0,0" Orientation="Horizontal"
+                                                                    VerticalAlignment="Center"
+                                                                    HorizontalAlignment="Right">
+                                                            <TextBlock VerticalAlignment="Center"
+                                                                       x:Name="textBlock"
+                                                                       Text="{Binding Title}"
+                                                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                            <controls:NumberBox Margin="10,5,10,5" MinWidth="40"
+                                                                SimpleNumberFormat="F2"
+                                                                SpinButtonPlacementMode="Inline"
+                                                                ValidationMode="InvalidInputOverwritten"
+                                                                Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                                                Value="{Binding InputObject, Mode=TwoWay}"
+                                                                PlaceholderText="浮点" />
+                                                        </StackPanel>
+
+                                                    </DataTemplate>
+                                                    <DataTemplate x:Key="BoolTemplate"
+                                                                  DataType="{x:Type customScenario:ConnectorItem}">
+                                                        <StackPanel Margin="10,0,0,0" Orientation="Horizontal"
+                                                                    VerticalAlignment="Center"
+                                                                    HorizontalAlignment="Right">
+                                                            <TextBlock VerticalAlignment="Center"
+                                                                       x:Name="textBlock"
+                                                                       Text="{Binding Title}"
+                                                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                            <ToggleSwitch Margin="10,5,10,5" MinWidth="40"
+                                                                          IsChecked="{Binding InputObject, Mode=TwoWay}" />
+                                                        </StackPanel>
+
+                                                    </DataTemplate>
+                                                    <DataTemplate x:Key="SearchItemTemplate"
+                                                                  DataType="{x:Type customScenario:ConnectorItem}">
+                                                        <StackPanel Margin="10,0,0,0" Orientation="Horizontal"
+                                                                    VerticalAlignment="Center"
+                                                                    HorizontalAlignment="Right">
+                                                            <TextBlock VerticalAlignment="Center"
+                                                                       x:Name="textBlock"
+                                                                       Text="{Binding Title}"
+                                                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                            <controls1:SearchItemShow Margin="10,5,10,5"
+                                                                ToolTip.Tip="{Binding RelativeSource={RelativeSource Self},Path=OnlyKey}"
+                                                                Click="SearchItemShow_OnClick"
+                                                                OnlyKey="{Binding InputObject, Mode=TwoWay}" />
+                                                        </StackPanel>
+
+                                                    </DataTemplate>
+                                                </plugin:MyDataTemplateSelector>
+                                            </ContentPresenter.DataTemplates>
+                                        </ContentPresenter>
+
+                                    </DataTemplate>
 
 
-                                        </DataTemplate>
-                                        <DataTemplate x:Key="StringTemplate"
-                                                      DataType="{x:Type customScenario:ConnectorItem}">
-                                            <StackPanel Margin="10,0,0,0" Orientation="Horizontal"
-                                                        VerticalAlignment="Center"
-                                                        HorizontalAlignment="Right">
-                                                <TextBlock VerticalAlignment="Center" x:Name="textBlock"
-                                                           Text="{Binding Title}"
-                                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                                                <TextBox Margin="10,5,10,5" MinWidth="40"
-                                                         Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                                         Text="{Binding InputObject}" Watermark="字符串" />
-                                            </StackPanel>
-
-                                        </DataTemplate>
-                                        <DataTemplate x:Key="IntTemplate"
-                                                      DataType="{x:Type customScenario:ConnectorItem}">
-                                            <StackPanel Margin="10,0,0,0" Orientation="Horizontal"
-                                                        VerticalAlignment="Center"
-                                                        HorizontalAlignment="Right">
-                                                <TextBlock VerticalAlignment="Center" x:Name="textBlock"
-                                                           Text="{Binding Title}"
-                                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                                                <controls:NumberBox Margin="10,5,10,5" MinWidth="40"
-                                                                    ValidationMode="InvalidInputOverwritten"
-                                                                    SpinButtonPlacementMode="Inline"
-                                                                    Maximum="2147483647" Minimum="-2147483648"
-                                                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                                                    Value="{Binding InputObject, Mode=TwoWay }"
-                                                                    PlaceholderText="整型" />
-                                            </StackPanel>
-
-                                        </DataTemplate>
-                                        <DataTemplate x:Key="DoubleTemplate"
-                                                      DataType="{x:Type customScenario:ConnectorItem}">
-                                            <StackPanel Margin="10,0,0,0" Orientation="Horizontal"
-                                                        VerticalAlignment="Center"
-                                                        HorizontalAlignment="Right">
-                                                <TextBlock VerticalAlignment="Center" x:Name="textBlock"
-                                                           Text="{Binding Title}"
-                                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                                                <controls:NumberBox Margin="10,5,10,5" MinWidth="40"
-                                                                    SimpleNumberFormat="F2"
-                                                                    SpinButtonPlacementMode="Inline"
-                                                                    ValidationMode="InvalidInputOverwritten"
-                                                                    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                                                    Value="{Binding InputObject, Mode=TwoWay}"
-                                                                    PlaceholderText="浮点" />
-                                            </StackPanel>
-
-                                        </DataTemplate>
-                                        <DataTemplate x:Key="BoolTemplate"
-                                                      DataType="{x:Type customScenario:ConnectorItem}">
-                                            <StackPanel Margin="10,0,0,0" Orientation="Horizontal"
-                                                        VerticalAlignment="Center"
-                                                        HorizontalAlignment="Right">
-                                                <TextBlock VerticalAlignment="Center" x:Name="textBlock"
-                                                           Text="{Binding Title}"
-                                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                                                <ToggleSwitch Margin="10,5,10,5" MinWidth="40"
-                                                              IsChecked="{Binding InputObject, Mode=TwoWay}" />
-                                            </StackPanel>
-
-                                        </DataTemplate>
-                                        <DataTemplate x:Key="SearchItemTemplate"
-                                                      DataType="{x:Type customScenario:ConnectorItem}">
-                                            <StackPanel Margin="10,0,0,0" Orientation="Horizontal"
-                                                        VerticalAlignment="Center"
-                                                        HorizontalAlignment="Right">
-                                                <TextBlock VerticalAlignment="Center" x:Name="textBlock"
-                                                           Text="{Binding Title}"
-                                                           Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                                                <controls1:SearchItemShow Margin="10,5,10,5"
-                                                                          ToolTip.Tip="{Binding RelativeSource={RelativeSource Self},Path=OnlyKey}"
-                                                                          Click="SearchItemShow_OnClick"
-                                                                          OnlyKey="{Binding InputObject, Mode=TwoWay}" />
-                                            </StackPanel>
-
-                                        </DataTemplate>
-                                    </plugin:MyDataTemplateSelector>
                                     <!-- Use a ContentControl to display the single element -->
 
 
