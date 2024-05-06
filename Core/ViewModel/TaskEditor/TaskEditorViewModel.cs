@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -255,8 +256,13 @@ public partial class TaskEditorViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    private void SwitchConnector(ConnectorItem connector)
+    private void SwitchConnector(ContentPresenter c)
     {
+        if (c.DataContext is not ConnectorItem connector)
+        {
+            return;
+        }
+
         if (!connector.SelfInputAble)
         {
             return;
@@ -285,7 +291,8 @@ public partial class TaskEditorViewModel : ObservableRecipient
             }
         }
 
-        // Scenario.nodes.ResetBindings();
+        c.DataContext = null;
+        c.DataContext = connector;
     }
 
     [RelayCommand]

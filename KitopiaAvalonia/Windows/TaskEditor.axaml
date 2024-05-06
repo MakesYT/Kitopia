@@ -13,10 +13,10 @@
                      xmlns:taskEditor1="clr-namespace:Core.ViewModel.TaskEditor;assembly=Core"
 
                      xmlns:objectModel="clr-namespace:System.Collections.ObjectModel;assembly=System.ObjectModel"
-                     xmlns:plugin="clr-namespace:Kitopia.View.Pages.Plugin"
                      xmlns:generic="clr-namespace:System.Collections.Generic;assembly=System.Runtime"
                      xmlns:sdKs="clr-namespace:Kitopia.SDKs"
                      xmlns:controls2="clr-namespace:NodifyM.Avalonia.Controls;assembly=NodifyM.Avalonia"
+                     xmlns:pages="clr-namespace:KitopiaAvalonia.Pages"
                      mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
                      x:Class="KitopiaAvalonia.Windows.TaskEditor"
                      Title="情景编排"
@@ -792,7 +792,7 @@
                                                                         </ItemsControl.ItemsPanel>
                                                                         <!-- Set the ItemTemplate to a Button with the content bound to the item -->
                                                                         <ItemsControl.ItemTemplate>
-                                                                            <plugin:MyDataTemplateSelector>
+                                                                            <pages:MyDataTemplateSelector>
                                                                                 <DataTemplate x:Key="InputTemplate"
                                                                                     DataType="{x:Type customScenario:ConnectorItem}">
 
@@ -949,7 +949,7 @@
                                                                                     </StackPanel>
 
                                                                                 </DataTemplate>
-                                                                            </plugin:MyDataTemplateSelector>
+                                                                            </pages:MyDataTemplateSelector>
                                                                         </ItemsControl.ItemTemplate>
                                                                     </ItemsControl>
 
@@ -1193,18 +1193,18 @@
                                 <controls2:Node.InputConnectorTemplate>
                                     <DataTemplate DataType="{x:Type customScenario:ConnectorItem}">
 
-                                        <ContentPresenter Content="{Binding}">
+                                        <ContentPresenter Content="{Binding .}" Name="ContentPresenter">
                                             <ContentPresenter.ContextFlyout>
                                                 <MenuFlyout>
                                                     <!-- ReSharper disable once Xaml.RedundantResource -->
                                                     <MenuItem Header="切换自输入/连接器"
                                                               Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                                              Command="{Binding $parent[Grid].((taskEditor1:TaskEditorViewModel)DataContext).SwitchConnectorCommand}"
-                                                              CommandParameter="{Binding }" />
+                                                              Command="{Binding $parent[controls2:NodifyEditor].((taskEditor1:TaskEditorViewModel)DataContext).SwitchConnectorCommand}"
+                                                              CommandParameter="{Binding #ContentPresenter  }" />
                                                 </MenuFlyout>
                                             </ContentPresenter.ContextFlyout>
                                             <ContentPresenter.DataTemplates>
-                                                <plugin:MyDataTemplateSelector>
+                                                <pages:MyDataTemplateSelector>
                                                     <DataTemplate x:Key="InputTemplate"
                                                                   DataType="{x:Type customScenario:ConnectorItem}">
                                                         <controls2:NodeInput
@@ -1267,8 +1267,6 @@
                                                                     Opacity="0.5" />
                                                             </controls2:NodeInput.BorderBrush>
                                                         </controls2:NodeInput>
-
-
                                                     </DataTemplate>
                                                     <DataTemplate x:Key="StringTemplate"
                                                                   DataType="{x:Type customScenario:ConnectorItem}">
@@ -1285,7 +1283,6 @@
                                                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                                                      Text="{Binding InputObject}" Watermark="字符串" />
                                                         </StackPanel>
-
                                                     </DataTemplate>
                                                     <DataTemplate x:Key="IntTemplate"
                                                                   DataType="{x:Type customScenario:ConnectorItem}">
@@ -1355,7 +1352,7 @@
                                                         </StackPanel>
 
                                                     </DataTemplate>
-                                                </plugin:MyDataTemplateSelector>
+                                                </pages:MyDataTemplateSelector>
                                             </ContentPresenter.DataTemplates>
                                         </ContentPresenter>
 
