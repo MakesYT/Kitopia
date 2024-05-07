@@ -1,44 +1,44 @@
 ﻿using Core.SDKs.Services;
-using PluginCore;
+using log4net;
 
 namespace Core.Window.Everything;
 
 public class EverythingService : IEverythingService
 {
+    private static readonly ILog Log = LogManager.GetLogger(nameof(EverythingService));
+
     public bool isRun()
     {
         if (IntPtr.Size == 8)
         {
             // 64-bit
-            Everything64.Everything_SetMax(1);
-            
-            try
+            var task = Task.Run<bool>(() => {
+                Everything64.Everything_SetMax(1);
+                return Everything64.Everything_QueryW(true);
+            });
+            if (!task.Wait(TimeSpan.FromSeconds(1)))
             {
-                var task = Task.Run<bool>(()=> Everything64.Everything_QueryW(true));
-                task.Wait(TimeSpan.FromSeconds(1));
-
-                return task.Result;
-            }
-            catch (Exception)
-            {
+                Log.Error("Everything调用超时");
                 return false;
             }
+
+            return task.Result;
         }
         else
         {
             // 32-bit
-            try
-            {
-                var task = Task.Run<bool>(()=> Everything32.Everything_QueryW(true));
-                task.Wait(TimeSpan.FromSeconds(1));
 
-                return task.Result;
-            }
-            catch (Exception)
+            var task = Task.Run<bool>(() => {
+                Everything32.Everything_SetMax(1);
+                return Everything32.Everything_QueryW(true);
+            });
+            if (!task.Wait(TimeSpan.FromSeconds(1)))
             {
+                Log.Error("Everything调用超时");
                 return false;
             }
+
+            return task.Result;
         }
     }
-    
 }

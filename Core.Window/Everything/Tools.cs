@@ -1,9 +1,8 @@
 ﻿#region
 
-using System.IO;
 using System.Text;
 using Core.SDKs.Services.Config;
-using PluginCore;
+using log4net;
 
 #endregion
 
@@ -11,27 +10,32 @@ namespace Core.Window.Everything;
 
 public class Tools
 {
+    private static readonly ILog Log = LogManager.GetLogger("EverythingTools");
+
     public static void main(List<string> Items)
     {
-        
-        if (IntPtr.Size == 8)
-            // 64-bit
+        var task = Task.Run(() => {
+            if (IntPtr.Size == 8)
+                // 64-bit
+            {
+                amd64(Items);
+            }
+            else
+                // 32-bit
+            {
+                amd32(Items);
+            }
+        });
+        if (!task.Wait(TimeSpan.FromSeconds(1)))
         {
-            amd64(Items);
+            Log.Error("Everything调用超时");
         }
-        else
-            // 32-bit
-        {
-            amd32(Items);
-        }
-        
-        
     }
 
     public static void amd32(List<string> Items)
     {
         Everything32.Everything_Reset();
-        Everything32.Everything_SetSearchW(String.Join("|",ConfigManger.Config!.everythingSearchExtensions));
+        Everything32.Everything_SetSearchW(String.Join("|", ConfigManger.Config!.everythingSearchExtensions));
         Everything32.Everything_SetMatchCase(true);
         Everything32.Everything_QueryW(true);
         const int bufsize = 260;
@@ -48,7 +52,7 @@ public class Tools
     public static void amd64(List<string> Items)
     {
         Everything64.Everything_Reset();
-        Everything64.Everything_SetSearchW(String.Join("|",ConfigManger.Config!.everythingSearchExtensions));
+        Everything64.Everything_SetSearchW(String.Join("|", ConfigManger.Config!.everythingSearchExtensions));
         Everything64.Everything_SetMatchCase(true);
         Everything64.Everything_QueryW(true);
         const int bufsize = 260;
