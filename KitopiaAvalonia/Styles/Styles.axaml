@@ -1,12 +1,33 @@
 ﻿<Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:windowing="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
-        xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Design.PreviewWith>
         <Border Padding="20">
             <!-- Add Controls for Previewer Here -->
         </Border>
     </Design.PreviewWith>
+    <Style Selector=":is(ListBox)">
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel Orientation="Vertical" />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
 
-   
+    </Style>
+    <Style Selector=":is(ListBox).draggableVirtualizing > :is(ListBoxItem)">
+        <Setter Property="ZIndex" Value="0" />
+        <Setter Property="(Interaction.Behaviors)">
+            <BehaviorCollectionTemplate>
+                <BehaviorCollection>
+                    <ItemDragBehavior HorizontalDragThreshold="3" VerticalDragThreshold="3" Orientation="Vertical" />
+                </BehaviorCollection>
+            </BehaviorCollectionTemplate>
+        </Setter>
+    </Style>
+
+    <Style Selector=":is(ListBox).draggableVirtualizing > :is(ListBoxItem):pressed">
+        <Setter Property="ZIndex" Value="1" />
+    </Style>
+
 </Styles>

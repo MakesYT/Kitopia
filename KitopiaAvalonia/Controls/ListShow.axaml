@@ -1,7 +1,6 @@
 ﻿<Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="using:KitopiaAvalonia.Controls"
-        xmlns:system="clr-namespace:System;assembly=System.Runtime"
         xmlns:controls1="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia">
     <Design.PreviewWith>
         <controls:ListShow Width="200" Height="200">
@@ -16,9 +15,9 @@
         <Setter Property="Template">
             <ControlTemplate>
                 <ItemsControl>
-                    <ListBox
-                        ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                        ItemsSource="{TemplateBinding ItemsSource}">
+                    <ListBox Classes="draggableVirtualizing"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             ItemsSource="{TemplateBinding ItemsSource}">
                         <ListBox.ItemContainerTheme>
                             <ControlTheme TargetType="ListBoxItem">
                                 <Setter Property="Template">
@@ -84,9 +83,9 @@
                                 CommandParameter="{TemplateBinding TextValue}"
                                 Grid.Column="1" Height="36" Width="36">
                             <controls1:FontIcon FontFamily="{StaticResource FluentFont}" Foreground="GreenYellow"
-                                               Glyph="&#xf107;" />
+                                                Glyph="&#xf107;" />
                         </Button>
-                        <DockPanel  Grid.Column="0" Margin="0" >
+                        <DockPanel Grid.Column="0" Margin="0">
                             <TextBox
                                 Text="{Binding TextValue,Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
                         </DockPanel>
