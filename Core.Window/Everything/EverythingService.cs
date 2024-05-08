@@ -1,5 +1,7 @@
 ﻿using Core.SDKs.Services;
 using log4net;
+using Microsoft.Extensions.DependencyInjection;
+using PluginCore;
 
 namespace Core.Window.Everything;
 
@@ -19,6 +21,7 @@ public class EverythingService : IEverythingService
             if (!task.Wait(TimeSpan.FromSeconds(1)))
             {
                 Log.Error("Everything调用超时");
+                ServiceManager.Services.GetService<IToastService>()!.Show("Everything", "Everything调用超时");
                 return false;
             }
 
@@ -35,6 +38,7 @@ public class EverythingService : IEverythingService
             if (!task.Wait(TimeSpan.FromSeconds(1)))
             {
                 Log.Error("Everything调用超时");
+                ServiceManager.Services.GetService<IToastService>()!.Show("Everything", "Everything调用超时");
                 return false;
             }
 

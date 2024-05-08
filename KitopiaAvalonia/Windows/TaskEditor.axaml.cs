@@ -9,6 +9,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.Services;
@@ -127,6 +128,11 @@ public partial class TaskEditor : AppWindow
                     var data = new DataObject();
                     data.Set("KitopiaPointItem", pointItem);
                     DragDrop.DoDragDrop(e, data, DragDropEffects.Copy);
+                    RenderTargetBitmap renderTargetBitmap =
+                        new RenderTargetBitmap(new PixelSize((int)border.Bounds.Width, (int)border.Bounds.Height));
+                    renderTargetBitmap.Render(border);
+                    //Cursor.Dispose();
+                    //Cursor = new Cursor(renderTargetBitmap,new PixelPoint((int)(renderTargetBitmap.Size.Width/2),(int)(renderTargetBitmap.Size.Height/2)));
                 }
                 catch (Exception exception)
                 {
@@ -171,17 +177,13 @@ public partial class TaskEditor : AppWindow
 
     private void SearchItemShow_OnClick(object? sender, RoutedEventArgs routedEventArgs)
     {
-        ServiceManager.Services.GetService<SearchWindowViewModel>()!.SetSelectMode(true, (item =>
-        {
-            Dispatcher.UIThread.Post(() =>
-            {
-                ((SearchItemShow)sender).OnlyKey = item.OnlyKey;
-            });
-        }));
+        ServiceManager.Services.GetService<SearchWindowViewModel>()!.SetSelectMode(true,
+            (item => { Dispatcher.UIThread.Post(() => { ((SearchItemShow)sender).OnlyKey = item.OnlyKey; }); }));
         ServiceManager.Services.GetService<SearchWindow>()!.Show();
 
         User32.SetForegroundWindow(
-            ServiceManager.Services.GetService<SearchWindow>()!.TryGetPlatformHandle().Handle);
+            ServiceManager.Services.GetService<SearchWindow>()!.TryGetPlatformHandle()
+                          .Handle);
         ServiceManager.Services.GetService<SearchWindow>()!.tx.Focus();
     }
 }

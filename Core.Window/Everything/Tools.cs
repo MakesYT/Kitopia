@@ -1,8 +1,11 @@
 ﻿#region
 
 using System.Text;
+using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using log4net;
+using Microsoft.Extensions.DependencyInjection;
+using PluginCore;
 
 #endregion
 
@@ -29,6 +32,7 @@ public class Tools
         if (!task.Wait(TimeSpan.FromSeconds(1)))
         {
             Log.Error("Everything调用超时");
+            ServiceManager.Services.GetService<IToastService>()!.Show("Everything", "Everything调用超时");
         }
     }
 
