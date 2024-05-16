@@ -1,41 +1,29 @@
+#if LINUX
+    using Core.Linux;
+#endif
+
 using System;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-#if LINUX
-    using Core.Linux;        
-#endif
-
-#if WINDOWS
-using Core.Window;
-using Core.Window.Everything;
-#endif
-using Core.SDKs;
-using Core.SDKs.CustomScenario;
 using Core.SDKs.Services;
-using Core.SDKs.Services.Config;
-using Core.SDKs.Services.Plugin;
-using Core.SDKs.Tools;
 using Core.ViewModel;
 using Core.ViewModel.Pages;
 using Core.ViewModel.Pages.customScenario;
 using Core.ViewModel.Pages.plugin;
 using Core.ViewModel.TaskEditor;
-using HotAvalonia;
 using Kitopia.Services;
 using KitopiaAvalonia.Pages;
 using KitopiaAvalonia.Services;
 using KitopiaAvalonia.Windows;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Win32;
 using PluginCore;
-using HotKeyManager = Core.SDKs.HotKey.HotKeyManager;
+#if WINDOWS
+using Core.Window;
+using Core.Window.Everything;
+#endif
 
 namespace KitopiaAvalonia;
 
@@ -57,11 +45,9 @@ public partial class App : Application
         {
             desktop.MainWindow = ServiceManager.Services.GetService<MainWindow>();
             DataContext = new AppViewModel();
-            
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
         {
-            
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -81,9 +67,9 @@ public partial class App : Application
         services.AddSingleton<IMouseQuickWindowService, MouseQuickWindowService>();
         services.AddTransient<ISearchWindowService, SearchWindowService>();
         services.AddTransient<IErrorWindow, ErrorWindow>();
-        services.AddTransient<IScreenCapture, Services.ScreenCapture>();
+        services.AddTransient<IScreenCaptureWindow, Services.ScreenCaptureWindow>();
         services.AddTransient<IPluginToolService, PluginToolService>();
-        
+
         services.AddTransient<INavigationPageService, NavigationPageService>();
         #if WINDOWS
         services.AddTransient<IEverythingService, EverythingService>();
@@ -96,7 +82,7 @@ public partial class App : Application
         #if LINUX
             services.AddTransient<IAppToolService, AppToolLinuxService>();
         #endif
-        
+
 
         services.AddTransient<TaskEditorViewModel>();
         services.AddTransient<TaskEditor>(e => new TaskEditor() { DataContext = e.GetService<TaskEditorViewModel>() });
@@ -108,7 +94,7 @@ public partial class App : Application
         services.AddTransient<MouseQuickWindowViewModel>();
         services.AddTransient<MouseQuickWindow>(e => new MouseQuickWindow()
             { DataContext = e.GetService<MouseQuickWindowViewModel>() });
-        
+
         services.AddSingleton<HomePageViewModel>(e => new HomePageViewModel() { IsActive = true });
         services.AddKeyedSingleton<UserControl, HomePage>("HomePage",
             (e, _) => new HomePage() { DataContext = e.GetService<HomePageViewModel>() });
@@ -126,7 +112,7 @@ public partial class App : Application
         services.AddSingleton<PluginSettingViewModel>(e => new PluginSettingViewModel() { IsActive = true });
         services.AddKeyedSingleton<UserControl, PluginSettingSelectPage>("PluginSettingSelectPage",
             (e, _) => new PluginSettingSelectPage() { DataContext = e.GetService<PluginSettingViewModel>() });
-        services.AddSingleton<SettingPage>(e => new SettingPage() );
+        services.AddSingleton<SettingPage>(e => new SettingPage());
 
         return services.BuildServiceProvider();
     }

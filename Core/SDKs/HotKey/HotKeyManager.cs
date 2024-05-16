@@ -25,30 +25,20 @@ public class HotKeyManager
     private static Timer keyPressTimer = new(1000);
     private static bool canPress = true;
     public static SimpleReactiveGlobalHook hook;
-    public static event EventHandler<HotKeyModel> OnHotKeyPressed ;
+    public static event EventHandler<HotKeyModel> OnHotKeyPressed;
 
-    public static ObservableCollection<HotKeyModel> HotKeys
-    {
-        get;
-        set;
-    } = new();
+    public static ObservableCollection<HotKeyModel> HotKeys { get; set; } = new();
 
     public static void Init()
     {
-        OnHotKeyPressed += (sender, model) =>
-        {
-            log.Debug($"快捷键{model.MainName} {model.Name}被触发");
-        };
+        OnHotKeyPressed += (sender, model) => { log.Debug($"快捷键{model.MainName} {model.Name}被触发"); };
         hook = new SimpleReactiveGlobalHook();
         hook.KeyPressed.Subscribe(OnKeyPressed);
         hook.KeyReleased.Subscribe(OnKeyReleased);
         hook.MousePressed.Subscribe(OnMousePressed);
         hook.MouseReleased.Subscribe(OnMouseReleased);
         keyPressTimer.AutoReset = true;
-        keyPressTimer.Elapsed += (_timer, _) =>
-        {
-            canPress = true;
-        };
+        keyPressTimer.Elapsed += (_timer, _) => { canPress = true; };
         hook.RunAsync();
         foreach (var customScenario in CustomScenarioManger.CustomScenarios)
         {
@@ -56,7 +46,7 @@ public class HotKeyManager
             HotKeys.Add(customScenario.StopHotKey);
         }
     }
-  
+
 
     private static void OnKeyPressed(KeyboardHookEventArgs e)
     {
@@ -98,8 +88,9 @@ public class HotKeyManager
             if ((int)configHotKey.SelectKey != (int)e.Data.KeyCode)
             {
                 continue;
-            } 
-            OnHotKeyPressed.Invoke( new(), configHotKey);
+            }
+
+            OnHotKeyPressed.Invoke(new(), configHotKey);
 
             switch (configHotKey.MainName)
             {
@@ -110,22 +101,22 @@ public class HotKeyManager
                         case "截图":
                         {
                             log.Debug("截图热键被触发");
-                            Dispatcher.UIThread.InvokeAsync(() =>
-                            {
-                                ServiceManager.Services.GetService<IScreenCapture>()!.CaptureScreen();
-                            }).GetTask().ContinueWith((e) =>
-                            {
-                                if (e.IsFaulted)
-                                {
-                                    log.Error(e.Exception);
-                                    ServiceManager.Services.GetService<IErrorWindow>()!.ShowErrorWindow("截图失败", e.Exception.Message);
-                                }
-                            });
+                            Dispatcher.UIThread.InvokeAsync(() => {
+                                           ServiceManager.Services.GetService<IScreenCaptureWindow>()!.CaptureScreen();
+                                       })
+                                      .GetTask()
+                                      .ContinueWith((e) => {
+                                           if (e.IsFaulted)
+                                           {
+                                               log.Error(e.Exception);
+                                               ServiceManager.Services.GetService<IErrorWindow>()!.ShowErrorWindow(
+                                                   "截图失败", e.Exception.Message);
+                                           }
+                                       });
                             break;
                         }
                         case "显示搜索框":
                         {
-                            
                             log.Debug("显示搜索框热键被触发");
                             ServiceManager.Services.GetService<ISearchWindowService>()!.ShowOrHiddenSearchWindow();
 
@@ -199,8 +190,7 @@ public class HotKeyManager
 
         if (_timer is null)
         {
-            _timer = new TimerHelper(ConfigManger.Config.mouseKeyInverval, () =>
-            {
+            _timer = new TimerHelper(ConfigManger.Config.mouseKeyInverval, () => {
                 log.Debug("快捷键触发");
                 ServiceManager.Services.GetService<IMouseQuickWindowService>()!.Open();
             });

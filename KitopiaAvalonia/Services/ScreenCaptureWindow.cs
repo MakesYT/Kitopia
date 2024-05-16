@@ -2,7 +2,7 @@
 
 namespace KitopiaAvalonia.Services;
 
-public class ScreenCapture : IScreenCapture
+public class ScreenCaptureWindow : IScreenCaptureWindow
 {
     public void CaptureScreen()
     {
