@@ -68,6 +68,7 @@ public partial class App : Application
         services.AddTransient<ISearchWindowService, SearchWindowService>();
         services.AddTransient<IErrorWindow, ErrorWindow>();
         services.AddTransient<IScreenCaptureWindow, Services.ScreenCaptureWindow>();
+        services.AddTransient<IScreenCapture, Core.SDKs.Tools.ScreenCapture>();
         services.AddTransient<IPluginToolService, PluginToolService>();
 
         services.AddTransient<INavigationPageService, NavigationPageService>();

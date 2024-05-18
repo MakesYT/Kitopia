@@ -12,8 +12,7 @@ public class SearchWindowService : ISearchWindowService
 {
     public void ShowOrHiddenSearchWindow()
     {
-        Dispatcher.UIThread.InvokeAsync(() =>
-        {
+        Dispatcher.UIThread.InvokeAsync(() => {
             var searchWindow = ServiceManager.Services.GetService<SearchWindow>();
             if (searchWindow!.IsVisible)
             {
@@ -24,14 +23,16 @@ public class SearchWindowService : ISearchWindowService
                 ServiceManager.Services.GetService<SearchWindowViewModel>()!.CheckClipboard();
                 ServiceManager.Services.GetService<IWindowTool>()!.MoveWindowToMouseScreenCenter(searchWindow);
                 searchWindow.Show();
-                ServiceManager.Services.GetService<IWindowTool>()!.SetForegroundWindow(searchWindow!.TryGetPlatformHandle()!.Handle);
-                
+                ServiceManager.Services.GetService<IWindowTool>()!.SetForegroundWindow(
+                    searchWindow!.TryGetPlatformHandle()!.Handle);
+
                 searchWindow.Focus();
                 searchWindow.tx.Focus();
                 searchWindow.tx.SelectAll();
-                Task.Run(() =>
-                {
+                Task.Run(() => {
                     Thread.CurrentThread.Priority = ThreadPriority.Lowest;
+                    ServiceManager.Services.GetService<IWindowTool>()!.SetForegroundWindow(
+                        searchWindow!.TryGetPlatformHandle()!.Handle);
                     ServiceManager.Services.GetService<SearchWindowViewModel>()!.ReloadApps();
                 });
             }

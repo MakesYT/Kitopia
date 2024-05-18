@@ -16,6 +16,7 @@ using Core.SDKs.Services.Config;
 using KitopiaAvalonia.Controls.Capture;
 using KitopiaAvalonia.SDKs;
 using Microsoft.Extensions.DependencyInjection;
+using PluginCore;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using Point = Avalonia.Point;
@@ -32,10 +33,14 @@ public partial class ScreenCaptureWindow : Window
     private Point _startPoint;
     public Stack<ScreenCaptureRedoInfo> redoStack = new();
     private List<CaptureToolBase> tools = new();
+    private bool selectMode = false;
+    private Action<ScreenCaptureInfo> selectModeAction;
+    private int Index = 0;
 
-    public ScreenCaptureWindow()
+    public ScreenCaptureWindow(int index)
     {
         InitializeComponent();
+        Index = index;
         WeakReferenceMessenger.Default.Register<string, string>(this, "ScreenCapture", (sender, message) => {
             switch (message)
             {
@@ -69,6 +74,12 @@ public partial class ScreenCaptureWindow : Window
                 }
             }
         });
+    }
+
+    public void SetToSelectMode(Action<ScreenCaptureInfo> selectModeAction)
+    {
+        selectMode = true;
+        this.selectModeAction = selectModeAction;
     }
 
     bool ShowAlignLine => !IsSelected && PointerOver && !Selecting;
@@ -182,6 +193,22 @@ public partial class ScreenCaptureWindow : Window
 
             WeakReferenceMessenger.Default.Send<string, string>("Selected", "ScreenCapture");
             UpdateSelectBox();
+            if (selectMode)
+            {
+                selectModeAction?.Invoke(new ScreenCaptureInfo()
+                {
+                    Index = Index,
+                    X = (int)SelectBox._dragTransform.X,
+                    Y = (int)SelectBox._dragTransform.Y,
+                    Width = (int)SelectBox.Width,
+                    Height = (int)SelectBox.Height
+                });
+                Image.Source = null;
+
+                WeakReferenceMessenger.Default.Send<string, string>("Close", "ScreenCapture");
+                this.Close();
+            }
+
             if (ConfigManger.Config.截图直接复制到剪贴板)
             {
                 if (Image.Source is Bitmap bitmap)

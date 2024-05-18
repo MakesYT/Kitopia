@@ -2,6 +2,7 @@
 using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using PluginCore;
 using ScreenCapture.NET;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Bmp;
@@ -15,7 +16,7 @@ using SixLabors.ImageSharp.Formats.Tiff;
 using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using IScreenCapture = Core.SDKs.Services.IScreenCapture;
+using IScreenCapture = PluginCore.IScreenCapture;
 
 namespace Core.SDKs.Tools;
 
@@ -100,85 +101,23 @@ public class ScreenCapture : IScreenCapture
         return (bitmaps, mosaics);
     }
 
-    public (Bitmap?, Bitmap?)? CaptureScreen(int index, bool withMosaic = false)
+    public (Bitmap?, Bitmap?)? CaptureScreen(ScreenCaptureInfo screenCaptureInfo, bool withMosaic = false)
     {
         using var screenCaptureService = new DX11ScreenCaptureService();
         var graphicsCards = screenCaptureService.GetGraphicsCards();
 
         var enumerable = screenCaptureService.GetDisplays(graphicsCards.First());
-        if (index + 1 > enumerable.Count())
+        if (screenCaptureInfo.Index + 1 > enumerable.Count())
         {
             return (null, null);
         }
 
-        var display = enumerable.ElementAtOrDefault(index);
-        using var screenCapture = screenCaptureService.GetScreenCapture(display);
-        var captureZone = screenCapture.RegisterCaptureZone(0, 0, display.Width, display.Height);
+        var display = enumerable.ElementAtOrDefault(screenCaptureInfo.Index);
+        var x = System.Math.Max(screenCaptureInfo.X, 0);
+        var y = System.Math.Max(screenCaptureInfo.Y, 0);
+        var width = System.Math.Max(screenCaptureInfo.Width, display.Width);
+        var height = System.Math.Max(screenCaptureInfo.Height, display.Height);
 
-        while (!screenCapture.CaptureScreen()) ;
-        using var loadPixelData = Image.LoadPixelData<Bgra32>(Lazy.Value,
-            captureZone.RawBuffer,
-            captureZone.Width, captureZone.Height);
-        Bitmap? mosaic = null;
-        if (withMosaic)
-        {
-            var clone = loadPixelData.Clone();
-            using (clone)
-            {
-                clone.Mutate(x => x.BoxBlur(10));
-                if (!clone.DangerousTryGetSinglePixelMemory(out Memory<Bgra32> memory1))
-                {
-                    throw new Exception(
-                        "This can only happen with multi-GB images or when PreferContiguousImageBuffers is not set to true.");
-                }
-
-                using (MemoryHandle pinHandle = memory1.Pin())
-                {
-                    unsafe
-                    {
-                        var bitmap1 = new Bitmap(PixelFormat.Bgra8888, AlphaFormat.Unpremul, (IntPtr)pinHandle.Pointer,
-                            new PixelSize(captureZone.Width, captureZone.Height), new Vector(96, 96),
-                            (captureZone.Height * PixelFormat.Bgra8888.BitsPerPixel + 7) / 8);
-                        mosaic = bitmap1;
-                    }
-                }
-            }
-        }
-
-        if (!loadPixelData.DangerousTryGetSinglePixelMemory(out Memory<Bgra32> memory))
-        {
-            throw new Exception(
-                "This can only happen with multi-GB images or when PreferContiguousImageBuffers is not set to true.");
-        }
-
-        Bitmap? bitmap = null;
-        using (MemoryHandle pinHandle = memory.Pin())
-        {
-            unsafe
-            {
-                var bitmap1 = new Bitmap(PixelFormat.Bgra8888, AlphaFormat.Unpremul, (IntPtr)pinHandle.Pointer,
-                    new PixelSize(captureZone.Width, captureZone.Height), new Vector(96, 96),
-                    (captureZone.Height * PixelFormat.Bgra8888.BitsPerPixel + 7) / 8);
-                bitmap = bitmap1;
-            }
-        }
-
-
-        return (bitmap, mosaic);
-    }
-
-    public (Bitmap?, Bitmap?)? CaptureScreen(int index, int x, int y, int width, int height, bool withMosaic = false)
-    {
-        using var screenCaptureService = new DX11ScreenCaptureService();
-        var graphicsCards = screenCaptureService.GetGraphicsCards();
-
-        var enumerable = screenCaptureService.GetDisplays(graphicsCards.First());
-        if (index + 1 > enumerable.Count())
-        {
-            return (null, null);
-        }
-
-        var display = enumerable.ElementAtOrDefault(index);
         using var screenCapture = screenCaptureService.GetScreenCapture(display);
         var captureZone = screenCapture.RegisterCaptureZone(x, y, width, height);
 
@@ -232,5 +171,10 @@ public class ScreenCapture : IScreenCapture
 
 
         return (bitmap, mosaic);
+    }
+
+    public ScreenCaptureInfo GetScreenCaptureInfoByUserManual()
+    {
+        throw new NotImplementedException();
     }
 }
