@@ -247,7 +247,6 @@ public class Plugin
                         }
                     }
 
-
                     inpItems.Add(new ConnectorItem()
                     {
                         Source = pointItem,
@@ -262,14 +261,32 @@ public class Plugin
             }
             else
             {
-                inpItems.Add(new ConnectorItem()
+                var connectorItem = new ConnectorItem()
                 {
                     Source = pointItem,
                     Type = parameterInfo.ParameterType,
                     IsSelf = IsSelf,
                     Title = customAttribute.GetParameterName(parameterInfo.Name),
                     TypeName = BaseNodeMethodsGen.GetI18N(parameterInfo.ParameterType.FullName)
-                });
+                };
+                if (parameterInfo.ParameterType.GetCustomAttribute<CustomNodeInputType>() is not null
+                    and var customNodeInputType)
+                {
+                    connectorItem.isPluginInputConnector = true;
+                    connectorItem.IsSelf = true;
+                    try
+                    {
+                        var service = ServiceProvider.GetService(customNodeInputType.Type);
+                        connectorItem.PluginInputConnector = service as INodeInputConnector;
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                        throw;
+                    }
+                }
+
+                inpItems.Add(connectorItem);
             }
 
             //Log.Debug($"参数{index}:类型为{parameterInfo.ParameterType}");
@@ -335,6 +352,11 @@ public class Plugin
         pointItem.Input = inpItems;
 
         return pointItem;
+    }
+
+    private ObservableCollection<ConnectorItem> getConnectorItemsBy()
+    {
+        return new ObservableCollection<ConnectorItem>();
     }
 
 

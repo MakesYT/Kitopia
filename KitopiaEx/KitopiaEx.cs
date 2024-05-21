@@ -39,6 +39,7 @@ public class KitopiaEx : IPlugin
         services.AddSingleton<ClipboardEx>();
         services.AddSingleton<ImageTools>();
         services.AddSingleton<Test1>();
+        services.AddSingleton<NodeInputConnector1>();
         return services.BuildServiceProvider();
     }
 }

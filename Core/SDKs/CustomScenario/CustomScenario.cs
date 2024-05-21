@@ -325,14 +325,8 @@ public partial class CustomScenario : ObservableRecipient
             return;
         }
 
-        var connectionItem = connections.FirstOrDefault((e) => e.Source == nodes[1]
-           .Output[0]);
-        var firstNodes = connectionItem.Target.Source;
-        nodes[1].Status = s节点状态.已验证;
-        _tickTasks.Add(nodes[0], null);
-        _tickTasks.Add(nodes[1], null);
-        _tickTasks.Add(firstNodes, null);
-        ParsePointItem(_tickTasks, firstNodes, false, true, _cancellationTokenSource.Token);
+        var nowPointItem = nodes[1];
+        ParsePointItem(_tickTasks, nowPointItem, false, true, _cancellationTokenSource.Token);
 
         while (true)
         {

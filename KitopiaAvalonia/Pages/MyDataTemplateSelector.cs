@@ -1,5 +1,6 @@
 ﻿#region
 
+using System;
 using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
@@ -25,6 +26,14 @@ public class MyDataTemplateSelector : IDataTemplate
             {
                 return Templates["InputTemplate"]
                    .Build(item);
+            }
+
+            if (pointItem.isPluginInputConnector)
+            {
+                var control = pointItem.PluginInputConnector.IDataTemplate.Build(item);
+                pointItem.PluginInputConnector.Value.Subscribe(x => { pointItem.InputObject = x; });
+                control!.Styles.Add(pointItem.PluginInputConnector.Style);
+                return control;
             }
 
             return (pointItem.RealType.FullName! switch

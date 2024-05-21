@@ -4,13 +4,16 @@ using Avalonia;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.Services.Config;
+using PluginCore;
 
 namespace Core.SDKs.CustomScenario;
 
-public partial class ConnectorItem : ObservableRecipient
+public partial class ConnectorItem : ObservableRecipient, IConnectorItem
 {
     [JsonConverter(typeof(PointJsonConverter))]
+    #pragma warning disable CS0657 // 不是此声明的有效特性位置
     [property: JsonConverter(typeof(PointJsonConverter))]
+    #pragma warning restore CS0657 // 不是此声明的有效特性位置
     [ObservableProperty]
     private Point _anchor;
 
@@ -37,10 +40,6 @@ public partial class ConnectorItem : ObservableRecipient
     [JsonConverter(typeof(TypeJsonConverter))]
     public Type Type { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    ///
     [JsonConverter(typeof(TypeJsonConverter))]
     public Type RealType
     {
@@ -81,4 +80,8 @@ public partial class ConnectorItem : ObservableRecipient
     {
         WeakReferenceMessenger.Default.Send(new CustomScenarioChangeMsg() { PointItem = Source, ConnectorItem = this });
     }
+
+    //插件自定义输入连接器
+    public bool isPluginInputConnector { get; set; }
+    public INodeInputConnector PluginInputConnector { get; set; }
 }

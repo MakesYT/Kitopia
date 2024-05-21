@@ -2,6 +2,8 @@
 using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Core.SDKs.Services;
+using Microsoft.Extensions.DependencyInjection;
 using PluginCore;
 using ScreenCapture.NET;
 using SixLabors.ImageSharp;
@@ -175,6 +177,7 @@ public class ScreenCapture : IScreenCapture
 
     public ScreenCaptureInfo GetScreenCaptureInfoByUserManual()
     {
-        throw new NotImplementedException();
+        return ServiceManager.Services.GetService<IScreenCaptureWindow>()!.GetScreenCaptureInfo()
+                             .Result;
     }
 }

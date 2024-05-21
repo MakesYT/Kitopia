@@ -328,7 +328,9 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 AutoUnboxIndex = connectorItem.AutoUnboxIndex,
                 IsSelf = connectorItem.IsSelf,
                 SelfInputAble = connectorItem.SelfInputAble,
-                IsOut = connectorItem.IsOut
+                IsOut = connectorItem.IsOut,
+                isPluginInputConnector = connectorItem.isPluginInputConnector,
+                PluginInputConnector = connectorItem.PluginInputConnector
             });
             var plugin = PluginManager.EnablePlugin.FirstOrDefault((e) => e.Value._dll == connectorItem.Type.Assembly)
                                       .Value;
@@ -427,7 +429,9 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 AutoUnboxIndex = connectorItem.AutoUnboxIndex,
                 IsSelf = connectorItem.IsSelf,
                 SelfInputAble = connectorItem.SelfInputAble,
-                IsOut = connectorItem.IsOut
+                IsOut = connectorItem.IsOut,
+                isPluginInputConnector = connectorItem.isPluginInputConnector,
+                PluginInputConnector = connectorItem.PluginInputConnector
             });
         }
 
