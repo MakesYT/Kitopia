@@ -28,7 +28,7 @@
         <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
         <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
         <DebugType Condition="'$(Configuration)' == 'Release'">none</DebugType>
-        <Version>0.0.2.046</Version>
+        <Version>0.0.2.047</Version>
         <AvaloniaVersion>11.1.0-beta2</AvaloniaVersion>
     </PropertyGroup>
     <ItemGroup>
