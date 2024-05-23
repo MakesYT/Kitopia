@@ -40,8 +40,8 @@
         <PackageReference Include="FluentAvaloniaUI" Version="2.0.5" />
         <PackageReference Include="log4net" Version="2.0.16" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0"/>
-        <PackageReference Include="SharpHook" Version="5.2.3"/>
-        <PackageReference Include="SharpHook.Reactive" Version="5.2.3"/>
+        <PackageReference Include="SharpHook" Version="5.3.5"/>
+        <PackageReference Include="SharpHook.Reactive" Version="5.3.5"/>
         <PackageReference Include="SixLabors.ImageSharp" Version="3.1.4"/>
         <PackageReference Include="System.Drawing.Common" Version="8.0.1"/>
         <PackageReference Include="System.Management" Version="8.0.0"/>
@@ -57,7 +57,6 @@
         <ProjectReference Include="..\PinyinM.NET\Pinyin.NET\Pinyin.NET.csproj" />
         <ProjectReference Include="..\ScreenCapture.NET\ScreenCapture.NET.DX11\ScreenCapture.NET.DX11.csproj"/>
         <ProjectReference Include="..\ScreenCapture.NET\ScreenCapture.NET\ScreenCapture.NET.csproj"/>
-        <ProjectReference Include="..\DesktopNotifications\DesktopNotifications.Avalonia\DesktopNotifications.Avalonia.csproj"/>
         <ProjectReference Include="..\PluginCore\PluginCore.csproj"/>
     </ItemGroup>
 

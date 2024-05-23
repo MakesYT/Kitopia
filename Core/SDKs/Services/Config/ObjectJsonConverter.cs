@@ -33,6 +33,13 @@ public class ObjectJsonConverter : JsonConverter<object>
 
     public override void Write(Utf8JsonWriter writer, object value, JsonSerializerOptions options)
     {
+        if (value.GetType() == typeof(object))
+        {
+            JsonSerializer.Serialize(writer, "", typeof(string), options);
+            return;
+        }
+
+
         JsonSerializer.Serialize(writer, value, value.GetType(), options);
     }
 }

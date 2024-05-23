@@ -595,7 +595,7 @@ public partial class CustomScenario : ObservableRecipient
 
                             break;
                         }
-                        case "本地项目":
+                        case "打开/运行本地项目":
                         {
                             if (nowPointItem.Input.Count() >= 3)
                             {
@@ -633,6 +633,11 @@ public partial class CustomScenario : ObservableRecipient
                         default:
                         {
                             var userInputConnector = nowPointItem.Input.FirstOrDefault();
+                            if (userInputConnector.Title == "流输入")
+                            {
+                                userInputConnector = nowPointItem.Input[1];
+                            }
+
                             if (userInputConnector is null)
                             {
                                 break;

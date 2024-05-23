@@ -15,27 +15,27 @@ using SixLabors.ImageSharp.Processing;
 using Vanara.PInvoke;
 using Application = Avalonia.Application;
 using Bitmap = Avalonia.Media.Imaging.Bitmap;
-using DataObject = System.Windows.DataObject;
 using PixelFormat = Avalonia.Platform.PixelFormat;
 using PixelFormats = System.Windows.Media.PixelFormats;
 using Rectangle = System.Drawing.Rectangle;
 using Vector = Avalonia.Vector;
+using Clipboard = System.Windows.Clipboard;
 
 namespace Core.Window;
 
 public class ClipboardWindow : IClipboardService
 {
-  
-
     public bool HasText()
     {
         try
         {
             if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime appLifetime)
             {
-                return appLifetime.MainWindow.Clipboard.GetFormatsAsync().WaitAsync(TimeSpan.FromSeconds(1))
-                    .GetAwaiter()
-                    .GetResult().Contains("Text");
+                return appLifetime.MainWindow.Clipboard.GetFormatsAsync()
+                                  .WaitAsync(TimeSpan.FromSeconds(1))
+                                  .GetAwaiter()
+                                  .GetResult()
+                                  .Contains("Text");
             }
 
             return false;
@@ -52,8 +52,10 @@ public class ClipboardWindow : IClipboardService
         {
             if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime appLifetime)
             {
-                return appLifetime.MainWindow.Clipboard.GetTextAsync().WaitAsync(TimeSpan.FromSeconds(1)).GetAwaiter()
-                    .GetResult();
+                return appLifetime.MainWindow.Clipboard.GetTextAsync()
+                                  .WaitAsync(TimeSpan.FromSeconds(1))
+                                  .GetAwaiter()
+                                  .GetResult();
             }
 
             return null;
@@ -70,8 +72,10 @@ public class ClipboardWindow : IClipboardService
         {
             if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime appLifetime)
             {
-                appLifetime.MainWindow.Clipboard.SetTextAsync(text).WaitAsync(TimeSpan.FromSeconds(1)).GetAwaiter()
-                    .GetResult();
+                appLifetime.MainWindow.Clipboard.SetTextAsync(text)
+                           .WaitAsync(TimeSpan.FromSeconds(1))
+                           .GetAwaiter()
+                           .GetResult();
                 return true;
             }
 
@@ -89,9 +93,10 @@ public class ClipboardWindow : IClipboardService
         {
             if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime appLifetime)
             {
-                var strings = appLifetime.MainWindow.Clipboard.GetFormatsAsync().WaitAsync(TimeSpan.FromSeconds(1))
-                    .GetAwaiter()
-                    .GetResult();
+                var strings = appLifetime.MainWindow.Clipboard.GetFormatsAsync()
+                                         .WaitAsync(TimeSpan.FromSeconds(1))
+                                         .GetAwaiter()
+                                         .GetResult();
                 if (strings is null)
                 {
                     return false;
@@ -115,22 +120,21 @@ public class ClipboardWindow : IClipboardService
             if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime appLifetime)
             {
                 byte[] result = [];
-                Dispatcher.UIThread.Invoke(() =>
-                {
+                Dispatcher.UIThread.Invoke(() => {
                     result = appLifetime.MainWindow.Clipboard.GetDataAsync("Unknown_Format_8")
-                        .WaitAsync(TimeSpan.FromSeconds(1))
-                        .GetAwaiter()
-                        .GetResult() as byte[];
+                                        .WaitAsync(TimeSpan.FromSeconds(1))
+                                        .GetAwaiter()
+                                        .GetResult() as byte[];
                 });
                 var imgInfo = new byte[Marshal.SizeOf<Gdi32.BITMAPINFO>()];
                 var img = new byte[result.Length - Marshal.SizeOf<Gdi32.BITMAPINFO>() + 4];
                 Array.Copy(result, 40, img, 0, img.Length);
                 Array.Copy(result, 0, imgInfo, 0, imgInfo.Length);
                 Gdi32.BITMAPINFO info = BytesToStructure<Gdi32.BITMAPINFO>(imgInfo);
-                SixLabors.ImageSharp.Configuration configuration= Configuration.Default;
+                SixLabors.ImageSharp.Configuration configuration = Configuration.Default;
                 configuration.PreferContiguousImageBuffers = true;
-                
-                var image = SixLabors.ImageSharp.Image.LoadPixelData<Rgba32>(configuration,img, info.bmiHeader.biWidth,
+
+                var image = SixLabors.ImageSharp.Image.LoadPixelData<Rgba32>(configuration, img, info.bmiHeader.biWidth,
                     info.bmiHeader.biHeight);
                 image.Mutate(x => x.Flip(FlipMode.Vertical));
                 if (!image.DangerousTryGetSinglePixelMemory(out Memory<Rgba32> memory))
@@ -162,7 +166,6 @@ public class ClipboardWindow : IClipboardService
 
     public bool SetImage(Bitmap image)
     {
-        
         try
         {
             var data2 = new DataObject();
@@ -199,9 +202,7 @@ public class ClipboardWindow : IClipboardService
     public async Task<bool> SetImageAsync(Image image)
     {
         var tcs = new TaskCompletionSource<bool>();
-        var thread = new Thread(() =>
-        {
-            
+        var thread = new Thread(() => {
             var memoryStream = new MemoryStream();
             image.SaveAsBmp(memoryStream);
             var bitmap = new System.Drawing.Bitmap(memoryStream);
@@ -209,7 +210,6 @@ public class ClipboardWindow : IClipboardService
             var bitmapData = bitmap.LockBits(
                 new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
                 System.Drawing.Imaging.ImageLockMode.ReadOnly, bitmap.PixelFormat);
-
             var bitmapSource = BitmapSource.Create(
                 bitmapData.Width, bitmapData.Height,
                 bitmap.HorizontalResolution, bitmap.VerticalResolution,
@@ -218,10 +218,7 @@ public class ClipboardWindow : IClipboardService
 
             bitmap.UnlockBits(bitmapData);
             bitmap.Dispose();
-            
             Clipboard.SetImage(bitmapSource);
-            
-            
         });
         thread.SetApartmentState(ApartmentState.STA);
         thread.Start();

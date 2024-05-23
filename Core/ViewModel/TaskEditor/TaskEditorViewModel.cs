@@ -175,7 +175,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                     }
                 }
 
-                if (e.PointItem.MerthodName == "本地项目")
+                if (e.PointItem.MerthodName == "打开/运行本地项目")
                 {
                     var o = e.PointItem.Input[1].InputObject;
                     if (o is string inputObject)

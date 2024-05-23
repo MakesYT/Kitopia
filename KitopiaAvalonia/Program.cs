@@ -3,12 +3,10 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Media;
-using Avalonia.Threading;
-using DesktopNotifications;
-using DesktopNotifications.Avalonia;
 using KitopiaAvalonia.Services;
 using log4net;
 using log4net.Config;
+using Microsoft.Toolkit.Uwp.Notifications;
 using ReactiveUI;
 
 namespace KitopiaAvalonia;
@@ -16,9 +14,6 @@ namespace KitopiaAvalonia;
 class Program
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(Program));
-
-    public static INotificationManager NotificationManager = null!;
-
 
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
@@ -34,9 +29,14 @@ class Program
         {
             RxApp.DefaultExceptionHandler = new MyCoolObservableExceptionHandler();
             TaskScheduler.UnobservedTaskException += (sender, eventArgs) => { Log.Error(eventArgs.Exception); };
+
+            AppDomain.CurrentDomain.UnhandledException += (sender, e) => { Log.Fatal(e.ExceptionObject); };
+            AppDomain.CurrentDomain.ProcessExit += (sender, e) => {
+                Log.Info("程序退出");
+                ToastNotificationManagerCompat.Uninstall();
+            };
             BuildAvaloniaApp()
                .StartWithClassicDesktopLifetime(args);
-            Dispatcher.UIThread.UnhandledException += (sender, e) => { Log.Fatal(e.Exception); };
         }
         catch (Exception e)
         {
@@ -67,7 +67,7 @@ class Program
             },
         });
         buildAvaloniaApp.LogToTrace();
-        buildAvaloniaApp.SetupDesktopNotifications(out NotificationManager!);
+
         return buildAvaloniaApp;
     }
 }

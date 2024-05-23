@@ -72,12 +72,12 @@ public class BaseNodeMethodsGen
             nodes.Add(String);
         } //基本数值类型
 
-        //SearchItem
+        //打开/运行本地项目
         var point = new PointItem()
         {
             Plugin = "Kitopia",
-            MerthodName = "本地项目",
-            Title = "本地项目"
+            MerthodName = "打开/运行本地项目",
+            Title = "打开/运行本地项目"
         };
         ObservableCollection<ConnectorItem> pointOutItems = new()
         {
@@ -105,6 +105,48 @@ public class BaseNodeMethodsGen
         };
         point.Input = pointInItems;
         nodes.Add(point);
+
+        //选择本地项目
+        var point1 = new PointItem()
+        {
+            Plugin = "Kitopia",
+            MerthodName = "选择本地项目",
+            Title = "选择本地项目"
+        };
+        ObservableCollection<ConnectorItem> pointOutItems1 = new()
+        {
+            new ConnectorItem()
+            {
+                Source = point1,
+                Type = typeof(string),
+                Title = "本地项目",
+                TypeName = "字符串",
+                IsOut = true
+            }
+        };
+        point1.Output = pointOutItems1;
+        ObservableCollection<ConnectorItem> pointInItems1 = new()
+        {
+            new ConnectorItem()
+            {
+                Source = point1,
+                Type = typeof(NodeConnectorClass),
+                Title = "流输入",
+                TypeName = "节点"
+            },
+            new ConnectorItem()
+            {
+                Source = point,
+                Type = typeof(string),
+                RealType = typeof(SearchViewItem),
+                InputObject = "",
+                Title = "本地项目",
+                TypeName = "字符串",
+                IsSelf = true
+            }
+        };
+        point1.Input = pointInItems1;
+        nodes.Add(point1);
         //if
         {
             var String = new PointItem()
