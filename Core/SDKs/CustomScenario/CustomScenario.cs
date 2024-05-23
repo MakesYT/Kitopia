@@ -633,14 +633,16 @@ public partial class CustomScenario : ObservableRecipient
                         default:
                         {
                             var userInputConnector = nowPointItem.Input.FirstOrDefault();
-                            if (userInputConnector.Title == "流输入")
-                            {
-                                userInputConnector = nowPointItem.Input[1];
-                            }
+
 
                             if (userInputConnector is null)
                             {
                                 break;
+                            }
+
+                            if (userInputConnector.Title == "流输入")
+                            {
+                                userInputConnector = nowPointItem.Input[1];
                             }
 
                             var userInputData = userInputConnector.InputObject;
