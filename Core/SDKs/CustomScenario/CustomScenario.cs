@@ -282,6 +282,11 @@ public partial class CustomScenario : ObservableRecipient
                         return;
                     }
 
+                    if (_cancellationTokenSource.IsCancellationRequested)
+                    {
+                        return;
+                    }
+
                     var connectionItem = connections.FirstOrDefault((e) => e.Source == nodes[1]
                        .Output[0]);
                     if (connectionItem == null || onExit)
@@ -333,6 +338,7 @@ public partial class CustomScenario : ObservableRecipient
             if (_cancellationTokenSource.Token.IsCancellationRequested)
             {
                 InTick = false;
+                _tickUtil.Dispose();
                 break;
             }
 
@@ -366,16 +372,17 @@ public partial class CustomScenario : ObservableRecipient
         }
     }
 
-    public void Stop()
+    public void Stop(bool inTickError = false)
     {
         if (!IsRunning)
         {
             return;
         }
 
-        _tickUtil?.Dispose();
+
         try
         {
+            _tickUtil?.Dispose();
             _cancellationTokenSource.Cancel();
         }
         catch (Exception e)
@@ -396,8 +403,17 @@ public partial class CustomScenario : ObservableRecipient
         _initTasks.Clear();
         _tickTasks.Clear();
         IsRunning = false;
-        ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show("情景", $"情景{Name}被用户停止");
-        Log.Debug($"情景{Name}被用户停止");
+        if (inTickError)
+        {
+            ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!)
+               .Show("情景", $"情景{Name}由于出现错误被停止");
+            Log.Debug($"情景{Name}由于出现错误被停止");
+        }
+        else
+        {
+            ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show("情景", $"情景{Name}被用户停止");
+            Log.Debug($"情景{Name}被用户停止");
+        }
     }
 
     private void MakeSourcePointState(ConnectorItem targetConnectorItem, PointItem pointItem)
@@ -784,6 +800,8 @@ public partial class CustomScenario : ObservableRecipient
                 Log.Debug(e);
                 ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show("情景",
                     $"情景{Name}出现错误\n{e.Message}");
+                Task.Run(() => { Stop(true); });
+
                 valid = false;
                 goto finnish;
             }
