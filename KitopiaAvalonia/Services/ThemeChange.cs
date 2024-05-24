@@ -3,6 +3,7 @@
 using System;
 using Avalonia;
 using Avalonia.Styling;
+using Avalonia.Threading;
 using Core.SDKs.Services;
 using FluentAvalonia.Styling;
 using KitopiaAvalonia;
@@ -20,17 +21,18 @@ public class ThemeChange : IThemeChange
     {
         log.Debug(nameof(ThemeChange) + "的接口" + nameof(changeTo) + "被调用");
 
+        Dispatcher.UIThread.Post(() => {
+            switch (name)
+            {
+                case "theme_light":
+                    Application.Current.RequestedThemeVariant = ThemeVariant.Light;
+                    break;
 
-        switch (name)
-        {
-            case "theme_light":
-                Application.Current.RequestedThemeVariant = ThemeVariant.Light;
-                break;
-
-            default:
-                Application.Current.RequestedThemeVariant = ThemeVariant.Dark;
-                break;
-        }
+                default:
+                    Application.Current.RequestedThemeVariant = ThemeVariant.Dark;
+                    break;
+            }
+        });
     }
 
     public void changeAnother()
