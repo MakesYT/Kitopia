@@ -79,6 +79,7 @@ public partial class App : Application
         services.AddSingleton<ISearchItemTool, SearchItemTool>();
         services.AddTransient<IClipboardService, ClipboardWindow>();
         services.AddTransient<IWindowTool, WindowToolServiceWindow>();
+        services.AddTransient<IAutoStartService, AutoStartService>();
         #endif
 
         #if LINUX

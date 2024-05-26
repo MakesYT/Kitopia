@@ -13,7 +13,6 @@ using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.Threading;
-using Core.SDKs;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
@@ -26,8 +25,6 @@ using FluentAvalonia.UI.Windowing;
 using KitopiaAvalonia.Pages;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Win32;
-using PluginCore;
 using HotKeyManager = Core.SDKs.HotKey.HotKeyManager;
 
 namespace KitopiaAvalonia;
@@ -271,67 +268,8 @@ public partial class MainWindow : AppWindow
 
     private void SetAutoStartupWindow()
     {
-        var strName = AppDomain.CurrentDomain.BaseDirectory + "KitopiaAvalonia.exe"; //获取要自动运行的应用程序名
-        if (!File.Exists(strName)) //判断要自动运行的应用程序文件是否存在
-        {
-            return;
-        }
-
-        var registry =
-            Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run", true); //检索指定的子项
-        if (registry == null) //若指定的子项不存在
-        {
-            registry = Registry.CurrentUser.CreateSubKey(
-                "Software\\Microsoft\\Windows\\CurrentVersion\\Run"); //则创建指定的子项
-        }
-
-        if (registry.GetValue("Kitopia") is null)
-        {
-            ServiceManager.Services.GetService<IContentDialog>()
-                          .ShowDialogAsync(null, new DialogContent("Kitopia",
-                               new TextBlock()
-                               {
-                                   Text = "是否设置开机自启?\n可能被杀毒软件阻止      ",
-                                   FontSize = 15
-                               }, "取消", null, "确定", () => {
-                                   log.Info("用户确认启用开机自启");
-                                   try
-                                   {
-                                       registry.SetValue("Kitopia", $"\"{strName}\""); //设置该子项的新的“键值对”
-                                       ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show(
-                                           "开机自启",
-                                           "开机自启设置成功");
-                                   }
-                                   catch (Exception exception)
-                                   {
-                                       log.Error("开机自启设置失败");
-                                       log.Error(exception.StackTrace);
-                                       ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show(
-                                           "开机自启",
-                                           "开机自启设置失败,请检查杀毒软件后重试");
-                                   }
-                               }, null, () => { log.Info("用户取消启用开机自启"); }));
-        }
-        else if (!registry.GetValue("Kitopia")
-                          .Equals($"\"{strName}\""))
-        {
-            try
-            {
-                registry.SetValue("Kitopia", $"\"{strName}\""); //设置该子项的新的“键值对”
-                ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show("开机自启", "开机自启设置成功");
-            }
-            catch (Exception exception)
-            {
-                log.Error("开机自启设置失败");
-                log.Error(exception.StackTrace);
-                ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!).Show("开机自启",
-                    "开机自启设置失败,请检查杀毒软件后重试");
-            }
-        }
-        else
-        {
-            log.Debug("程序自启已存在");
-        }
+        ServiceManager.Services.GetService<IAutoStartService>()
+                      .ChangeAutoStart(true);
     }
 
     private void SetAutoStartupLinux()
