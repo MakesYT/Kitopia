@@ -9,6 +9,7 @@
                      xmlns:converter="clr-namespace:Kitopia.Converter"
                      xmlns:controls1="clr-namespace:KitopiaAvalonia.Controls"
                      xmlns:pluginCore="clr-namespace:PluginCore;assembly=PluginCore"
+                     xmlns:converter1="clr-namespace:KitopiaAvalonia.Converter"
                      mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
                      x:Class="KitopiaAvalonia.Windows.SearchWindow"
                      x:DataType="viewModel:SearchWindowViewModel"
@@ -35,6 +36,7 @@
         <converter:IntToIconSymbol x:Key="IntToIconSymbol" />
         <searchWindow:SymbolToVisible x:Key="SymbolToVisible" />
         <searchWindow:ItemNameMatchCtr x:Key="ItemNameMatchCtr" />
+        <converter1:ControlContentSize x:Key="ControlContentSize" />
     </windowing:AppWindow.Resources>
     <Panel>
         <Panel.Background>
@@ -61,10 +63,12 @@
                      ItemsSource="{Binding Items,Mode=OneWay }"
                      KeyDown="DataGrid_OnKeyDown"
                      PointerMoved="DataGrid_OnPointerMoved"
+
                      Margin="0,0,0,0">
                 <ListBox.Resources>
                     <SolidColorBrush x:Key="Brush" Color="LightGray" Opacity="0.15" />
                 </ListBox.Resources>
+
                 <ListBox.Styles>
                     <Style
                         Selector="ListBoxItem:selected > Button#Item /template/ ContentPresenter#PART_ContentPresenter">
@@ -72,11 +76,12 @@
                     </Style>
 
                     <Style Selector="ListBoxItem">
-
+                        <Setter Property="Padding" Value="0,3,0,3"></Setter>
                         <Setter Property="Template">
                             <ControlTemplate x:DataType="pluginCore:SearchViewItem">
 
                                 <Button ToolTip.Tip="{Binding Path=. ,Converter={StaticResource SearchItemToInfo}}"
+                                        HorizontalAlignment="Stretch"
                                         IsTabStop="True"
                                         Name="Item"
                                         Command="{Binding  $parent[ListBox].((viewModel:SearchWindowViewModel)DataContext).OpenFileCommand}"
@@ -100,13 +105,25 @@
                                         </MenuFlyout>
 
                                     </Button.ContextFlyout>
-                                    <Grid HorizontalAlignment="Left" Margin="5,0,0,0">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="30" />
-                                            <ColumnDefinition Width="48" />
-                                            <ColumnDefinition Width="455 " />
-                                            <ColumnDefinition Width="195" />
-                                        </Grid.ColumnDefinitions>
+                                    <Grid HorizontalAlignment="Stretch"
+                                          ColumnDefinitions="Auto,Auto,* ,Auto">
+                                        <Grid.Width>
+                                            <MultiBinding Converter="{StaticResource ControlContentSize}">
+                                                <MultiBinding.Bindings>
+                                                    <Binding
+                                                        RelativeSource="{RelativeSource AncestorType=ContentPresenter, Tree=Visual}"
+                                                        Path="Bounds.Width">
+                                                    </Binding>
+                                                    <Binding
+                                                        RelativeSource="{RelativeSource AncestorType=ContentPresenter, Tree=Visual}"
+                                                        Path="Padding">
+                                                    </Binding>
+
+                                                </MultiBinding.Bindings>
+                                            </MultiBinding>
+
+
+                                        </Grid.Width>
                                         <Panel Width="28">
                                             <controls1:PinButton KeyboardNavigation.TabNavigation="None" FontSize="26"
                                                                  IsVisible="{Binding Path=FileType, Converter={StaticResource EnumToVisibilityConverter}, ConverterParameter='Pin'}"
@@ -126,7 +143,8 @@
                                                            Glyph="{Binding IconSymbol,Converter={StaticResource IntToIconSymbol}}" />
 
 
-                                        <StackPanel Grid.Column="2" Margin="5" VerticalAlignment="Top">
+                                        <StackPanel Grid.Column="2" Margin="5" VerticalAlignment="Top"
+                                                    HorizontalAlignment="Stretch">
                                             <TextBlock VerticalAlignment="Center" Margin="0" Focusable="False"
                                                        FontFamily="HarmonyOS Sans"
                                                        Inlines="{Binding Path=., 

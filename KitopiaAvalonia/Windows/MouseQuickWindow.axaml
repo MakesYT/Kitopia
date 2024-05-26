@@ -30,11 +30,7 @@
         <searchWindow:SymbolToVisible x:Key="SymbolToVisible" />
         <converter:IntToIconSymbol x:Key="IntToIconSymbol" />
     </Window.Resources>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+    <Grid RowDefinitions="Auto,*">
         <TextBlock Grid.Row="0" Text="{Binding SelectedItem,Converter={StaticResource MouseQuickSelectedItem}}"
                    TextWrapping="Wrap" FontSize="20" Margin="10,10,10,10" />
 

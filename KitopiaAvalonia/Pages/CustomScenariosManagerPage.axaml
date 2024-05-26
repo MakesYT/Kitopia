@@ -12,21 +12,20 @@
     <UserControl.Resources>
         <converter:ReverseBoolToVisibilityConverter x:Key="reverseBoolToVisibilityConverter" />
     </UserControl.Resources>
-    <StackPanel Margin="42">
+    <Grid RowDefinitions="Auto,Auto,*" Margin="42">
         <TextBlock Margin="0" FontSize="18" FontWeight="DemiBold" Text="情景列表">
             <TextBlock.Foreground>
                 <SolidColorBrush Color="{DynamicResource TextFillColorPrimary}" />
             </TextBlock.Foreground>
         </TextBlock>
-        <StackPanel Orientation="Horizontal">
+        <StackPanel Grid.Row="1" Orientation="Horizontal">
             <Button Content="新建情景" Command="{Binding NewCustomScenariosCommand}" />
         </StackPanel>
-        <ListBox Classes="draggableVirtualizing"
+        <ListBox Grid.Row="2" Classes="draggableVirtualizing"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                 MaxHeight="385"
+
                  ItemsSource="{Binding CustomScenarios,Mode=OneWay}"
                  Margin="0,10,0,0">
-
             <ListBox.ItemContainerTheme>
                 <ControlTheme TargetType="ListBoxItem">
                     <Setter Property="Template">
@@ -118,5 +117,7 @@
 
 
         </ListBox>
-    </StackPanel>
+
+
+    </Grid>
 </UserControl>

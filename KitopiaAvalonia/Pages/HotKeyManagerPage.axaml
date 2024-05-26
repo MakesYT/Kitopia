@@ -12,39 +12,44 @@
     <UserControl.Resources>
         <converter:HotKeySignNameToStringCtr x:Key="HotKeySignNameToStringCtr" />
     </UserControl.Resources>
-    <StackPanel Margin="42">
+    <Grid RowDefinitions="Auto,*" Margin="42">
         <TextBlock Margin="0" FontSize="18" FontWeight="DemiBold" Text="快捷键列表">
             <TextBlock.Foreground>
                 <SolidColorBrush Color="{DynamicResource TextFillColorPrimary}" />
             </TextBlock.Foreground>
         </TextBlock>
+        <ScrollViewer Grid.Row="1">
+            <ItemsControl
 
-        <ItemsControl
-            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-            MaxHeight="385"
-            Margin="0,10,0,0" ItemsSource="{Binding Source={x:Static hotkey:HotKeyManager.HotKeys}}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate x:DataType="hotkey:HotKeyModel">
-                    <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="4">
-                        <StackPanel HorizontalAlignment="Center" Margin="5,0,5,5">
-                            <TextBlock Margin="0,5,0,0" Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                       Text="{Binding SignName,Converter={StaticResource HotKeySignNameToStringCtr}}" />
-                            <controls1:HotKeyShow Margin="0,5,0,0"
-                                                  HotKeyModel="{Binding RelativeSource={RelativeSource AncestorType=StackPanel},Path=DataContext}" />
-                        </StackPanel>
+                Margin="0,10,0,0" ItemsSource="{Binding Source={x:Static hotkey:HotKeyManager.HotKeys}}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="hotkey:HotKeyModel">
+                        <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="4">
+                            <StackPanel HorizontalAlignment="Center" Margin="5,0,5,5">
+                                <TextBlock Margin="0,5,0,0" Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                           Text="{Binding SignName,Converter={StaticResource HotKeySignNameToStringCtr}}" />
+                                <controls1:HotKeyShow Margin="0,5,0,0"
+                                                      HotKeyModel="{Binding RelativeSource={RelativeSource AncestorType=StackPanel},Path=DataContext}" />
+                            </StackPanel>
 
-                    </Border>
+                        </Border>
 
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
 
-        </ItemsControl>
+                        <WrapPanel ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                   ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                   ScrollViewer.AllowAutoHide="True">
+
+                        </WrapPanel>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+            </ItemsControl>
+        </ScrollViewer>
 
 
-    </StackPanel>
+    </Grid>
 </UserControl>

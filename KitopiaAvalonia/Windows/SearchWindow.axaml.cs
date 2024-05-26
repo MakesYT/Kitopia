@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
@@ -23,13 +22,8 @@ public partial class SearchWindow : Window
     {
         InitializeComponent();
         RenderOptions.SetTextRenderingMode(this, TextRenderingMode.Antialias);
-        WeakReferenceMessenger.Default.Register<string, string>(this, "SearchWindowClose", (_, _) =>
-        {
-            Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                IsVisible = false;
-            });
-        });
+        WeakReferenceMessenger.Default.Register<string, string>(this, "SearchWindowClose",
+            (_, _) => { Dispatcher.UIThread.InvokeAsync(() => { IsVisible = false; }); });
     }
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
@@ -51,7 +45,6 @@ public partial class SearchWindow : Window
     private void w_Activated(object sender, EventArgs e)
     {
         this.Focus();
-        
     }
 
     private void tx_KeyDown(object? sender, KeyEventArgs e)
@@ -65,7 +58,6 @@ public partial class SearchWindow : Window
             }
 
             e.Handled = true;
-            return;
         }
         else if (e.Key == Key.Down)
         {
@@ -87,7 +79,8 @@ public partial class SearchWindow : Window
         if (e.Key == Key.Up)
         {
             var realizedContainers = dataGrid.GetRealizedContainers();
-            if (realizedContainers.First().DataContext == dataGrid.SelectedItem)
+            if (realizedContainers.First()
+                                  .DataContext == dataGrid.SelectedItem)
             {
                 tx.Focus();
             }
@@ -111,7 +104,8 @@ public partial class SearchWindow : Window
 
     private void DataGrid_OnPointerMoved(object? sender, PointerEventArgs e)
     {
-        var listBoxItem = dataGrid.GetVisualAt<ListBoxItem>(e.GetCurrentPoint(dataGrid).Position);
+        var listBoxItem = dataGrid.GetVisualAt<ListBoxItem>(e.GetCurrentPoint(dataGrid)
+                                                             .Position);
         if (listBoxItem != null)
         {
             listBoxItem.IsSelected = true;
