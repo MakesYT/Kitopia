@@ -119,7 +119,7 @@ class Build : NukeBuild
                                 DotNetPublish(c => new DotNetPublishSettings()
                                                   .SetProject(AvaloniaProject.Name)
                                                   .SetOutput(RootDirectory / "Publish")
-                                                  .SetPublishSingleFile(true)
+                                                  .SetPublishSingleFile(false)
                                                   
                                                   .SetRuntime( "win-x64")
                                                   .SetFramework("net8.0-windows10.0.17763.0")
@@ -129,7 +129,7 @@ class Build : NukeBuild
                                 DotNetPublish(c => new DotNetPublishSettings()
                                                   .SetProject(AvaloniaProject.Name)
                                                   .SetOutput(RootDirectory / "Publish_SelfContained")
-                                                  .SetPublishSingleFile(true)
+                                                  .SetPublishSingleFile(false)
                                                   
                                                   .SetRuntime( "win-x64")
                                                   .SetFramework("net8.0-windows10.0.17763.0")
