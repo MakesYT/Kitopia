@@ -26,6 +26,7 @@
                      SystemDecorations="BorderOnly"
                      KeyDown="InputElement_OnKeyDown"
                      Topmost="True"
+                     Closing="Window_OnClosing"
                      Title="SearchWindow">
     <windowing:AppWindow.Resources>
         <searchWindow:StarBoolToText x:Key="StarBoolToText" />

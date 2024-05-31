@@ -119,4 +119,10 @@ public partial class SearchWindow : Window
             IsVisible = false;
         }
     }
+
+    private void Window_OnClosing(object? sender, WindowClosingEventArgs e)
+    {
+        e.Cancel = true;
+        IsVisible = false;
+    }
 }
