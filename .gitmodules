@@ -10,12 +10,6 @@
 [submodule "NodifyM.Avalonia"]
 	path = NodifyM.Avalonia
 	url = https://github.com/MakesYT/NodifyM.Avalonia/
-[submodule "DesktopNotifications"]
-	path = DesktopNotifications
-	url = https://github.com/pr8x/DesktopNotifications
-[submodule "ScreenCapture.NET"]
-	path = ScreenCapture.NET
-	url = https://github.com/MakesYT/ScreenCapture.NET.git
 [submodule "PinyinM.NET"]
 	path = PinyinM.NET
 	url = https://github.com/MakesYT/Pinyin.NET
