@@ -26,6 +26,16 @@ public partial class SearchWindow : Window
             (_, _) => { Dispatcher.UIThread.InvokeAsync(() => { IsVisible = false; }); });
     }
 
+    public override void Show()
+    {
+        ServiceManager.Services.GetService<IWindowTool>()!.MoveWindowToMouseScreenCenter(this);
+        base.Show();
+        ServiceManager.Services.GetService<IWindowTool>()!.SetForegroundWindow(
+            this.TryGetPlatformHandle()!.Handle);
+        tx.Focus();
+        tx.SelectAll();
+    }
+
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);

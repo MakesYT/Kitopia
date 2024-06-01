@@ -21,18 +21,9 @@ public class SearchWindowService : ISearchWindowService
             else
             {
                 ServiceManager.Services.GetService<SearchWindowViewModel>()!.CheckClipboard();
-                ServiceManager.Services.GetService<IWindowTool>()!.MoveWindowToMouseScreenCenter(searchWindow);
                 searchWindow.Show();
-                ServiceManager.Services.GetService<IWindowTool>()!.SetForegroundWindow(
-                    searchWindow!.TryGetPlatformHandle()!.Handle);
-
-                searchWindow.Focus();
-                searchWindow.tx.Focus();
-                searchWindow.tx.SelectAll();
                 Task.Run(() => {
                     Thread.CurrentThread.Priority = ThreadPriority.Lowest;
-                    ServiceManager.Services.GetService<IWindowTool>()!.SetForegroundWindow(
-                        searchWindow!.TryGetPlatformHandle()!.Handle);
                     ServiceManager.Services.GetService<SearchWindowViewModel>()!.ReloadApps();
                 });
             }
