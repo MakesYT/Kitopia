@@ -28,10 +28,10 @@
         </Content>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Vanara.Core" Version="3.4.17"/>
-        <PackageReference Include="Vanara.PInvoke.FirewallApi" Version="3.4.17"/>
-        <PackageReference Include="Vanara.PInvoke.NetApi32" Version="3.4.17"/>
-        <PackageReference Include="Vanara.PInvoke.NetListMgr" Version="3.4.17"/>
-        <PackageReference Include="Vanara.Windows.Shell" Version="3.4.17"/>
+        <PackageReference Include="Vanara.Core" Version="4.0.1"/>
+        <PackageReference Include="Vanara.PInvoke.FirewallApi" Version="4.0.1"/>
+        <PackageReference Include="Vanara.PInvoke.NetApi32" Version="4.0.1"/>
+        <PackageReference Include="Vanara.PInvoke.NetListMgr" Version="4.0.1"/>
+        <PackageReference Include="Vanara.Windows.Shell" Version="4.0.1"/>
     </ItemGroup>
 </Project>
