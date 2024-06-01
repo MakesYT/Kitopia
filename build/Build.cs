@@ -1,27 +1,17 @@
 using System;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Text;
-using Microsoft.Build.Construction;
 using Nuke.Common;
-using Nuke.Common.CI;
 using Nuke.Common.CI.GitHubActions;
-using Nuke.Common.Execution;
 using Nuke.Common.Git;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
-using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.Git;
 using Nuke.Common.Tools.GitHub;
-using Nuke.Common.Tools.GitVersion;
-using Nuke.Common.Utilities.Collections;
 using Octokit;
 using Serilog;
-using static Nuke.Common.EnvironmentInfo;
-using static Nuke.Common.IO.FileSystemTasks;
-using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using Project = Nuke.Common.ProjectModel.Project;
 
@@ -36,10 +26,9 @@ class Build : NukeBuild
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
 
-    [Parameter][Secret]readonly string GitHubToken;
+    [Parameter] [Secret] readonly string GitHubToken;
 
-    [Solution]
-    readonly Solution Solution;
+    [Solution] readonly Solution Solution;
 
     Project AvaloniaProject => Solution.GetProject("KitopiaAvalonia");
 
@@ -47,18 +36,20 @@ class Build : NukeBuild
     Target Restore => _ => _
        .Executes(() =>
         {
-            Log.Debug( "Restoring solution {0}", Solution);
+            Log.Debug("Restoring solution {0}", Solution);
             Log.Debug("Restoring project {0}", AvaloniaProject);
             if (!IsLocalBuild)
             {
                 GitTasks.Git("rm KitopiaWeb");
             }
+
             GitTasks.Git("submodule update --init --recursive --remote");
             DotNetRestore(c => new DotNetRestoreSettings()
-               .SetProjectFile(AvaloniaProject.Path).SetRuntime( "win-x64"));
+                              .SetProjectFile(AvaloniaProject.Path)
+                              .SetRuntime("win-x64"));
             DotNetRestore(c => new DotNetRestoreSettings()
-               .SetProjectFile("KitopiaEx").SetRuntime( "win-x64"));
-
+                              .SetProjectFile("KitopiaEx")
+                              .SetRuntime("win-x64"));
         });
 
     Target Compile => _ => _
@@ -78,19 +69,24 @@ class Build : NukeBuild
                        .OnlyWhenDynamic(() =>
                         {
                             var gitRepository = GitRepository.FromUrl("https://github.com/MakesYT/Kitopia");
-                            var result = GitHubTasks.GetLatestRelease(gitRepository,true).Result;
+                            var result = GitHubTasks.GetLatestRelease(gitRepository, true)
+                                                    .Result;
                             Log.Debug("Packing project {0}", AvaloniaProject);
-                            Log.Debug("GitHubName {0}",  gitRepository.GetGitHubName());
+                            Log.Debug("GitHubName {0}", gitRepository.GetGitHubName());
                             var _gitHubClient = new GitHubClient(new ProductHeaderValue("Kitopia"))
                             {
                                 Credentials = new Credentials(GitHubToken)
                             };
-                            
-                            var readOnlyList = _gitHubClient.Repository.GetAllTags(gitRepository.GetGitHubOwner(), gitRepository.GetGitHubName()).Result;
-                            if (readOnlyList.Any(e=>e.Name==AvaloniaProject.GetProperty("Version")))
+
+                            var readOnlyList = _gitHubClient
+                                              .Repository.GetAllTags(gitRepository.GetGitHubOwner(),
+                                                   gitRepository.GetGitHubName())
+                                              .Result;
+                            if (readOnlyList.Any(e => e.Name == AvaloniaProject.GetProperty("Version")))
                             {
                                 return false;
                             }
+
                             return true;
                         })
                        .DependsOn(Compile)
@@ -103,15 +99,16 @@ class Build : NukeBuild
                                 DotNetPublish(c => new DotNetPublishSettings()
                                                   .SetProject("KitopiaEx")
                                                   .SetOutput(RootDirectory / "Publish" / "plugins" / "KitopiaEx")
-                                                  .SetRuntime( "win-x64")
+                                                  .SetRuntime("win-x64")
                                                   .SetFramework("net8.0")
                                                   .SetConfiguration("Release")
                                                   .SetSelfContained(false)
                                 );
                                 DotNetPublish(c => new DotNetPublishSettings()
                                                   .SetProject("KitopiaEx")
-                                                  .SetOutput(RootDirectory / "Publish_SelfContained" / "plugins" / "KitopiaEx")
-                                                  .SetRuntime( "win-x64")
+                                                  .SetOutput(RootDirectory / "Publish_SelfContained" / "plugins" /
+                                                             "KitopiaEx")
+                                                  .SetRuntime("win-x64")
                                                   .SetFramework("net8.0")
                                                   .SetConfiguration("Release")
                                                   .SetSelfContained(true)
@@ -120,8 +117,7 @@ class Build : NukeBuild
                                                   .SetProject(AvaloniaProject.Name)
                                                   .SetOutput(RootDirectory / "Publish")
                                                   .SetPublishSingleFile(false)
-                                                  
-                                                  .SetRuntime( "win-x64")
+                                                  .SetRuntime("win-x64")
                                                   .SetFramework("net8.0-windows10.0.17763.0")
                                                   .SetConfiguration("Release")
                                                   .SetSelfContained(false)
@@ -130,17 +126,17 @@ class Build : NukeBuild
                                                   .SetProject(AvaloniaProject.Name)
                                                   .SetOutput(RootDirectory / "Publish_SelfContained")
                                                   .SetPublishSingleFile(false)
-                                                  
-                                                  .SetRuntime( "win-x64")
+                                                  .SetRuntime("win-x64")
                                                   .SetFramework("net8.0-windows10.0.17763.0")
                                                   .SetConfiguration("Release")
                                                   .SetSelfContained(true)
                                 );
                                 var gitRepository = GitRepository.FromUrl("https://github.com/MakesYT/Kitopia");
-                                var result = GitHubTasks.GetLatestRelease(gitRepository,true).Result;
+                                var result = GitHubTasks.GetLatestRelease(gitRepository, true)
+                                                        .Result;
                                 Log.Debug("Packing project {0}", AvaloniaProject);
-                                Log.Debug("GitHubName {0}",  gitRepository.GetGitHubName());
-                                
+                                Log.Debug("GitHubName {0}", gitRepository.GetGitHubName());
+
                                 foreach (var absolutePath in rootDirectory.GetFiles())
                                 {
                                     if (absolutePath.Extension is ".pdb" or ".xml")
@@ -149,16 +145,17 @@ class Build : NukeBuild
                                     }
                                 }
 
-                                var archiveFile = RootDirectory / "Kitopia"+AvaloniaProject.GetProperty("Version")+"_WithoutContained.zip";
-                                var archiveFile_self = RootDirectory / "Kitopia"+AvaloniaProject.GetProperty("Version")+"_SelfContained.zip";
+                                var archiveFile = RootDirectory / "Kitopia" + AvaloniaProject.GetProperty("Version") +
+                                                  "_WithoutContained.zip";
+                                var archiveFile_self = RootDirectory / "Kitopia" +
+                                                       AvaloniaProject.GetProperty("Version") + "_SelfContained.zip";
                                 archiveFile.DeleteFile();
                                 archiveFile_self.DeleteFile();
                                 rootDirectory.ZipTo(archiveFile);
                                 rootDirectory_self.ZipTo(archiveFile_self);
-                                
+
                                 if (IsLocalBuild)
                                 {
-                                   
                                 }
                                 else
                                 {
@@ -168,11 +165,15 @@ class Build : NukeBuild
                                         Credentials = new Credentials(GitHubToken)
                                     };
                                     StringBuilder body = new StringBuilder();
-                                    var repositoryTags = _gitHubClient.Repository.GetAllTags(gitRepository.GetGitHubOwner(), gitRepository.GetGitHubName()).Result;
-                                    if (repositoryTags.Count<=0)
+                                    var repositoryTags = _gitHubClient
+                                                        .Repository.GetAllTags(gitRepository.GetGitHubOwner(),
+                                                             gitRepository.GetGitHubName())
+                                                        .Result;
+                                    if (repositoryTags.Count <= 0)
                                     {
                                         body.AppendLine("Initial release");
-                                    }else
+                                    }
+                                    else
                                     {
                                         string lastCommit = GitTasks.GitCurrentCommit();
                                         Log.Debug("Last commit {0}", lastCommit);
@@ -180,28 +181,40 @@ class Build : NukeBuild
                                         Log.Debug("First commit {0}", repositoryTag.Commit.Sha);
                                         while (lastCommit != repositoryTag.Commit.Sha)
                                         {
-                                            var gitHubCommit = _gitHubClient.Repository.Commit.Get(gitRepository.GetGitHubOwner(), gitRepository.GetGitHubName(), lastCommit).Result;
-                                            if (gitHubCommit.Commit.Message.Length>=3)
+                                            var gitHubCommit = _gitHubClient
+                                                              .Repository.Commit.Get(gitRepository.GetGitHubOwner(),
+                                                                   gitRepository.GetGitHubName(), lastCommit)
+                                                              .Result;
+                                            if (gitHubCommit.Commit.Message.Length >= 3)
                                             {
-                                                body.AppendLine(gitHubCommit.Commit.Message);
+                                                if (!gitHubCommit.Commit.Message.StartsWith("*"))
+                                                {
+                                                    body.AppendLine(gitHubCommit.Commit.Message);
+                                                }
                                             }
-                                    
-                                            lastCommit = gitHubCommit.Parents.First().Sha;
+
+                                            lastCommit = gitHubCommit.Parents.First()
+                                                                     .Sha;
                                             Log.Debug(lastCommit);
                                         }
-                                
                                     }
+
                                     var tag = _gitHubClient.Git.Tag.Create(gitRepository.GetGitHubOwner(),
-                                        gitRepository.GetGitHubName(),
-                                        new NewTag()
-                                        {
-                                            Object = GitTasks.GitCurrentCommit(),
-                                            Tag = AvaloniaProject.GetProperty("Version"),
-                                            Message = AvaloniaProject.GetProperty("Version"),
-                                        }).Result;
+                                                                gitRepository.GetGitHubName(),
+                                                                new NewTag()
+                                                                {
+                                                                    Object = GitTasks.GitCurrentCommit(),
+                                                                    Tag = AvaloniaProject.GetProperty("Version"),
+                                                                    Message = AvaloniaProject.GetProperty("Version"),
+                                                                })
+                                                           .Result;
                                     var reference = _gitHubClient.Git.Reference.Create(gitRepository.GetGitHubOwner(),
-                                        gitRepository.GetGitHubName(),
-                                        new NewReference("refs/tags/" + AvaloniaProject.GetProperty("Version"), GitTasks.GitCurrentCommit())).Result;
+                                                                      gitRepository.GetGitHubName(),
+                                                                      new NewReference(
+                                                                          "refs/tags/" +
+                                                                          AvaloniaProject.GetProperty("Version"),
+                                                                          GitTasks.GitCurrentCommit()))
+                                                                 .Result;
                                     var newRelease = new NewRelease(AvaloniaProject.GetProperty("Version"))
                                     {
                                         Name = AvaloniaProject.GetProperty("Version"),
@@ -209,27 +222,31 @@ class Build : NukeBuild
                                         Draft = false,
                                         Body = body.ToString()
                                     };
-                                    var release = _gitHubClient.Repository.Release.Create(gitRepository.GetGitHubOwner(), gitRepository.GetGitHubName(),
-                                        newRelease).Result;
+                                    var release = _gitHubClient.Repository.Release.Create(
+                                                                    gitRepository.GetGitHubOwner(),
+                                                                    gitRepository.GetGitHubName(),
+                                                                    newRelease)
+                                                               .Result;
                                     using var artifactStream = File.OpenRead(archiveFile);
-                                   
+
                                     var assetUpload = new ReleaseAssetUpload
                                     {
                                         FileName = archiveFile.Name,
-                                        ContentType =  "application/octet-stream",
+                                        ContentType = "application/octet-stream",
                                         RawData = artifactStream,
                                     };
                                     var assetUpload_self = new ReleaseAssetUpload
                                     {
                                         FileName = archiveFile_self.Name,
-                                        ContentType =  "application/octet-stream",
+                                        ContentType = "application/octet-stream",
                                         RawData = File.OpenRead(archiveFile_self),
                                     };
-                                    _gitHubClient.Repository.Release.UploadAsset(release,assetUpload).Wait();
-                                    _gitHubClient.Repository.Release.UploadAsset(release,assetUpload_self).Wait();
+                                    _gitHubClient.Repository.Release.UploadAsset(release, assetUpload)
+                                                 .Wait();
+                                    _gitHubClient.Repository.Release.UploadAsset(release, assetUpload_self)
+                                                 .Wait();
                                     Log.Debug(result);
                                 }
-                                
                             }
                         );
 
@@ -237,55 +254,60 @@ class Build : NukeBuild
                         .DependsOn(Pack)
                         .Executes(() =>
                          {
-                             
                          });
 
     Target Test => _ => _
-                       .Executes(() =>
-                        {
-                            var _gitHubClient = new GitHubClient(new ProductHeaderValue("Kitopia"))
-                            {
-                                Credentials = new Credentials(GitHubToken)
-                            };
-                            var gitRepository = GitRepository.FromUrl("https://github.com/MakesYT/Kitopia");
-                            StringBuilder body = new StringBuilder();
-                            var repositoryTags = _gitHubClient.Repository.GetAllTags(gitRepository.GetGitHubOwner(), gitRepository.GetGitHubName()).Result;
-                            foreach (var repositoryTag in repositoryTags)
-                            {
-                                Log.Debug(repositoryTag.Name);
-                            }
-                            if (repositoryTags.Count<=0)
-                            {
-                                body.AppendLine("Initial release");
-                            }else
-                            {
-                                string lastCommit = GitTasks.GitCurrentCommit();
-                                Log.Debug("Last commit {0}", lastCommit);
-                                var repositoryTag = repositoryTags.First();
-                                Log.Debug("First commit {0}", repositoryTag.Commit.Sha);
-                                Log.Debug("First commit {0}", repositoryTag.Name);
-                                while (lastCommit != repositoryTag.Commit.Sha)
-                                {
-                                    var gitHubCommit = _gitHubClient.Repository.Commit.Get(gitRepository.GetGitHubOwner(), gitRepository.GetGitHubName(), lastCommit).Result;
-                                    if (gitHubCommit.Commit.Message.Length>=3)
-                                    {
-                                        body.AppendLine(gitHubCommit.Commit.Message);
-                                    }
-                                    
-                                    lastCommit = gitHubCommit.Parents.First().Sha;
-                                    Console.WriteLine(lastCommit);
-                                }
-                                
-                            }
-                            Log.Debug("Creating release {0}", AvaloniaProject.GetProperty("Version"));
-                            Log.Debug("body {0}", body);
-                        });
+       .Executes(() =>
+        {
+            var _gitHubClient = new GitHubClient(new ProductHeaderValue("Kitopia"))
+            {
+                Credentials = new Credentials(GitHubToken)
+            };
+            var gitRepository = GitRepository.FromUrl("https://github.com/MakesYT/Kitopia");
+            StringBuilder body = new StringBuilder();
+            var repositoryTags = _gitHubClient
+                                .Repository.GetAllTags(gitRepository.GetGitHubOwner(), gitRepository.GetGitHubName())
+                                .Result;
+            foreach (var repositoryTag in repositoryTags)
+            {
+                Log.Debug(repositoryTag.Name);
+            }
+
+            if (repositoryTags.Count <= 0)
+            {
+                body.AppendLine("Initial release");
+            }
+            else
+            {
+                string lastCommit = GitTasks.GitCurrentCommit();
+                Log.Debug("Last commit {0}", lastCommit);
+                var repositoryTag = repositoryTags.First();
+                Log.Debug("First commit {0}", repositoryTag.Commit.Sha);
+                Log.Debug("First commit {0}", repositoryTag.Name);
+                while (lastCommit != repositoryTag.Commit.Sha)
+                {
+                    var gitHubCommit = _gitHubClient.Repository.Commit.Get(gitRepository.GetGitHubOwner(),
+                                                         gitRepository.GetGitHubName(), lastCommit)
+                                                    .Result;
+                    if (gitHubCommit.Commit.Message.Length >= 3)
+                    {
+                        body.AppendLine(gitHubCommit.Commit.Message);
+                    }
+
+                    lastCommit = gitHubCommit.Parents.First()
+                                             .Sha;
+                    Console.WriteLine(lastCommit);
+                }
+            }
+
+            Log.Debug("Creating release {0}", AvaloniaProject.GetProperty("Version"));
+            Log.Debug("body {0}", body);
+        });
 
     /// Support plugins are available for:
     ///   - JetBrains ReSharper        https://nuke.build/resharper
     ///   - JetBrains Rider            https://nuke.build/rider
     ///   - Microsoft VisualStudio     https://nuke.build/visualstudio
     ///   - Microsoft VSCode           https://nuke.build/vscode
-
-    public static int Main () => Execute<Build>(x => x.Compile);
+    public static int Main() => Execute<Build>(x => x.Compile);
 }
