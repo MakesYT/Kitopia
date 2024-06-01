@@ -66,6 +66,11 @@ class Program
                 }
             },
         });
+        buildAvaloniaApp.With(new RenderOptions()
+        {
+            TextRenderingMode = TextRenderingMode.Antialias,
+            EdgeMode = EdgeMode.Antialias,
+        });
         buildAvaloniaApp.LogToTrace();
 
         return buildAvaloniaApp;

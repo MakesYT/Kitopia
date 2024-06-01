@@ -8,7 +8,6 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
-using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Core.SDKs.CustomScenario;
@@ -36,7 +35,6 @@ public partial class TaskEditor : AppWindow
     public TaskEditor()
     {
         InitializeComponent();
-        RenderOptions.SetTextRenderingMode(this, TextRenderingMode.Antialias);
         if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             var size = desktop.MainWindow.Screens.Primary.Bounds.Size;

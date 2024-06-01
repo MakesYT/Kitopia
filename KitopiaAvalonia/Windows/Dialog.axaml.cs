@@ -1,7 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Media;
 using Core.SDKs;
 
 namespace KitopiaAvalonia.Controls;
@@ -17,13 +16,11 @@ public partial class Dialog : Window
     public Dialog()
     {
         InitializeComponent();
-        RenderOptions.SetTextRenderingMode(this, TextRenderingMode.Antialias);
     }
 
     public Dialog(DialogContent content)
     {
         InitializeComponent();
-        RenderOptions.SetTextRenderingMode(this, TextRenderingMode.Antialias);
         Title.Text = content.Title;
         Content.Content = content.Content;
 
@@ -32,8 +29,7 @@ public partial class Dialog : Window
         {
             PrimaryButton.Content = content.PrimaryButtonText;
 
-            PrimaryButton.Click += (sender, args) =>
-            {
+            PrimaryButton.Click += (sender, args) => {
                 this.Close();
                 content.PrimaryAction?.Invoke();
             };
@@ -43,8 +39,7 @@ public partial class Dialog : Window
         if (content.CloseButtonText != null)
         {
             CloseButton.Content = content.CloseButtonText;
-            CloseButton.Click += (sender, args) =>
-            {
+            CloseButton.Click += (sender, args) => {
                 this.Close();
                 content.CloseAction?.Invoke();
             };
@@ -54,8 +49,7 @@ public partial class Dialog : Window
         if (content.SecondaryButtonText != null)
         {
             SecondaryButton.Content = content.SecondaryButtonText;
-            SecondaryButton.Click += (sender, args) =>
-            {
+            SecondaryButton.Click += (sender, args) => {
                 this.Close();
                 content.SecondaryAction?.Invoke();
             };

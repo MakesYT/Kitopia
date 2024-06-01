@@ -1,17 +1,10 @@
-﻿using System.Linq;
-using Avalonia.Controls;
-using Avalonia.Input;
+﻿using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Media;
 using Avalonia.Win32.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using Core.SDKs;
 using Core.SDKs.HotKey;
-using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using log4net;
-using Microsoft.Extensions.DependencyInjection;
-using HotKeyManager = Core.SDKs.HotKey.HotKeyManager;
 using Window = Avalonia.Controls.Window;
 
 namespace KitopiaAvalonia.Windows;
@@ -27,7 +20,6 @@ public partial class HotKeyEditorWindow : Window
     public HotKeyEditorWindow(HotKeyModel hotKeyModel)
     {
         InitializeComponent();
-        RenderOptions.SetTextRenderingMode(this, TextRenderingMode.Antialias);
         _hotKeyModel = hotKeyModel;
         Name.Text = $"快捷键:{hotKeyModel.SignName}";
 

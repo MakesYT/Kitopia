@@ -10,7 +10,6 @@ using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
-using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using Core.SDKs.CustomScenario;
@@ -81,7 +80,6 @@ public partial class MainWindow : AppWindow
             e.Handled = true;
             log.Fatal(e.Exception);
         };
-        RenderOptions.SetTextRenderingMode(this, TextRenderingMode.Antialias);
         TitleBar.ExtendsContentIntoTitleBar = true;
         TitleBar.TitleBarHitTestType = TitleBarHitTestType.Complex;
         FrameView.NavigationPageFactory = new NavigationPageFactory();

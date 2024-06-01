@@ -9,7 +9,6 @@ using PluginCore;
 using Vanara.Extensions;
 using Vanara.PInvoke;
 using Vanara.Windows.Shell;
-using WinRT;
 
 #endregion
 
@@ -40,8 +39,7 @@ internal static class UwpTools
 
     internal static async Task GetAll(ConcurrentDictionary<string, SearchViewItem> items)
     {
-        
-        List<Task> list = new();
+        ConcurrentBag<Task> list = new();
         FirewallApi.NetworkIsolationEnumAppContainers(FirewallApi.NETISO_FLAG.NETISO_FLAG_FORCE_COMPUTE_BINARIES,
             out var pdwNuminternalAppCs, out var ppinternalAppCs);
         var options = new ParallelOptions
@@ -49,9 +47,7 @@ internal static class UwpTools
             MaxDegreeOfParallelism = 256
         };
         Parallel.ForEach(ppinternalAppCs.ToIEnum<FirewallApi.INET_FIREWALL_APP_CONTAINER>(
-            (int)pdwNuminternalAppCs), options,file => {
-            list.Add(AppContainerAnalyse(file, items));
-        });
+            (int)pdwNuminternalAppCs), options, file => { list.Add(AppContainerAnalyse(file, items)); });
 
         await Task.WhenAll(list.ToArray());
     }
@@ -88,8 +84,7 @@ internal static class UwpTools
             return;
         }
 
-       
-        
+
         var xmlDocument = new XmlDocument();
         if (File.Exists($"{appContainer.workingDirectory}{Path.DirectorySeparatorChar}AppxManifest.xml"))
         {
@@ -147,7 +142,10 @@ internal static class UwpTools
         }
 
         var squareLogo = visualElementsAttribute.Value;
-        var logoName = squareLogo.Split(Path.DirectorySeparatorChar).Last().Split(".").First();
+        var logoName = squareLogo.Split(Path.DirectorySeparatorChar)
+                                 .Last()
+                                 .Split(".")
+                                 .First();
         var path = $"{appContainer.workingDirectory}{squareLogo.Split(Path.DirectorySeparatorChar).First()}";
         if (!Directory.Exists(path))
         {
@@ -164,12 +162,12 @@ internal static class UwpTools
                 ItemDisplayName = fileName,
                 OnlyKey = $"{appContainer.appContainerName}!{id}",
                 FileType = FileType.UWP应用,
-                PinyinItem =  Window.AppTools.NameSolver(fileName),
+                PinyinItem = Window.AppTools.NameSolver(fileName),
                 IconPath = pa,
                 IsVisible = true
             };
 
-           
+
             //Console.WriteLine(searchViewItem);
             items.TryAdd(searchViewItem.OnlyKey, searchViewItem);
             return;
@@ -185,7 +183,7 @@ internal static class UwpTools
                         ItemDisplayName = fileName,
                         OnlyKey = $"{appContainer.appContainerName}!{id}",
                         FileType = FileType.UWP应用,
-                        PinyinItem =  Window.AppTools.NameSolver(fileName),
+                        PinyinItem = Window.AppTools.NameSolver(fileName),
                         IconPath = enumerateFile.FullName,
                         IsVisible = true
                     };
