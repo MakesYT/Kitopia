@@ -9,7 +9,6 @@ using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.LogicalTree;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using Core.SDKs.CustomScenario;
@@ -142,16 +141,6 @@ public partial class MainWindow : AppWindow
     private void NavView_OnItemInvoked(object? sender, NavigationViewItemInvokedEventArgs e)
     {
         FrameView.NavigateFromObject(e.InvokedItemContainer.Tag);
-    }
-
-    protected override void OnAttachedToLogicalTree(LogicalTreeAttachmentEventArgs e)
-    {
-        base.OnAttachedToLogicalTree(e);
-    }
-
-    protected override void OnOpened(EventArgs e)
-    {
-        base.OnOpened(e);
     }
 
     private void FirstOpenEventHandler(object? o, EventArgs args)

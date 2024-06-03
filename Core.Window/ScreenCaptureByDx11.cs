@@ -26,11 +26,11 @@ using IScreenCapture = PluginCore.IScreenCapture;
 
 namespace Core.SDKs.Tools;
 
-public class ScreenCapture : IScreenCapture
+public class ScreenCaptureByDx11 : IScreenCapture
 {
     private static readonly Lazy<Configuration> Lazy = new(CreateDefaultInstance);
     public static Configuration Configuration => Lazy.Value;
-    private static readonly ILog log = LogManager.GetLogger(nameof(ScreenCapture));
+    private static readonly ILog log = LogManager.GetLogger(nameof(ScreenCaptureByDx11));
 
     private static Configuration CreateDefaultInstance()
     {
@@ -174,29 +174,9 @@ public class ScreenCapture : IScreenCapture
                             (int)mappedSubresource.DepthPitch);
                         immediateContext->Unmap(stagingResource, 0);
                         outputDuplication->ReleaseFrame();
-                        var loadPixelData = Image.LoadPixelData<Bgra32>(CreateDefaultInstance(), span,
+                        var loadPixelData = Image.LoadPixelData<Bgra32>(Configuration, span,
                             desc.DesktopCoordinates.Size.X, desc.DesktopCoordinates.Size.Y);
-
-                        var clone = loadPixelData.Clone();
-                        using (clone)
-                        {
-                            clone.Mutate(x => x.BoxBlur(10));
-                            if (!clone.DangerousTryGetSinglePixelMemory(out Memory<Bgra32> memory1))
-                            {
-                                throw new Exception(
-                                    "This can only happen with multi-GB images or when PreferContiguousImageBuffers is not set to true.");
-                            }
-
-                            using (MemoryHandle pinHandle = memory1.Pin())
-                            {
-                                var bitmap1 = new Bitmap(PixelFormat.Bgra8888, AlphaFormat.Unpremul,
-                                    (IntPtr)pinHandle.Pointer,
-                                    new PixelSize(desc.DesktopCoordinates.Size.X, desc.DesktopCoordinates.Size.Y),
-                                    new Vector(96, 96),
-                                    (desc.DesktopCoordinates.Size.Y * PixelFormat.Bgra8888.BitsPerPixel + 7) / 8);
-                                mosaics.Enqueue(bitmap1);
-                            }
-                        }
+                        span = null;
 
                         if (!loadPixelData.DangerousTryGetSinglePixelMemory(out Memory<Bgra32> memory))
                         {
@@ -212,6 +192,24 @@ public class ScreenCapture : IScreenCapture
                                 new Vector(96, 96),
                                 (desc.DesktopCoordinates.Size.Y * PixelFormat.Bgra8888.BitsPerPixel + 7) / 8);
                             bitmaps.Enqueue(bitmap1);
+                        }
+
+                        loadPixelData.Mutate(x => x.BoxBlur(10));
+
+                        if (!loadPixelData.DangerousTryGetSinglePixelMemory(out Memory<Bgra32> memory1))
+                        {
+                            throw new Exception(
+                                "This can only happen with multi-GB images or when PreferContiguousImageBuffers is not set to true.");
+                        }
+
+                        using (MemoryHandle pinHandle = memory1.Pin())
+                        {
+                            var bitmap1 = new Bitmap(PixelFormat.Bgra8888, AlphaFormat.Unpremul,
+                                (IntPtr)pinHandle.Pointer,
+                                new PixelSize(desc.DesktopCoordinates.Size.X, desc.DesktopCoordinates.Size.Y),
+                                new Vector(96, 96),
+                                (desc.DesktopCoordinates.Size.Y * PixelFormat.Bgra8888.BitsPerPixel + 7) / 8);
+                            mosaics.Enqueue(bitmap1);
                         }
 
                         loadPixelData.Dispose();

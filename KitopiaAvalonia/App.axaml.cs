@@ -69,11 +69,12 @@ public partial class App : Application
         services.AddTransient<ISearchWindowService, SearchWindowService>();
         services.AddTransient<IErrorWindow, ErrorWindow>();
         services.AddTransient<IScreenCaptureWindow, Services.ScreenCaptureWindow>();
-        services.AddTransient<IScreenCapture, Core.SDKs.Tools.ScreenCapture>();
+
         services.AddTransient<IPluginToolService, PluginToolService>();
 
         services.AddTransient<INavigationPageService, NavigationPageService>();
         #if WINDOWS
+        services.AddTransient<IScreenCapture, Core.SDKs.Tools.ScreenCaptureByDx11>();
         services.AddTransient<IEverythingService, EverythingService>();
         services.AddTransient<IAppToolService, AppToolService>();
         services.AddSingleton<ISearchItemTool, SearchItemTool>();
