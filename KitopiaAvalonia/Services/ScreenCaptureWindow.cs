@@ -30,7 +30,7 @@ public class ScreenCaptureWindow : IScreenCaptureWindow
                     SystemDecorations = SystemDecorations.None,
                     Background = new SolidColorBrush(Colors.Black),
                     ShowInTaskbar = false,
-                    Topmost = false,
+                    Topmost = true,
                     CanResize = false,
                     IsVisible = true,
                 };
