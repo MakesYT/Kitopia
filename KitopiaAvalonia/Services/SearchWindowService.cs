@@ -14,11 +14,6 @@ public class SearchWindowService : ISearchWindowService
     {
         Dispatcher.UIThread.InvokeAsync(() => {
             var searchWindow = ServiceManager.Services.GetService<SearchWindow>();
-            if (searchWindow!.IsVisible)
-            {
-                searchWindow!.IsVisible = false;
-            }
-            else
             {
                 ServiceManager.Services.GetService<SearchWindowViewModel>()!.CheckClipboard();
                 searchWindow.Show();

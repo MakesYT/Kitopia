@@ -26,6 +26,11 @@ public partial class SearchWindow : Window
 
     public override void Show()
     {
+        if (!IsLoaded)
+        {
+            base.Show();
+        }
+
         ServiceManager.Services.GetService<IWindowTool>()!.MoveWindowToMouseScreenCenter(this);
         base.Show();
         ServiceManager.Services.GetService<IWindowTool>()!.SetForegroundWindow(
