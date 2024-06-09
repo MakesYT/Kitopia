@@ -133,6 +133,7 @@ public partial class ScreenCaptureWindow : Window
         base.OnClosed(e);
         SelectBox.LocationOrSizeChanged -= LocationOrSizeChanged;
         renderTargetBitmap.Dispose();
+        MosaicImage.OpacityMask = null;
     }
 
 
@@ -837,6 +838,7 @@ public partial class ScreenCaptureWindow : Window
             }
 
             SelectBox.IsSelected = false;
+            ToolBar.IsVisible = false;
             var renderTargetBitmap =
                 new RenderTargetBitmap(new PixelSize(bitmap.PixelSize.Width, bitmap.PixelSize.Height),
                     new Vector(96, 96));
