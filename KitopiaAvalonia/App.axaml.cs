@@ -21,6 +21,7 @@ using KitopiaAvalonia.Windows;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
 using PluginCore;
+using ScreenCaptureWindow = KitopiaAvalonia.Services.ScreenCaptureWindow;
 #if WINDOWS
 using Core.Window;
 using Core.Window.Everything;
@@ -68,24 +69,24 @@ public partial class App : Application
         services.AddSingleton<IMouseQuickWindowService, MouseQuickWindowService>();
         services.AddTransient<ISearchWindowService, SearchWindowService>();
         services.AddTransient<IErrorWindow, ErrorWindow>();
-        services.AddTransient<IScreenCaptureWindow, Services.ScreenCaptureWindow>();
+        services.AddTransient<IScreenCaptureWindow, ScreenCaptureWindow>();
 
         services.AddTransient<IPluginToolService, PluginToolService>();
 
         services.AddTransient<INavigationPageService, NavigationPageService>();
-        #if WINDOWS
-        services.AddTransient<IScreenCapture, Core.SDKs.Tools.ScreenCaptureByDx11>();
+#if WINDOWS
+        services.AddTransient<IScreenCapture, ScreenCaptureByDx11>();
         services.AddTransient<IEverythingService, EverythingService>();
         services.AddTransient<IAppToolService, AppToolService>();
         services.AddSingleton<ISearchItemTool, SearchItemTool>();
         services.AddTransient<IClipboardService, ClipboardWindow>();
         services.AddTransient<IWindowTool, WindowToolServiceWindow>();
         services.AddTransient<IAutoStartService, AutoStartService>();
-        #endif
+#endif
 
-        #if LINUX
+#if LINUX
             services.AddTransient<IAppToolService, AppToolLinuxService>();
-        #endif
+#endif
 
 
         services.AddTransient<TaskEditorViewModel>();

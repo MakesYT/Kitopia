@@ -23,7 +23,7 @@ public class ScreenCaptureWindow : IScreenCaptureWindow
             {
                 var screen = screens.All[index];
                 var rect = screen.Bounds;
-                var window = new Windows.ScreenCaptureWindow(index)
+                new Windows.ScreenCaptureWindow(index)
                 {
                     Position = new PixelPoint(rect.X, rect.Y),
                     WindowState = WindowState.FullScreen,
@@ -33,10 +33,15 @@ public class ScreenCaptureWindow : IScreenCaptureWindow
                     Topmost = true,
                     CanResize = false,
                     IsVisible = true,
-                };
-                window.MosaicImage.Source = captureAllScreen.Item2.Count > 0 ? captureAllScreen.Item2.Dequeue() : null;
-                window.Image.Source = captureAllScreen.Item1.Count > 0 ? captureAllScreen.Item1.Dequeue() : null;
-                window.Show();
+                    MosaicImage =
+                    {
+                        Source = captureAllScreen.Item2.Count > 0 ? captureAllScreen.Item2.Dequeue() : null
+                    },
+                    Image =
+                    {
+                        Source = captureAllScreen.Item1.Count > 0 ? captureAllScreen.Item1.Dequeue() : null
+                    }
+                }.Show();
             }
         }
 
@@ -52,7 +57,8 @@ public class ScreenCaptureWindow : IScreenCaptureWindow
             Index = -1
         };
         SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
-        Action<ScreenCaptureInfo> action = (info) => {
+        Action<ScreenCaptureInfo> action = (info) =>
+        {
             screenCaptureInfo = info;
             semaphore.Release();
         };

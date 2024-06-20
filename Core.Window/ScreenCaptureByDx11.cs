@@ -24,7 +24,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using IScreenCapture = PluginCore.IScreenCapture;
 
-namespace Core.SDKs.Tools;
+namespace Core.Window;
 
 public class ScreenCaptureByDx11 : IScreenCapture
 {
@@ -69,7 +69,7 @@ public class ScreenCaptureByDx11 : IScreenCapture
             D3D11 d3D11 = new D3D11(new DefaultNativeContext("d3d11"));
             try
             {
-                if (dxgi.CreateDXGIFactory1<IDXGIFactory1>(out factory) != 0)
+                if (dxgi.CreateDXGIFactory1(out factory) != 0)
                 {
                     throw new Exception("Failed to create DXGI factory");
                 }
@@ -268,6 +268,6 @@ public class ScreenCaptureByDx11 : IScreenCapture
     public ScreenCaptureInfo GetScreenCaptureInfoByUserManual()
     {
         return ServiceManager.Services.GetService<IScreenCaptureWindow>()!.GetScreenCaptureInfo()
-                             .Result;
+            .Result;
     }
 }

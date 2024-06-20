@@ -12,60 +12,71 @@ public class AutoStartService : IAutoStartService
 
     public bool ChangeAutoStart(bool autoStart)
     {
-        if (autoStart)
+        try
         {
-            var strName = AppDomain.CurrentDomain.BaseDirectory + "KitopiaAvalonia.exe"; //获取要自动运行的应用程序名
-            if (!File.Exists(strName)) //判断要自动运行的应用程序文件是否存在
+            if (autoStart)
             {
-                return false;
-            }
-
-            var registry =
-                Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run",
-                    true); //检索指定的子项
-            if (registry == null) //若指定的子项不存在
-            {
-                registry = Registry.CurrentUser.CreateSubKey(
-                    "Software\\Microsoft\\Windows\\CurrentVersion\\Run"); //则创建指定的子项
-            }
-            else
-            {
-                if (Equals(registry.GetValue("Kitopia"), $"\"{strName}\""))
+                var strName = AppDomain.CurrentDomain.BaseDirectory + "KitopiaAvalonia.exe"; //获取要自动运行的应用程序名
+                if (!File.Exists(strName)) //判断要自动运行的应用程序文件是否存在
                 {
-                    log.Info("开机自启配置已存在");
-                    return true;
+                    return false;
                 }
-            }
 
-            log.Info("用户确认启用开机自启");
-            try
-            {
-                registry.SetValue("Kitopia", $"\"{strName}\""); //设置该子项的新的“键值对”
-                ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))).Show("开机自启",
-                    "开机自启设置成功");
-            }
-            catch (Exception exception)
-            {
-                log.Error("开机自启设置失败");
-                log.Error(exception.StackTrace);
-                ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))).Show("开机自启",
-                    "开机自启设置失败");
-                return false;
-            }
-        }
-        else
-        {
-            try
-            {
                 var registry =
                     Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run",
                         true); //检索指定的子项
-                registry?.DeleteValue("Kitopia");
+                if (registry == null) //若指定的子项不存在
+                {
+                    registry = Registry.CurrentUser.CreateSubKey(
+                        "Software\\Microsoft\\Windows\\CurrentVersion\\Run"); //则创建指定的子项
+                }
+                else
+                {
+                    if (Equals(registry.GetValue("Kitopia"), $"\"{strName}\""))
+                    {
+                        log.Info("开机自启配置已存在");
+                        return true;
+                    }
+                }
+
+                log.Info("用户确认启用开机自启");
+                try
+                {
+                    registry.SetValue("Kitopia", $"\"{strName}\""); //设置该子项的新的“键值对”
+                    ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))).Show("开机自启",
+                        "开机自启设置成功");
+                }
+                catch (Exception exception)
+                {
+                    log.Error("开机自启设置失败");
+                    log.Error(exception.StackTrace);
+                    ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))).Show("开机自启",
+                        "开机自启设置失败");
+                    return false;
+                }
             }
-            catch (Exception)
+            else
             {
-                return false;
+                try
+                {
+                    var registry =
+                        Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                            true); //检索指定的子项
+                    registry?.DeleteValue("Kitopia");
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
             }
+        }
+        catch (Exception e)
+        {
+            log.Error("开机自启设置失败");
+            log.Error(e.StackTrace);
+            ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))).Show("开机自启",
+                "开机自启设置失败");
+            return false;
         }
 
         return true;
