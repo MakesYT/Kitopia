@@ -948,6 +948,7 @@
                                                                                     </StackPanel>
 
                                                                                 </DataTemplate>
+
                                                                             </pages:MyDataTemplateSelector>
                                                                         </ItemsControl.ItemTemplate>
                                                                     </ItemsControl>

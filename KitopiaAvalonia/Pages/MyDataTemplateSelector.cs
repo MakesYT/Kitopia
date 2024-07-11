@@ -2,8 +2,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
+using Avalonia.Data;
+using Avalonia.Layout;
+using Avalonia.Media;
 using Avalonia.Metadata;
 using Core.SDKs.CustomScenario;
 
@@ -25,7 +30,7 @@ public class MyDataTemplateSelector : IDataTemplate
             if (!pointItem.IsSelf)
             {
                 return Templates["InputTemplate"]
-                   .Build(item);
+                    .Build(item);
             }
 
             if (pointItem.isPluginInputConnector)
@@ -36,23 +41,51 @@ public class MyDataTemplateSelector : IDataTemplate
                 return control;
             }
 
-            return (pointItem.RealType.FullName! switch
+            if (pointItem.RealType.BaseType.FullName == "System.Enum")
             {
-                "System.String" => Templates["StringTemplate"]
-                   .Build(item),
+                StackPanel stackPanel = new StackPanel();
+                stackPanel.Orientation = Orientation.Horizontal;
+                stackPanel.VerticalAlignment = VerticalAlignment.Center;
+                stackPanel.HorizontalAlignment = HorizontalAlignment.Right;
+                TextBlock textBlock = new TextBlock
+                {
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Name = "textBlock",
+                    Foreground = Application.Current.Resources["TextFillColorPrimaryBrush"] as IBrush,
+                };
+                var binding = new Binding();
+                binding.Path = "Title";
+                textBlock.Bind(TextBlock.TextProperty, binding);
+                stackPanel.Children.Add(textBlock);
+                var itemsSource = pointItem.RealType.GetEnumValues();
+                var enumerable = itemsSource.Cast<Object>().ToList().AsReadOnly();
+                var comboBox = new ComboBox()
+                {
+                    ItemsSource = enumerable,
+                    SelectedIndex = 0
+                };
+                var bingding2 = new Binding();
+                bingding2.Path = "InputObject";
+                comboBox.Bind(ComboBox.SelectedValueProperty, bingding2);
+                stackPanel.Children.Add(comboBox);
+                return stackPanel;
+            }
 
-                "System.Int32" => Templates["IntTemplate"]
-                   .Build(item),
-
-                "System.Double" => Templates["DoubleTemplate"]
-                   .Build(item),
-                "System.Boolean" => Templates["BoolTemplate"]
-                   .Build(item),
-                "PluginCore.SearchViewItem" => Templates["SearchItemTemplate"]
-                   .Build(item),
-                _ => Templates["InputTemplate"]
-                   .Build(item)
-            })!;
+            switch (pointItem.RealType.FullName!)
+            {
+                case "System.String":
+                    return Templates["StringTemplate"].Build(item);
+                case "System.Int32":
+                    return Templates["IntTemplate"].Build(item);
+                case "System.Double":
+                    return Templates["DoubleTemplate"].Build(item);
+                case "System.Boolean":
+                    return Templates["BoolTemplate"].Build(item);
+                case "PluginCore.SearchViewItem":
+                    return Templates["SearchItemTemplate"].Build(item);
+                default:
+                    return Templates["InputTemplate"].Build(item);
+            }
         }
 
         return null;
