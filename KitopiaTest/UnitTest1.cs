@@ -1,4 +1,5 @@
-using System.Management;
+using SharpHook;
+using SharpHook.Native;
 
 namespace KitopiaTest;
 
@@ -12,20 +13,17 @@ public class Tests
     [Test]
     public void Test1()
     {
-        try
-        {
-            ManagementObjectSearcher searcher =
-                new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_OperatingSystem");
+        var eventSimulator = new EventSimulator();
+        eventSimulator.SimulateKeyPress(KeyCode.VcLeftControl);
 
-            foreach (ManagementObject queryObj in searcher.Get())
-            {
-                Console.WriteLine("Caption: {0}", queryObj["Caption"]);
-            }
-        }
-        catch (ManagementException e)
-        {
-            Console.WriteLine("An error occurred while querying for WMI data: " + e.Message);
-        }
+        eventSimulator.SimulateKeyPress(KeyCode.VcLeftAlt);
+        eventSimulator.SimulateKeyPress(KeyCode.VcA);
+        Task.Delay(100).GetAwaiter().GetResult();
+
+        eventSimulator.SimulateKeyRelease(KeyCode.VcA);
+        eventSimulator.SimulateKeyRelease(KeyCode.VcLeftAlt);
+        eventSimulator.SimulateKeyRelease(KeyCode.VcLeftControl);
+
 
         Assert.Pass();
     }
