@@ -5,22 +5,20 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
-using Avalonia.Input;
-using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using Avalonia.Xaml.Interactivity;
 using Core.ViewModel;
-using Desktop.Robot;
+using log4net;
 using PluginCore;
 using SharpHook;
 using SharpHook.Native;
 using Vanara.PInvoke;
-using Key = Desktop.Robot.Key;
 
 namespace KitopiaAvalonia.Windows;
 
 public partial class MouseQuickWindow : Window
 {
+    private static readonly ILog log = LogManager.GetLogger(nameof(MouseQuickWindow));
+
     public MouseQuickWindow()
     {
         InitializeComponent();
@@ -47,7 +45,7 @@ public partial class MouseQuickWindow : Window
         User32.GetWindowInfo(TryGetPlatformHandle().Handle, ref windowinfo);
 
         int Left, Top;
-        if (pos.X + windowinfo.rcClient.Width<monitorInfo.rcMonitor.Right)
+        if (pos.X + windowinfo.rcClient.Width < monitorInfo.rcMonitor.Right)
         {
             Left = pos.X;
         }
@@ -55,8 +53,8 @@ public partial class MouseQuickWindow : Window
         {
             Left = pos.X - windowinfo.rcClient.Width;
         }
-        
-       
+
+
         if (pos.Y + windowinfo.rcClient.Height < monitorInfo.rcMonitor.Bottom)
         {
             Top = pos.Y;
@@ -75,13 +73,12 @@ public partial class MouseQuickWindow : Window
         }
 
 
-        var robot = new Robot();
-        robot.AutoDelay = 1;
-        robot.KeyDown(Key.Control);
-        robot.KeyDown(Key.C);
-        Task.Delay(200);
-        robot.KeyUp(Key.C);
-        robot.KeyUp(Key.Control);
+        var eventSimulator = new EventSimulator();
+        eventSimulator.SimulateKeyPress(KeyCode.VcLeftControl);
+        eventSimulator.SimulateKeyPress(KeyCode.VcC);
+        Task.Delay(100).GetAwaiter().GetResult();
+        eventSimulator.SimulateKeyRelease(KeyCode.VcC);
+        eventSimulator.SimulateKeyRelease(KeyCode.VcLeftControl);
 
         Dispatcher.UIThread.InvokeAsync(() =>
         {
@@ -91,7 +88,8 @@ public partial class MouseQuickWindow : Window
             {
                 ((MouseQuickWindowViewModel)DataContext).SelectedItem = new SelectedItem()
                     { type = FileType.文本, obj = s };
-                //log.Info(Clipboard.GetText());
+
+                log.Info(s);
             }
 
             if (text != null)
