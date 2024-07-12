@@ -2,15 +2,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using Avalonia.Data;
-using Avalonia.Layout;
-using Avalonia.Media;
 using Avalonia.Metadata;
 using Core.SDKs.CustomScenario;
+using KitopiaAvalonia.Tools;
 
 #endregion
 
@@ -21,6 +17,15 @@ public class MyDataTemplateSelector : IDataTemplate
     // Override the SelectTemplate method
     [Content] public Dictionary<string, IDataTemplate> Templates { get; } = new Dictionary<string, IDataTemplate>();
 
+    private static Type ResolveType(string? ns, string typeName)
+    {
+        return typeName switch
+        {
+            "TextBlock" => typeof(TextBlock),
+            "ComboBox" => typeof(ComboBox),
+            _ => throw new InvalidOperationException($"Could not resolve type {typeName}.")
+        };
+    }
 
     public Control? Build(object? item)
     {
@@ -41,34 +46,14 @@ public class MyDataTemplateSelector : IDataTemplate
                 return control;
             }
 
+
             if (pointItem.RealType.BaseType.FullName == "System.Enum")
             {
-                StackPanel stackPanel = new StackPanel();
-                stackPanel.Orientation = Orientation.Horizontal;
-                stackPanel.VerticalAlignment = VerticalAlignment.Center;
-                stackPanel.HorizontalAlignment = HorizontalAlignment.Right;
-                TextBlock textBlock = new TextBlock
-                {
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Name = "textBlock",
-                    Foreground = Application.Current.Resources["TextFillColorPrimaryBrush"] as IBrush,
-                };
-                var binding = new Binding();
-                binding.Path = "Title";
-                textBlock.Bind(TextBlock.TextProperty, binding);
-                stackPanel.Children.Add(textBlock);
-                var itemsSource = pointItem.RealType.GetEnumValues();
-                var enumerable = itemsSource.Cast<Object>().ToList().AsReadOnly();
-                var comboBox = new ComboBox()
-                {
-                    ItemsSource = enumerable,
-                    SelectedIndex = 0
-                };
-                var bingding2 = new Binding();
-                bingding2.Path = "InputObject";
-                comboBox.Bind(ComboBox.SelectedValueProperty, bingding2);
-                stackPanel.Children.Add(comboBox);
-                return stackPanel;
+                var control = Templates["EnumTemplate"].Build(item);
+                var childOfType = control.GetChildOfType<ComboBox>("ComboBox");
+                childOfType.ItemsSource = pointItem.RealType.GetEnumValues();
+                Console.WriteLine(1);
+                return control;
             }
 
             switch (pointItem.RealType.FullName!)

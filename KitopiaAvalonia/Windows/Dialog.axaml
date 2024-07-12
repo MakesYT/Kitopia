@@ -1,125 +1,122 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
-           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-           xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
-           mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-           x:Class="KitopiaAvalonia.Controls.Dialog"
-           Foreground="{DynamicResource ContentDialogForeground}"
-           
-           BorderBrush="{DynamicResource ContentDialogBorderBrush}"
-           BorderThickness="{DynamicResource ContentDialogBorderWidth}"
-           CornerRadius="{DynamicResource OverlayCornerRadius}"
-           Topmost="True"
-           CanResize="False"
-           SystemDecorations="BorderOnly"
-           ExtendClientAreaChromeHints="NoChrome"
-           ExtendClientAreaTitleBarHeightHint="25"
-           ExtendClientAreaToDecorationsHint="True"
-           WindowStartupLocation="CenterScreen"
-           ShowInTaskbar="False"
-           Name="myWindow"
-           SizeToContent="WidthAndHeight"
-           
-           TransparencyLevelHint="AcrylicBlur"
-           Title="Dialog">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="KitopiaAvalonia.Controls.Dialog"
+        Foreground="{DynamicResource ContentDialogForeground}"
+
+        BorderBrush="{DynamicResource ContentDialogBorderBrush}"
+        BorderThickness="{DynamicResource ContentDialogBorderWidth}"
+        CornerRadius="{DynamicResource OverlayCornerRadius}"
+        Topmost="True"
+        CanResize="False"
+        SystemDecorations="BorderOnly"
+        ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaTitleBarHeightHint="25"
+        ExtendClientAreaToDecorationsHint="True"
+        WindowStartupLocation="CenterScreen"
+        ShowInTaskbar="False"
+        Name="myWindow"
+        SizeToContent="WidthAndHeight"
+
+        TransparencyLevelHint="AcrylicBlur"
+        Title="Dialog">
     <Window.Background>
         <SolidColorBrush Color="{DynamicResource SolidBackgroundFillColorBase}" Opacity="0.65" />
 
     </Window.Background>
-    <controls:FABorder Name="BackgroundElement"
-                       Background="{DynamicResource ContentDialogBackground}"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center">
-        <!-- Even in WinUI, shadow is always black regardless of light/dark mode -->
 
-        <!-- if this border isn't here, dialog space displays outside of corner radius at top
+    <!-- Even in WinUI, shadow is always black regardless of light/dark mode -->
+
+    <!-- if this border isn't here, dialog space displays outside of corner radius at top
                                  if we put ClipToBounds=True on BackgroundElement above, it clips the shadow -->
-        <Border ClipToBounds="True">
-            <Grid Name="DialogSpace" ClipToBounds="True"
-                  RowDefinitions="Auto,*,Auto">
-                <Panel   Background="{DynamicResource ContentDialogTopOverlay}"
-                       PointerMoved="InputElement_OnPointerMoved" PointerPressed="InputElement_OnPointerPressed" PointerReleased="InputElement_OnPointerReleased"
-                       >
-                    <TextPresenter Name="Title" 
-                                   Margin="5"
-                                   FontSize="20"
-                                   FontFamily="Default"
-                                   FontWeight="SemiBold"
-                                   HorizontalAlignment="Left"
-                                   VerticalAlignment="Top" />
-                </Panel>
-                <ScrollViewer Grid.Row="1" Name="ContentScrollViewer"
-                              HorizontalScrollBarVisibility="Disabled"
-                              MinHeight="100"
-                              VerticalScrollBarVisibility="Auto">
-                    <Border Background="{DynamicResource ContentDialogTopOverlay}"
-                            Padding="5,0,5,0"
-                            BorderThickness="{StaticResource ContentDialogSeparatorThickness}"
-                            BorderBrush="{DynamicResource ContentDialogSeparatorBorderBrush}">
-                        <Grid RowDefinitions="Auto,*">
-                            <Grid.Styles>
-                                <!--Make sure text wrapping is on-->
-                                <Style Selector="TextBlock">
-                                    <Setter Property="TextWrapping" Value="Wrap" />
-                                </Style>
-                            </Grid.Styles>
-                            
+    <Border ClipToBounds="True" HorizontalAlignment="Center" Name="BackgroundElement"
+            Background="{DynamicResource ContentDialogBackground}"
+            VerticalAlignment="Center">
+        <Grid Name="DialogSpace" ClipToBounds="True"
+              RowDefinitions="Auto,*,Auto">
+            <Panel Background="{DynamicResource ContentDialogTopOverlay}"
+                   PointerMoved="InputElement_OnPointerMoved" PointerPressed="InputElement_OnPointerPressed"
+                   PointerReleased="InputElement_OnPointerReleased">
+                <TextPresenter Name="Title"
+                               Margin="5"
+                               FontSize="20"
+                               FontFamily="Default"
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Top" />
+            </Panel>
+            <ScrollViewer Grid.Row="1" Name="ContentScrollViewer"
+                          HorizontalScrollBarVisibility="Disabled"
+                          MinHeight="100"
+                          VerticalScrollBarVisibility="Auto">
+                <Border Background="{DynamicResource ContentDialogTopOverlay}"
+                        Padding="5,0,5,0"
+                        BorderThickness="{StaticResource ContentDialogSeparatorThickness}"
+                        BorderBrush="{DynamicResource ContentDialogSeparatorBorderBrush}">
+                    <Grid RowDefinitions="Auto,*">
+                        <Grid.Styles>
+                            <!--Make sure text wrapping is on-->
+                            <Style Selector="TextBlock">
+                                <Setter Property="TextWrapping" Value="Wrap" />
+                            </Style>
+                        </Grid.Styles>
 
-                            <ContentPresenter Name="Content"
-                                                
-                                              FontSize="{StaticResource ControlContentThemeFontSize}"
-                                              FontFamily="{StaticResource ContentControlThemeFontFamily}"
 
-                                              Grid.Row="1" />
-                        </Grid>
-                    </Border>
-                </ScrollViewer>
+                        <ContentPresenter Name="Content"
 
-                <Border Padding="{StaticResource ContentDialogPadding}"
-                        Grid.Row="2"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Bottom">
-                    <Grid Name="CommandSpace">
-                        <!--
+                                          FontSize="{StaticResource ControlContentThemeFontSize}"
+                                          FontFamily="{StaticResource ContentControlThemeFontFamily}"
+
+                                          Grid.Row="1" />
+                    </Grid>
+                </Border>
+            </ScrollViewer>
+
+            <Border Padding="{StaticResource ContentDialogPadding}"
+                    Grid.Row="2"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Bottom">
+                <Grid Name="CommandSpace">
+                    <!--
                                             B/C we can't target Row/Column defs in Styles like WinUI
                                             this still uses the old Col defs, but it works the same
                                             way in the end...
                                             -->
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="0.5*" />
-                            <ColumnDefinition Width="0.5*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Button Name="PrimaryButton"
-                                IsDefault="True"
-                                Classes="accent"
-                                HorizontalAlignment="Stretch"
-                                VerticalAlignment="Stretch"
-                                HorizontalContentAlignment="Center"
-                                VerticalContentAlignment="Center"
-                                IsVisible="False" />
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="0.5*" />
+                        <ColumnDefinition Width="0.5*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Button Name="PrimaryButton"
+                            IsDefault="True"
+                            Classes="accent"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            IsVisible="False" />
 
-                        <Button Name="SecondaryButton"
+                    <Button Name="SecondaryButton"
 
-                                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                                HorizontalContentAlignment="Center"
-                                VerticalContentAlignment="Center"
-                                IsVisible="False" />
+                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            IsVisible="False" />
 
-                        <Button Name="CloseButton"
+                    <Button Name="CloseButton"
 
-                                HorizontalAlignment="Stretch"
-                                VerticalAlignment="Stretch"
-                                HorizontalContentAlignment="Center"
-                                VerticalContentAlignment="Center"
-                                IsVisible="False" />
-                    </Grid>
-                </Border>
-            </Grid>
-        </Border>
-    </controls:FABorder>
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            IsVisible="False" />
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
 
 
 </Window>

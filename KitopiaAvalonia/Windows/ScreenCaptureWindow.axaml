@@ -8,16 +8,17 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="KitopiaAvalonia.Windows.ScreenCaptureWindow"
         Title="ScreenCaptureWindow">
-   
+
     <Canvas>
 
         <Image Name="Image" />
-        <Image Name="MosaicImage" Width="{Binding $parent[Canvas].Bounds.Width}" 
+        <Image Name="MosaicImage" Width="{Binding $parent[Canvas].Bounds.Width}"
                Height="{Binding $parent[Canvas].Bounds.Height}">
-          
+
         </Image>
         <capture:PenCaptureTool Name="MosaicCanvas" Width="{Binding $parent[Canvas].Bounds.Width}" ZIndex="-1"
-                  Height="{Binding $parent[Canvas].Bounds.Height}" Stroke="Black" Fill="Black" StrokeThickness="7">
+                                Height="{Binding $parent[Canvas].Bounds.Height}" Stroke="Black" Fill="Black"
+                                StrokeThickness="7">
         </capture:PenCaptureTool>
         <Rectangle ZIndex="1" Name="Rectangle" Width="{Binding $parent[Window].Bounds.Width}" Focusable="True"
                    Height="{Binding $parent[Window].Bounds.Height}" PointerEntered="Rectangle_OnPointerEntered">
@@ -25,7 +26,8 @@
                 <SolidColorBrush Color="Black" Opacity="0.5" />
             </Rectangle.Fill>
         </Rectangle>
-        <capture:DraggableResizeableControl IsVisible="False" IsSelected="True" ZIndex="2" Name="SelectBox" OnlyShowReSizingBoxOnSelect="False">
+        <capture:DraggableResizeableControl IsVisible="False" IsSelected="True" ZIndex="2" Name="SelectBox"
+                                            OnlyShowReSizingBoxOnSelect="False">
             <Rectangle PointerMoved="SelectBox_OnPointerMoved" PointerReleased="SelectBox_OnPointerReleased"
                        PointerPressed="SelectBox_OnPointerPressed" PointerCaptureLost="SelectBox_OnPointerCaptureLost">
                 <Rectangle.Fill>
@@ -36,8 +38,9 @@
 
 
         <Canvas ZIndex="3" Name="Canvas" Width="{Binding $parent[Canvas].Bounds.Width}"
-                Height="{Binding $parent[Canvas].Bounds.Height}"/>
-        <Border ZIndex="3" Padding="5" CornerRadius="4" IsVisible="False"   d:IsHidden="False" Name="ToolBar" Focusable="True">
+                Height="{Binding $parent[Canvas].Bounds.Height}" />
+        <Border ZIndex="3" Padding="5" CornerRadius="4" IsVisible="False" d:IsHidden="False" Name="ToolBar"
+                Focusable="True">
             <Border.Background>
                 <SolidColorBrush Color="{DynamicResource SolidBackgroundFillColorBase}" Opacity="0.5" />
             </Border.Background>
@@ -53,7 +56,7 @@
                             <Setter Property="BorderBrush" Value="DimGray"></Setter>
 
                         </Style>
-                        <Style Selector="Button.Selected:pointerover /template/ controls|FABorder#Root">
+                        <Style Selector="Button.Selected:pointerover /template/ Border#Root">
                             <Setter Property="BorderBrush" Value="DimGray" />
                             <Setter Property="Background">
                                 <Setter.Value>
@@ -82,11 +85,13 @@
                             </controls:FontIcon.RenderTransform>
                         </controls:FontIcon>
                     </Button>
-                    <Button BorderThickness="1" ToolTip.Tip="批注" Width="32" Height="32" Padding="0,3,0,0" Click="CommentButton_OnClick">
+                    <Button BorderThickness="1" ToolTip.Tip="批注" Width="32" Height="32" Padding="0,3,0,0"
+                            Click="CommentButton_OnClick">
                         <controls:FontIcon Width="24" Height="24"
                                            FontFamily="{StaticResource FluentFont}" Glyph="&#xe8d8;" FontSize="24" />
                     </Button>
-                    <Button BorderThickness="1" ToolTip.Tip="文本" Width="32" Height="32" Padding="1,3,0,0" Click="TextButton_OnClick">
+                    <Button BorderThickness="1" ToolTip.Tip="文本" Width="32" Height="32" Padding="1,3,0,0"
+                            Click="TextButton_OnClick">
                         <controls:FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" Width="24"
                                            Height="24"
                                            FontFamily="{StaticResource FluentFont}" Glyph="&#xecaf;" FontSize="24" />
@@ -98,7 +103,8 @@
                           StrokeThickness="1"
                           StartPoint="0.5,0"
                           EndPoint="0.5,32" />
-                    <Button BorderThickness="1" ToolTip.Tip="撤销" Width="32" Height="32" Padding="1,3,0,0" Click="RedoButton_OnClick">
+                    <Button BorderThickness="1" ToolTip.Tip="撤销" Width="32" Height="32" Padding="1,3,0,0"
+                            Click="RedoButton_OnClick">
                         <controls:FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" Width="24"
                                            Height="24"
                                            FontFamily="{StaticResource FluentFont}" Glyph="&#xf8e6;" FontSize="24" />
@@ -132,7 +138,7 @@
                             <Setter Property="BorderBrush" Value="DimGray"></Setter>
 
                         </Style>
-                        <Style Selector="Button.Selected:pointerover /template/ controls|FABorder#Root">
+                        <Style Selector="Button.Selected:pointerover /template/ Border#Root">
                             <Setter Property="BorderBrush" Value="DimGray" />
                             <Setter Property="Background">
                                 <Setter.Value>
@@ -141,23 +147,25 @@
                             </Setter>
                         </Style>
                     </StackPanel.Styles>
-                    <controls:NumberBox ToolTip.Tip="画笔大小" Margin="0,2,0,0" Height="37" Name="StrokeWidth" Minimum="1" Maximum="50"  
+                    <controls:NumberBox ToolTip.Tip="画笔大小" Margin="0,2,0,0" Height="37" Name="StrokeWidth" Minimum="1"
+                                        Maximum="50"
                                         PlaceholderText="3"
-                                        SpinButtonPlacementMode="Inline" Value="3" ValidationMode="InvalidInputOverwritten" >
+                                        SpinButtonPlacementMode="Inline" Value="3"
+                                        ValidationMode="InvalidInputOverwritten">
                         <controls:NumberBox.Styles>
                             <Style Selector="controls|NumberBox /template/ TextBox#InputBox">
                                 <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
                             </Style>
                         </controls:NumberBox.Styles>
-                    </controls:NumberBox> 
+                    </controls:NumberBox>
                     <controls:ColorPickerButton ToolTip.Tip="画笔颜色" Name="ColorPicker" UseColorPalette="True"></controls:ColorPickerButton>
-                   
+
                 </StackPanel>
             </StackPanel>
 
         </Border>
 
-        
+
         <Line ZIndex="2" Name="X" Fill="WhiteSmoke" Stroke="WhiteSmoke" StrokeThickness="1.5" IsVisible="False" />
         <Line ZIndex="2" Name="Y" Fill="WhiteSmoke" Stroke="WhiteSmoke" StrokeThickness="1.5" IsVisible="False" />
 

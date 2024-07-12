@@ -82,6 +82,7 @@ public class ScreenCaptureWindow : IScreenCaptureWindow
                     CanResize = false,
                     IsVisible = true,
                 };
+
                 window.MosaicImage.Source = captureAllScreen.Item2.Count > 0 ? captureAllScreen.Item2.Dequeue() : null;
                 window.Image.Source = captureAllScreen.Item1.Count > 0 ? captureAllScreen.Item1.Dequeue() : null;
                 window.SetToSelectMode(action);

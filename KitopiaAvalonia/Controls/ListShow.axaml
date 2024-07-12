@@ -60,7 +60,7 @@
                                             <Button.Styles>
 
                                                 <Style
-                                                    Selector="Button#Button:pointerover /template/ controls1|FABorder#Root">
+                                                    Selector="Button#Button:pointerover /template/ Border#Root">
 
                                                     <Setter Property="Background">
                                                         <SolidColorBrush

@@ -35,6 +35,17 @@
 
         <converter:ReverseBool x:Key="ReverseBool" />
     </windowing:AppWindow.Resources>
+    <windowing:AppWindow.Styles>
+        <Style Selector="RepeatButton /template/ ContentPresenter">
+            <Setter Property="ContentTemplate">
+                <Setter.Value>
+                    <DataTemplate DataType="x:String">
+                        <TextBlock FontFamily="{DynamicResource SymbolThemeFontFamily}" Text="{Binding .}"></TextBlock>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </windowing:AppWindow.Styles>
     <Interaction.Behaviors>
         <EventTriggerBehavior EventName="Closing">
             <InvokeCommandAction Command="{Binding ReloadScenarioCommand}" PassEventArgsToCommand="True" />
@@ -171,7 +182,7 @@
                                                     <Button.Styles>
 
                                                         <Style
-                                                            Selector="Button#Button:pointerover /template/ controls|FABorder#Root">
+                                                            Selector="Button#Button:pointerover /template/ Border#Root">
 
                                                             <Setter Property="Background">
                                                                 <SolidColorBrush
@@ -865,6 +876,24 @@
                                                                                     </StackPanel>
 
                                                                                 </DataTemplate>
+                                                                                <DataTemplate x:Key="EnumTemplate"
+                                                                                    DataType="{x:Type customScenario:ConnectorItem}">
+                                                                                    <StackPanel Margin="10,0,0,0"
+                                                                                        Orientation="Horizontal"
+                                                                                        VerticalAlignment="Center"
+                                                                                        HorizontalAlignment="Right">
+                                                                                        <TextBlock
+                                                                                            VerticalAlignment="Center"
+                                                                                            x:Name="textBlock"
+                                                                                            Text="{Binding Title}"
+                                                                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                                                        <ComboBox Margin="10,5,10,5"
+                                                                                            x:Name="ComboBox"
+                                                                                            MinWidth="40"
+                                                                                            SelectedValue="{Binding InputObject,Mode=TwoWay}" />
+                                                                                    </StackPanel>
+
+                                                                                </DataTemplate>
                                                                                 <DataTemplate x:Key="IntTemplate"
                                                                                     DataType="{x:Type customScenario:ConnectorItem}">
                                                                                     <StackPanel Margin="10,0,0,0"
@@ -1191,14 +1220,14 @@
                                 <controls2:Node.InputConnectorTemplate>
                                     <DataTemplate DataType="{x:Type customScenario:ConnectorItem}">
 
-                                        <ContentPresenter Content="{Binding .}" Name="ContentPresenter">
+                                        <ContentPresenter Content="{Binding .}" Name="ContentPresenter1">
                                             <ContentPresenter.ContextFlyout>
                                                 <MenuFlyout>
                                                     <!-- ReSharper disable once Xaml.RedundantResource -->
                                                     <MenuItem Header="切换自输入/连接器"
                                                               Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                                               Command="{Binding $parent[controls2:NodifyEditor].((taskEditor1:TaskEditorViewModel)DataContext).SwitchConnectorCommand}"
-                                                              CommandParameter="{Binding #ContentPresenter  }" />
+                                                              CommandParameter="{Binding #ContentPresenter1  }" />
                                                 </MenuFlyout>
                                             </ContentPresenter.ContextFlyout>
                                             <ContentPresenter.DataTemplates>
@@ -1281,6 +1310,23 @@
                                                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                                                      Text="{Binding InputObject}" Watermark="字符串" />
                                                         </StackPanel>
+                                                    </DataTemplate>
+                                                    <DataTemplate x:Key="EnumTemplate"
+                                                                  DataType="{x:Type customScenario:ConnectorItem}">
+                                                        <StackPanel Margin="10,0,0,0"
+                                                                    Orientation="Horizontal"
+                                                                    VerticalAlignment="Center"
+                                                                    HorizontalAlignment="Right">
+                                                            <TextBlock
+                                                                VerticalAlignment="Center"
+                                                                x:Name="textBlock"
+                                                                Text="{Binding Title}"
+                                                                Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                            <ComboBox Margin="10,5,10,5" x:Name="ComboBox"
+                                                                      MinWidth="40"
+                                                                      SelectedValue="{Binding InputObject,Mode=TwoWay}" />
+                                                        </StackPanel>
+
                                                     </DataTemplate>
                                                     <DataTemplate x:Key="IntTemplate"
                                                                   DataType="{x:Type customScenario:ConnectorItem}">

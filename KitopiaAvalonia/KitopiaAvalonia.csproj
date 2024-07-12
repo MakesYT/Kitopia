@@ -30,7 +30,7 @@
         <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
         <DebugType Condition="'$(Configuration)' == 'Release'">none</DebugType>
         <Version>0.0.2.053</Version>
-        <AvaloniaVersion>11.1.0-beta2</AvaloniaVersion>
+        <AvaloniaVersion>11.2.999-cibuild0050044-alpha</AvaloniaVersion>
     </PropertyGroup>
 
 
@@ -52,14 +52,14 @@
 
     <ItemGroup>
         <PackageReference Condition="$(DefineConstants.Contains(ENABLE_XAML_HOT_RELOAD))" Include="Avalonia.Markup.Xaml.Loader" Version="$(AvaloniaVersion)" />
-        <PackageReference Include="Avalonia.ReactiveUI" Version="11.1.0-rc2"/>
+        <PackageReference Include="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)"/>
         <PackageReference Condition="$(DefineConstants.Contains(ENABLE_XAML_HOT_RELOAD))" Include="HotAvalonia" Version="1.1.1"/>
         <PackageReference Include="HotAvalonia.Extensions" Version="1.1.1" PrivateAssets="All"/>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="11.1.0-rc2"/>
-        <PackageReference Include="Avalonia.Desktop" Version="11.1.0-rc2"/>
-        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.1.0-rc2"/>
+        <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)"/>
+        <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)"/>
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)"/>
         <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.1.0-rc2"/>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2"/>
         <PackageReference Include="log4net" Version="2.0.17"/>
