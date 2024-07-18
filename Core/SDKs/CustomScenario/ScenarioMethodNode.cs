@@ -14,7 +14,7 @@ public enum s节点状态
     初步验证
 }
 
-public partial class PointItem : ObservableRecipient
+public partial class ScenarioMethodNode : ObservableRecipient
 {
     [property: JsonConverter(typeof(PointJsonConverter))]
     [JsonConverter(typeof(PointJsonConverter))]
@@ -26,10 +26,7 @@ public partial class PointItem : ObservableRecipient
     [ObservableProperty] private ObservableCollection<ConnectorItem> output = new();
     [ObservableProperty] private s节点状态 status = s节点状态.未验证;
 
-    public string? Plugin { get; set; }
-
-
-    public string? MerthodName { get; set; }
+    public ScenarioMethodInfo ScenarioMethodInfo { get; set; }
 
     public string? ValueRef { get; set; }
 }

@@ -1,6 +1,5 @@
 ﻿#region
 
-using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -8,7 +7,6 @@ using System.Text.Json;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.HotKey;
 using Core.SDKs.Services.Config;
-using Core.SDKs.Tools;
 using log4net;
 using PluginCore;
 using PluginCore.Attribute;
@@ -48,8 +46,8 @@ public class Plugin
             }
 
             deserializeObject.GetType()
-                             .BaseType.GetField("Instance")
-                             .SetValue(deserializeObject, deserializeObject);
+                .BaseType.GetField("Instance")
+                .SetValue(deserializeObject, deserializeObject);
             deserializeObject.AfterLoad();
         }
         catch (Exception e)
@@ -59,23 +57,24 @@ public class Plugin
         }
 
         configBase.GetType()
-                  .GetFields(BindingFlags.Instance | BindingFlags.Public)
-                  .ToList()
-                  .ForEach(x => {
-                       if (x.GetCustomAttribute<ConfigField>() is { } configField)
-                       {
-                           if (configField.FieldType == ConfigFieldType.快捷键)
-                           {
-                               HotKeyManager.HotKeys.Add(x.GetValue(configBase) as HotKeyModel);
-                           }
-                       }
-                   });
+            .GetFields(BindingFlags.Instance | BindingFlags.Public)
+            .ToList()
+            .ForEach(x =>
+            {
+                if (x.GetCustomAttribute<ConfigField>() is { } configField)
+                {
+                    if (configField.FieldType == ConfigFieldType.快捷键)
+                    {
+                        HotKeyManager.HotKeys.Add(x.GetValue(configBase) as HotKeyModel);
+                    }
+                }
+            });
     }
 
     public Plugin(string path)
     {
         _plugin = new AssemblyLoadContextH(path, path.Split(Path.DirectorySeparatorChar)
-                                                     .Last() + "_plugin");
+            .Last() + "_plugin");
         Log.Debug($"加载插件:{path}");
         var t = _dll.GetExportedTypes();
         Dictionary<string, (MethodInfo, object)> methodInfos = new();
@@ -85,13 +84,13 @@ public class Plugin
             if (type.GetInterface("IPlugin") != null)
             {
                 var PluginInfo = (PluginInfo)type.GetField("PluginInfo")
-                                                 .GetValue(null);
+                    .GetValue(null);
                 PluginInfo.Path = path;
                 this.PluginInfo = PluginInfo;
                 Log.Debug($"加载插件:{PluginInfo.ToPlgString()}");
                 //var instance = Activator.CreateInstance(type);
                 ServiceProvider = (IServiceProvider)type.GetMethod("GetServiceProvider")
-                                                        .Invoke(null, null);
+                    .Invoke(null, null);
 
                 ((IPlugin)ServiceProvider.GetService(type)).OnEnabled(ServiceProvider);
                 break;
@@ -120,8 +119,8 @@ public class Plugin
 
             foreach (var methodInfo in type.GetMethods())
             {
-                if (methodInfo.GetCustomAttributes(typeof(PluginMethod))
-                              .Any()) //情景的可用节点
+                if (methodInfo.GetCustomAttributes(typeof(ScenarioMethodAttribute))
+                    .Any()) //情景的可用节点
                 {
                     if (methodInfo.GetParameters()[^1].ParameterType.FullName != "System.Threading.CancellationToken")
                     {
@@ -133,9 +132,10 @@ public class Plugin
                 }
 
                 if (methodInfo.GetCustomAttributes(typeof(SearchMethod))
-                              .Any()) //搜索的切入方法
+                    .Any()) //搜索的切入方法
                 {
-                    searchViews.Add(e => {
+                    searchViews.Add(e =>
+                    {
                         var invoke = methodInfo.Invoke(
                             ServiceProvider!.GetService(methodInfo.DeclaringType!),
                             new object?[] { e });
@@ -167,8 +167,8 @@ public class Plugin
         foreach (var genericArgument in methodInfo.GetParameters())
         {
             var plugin = PluginManager.EnablePlugin
-                                      .FirstOrDefault((e) => e.Value._dll == genericArgument.ParameterType.Assembly)
-                                      .Value;
+                .FirstOrDefault((e) => e.Value._dll == genericArgument.ParameterType.Assembly)
+                .Value;
             // type.Assembly.
             // var a = PluginManager.GetPlugnNameByTypeName(type.FullName);
             if (plugin is null)
@@ -199,166 +199,6 @@ public class Plugin
         return null;
     }
 
-    private object GetPointItemByMethodInfo(MethodInfo methodInfo)
-    {
-        var customAttribute = (PluginMethod)methodInfo.GetCustomAttribute(typeof(PluginMethod));
-        var pointItem = new PointItem()
-        {
-            Plugin = this.ToPlgString(),
-            MerthodName = ToMtdString(methodInfo),
-            Title = $"{PluginInfo.Author}_{PluginInfo.PluginId}_{customAttribute.Name}"
-        };
-        ObservableCollection<ConnectorItem> inpItems = new();
-        inpItems.Add(new ConnectorItem()
-        {
-            Source = pointItem,
-            Type = typeof(NodeConnectorClass),
-            Title = "流输入",
-            TypeName = "节点"
-        });
-        int autoUnboxIndex = 0;
-        for (var index = 0;
-             index < methodInfo.GetParameters()
-                               .Length;
-             index++)
-        {
-            var parameterInfo = methodInfo.GetParameters()[index];
-            if (parameterInfo.ParameterType.FullName == "System.Threading.CancellationToken")
-            {
-                continue;
-            }
-
-            bool IsSelf = parameterInfo.GetCustomAttributes(typeof(SelfInput))
-                                       .Any();
-
-            if (parameterInfo.ParameterType.GetCustomAttribute(typeof(AutoUnbox)) is not null)
-            {
-                autoUnboxIndex++;
-                var type = parameterInfo.ParameterType;
-                foreach (var memberInfo in type.GetProperties())
-                {
-                    List<string>? interfaces = null;
-                    if (!memberInfo.PropertyType.FullName.StartsWith("System."))
-                    {
-                        interfaces = new();
-                        foreach (var @interface in memberInfo.PropertyType.GetInterfaces())
-                        {
-                            interfaces.Add(@interface.FullName);
-                        }
-                    }
-
-                    inpItems.Add(new ConnectorItem()
-                    {
-                        Source = pointItem,
-                        Type = memberInfo.PropertyType,
-                        IsSelf = IsSelf,
-                        AutoUnboxIndex = autoUnboxIndex,
-                        Interfaces = interfaces,
-                        Title = customAttribute.GetParameterName(memberInfo.Name),
-                        TypeName = BaseNodeMethodsGen.GetI18N(memberInfo.PropertyType.FullName),
-                    });
-                }
-            }
-            else
-            {
-                var connectorItem = new ConnectorItem()
-                {
-                    Source = pointItem,
-                    Type = parameterInfo.ParameterType,
-                    IsSelf = IsSelf,
-                    Title = customAttribute.GetParameterName(parameterInfo.Name),
-                    TypeName = BaseNodeMethodsGen.GetI18N(parameterInfo.ParameterType.FullName)
-                };
-                if (parameterInfo.ParameterType.GetCustomAttribute<CustomNodeInputType>() is not null
-                    and var customNodeInputType)
-                {
-                    connectorItem.isPluginInputConnector = true;
-                    connectorItem.IsSelf = true;
-                    try
-                    {
-                        var service = ServiceProvider.GetService(customNodeInputType.Type);
-                        connectorItem.PluginInputConnector = service as INodeInputConnector;
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                        throw;
-                    }
-                }
-
-                inpItems.Add(connectorItem);
-            }
-
-            //Log.Debug($"参数{index}:类型为{parameterInfo.ParameterType}");
-        }
-
-        if (methodInfo.ReturnParameter.ParameterType != typeof(void))
-        {
-            ObservableCollection<ConnectorItem> outItems = new();
-            if (methodInfo.ReturnParameter.ParameterType.GetCustomAttribute(typeof(AutoUnbox)) is not null)
-            {
-                autoUnboxIndex++;
-                var type = methodInfo.ReturnParameter.ParameterType;
-                foreach (var memberInfo in type.GetProperties())
-                {
-                    List<string>? interfaces = null;
-                    if (!memberInfo.PropertyType.FullName.StartsWith("System."))
-                    {
-                        interfaces = new();
-                        foreach (var @interface in memberInfo.PropertyType.GetInterfaces())
-                        {
-                            interfaces.Add(@interface.FullName);
-                        }
-                    }
-
-                    outItems.Add(new ConnectorItem()
-                    {
-                        Source = pointItem,
-                        Type = memberInfo.PropertyType,
-                        AutoUnboxIndex = autoUnboxIndex,
-                        Interfaces = interfaces,
-                        Title = customAttribute.GetParameterName(memberInfo.Name),
-                        TypeName = BaseNodeMethodsGen.GetI18N(memberInfo.PropertyType.FullName),
-                        IsOut = true
-                    });
-                }
-            }
-            else
-            {
-                List<string> interfaces = new();
-                foreach (var @interface in methodInfo.ReturnParameter.ParameterType.GetInterfaces())
-                {
-                    interfaces.Add(@interface.FullName);
-                }
-
-
-                outItems.Add(new ConnectorItem()
-                {
-                    Source = pointItem,
-                    Type = methodInfo.ReturnParameter.ParameterType,
-                    Title = customAttribute.GetParameterName("return"),
-                    Interfaces = interfaces,
-                    TypeName =
-                        BaseNodeMethodsGen.GetI18N(methodInfo.ReturnParameter.ParameterType.FullName),
-                    IsOut = true
-                });
-            }
-
-
-            pointItem.Output = outItems;
-        }
-
-
-        pointItem.Input = inpItems;
-
-        return pointItem;
-    }
-
-    private ObservableCollection<ConnectorItem> getConnectorItemsBy()
-    {
-        return new ObservableCollection<ConnectorItem>();
-    }
-
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void UnloadByPluginInfo(string pluginInfoEx, out WeakReference weakReference)
@@ -367,7 +207,7 @@ public class Plugin
         {
             {
                 PluginManager.EnablePlugin[pluginInfoEx]
-                             .Unload(out weakReference);
+                    .Unload(out weakReference);
 
                 return;
             }
@@ -389,7 +229,7 @@ public class Plugin
         ConfigManger.RemoveConfig($"{PluginInfo.ToPlgString()}");
 
         PluginOverall.SearchActions.Remove($"{PluginInfo.ToPlgString()}");
-        PluginOverall.CustomScenarioNodeMethods.Remove($"{PluginInfo.ToPlgString()}");
+        ScenarioMethodCategoryGroup.RootScenarioMethodCategoryGroup.RemoveMethodsByPluginName(PluginInfo.ToPlgString());
         var keyValuePairs = CustomScenarioGloble.Triggers.Where(e => e.Value.PluginInfo == PluginInfo.ToPlgString());
         foreach (var keyValuePair in keyValuePairs)
         {

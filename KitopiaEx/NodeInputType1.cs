@@ -1,4 +1,4 @@
-﻿using PluginCore.Attribute;
+﻿using PluginCore.Attribute.Scenario;
 
 namespace KitopiaEx;
 

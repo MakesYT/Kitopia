@@ -29,7 +29,7 @@ public partial class CustomScenario : ObservableRecipient
     private CancellationTokenSource _cancellationTokenSource = new();
 
     [JsonIgnore] [ObservableProperty] private string _description = "";
-    private Dictionary<PointItem, Thread?> _initTasks = new();
+    private Dictionary<ScenarioMethodNode, Thread?> _initTasks = new();
 
     [JsonIgnore] [ObservableProperty] private bool _isRunning = false;
 
@@ -37,7 +37,7 @@ public partial class CustomScenario : ObservableRecipient
 
     [JsonIgnore] [ObservableProperty] private string _name = "情景";
     public Dictionary<string, int> _plugs = new();
-    private Dictionary<PointItem, Thread?> _tickTasks = new();
+    private Dictionary<ScenarioMethodNode, Thread?> _tickTasks = new();
     private TickUtil? _tickUtil;
 
     /// <summary>
@@ -90,7 +90,7 @@ public partial class CustomScenario : ObservableRecipient
     void OnInputValueOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs args)
     {
         var outputs = nodes.First()
-                           .Output;
+            .Output;
         for (var i = outputs.Count - 1; i >= 1; i--)
         {
             outputs.RemoveAt(i);
@@ -106,7 +106,7 @@ public partial class CustomScenario : ObservableRecipient
                     Source = nodes.First(),
                     Type = value.GetType(),
                     TypeName = BaseNodeMethodsGen.GetI18N(value.GetType()
-                                                               .FullName),
+                        .FullName),
                     Title = key
                 });
             }
@@ -115,7 +115,8 @@ public partial class CustomScenario : ObservableRecipient
 
     private PropertyChangedEventHandler? PropertyChangedEventHandler()
     {
-        return (e, s) => {
+        return (e, s) =>
+        {
             if (s.PropertyName == nameof(IsRunning))
             {
                 return;
@@ -127,9 +128,9 @@ public partial class CustomScenario : ObservableRecipient
     }
 
     public string UUID { get; set; } = Guid.NewGuid()
-                                           .ToString();
+        .ToString();
 
-    public ObservableCollection<PointItem> nodes { get; set; } = new();
+    public ObservableCollection<ScenarioMethodNode> nodes { get; set; } = new();
 
     public ObservableCollection<ConnectionItem> connections { get; set; } = new();
 
@@ -217,17 +218,17 @@ public partial class CustomScenario : ObservableRecipient
             for (var i = 0; i < inputValues.Length; i++)
             {
                 nodes[0]
-                   .Output[i + 1].InputObject = inputValues[i];
+                    .Output[i + 1].InputObject = inputValues[i];
             }
         }
 
         for (var i = nodes.Count - 1; i >= 1; i--)
         {
             var toRemove = nodes[i]
-                          .Input.All(connectorItem => !connectorItem.IsConnected);
+                .Input.All(connectorItem => !connectorItem.IsConnected);
 
             if (nodes[i]
-               .Output.Any(connectorItem => connectorItem.IsConnected))
+                .Output.Any(connectorItem => connectorItem.IsConnected))
             {
                 toRemove = false;
             }
@@ -251,7 +252,8 @@ public partial class CustomScenario : ObservableRecipient
         //监听任务是否结束
         if (notRealTime)
         {
-            new Task(() => {
+            new Task(() =>
+            {
                 while (true)
                 {
                     Thread.Sleep(100);
@@ -288,7 +290,7 @@ public partial class CustomScenario : ObservableRecipient
                     }
 
                     var connectionItem = connections.FirstOrDefault((e) => e.Source == nodes[1]
-                       .Output[0]);
+                        .Output[0]);
                     if (connectionItem == null || onExit)
                     {
                         //当没有tick时直接结束
@@ -406,7 +408,7 @@ public partial class CustomScenario : ObservableRecipient
         if (inTickError)
         {
             ((IToastService)ServiceManager.Services.GetService(typeof(IToastService))!)
-               .Show("情景", $"情景{Name}由于出现错误被停止");
+                .Show("情景", $"情景{Name}由于出现错误被停止");
             Log.Debug($"情景{Name}由于出现错误被停止");
         }
         else
@@ -416,11 +418,11 @@ public partial class CustomScenario : ObservableRecipient
         }
     }
 
-    private void MakeSourcePointState(ConnectorItem targetConnectorItem, PointItem pointItem)
+    private void MakeSourcePointState(ConnectorItem targetConnectorItem, ScenarioMethodNode scenarioMethodNode)
     {
         foreach (var connectionItem in connections.Where(e => e.Target == targetConnectorItem))
         {
-            if (connectionItem.Source.Source == pointItem)
+            if (connectionItem.Source.Source == scenarioMethodNode)
             {
                 connectionItem.Source.Source.Status = s节点状态.已验证;
             }
@@ -431,15 +433,16 @@ public partial class CustomScenario : ObservableRecipient
         }
     }
 
-    private void ParsePointItem(Dictionary<PointItem, Thread?> threads, PointItem nowPointItem, bool onlyForward,
+    private void ParsePointItem(Dictionary<ScenarioMethodNode, Thread?> threads,
+        ScenarioMethodNode nowScenarioMethodNode, bool onlyForward,
         bool notRealTime,
         CancellationToken cancellationToken)
     {
-        Log.Debug($"解析节点:{nowPointItem.Title}");
+        Log.Debug($"解析节点:{nowScenarioMethodNode.Title}");
         var valid = true;
         List<Thread> sourceDataTask = new();
 
-        foreach (var connectorItem in nowPointItem.Input)
+        foreach (var connectorItem in nowScenarioMethodNode.Input)
         {
             if (!connectorItem.IsConnected)
             {
@@ -477,7 +480,8 @@ public partial class CustomScenario : ObservableRecipient
                     }
                     else
                     {
-                        var task = new Thread(() => {
+                        var task = new Thread(() =>
+                        {
                             ParsePointItem(threads, sourceSource, true, notRealTime, cancellationToken);
                         });
 
@@ -502,7 +506,7 @@ public partial class CustomScenario : ObservableRecipient
             return;
         }
 
-        foreach (var connectorItem in nowPointItem.Input)
+        foreach (var connectorItem in nowScenarioMethodNode.Input)
         {
             foreach (var sourceSource in connectorItem.GetSourceOrNextPointItems(connections))
             {
@@ -524,88 +528,89 @@ public partial class CustomScenario : ObservableRecipient
         {
             try
             {
-                if (nowPointItem.Plugin == "Kitopia")
+                if (nowScenarioMethodNode.Plugin == "Kitopia")
                 {
-                    switch (nowPointItem.MerthodName)
+                    switch (nowScenarioMethodNode.MerthodName)
                     {
                         case "判断":
                         {
-                            if (nowPointItem.Input[1].InputObject is true)
+                            if (nowScenarioMethodNode.Input[1].InputObject is true)
                             {
-                                nowPointItem.Output[0].InputObject = "当前流";
-                                nowPointItem.Output[0].IsNotUsed = false;
-                                nowPointItem.Output[1].IsNotUsed = true;
-                                nowPointItem.Output[1].InputObject = "未使用的流";
+                                nowScenarioMethodNode.Output[0].InputObject = "当前流";
+                                nowScenarioMethodNode.Output[0].IsNotUsed = false;
+                                nowScenarioMethodNode.Output[1].IsNotUsed = true;
+                                nowScenarioMethodNode.Output[1].InputObject = "未使用的流";
                             }
                             else
                             {
-                                nowPointItem.Output[1].InputObject = "当前流";
-                                nowPointItem.Output[0].InputObject = "未使用的流";
-                                nowPointItem.Output[0].IsNotUsed = true;
-                                nowPointItem.Output[1].IsNotUsed = false;
+                                nowScenarioMethodNode.Output[1].InputObject = "当前流";
+                                nowScenarioMethodNode.Output[0].InputObject = "未使用的流";
+                                nowScenarioMethodNode.Output[0].IsNotUsed = true;
+                                nowScenarioMethodNode.Output[1].IsNotUsed = false;
                             }
 
                             break;
                         }
                         case "一对二":
                         {
-                            nowPointItem.Output[0].InputObject = "流1";
-                            nowPointItem.Output[1].InputObject = "流2";
+                            nowScenarioMethodNode.Output[0].InputObject = "流1";
+                            nowScenarioMethodNode.Output[1].InputObject = "流2";
                             break;
                         }
                         case "一对N":
                         {
-                            for (var i = 0; i < nowPointItem.Output.Count; i++)
+                            for (var i = 0; i < nowScenarioMethodNode.Output.Count; i++)
                             {
-                                nowPointItem.Output[i].InputObject = $"流{i + 1}";
+                                nowScenarioMethodNode.Output[i].InputObject = $"流{i + 1}";
                             }
 
                             break;
                         }
                         case "相等":
                         {
-                            if (nowPointItem.Input[1].InputObject is null)
+                            if (nowScenarioMethodNode.Input[1].InputObject is null)
                             {
-                                nowPointItem.Output[0].InputObject = false;
+                                nowScenarioMethodNode.Output[0].InputObject = false;
                             }
-                            else if (nowPointItem.Input[2].InputObject is null)
+                            else if (nowScenarioMethodNode.Input[2].InputObject is null)
                             {
-                                nowPointItem.Output[0].InputObject = false;
+                                nowScenarioMethodNode.Output[0].InputObject = false;
                             }
                             else
                             {
-                                nowPointItem.Output[0].InputObject =
-                                    nowPointItem.Input[1].InputObject!.Equals(nowPointItem.Input[2].InputObject);
+                                nowScenarioMethodNode.Output[0].InputObject =
+                                    nowScenarioMethodNode.Input[1].InputObject!.Equals(nowScenarioMethodNode.Input[2]
+                                        .InputObject);
                             }
 
-                            foreach (var item in nowPointItem.Output[0]
-                                                             .GetSourceOrNextConnectorItems(connections))
+                            foreach (var item in nowScenarioMethodNode.Output[0]
+                                         .GetSourceOrNextConnectorItems(connections))
                             {
-                                item.InputObject = nowPointItem.Output[0].InputObject;
-                                MakeSourcePointState(item, nowPointItem);
+                                item.InputObject = nowScenarioMethodNode.Output[0].InputObject;
+                                MakeSourcePointState(item, nowScenarioMethodNode);
                             }
 
                             break;
                         }
                         case "valueSet":
                         {
-                            if (Values.ContainsKey(nowPointItem.ValueRef!))
+                            if (Values.ContainsKey(nowScenarioMethodNode.ValueRef!))
                             {
-                                Values.SetValueWithoutNotify(nowPointItem.ValueRef!,
-                                    nowPointItem.Input[1].InputObject!);
+                                Values.SetValueWithoutNotify(nowScenarioMethodNode.ValueRef!,
+                                    nowScenarioMethodNode.Input[1].InputObject!);
                             }
 
                             break;
                         }
                         case "valueGet":
                         {
-                            if (Values.ContainsKey(nowPointItem.ValueRef!))
+                            if (Values.ContainsKey(nowScenarioMethodNode.ValueRef!))
                             {
-                                foreach (var item in nowPointItem.Output[0]
-                                                                 .GetSourceOrNextConnectorItems(connections))
+                                foreach (var item in nowScenarioMethodNode.Output[0]
+                                             .GetSourceOrNextConnectorItems(connections))
                                 {
-                                    item.InputObject = Values[nowPointItem.ValueRef!];
-                                    MakeSourcePointState(item, nowPointItem);
+                                    item.InputObject = Values[nowScenarioMethodNode.ValueRef!];
+                                    MakeSourcePointState(item, nowScenarioMethodNode);
                                 }
                             }
 
@@ -613,34 +618,34 @@ public partial class CustomScenario : ObservableRecipient
                         }
                         case "打开/运行本地项目":
                         {
-                            if (nowPointItem.Input.Count() >= 3)
+                            if (nowScenarioMethodNode.Input.Count() >= 3)
                             {
                                 List<object> parameterList = new();
-                                for (var index = 2; index < nowPointItem.Input.Count; index++)
+                                for (var index = 2; index < nowScenarioMethodNode.Input.Count; index++)
                                 {
-                                    parameterList.Add(nowPointItem.Input[index].InputObject);
+                                    parameterList.Add(nowScenarioMethodNode.Input[index].InputObject);
                                 }
 
                                 ServiceManager.Services.GetService<ISearchItemTool>()
-                                              .OpenSearchItemByOnlyKey((string)nowPointItem.Input[1].InputObject,
-                                                   parameterList.ToArray());
+                                    .OpenSearchItemByOnlyKey((string)nowScenarioMethodNode.Input[1].InputObject,
+                                        parameterList.ToArray());
                             }
                             else
                             {
                                 ServiceManager.Services.GetService<ISearchItemTool>()
-                                              .OpenSearchItemByOnlyKey((string)nowPointItem.Input[1].InputObject);
+                                    .OpenSearchItemByOnlyKey((string)nowScenarioMethodNode.Input[1].InputObject);
                             }
 
                             break;
                         }
                         case "Main":
                         {
-                            for (var i = 1; i < nowPointItem.Output.Count; i++)
+                            for (var i = 1; i < nowScenarioMethodNode.Output.Count; i++)
                             {
-                                foreach (var sourceOrNextConnectorItem in nowPointItem.Output[i]
-                                            .GetSourceOrNextConnectorItems(connections))
+                                foreach (var sourceOrNextConnectorItem in nowScenarioMethodNode.Output[i]
+                                             .GetSourceOrNextConnectorItems(connections))
                                 {
-                                    sourceOrNextConnectorItem.InputObject = nowPointItem.Output[i].InputObject;
+                                    sourceOrNextConnectorItem.InputObject = nowScenarioMethodNode.Output[i].InputObject;
                                 }
                             }
 
@@ -648,7 +653,7 @@ public partial class CustomScenario : ObservableRecipient
                         }
                         default:
                         {
-                            var userInputConnector = nowPointItem.Input.FirstOrDefault();
+                            var userInputConnector = nowScenarioMethodNode.Input.FirstOrDefault();
 
 
                             if (userInputConnector is null)
@@ -658,7 +663,7 @@ public partial class CustomScenario : ObservableRecipient
 
                             if (userInputConnector.Title == "流输入")
                             {
-                                userInputConnector = nowPointItem.Input[1];
+                                userInputConnector = nowScenarioMethodNode.Input[1];
                             }
 
                             var userInputData = userInputConnector.InputObject;
@@ -667,17 +672,17 @@ public partial class CustomScenario : ObservableRecipient
                                 throw new NullReferenceException();
                             }
 
-                            if (nowPointItem.MerthodName == "System.Int32")
+                            if (nowScenarioMethodNode.MerthodName == "System.Int32")
                             {
                                 userInputData = int.Parse(userInputData.ToString()!);
                             }
 
-                            nowPointItem.Output[0].InputObject = userInputData;
-                            foreach (var item in nowPointItem.Output[0]
-                                                             .GetSourceOrNextConnectorItems(connections))
+                            nowScenarioMethodNode.Output[0].InputObject = userInputData;
+                            foreach (var item in nowScenarioMethodNode.Output[0]
+                                         .GetSourceOrNextConnectorItems(connections))
                             {
                                 item.InputObject = userInputData;
-                                MakeSourcePointState(item, nowPointItem);
+                                MakeSourcePointState(item, nowScenarioMethodNode);
                             }
 
                             break;
@@ -686,23 +691,24 @@ public partial class CustomScenario : ObservableRecipient
                 }
                 else
                 {
-                    var plugin = PluginManager.EnablePlugin[nowPointItem.Plugin];
-                    var customScenarioNodeMethod = PluginOverall.CustomScenarioNodeMethods[nowPointItem.Plugin];
+                    var plugin = PluginManager.EnablePlugin[nowScenarioMethodNode.Plugin];
+                    var customScenarioNodeMethod =
+                        PluginOverall.CustomScenarioNodeMethods[nowScenarioMethodNode.Plugin];
 
-                    var methodInfo = customScenarioNodeMethod[nowPointItem.MerthodName].Item1;
+                    var methodInfo = customScenarioNodeMethod[nowScenarioMethodNode.MerthodName].Item1;
                     List<object> list = new();
                     var index = 1;
                     foreach (var parameterInfo in methodInfo.GetParameters())
                     {
                         if (parameterInfo.ParameterType.GetCustomAttribute(typeof(AutoUnbox)) is not null)
                         {
-                            var autoUnboxIndex = nowPointItem.Input[index].AutoUnboxIndex;
+                            var autoUnboxIndex = nowScenarioMethodNode.Input[index].AutoUnboxIndex;
                             var parameterList = new List<object>();
                             List<Type> parameterTypesList = new();
-                            while (nowPointItem.Input.Count >= index &&
-                                   nowPointItem.Input[index].AutoUnboxIndex == autoUnboxIndex)
+                            while (nowScenarioMethodNode.Input.Count >= index &&
+                                   nowScenarioMethodNode.Input[index].AutoUnboxIndex == autoUnboxIndex)
                             {
-                                var item = nowPointItem.Input[index].InputObject;
+                                var item = nowScenarioMethodNode.Input[index].InputObject;
                                 if (item != null)
                                 {
                                     parameterList.Add(item);
@@ -718,7 +724,7 @@ public partial class CustomScenario : ObservableRecipient
                             }
 
                             var instance = parameterInfo.ParameterType.GetConstructor(parameterTypesList.ToArray())
-                                                       ?.Invoke(parameterList.ToArray());
+                                ?.Invoke(parameterList.ToArray());
                             if (instance != null)
                             {
                                 list.Add(instance);
@@ -732,13 +738,13 @@ public partial class CustomScenario : ObservableRecipient
                             continue;
                         }
 
-                        if (index == nowPointItem.Input.Count)
+                        if (index == nowScenarioMethodNode.Input.Count)
                         {
                             list.Add(cancellationToken);
                             break;
                         }
 
-                        var inputObject = nowPointItem.Input[index].InputObject;
+                        var inputObject = nowScenarioMethodNode.Input[index].InputObject;
                         if (inputObject != null)
                         {
                             list.Add(inputObject);
@@ -760,15 +766,15 @@ public partial class CustomScenario : ObservableRecipient
                         var type = methodInfo.ReturnParameter.ParameterType;
                         foreach (var memberInfo in type.GetProperties())
                         {
-                            foreach (var connectorItem in nowPointItem.Output)
+                            foreach (var connectorItem in nowScenarioMethodNode.Output)
                             {
                                 if (connectorItem.Type == memberInfo.PropertyType)
                                 {
                                     var value = invoke.GetType()
-                                                      .InvokeMember(memberInfo.Name,
-                                                           BindingFlags.Instance | BindingFlags.IgnoreCase |
-                                                           BindingFlags.Public | BindingFlags.NonPublic |
-                                                           BindingFlags.GetProperty, null, invoke, null);
+                                        .InvokeMember(memberInfo.Name,
+                                            BindingFlags.Instance | BindingFlags.IgnoreCase |
+                                            BindingFlags.Public | BindingFlags.NonPublic |
+                                            BindingFlags.GetProperty, null, invoke, null);
 
                                     connectorItem.InputObject = value;
                                     foreach (var item in connectorItem.GetSourceOrNextConnectorItems(connections))
@@ -783,11 +789,11 @@ public partial class CustomScenario : ObservableRecipient
                     }
                     else
                     {
-                        if (nowPointItem.Output.Any())
+                        if (nowScenarioMethodNode.Output.Any())
                         {
-                            nowPointItem.Output[0].InputObject = invoke;
-                            foreach (var item in nowPointItem.Output[0]
-                                                             .GetSourceOrNextConnectorItems(connections))
+                            nowScenarioMethodNode.Output[0].InputObject = invoke;
+                            foreach (var item in nowScenarioMethodNode.Output[0]
+                                         .GetSourceOrNextConnectorItems(connections))
                             {
                                 item.InputObject = invoke;
                             }
@@ -814,10 +820,10 @@ public partial class CustomScenario : ObservableRecipient
 
         if (!onlyForward)
         {
-            foreach (var outputConnector in nowPointItem.Output)
+            foreach (var outputConnector in nowScenarioMethodNode.Output)
             {
                 foreach (var nextPointItem in outputConnector.GetSourceOrNextPointItems(connections)
-                                                             .Where(_ => !outputConnector.IsNotUsed))
+                             .Where(_ => !outputConnector.IsNotUsed))
                 {
                     lock (threads)
                     {
@@ -826,7 +832,8 @@ public partial class CustomScenario : ObservableRecipient
                             return;
                         }
 
-                        var task = new Thread(() => {
+                        var task = new Thread(() =>
+                        {
                             ParsePointItem(threads, nextPointItem, false, notRealTime, cancellationToken);
                         });
 
@@ -840,13 +847,13 @@ public partial class CustomScenario : ObservableRecipient
         finnish:
         if (valid)
         {
-            nowPointItem.Status = notRealTime ? s节点状态.已验证 : s节点状态.初步验证;
-            Log.Debug($"解析节点完成:{nowPointItem.Title}");
+            nowScenarioMethodNode.Status = notRealTime ? s节点状态.已验证 : s节点状态.初步验证;
+            Log.Debug($"解析节点完成:{nowScenarioMethodNode.Title}");
         }
         else
         {
-            nowPointItem.Status = s节点状态.错误;
-            Log.Debug($"解析节点失败:{nowPointItem.Title}");
+            nowScenarioMethodNode.Status = s节点状态.错误;
+            Log.Debug($"解析节点失败:{nowScenarioMethodNode.Title}");
         }
     }
 

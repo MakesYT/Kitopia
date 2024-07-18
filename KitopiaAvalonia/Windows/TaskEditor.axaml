@@ -763,7 +763,7 @@
 
                                         </ListBox.Resources>
                                         <ListBox.ItemTemplate>
-                                            <DataTemplate DataType="{x:Type customScenario:PointItem}">
+                                            <DataTemplate DataType="{x:Type customScenario:ScenarioMethodNode}">
                                                 <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="3">
                                                     <DockPanel Panel.ZIndex="1">
                                                         <Border DockPanel.Dock="Top" CornerRadius="3 3 0 0">
@@ -1161,7 +1161,7 @@
                         </DataTemplate>
                     </controls2:NodifyEditor.PendingConnectionTemplate>
                     <controls2:NodifyEditor.ItemTemplate>
-                        <DataTemplate DataType="{x:Type customScenario:PointItem}">
+                        <DataTemplate DataType="{x:Type customScenario:ScenarioMethodNode}">
                             <controls2:Node
                                 Classes.Status0="{Binding  Status, Converter={StaticResource NodeStatusBorderCtr},ConverterParameter=0}"
                                 Classes.Status1="{Binding  Status, Converter={StaticResource NodeStatusBorderCtr},ConverterParameter=1}"
