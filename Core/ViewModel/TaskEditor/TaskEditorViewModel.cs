@@ -41,7 +41,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
     {
         PendingConnection = new PendingConnectionViewModel(this);
         GetAllMethods();
-        var nodify2 = new PointItem
+        var nodify2 = new ScenarioMethodNode
         {
             Title = "任务1",
             MerthodName = "Main",
@@ -59,7 +59,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
             }
         };
         Scenario.nodes.Add(nodify2);
-        var nodify3 = new PointItem
+        var nodify3 = new ScenarioMethodNode
         {
             Title = "Tick",
             Plugin = "Kitopia",
@@ -78,7 +78,8 @@ public partial class TaskEditorViewModel : ObservableRecipient
         };
         Scenario.nodes.Add(nodify3);
 
-        WeakReferenceMessenger.Default.Register<string, string>(this, "hotkey", (HotKey, o) => {
+        WeakReferenceMessenger.Default.Register<string, string>(this, "hotkey", (HotKey, o) =>
+        {
             if (o == Scenario.runHotKey.SignName)
             {
                 Dispatcher.UIThread.InvokeAsync(() => { IsModified = true; });
@@ -89,7 +90,8 @@ public partial class TaskEditorViewModel : ObservableRecipient
             }
         });
         WeakReferenceMessenger.Default.Register<CustomScenarioChangeMsg>(this,
-            (a, e) => {
+            (a, e) =>
+            {
                 Dispatcher.UIThread.Post(() => { IsModified = true; });
 
                 //Console.WriteLine(1);
@@ -103,7 +105,8 @@ public partial class TaskEditorViewModel : ObservableRecipient
                     return;
                 }
 
-                if (!Scenario.nodes.Contains(e.PointItem) && !NodeMethods.Any(a => a.Contains(e.PointItem)))
+                if (!Scenario.nodes.Contains(e.ScenarioMethodNode) &&
+                    !NodeMethods.Any(a => a.Contains(e.ScenarioMethodNode)))
                 {
                     return;
                 }
@@ -113,7 +116,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                     return;
                 }
 
-                if (e.PointItem.MerthodName == "一对N" && e.ConnectorItem.Title == "输出数量")
+                if (e.ScenarioMethodNode.MerthodName == "一对N" && e.ConnectorItem.Title == "输出数量")
                 {
                     int? value = null;
                     if (e.ConnectorItem.InputObject is int inputObject)
@@ -131,20 +134,20 @@ public partial class TaskEditorViewModel : ObservableRecipient
                         e.ConnectorItem.InputObject = (double)10;
                     }
 
-                    if (e.PointItem.Output.Count == value)
+                    if (e.ScenarioMethodNode.Output.Count == value)
                     {
                         return;
                     }
 
-                    while (e.PointItem.Output.Count != value)
+                    while (e.ScenarioMethodNode.Output.Count != value)
                     {
-                        if (e.PointItem.Output.Count > value)
+                        if (e.ScenarioMethodNode.Output.Count > value)
                         {
-                            var connectorItem = e.PointItem.Output[^1];
+                            var connectorItem = e.ScenarioMethodNode.Output[^1];
                             var connectionItems = Scenario.connections
-                                                          .Where(connectionItem =>
-                                                               connectionItem.Source == connectorItem)
-                                                          .ToList();
+                                .Where(connectionItem =>
+                                    connectionItem.Source == connectorItem)
+                                .ToList();
                             foreach (var connectionItem in connectionItems)
                             {
                                 Scenario.connections.Remove(connectionItem);
@@ -159,13 +162,13 @@ public partial class TaskEditorViewModel : ObservableRecipient
                                 }
                             }
 
-                            e.PointItem.Output.Remove(connectorItem);
+                            e.ScenarioMethodNode.Output.Remove(connectorItem);
                         }
                         else
                         {
-                            e.PointItem.Output.Add(new ConnectorItem
+                            e.ScenarioMethodNode.Output.Add(new ConnectorItem
                             {
-                                Source = e.PointItem,
+                                Source = e.ScenarioMethodNode,
                                 Type = typeof(NodeConnectorClass),
                                 Title = "流输出",
                                 IsOut = true,
@@ -175,9 +178,9 @@ public partial class TaskEditorViewModel : ObservableRecipient
                     }
                 }
 
-                if (e.PointItem.MerthodName == "打开/运行本地项目")
+                if (e.ScenarioMethodNode.MerthodName == "打开/运行本地项目")
                 {
-                    var o = e.PointItem.Input[1].InputObject;
+                    var o = e.ScenarioMethodNode.Input[1].InputObject;
                     if (o is string inputObject)
                     {
                         if (inputObject.StartsWith("CustomScenario:"))
@@ -189,40 +192,43 @@ public partial class TaskEditorViewModel : ObservableRecipient
                                 for (var index = 0; index < customScenario.InputValue.Count; index++)
                                 {
                                     var (key, value) = customScenario.InputValue[index];
-                                    if (e.PointItem.Input.Count() < index + 2)
+                                    if (e.ScenarioMethodNode.Input.Count() < index + 2)
                                     {
-                                        e.PointItem.Input.Add(new()
+                                        e.ScenarioMethodNode.Input.Add(new()
                                         {
                                             IsOut = false,
-                                            Source = e.PointItem,
+                                            Source = e.ScenarioMethodNode,
                                             Type = value.GetType(),
                                             TypeName = BaseNodeMethodsGen.GetI18N(value.GetType()
-                                               .FullName),
+                                                .FullName),
                                             Title = key
                                         });
                                     }
 
-                                    if (e.PointItem.Input[index + 2].Title != key)
+                                    if (e.ScenarioMethodNode.Input[index + 2].Title != key)
                                     {
-                                        e.PointItem.Input[index + 2].Title = key;
-                                        e.PointItem.Input[index + 2].Type = value.GetType();
-                                        e.PointItem.Input[index + 2].TypeName = BaseNodeMethodsGen.GetI18N(value
-                                           .GetType()
-                                           .FullName);
+                                        e.ScenarioMethodNode.Input[index + 2].Title = key;
+                                        e.ScenarioMethodNode.Input[index + 2].Type = value.GetType();
+                                        e.ScenarioMethodNode.Input[index + 2].TypeName = BaseNodeMethodsGen.GetI18N(
+                                            value
+                                                .GetType()
+                                                .FullName);
                                     }
                                 }
 
-                                for (var i = e.PointItem.Input.Count - 1; i >= customScenario.InputValue.Count + 2; i--)
+                                for (var i = e.ScenarioMethodNode.Input.Count - 1;
+                                     i >= customScenario.InputValue.Count + 2;
+                                     i--)
                                 {
-                                    e.PointItem.Input.RemoveAt(i);
+                                    e.ScenarioMethodNode.Input.RemoveAt(i);
                                 }
                             }
                         }
                         else
                         {
-                            for (var i = e.PointItem.Input.Count - 1; i >= 2; i--)
+                            for (var i = e.ScenarioMethodNode.Input.Count - 1; i >= 2; i--)
                             {
-                                e.PointItem.Input.RemoveAt(i);
+                                e.ScenarioMethodNode.Input.RemoveAt(i);
                             }
                         }
                     }
@@ -274,8 +280,8 @@ public partial class TaskEditorViewModel : ObservableRecipient
         if (connector.IsSelf)
         {
             var connectionItems = Scenario.connections
-                                          .Where(e => e.Source == connector || e.Target == connector)
-                                          .ToList();
+                .Where(e => e.Source == connector || e.Target == connector)
+                .ToList();
             foreach (var connectionItem in connectionItems)
             {
                 Scenario.connections.Remove(connectionItem);
@@ -296,25 +302,25 @@ public partial class TaskEditorViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    private void AddNodes(PointItem pointItem)
+    private void AddNodes(ScenarioMethodNode scenarioMethodNode)
     {
         IsModified = true;
 
-        var item = new PointItem
+        var item = new ScenarioMethodNode
         {
-            Title = pointItem.Title,
-            Plugin = pointItem.Plugin,
-            ValueRef = pointItem.ValueRef,
-            MerthodName = pointItem.MerthodName,
-            Location = new Point(pointItem.Location.X, pointItem.Location.Y)
+            Title = scenarioMethodNode.Title,
+            Plugin = scenarioMethodNode.Plugin,
+            ValueRef = scenarioMethodNode.ValueRef,
+            MerthodName = scenarioMethodNode.MerthodName,
+            Location = new Point(scenarioMethodNode.Location.X, scenarioMethodNode.Location.Y)
         };
-        if (pointItem.Plugin != "Kitopia")
+        if (scenarioMethodNode.Plugin != "Kitopia")
         {
-            Scenario._plugs!.AddOrIncrease(pointItem.Plugin);
+            Scenario._plugs!.AddOrIncrease(scenarioMethodNode.Plugin);
         }
 
         ObservableCollection<ConnectorItem> input = new();
-        foreach (var connectorItem in pointItem.Input)
+        foreach (var connectorItem in scenarioMethodNode.Input)
         {
             input.Add(new ConnectorItem
             {
@@ -333,15 +339,15 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 PluginInputConnector = connectorItem.PluginInputConnector
             });
             var plugin = PluginManager.EnablePlugin.FirstOrDefault((e) => e.Value._dll == connectorItem.Type.Assembly)
-                                      .Value;
+                .Value;
             if (plugin is not null)
             {
                 Scenario._plugs.AddOrIncrease(plugin.ToPlgString());
             }
 
             var plugin2 = PluginManager.EnablePlugin
-                                       .FirstOrDefault((e) => e.Value._dll == connectorItem.RealType.Assembly)
-                                       .Value;
+                .FirstOrDefault((e) => e.Value._dll == connectorItem.RealType.Assembly)
+                .Value;
             if (plugin2 is not null)
             {
                 Scenario._plugs.AddOrIncrease(plugin2.ToPlgString());
@@ -349,7 +355,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
         }
 
         ObservableCollection<ConnectorItem> output = new();
-        foreach (var connectorItem in pointItem.Output)
+        foreach (var connectorItem in scenarioMethodNode.Output)
         {
             var connectorItem1 = new ConnectorItem
             {
@@ -375,15 +381,15 @@ public partial class TaskEditorViewModel : ObservableRecipient
             }
 
             var plugin = PluginManager.EnablePlugin.FirstOrDefault((e) => e.Value._dll == connectorItem.Type.Assembly)
-                                      .Value;
+                .Value;
             if (plugin is not null)
             {
                 Scenario._plugs.AddOrIncrease(plugin.ToPlgString());
             }
 
             var plugin2 = PluginManager.EnablePlugin
-                                       .FirstOrDefault((e) => e.Value._dll == connectorItem.RealType.Assembly)
-                                       .Value;
+                .FirstOrDefault((e) => e.Value._dll == connectorItem.RealType.Assembly)
+                .Value;
             if (plugin2 is not null)
             {
                 Scenario._plugs.AddOrIncrease(plugin2.ToPlgString());
@@ -398,24 +404,24 @@ public partial class TaskEditorViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    private void CopyNode(PointItem pointItem)
+    private void CopyNode(ScenarioMethodNode scenarioMethodNode)
     {
         IsModified = true;
-        if (Scenario.nodes.IndexOf(pointItem) is 0 or 1)
+        if (Scenario.nodes.IndexOf(scenarioMethodNode) is 0 or 1)
         {
             return;
         }
 
-        var item = new PointItem
+        var item = new ScenarioMethodNode
         {
-            Title = pointItem.Title,
-            Plugin = pointItem.Plugin,
-            ValueRef = pointItem.ValueRef,
-            MerthodName = pointItem.MerthodName,
-            Location = new Point(pointItem.Location.X + 40, pointItem.Location.Y + 40)
+            Title = scenarioMethodNode.Title,
+            Plugin = scenarioMethodNode.Plugin,
+            ValueRef = scenarioMethodNode.ValueRef,
+            MerthodName = scenarioMethodNode.MerthodName,
+            Location = new Point(scenarioMethodNode.Location.X + 40, scenarioMethodNode.Location.Y + 40)
         };
         ObservableCollection<ConnectorItem> input = new();
-        foreach (var connectorItem in pointItem.Input)
+        foreach (var connectorItem in scenarioMethodNode.Input)
         {
             input.Add(new ConnectorItem
             {
@@ -436,7 +442,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
         }
 
         ObservableCollection<ConnectorItem> output = new();
-        foreach (var connectorItem in pointItem.Output)
+        foreach (var connectorItem in scenarioMethodNode.Output)
         {
             var connectorItem1 = new ConnectorItem
             {
@@ -470,18 +476,18 @@ public partial class TaskEditorViewModel : ObservableRecipient
     }
 
     [RelayCommand]
-    private void DelNode(PointItem pointItem)
+    private void DelNode(ScenarioMethodNode scenarioMethodNode)
     {
         IsModified = true;
-        var indexOf = Scenario.nodes.IndexOf(pointItem);
+        var indexOf = Scenario.nodes.IndexOf(scenarioMethodNode);
         if (indexOf is 0 or 1)
         {
             return;
         }
 
         var connectionItems = Scenario.connections
-                                      .Where(e => e.Source.Source == pointItem || e.Target.Source == pointItem)
-                                      .ToList();
+            .Where(e => e.Source.Source == scenarioMethodNode || e.Target.Source == scenarioMethodNode)
+            .ToList();
         foreach (var connectionItem in connectionItems)
         {
             Scenario.connections.Remove(connectionItem);
@@ -496,44 +502,44 @@ public partial class TaskEditorViewModel : ObservableRecipient
             }
         }
 
-        Scenario._plugs.DelOrDecrease(pointItem.Plugin);
-        foreach (var connectorItem in pointItem.Input)
+        Scenario._plugs.DelOrDecrease(scenarioMethodNode.Plugin);
+        foreach (var connectorItem in scenarioMethodNode.Input)
         {
             var plugin = PluginManager.EnablePlugin.FirstOrDefault((e) => e.Value._dll == connectorItem.Type.Assembly)
-                                      .Value;
+                .Value;
             if (plugin is not null)
             {
                 Scenario._plugs.DelOrDecrease(plugin.ToPlgString());
             }
 
             var plugin2 = PluginManager.EnablePlugin
-                                       .FirstOrDefault((e) => e.Value._dll == connectorItem.RealType.Assembly)
-                                       .Value;
+                .FirstOrDefault((e) => e.Value._dll == connectorItem.RealType.Assembly)
+                .Value;
             if (plugin2 is not null)
             {
                 Scenario._plugs.DelOrDecrease(plugin2.ToPlgString());
             }
         }
 
-        foreach (var connectorItem in pointItem.Output)
+        foreach (var connectorItem in scenarioMethodNode.Output)
         {
             var plugin = PluginManager.EnablePlugin.FirstOrDefault((e) => e.Value._dll == connectorItem.Type.Assembly)
-                                      .Value;
+                .Value;
             if (plugin is not null)
             {
                 Scenario._plugs.DelOrDecrease(plugin.ToPlgString());
             }
 
             var plugin2 = PluginManager.EnablePlugin
-                                       .FirstOrDefault((e) => e.Value._dll == connectorItem.RealType.Assembly)
-                                       .Value;
+                .FirstOrDefault((e) => e.Value._dll == connectorItem.RealType.Assembly)
+                .Value;
             if (plugin2 is not null)
             {
                 Scenario._plugs.DelOrDecrease(plugin2.ToPlgString());
             }
         }
 
-        Scenario.nodes.Remove(pointItem);
+        Scenario.nodes.Remove(scenarioMethodNode);
     }
 
     [RelayCommand]
@@ -576,8 +582,10 @@ public partial class TaskEditorViewModel : ObservableRecipient
             Title = "保存并退出?",
             PrimaryButtonText = "确定",
             CloseButtonText = "取消",
-            PrimaryAction = () => {
-                Dispatcher.UIThread.InvokeAsync(() => {
+            PrimaryAction = () =>
+            {
+                Dispatcher.UIThread.InvokeAsync(() =>
+                {
                     CustomScenarioManger.Save(Scenario);
                     OnPropertyChanged(nameof(IsSaveInLocal));
                     IsModified = false;
@@ -631,7 +639,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
     private void DisconnectConnector(ConnectorItem connector)
     {
         var connections = Scenario.connections.Where(e => e.Source == connector || e.Target == connector)
-                                  .ToList();
+            .ToList();
         for (var i = connections.Count - 1; i >= 0; i--)
         {
             var connection = connections[i];
@@ -693,8 +701,10 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 PrimaryButtonText = "保存并退出",
                 SecondaryButtonText = "不保存",
                 CloseButtonText = "取消",
-                PrimaryAction = () => {
-                    Dispatcher.UIThread.InvokeAsync(() => {
+                PrimaryAction = () =>
+                {
+                    Dispatcher.UIThread.InvokeAsync(() =>
+                    {
                         CustomScenarioManger.Save(Scenario);
                         IsModified = false;
 
@@ -702,8 +712,10 @@ public partial class TaskEditorViewModel : ObservableRecipient
                         _window.Close();
                     });
                 },
-                SecondaryAction = () => {
-                    Dispatcher.UIThread.InvokeAsync(() => {
+                SecondaryAction = () =>
+                {
+                    Dispatcher.UIThread.InvokeAsync(() =>
+                    {
                         CustomScenarioManger.Reload(Scenario);
                         IsModified = false;
 
@@ -714,7 +726,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 CloseAction = () => { e.Cancel = true; }
             };
             ((IContentDialog)ServiceManager.Services!.GetService(typeof(IContentDialog))!)
-               .ShowDialogAsync(null, dialog);
+                .ShowDialogAsync(null, dialog);
         }
     }
 
@@ -723,7 +735,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
         if (source.IsConnected)
         {
             if (Scenario.connections
-                        .Any(e => e.Source == source && e.Target == target))
+                .Any(e => e.Source == source && e.Target == target))
             {
                 return;
             }
@@ -734,8 +746,8 @@ public partial class TaskEditorViewModel : ObservableRecipient
             if (source.IsConnected)
             {
                 var connectionsToRemove = Scenario.connections
-                                                  .Where(e => e.Source == source)
-                                                  .ToList();
+                    .Where(e => e.Source == source)
+                    .ToList();
 
                 foreach (var connection in connectionsToRemove)
                 {
@@ -852,7 +864,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
         InputValueValue = null;
         Scenario.InputValue.Add(key, new object());
         OnPropertyChanged(CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs
-                                          .InputValue);
+            .InputValue);
         IsModified = true;
     }
 

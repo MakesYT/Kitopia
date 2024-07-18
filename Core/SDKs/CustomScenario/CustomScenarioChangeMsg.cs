@@ -1,6 +1,4 @@
-﻿using Core.ViewModel.TaskEditor;
-
-namespace Core.SDKs.CustomScenario;
+﻿namespace Core.SDKs.CustomScenario;
 
 public class CustomScenarioChangeMsg
 {
@@ -8,7 +6,7 @@ public class CustomScenarioChangeMsg
     public CustomScenario CustomScenario;
 
     public string Name;
-    public PointItem PointItem;
+    public ScenarioMethodNode ScenarioMethodNode;
 
     /// <summary>
     /// 0来自连接器的修改

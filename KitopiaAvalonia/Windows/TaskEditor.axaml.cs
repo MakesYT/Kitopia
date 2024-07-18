@@ -82,7 +82,7 @@ public partial class TaskEditor : AppWindow
                 try
                 {
                     var keyValuePair = (KeyValuePair<string, object>)borderDataContext;
-                    var pointItem = new PointItem()
+                    var pointItem = new ScenarioMethodNode()
                     {
                         Title = $"变量:{keyValuePair.Key}",
                         MerthodName = "valueSet",
@@ -143,7 +143,7 @@ public partial class TaskEditor : AppWindow
     private void NodifyEditor_Drop(object sender, DragEventArgs e)
     {
         //throw new System.NotImplementedException();
-        if (e.Data.Get("KitopiaPointItem") is PointItem fromListNode)
+        if (e.Data.Get("KitopiaPointItem") is ScenarioMethodNode fromListNode)
         {
             var command = add.Command;
             if (command != null &&
@@ -181,7 +181,7 @@ public partial class TaskEditor : AppWindow
 
         User32.SetForegroundWindow(
             ServiceManager.Services.GetService<SearchWindow>()!.TryGetPlatformHandle()
-                          .Handle);
+                .Handle);
         ServiceManager.Services.GetService<SearchWindow>()!.tx.Focus();
     }
 }

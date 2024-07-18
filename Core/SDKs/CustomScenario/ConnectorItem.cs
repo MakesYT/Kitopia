@@ -11,9 +11,9 @@ namespace Core.SDKs.CustomScenario;
 public partial class ConnectorItem : ObservableRecipient, IConnectorItem
 {
     [JsonConverter(typeof(PointJsonConverter))]
-    #pragma warning disable CS0657 // 不是此声明的有效特性位置
+#pragma warning disable CS0657 // 不是此声明的有效特性位置
     [property: JsonConverter(typeof(PointJsonConverter))]
-    #pragma warning restore CS0657 // 不是此声明的有效特性位置
+#pragma warning restore CS0657 // 不是此声明的有效特性位置
     [ObservableProperty]
     private Point _anchor;
 
@@ -49,7 +49,7 @@ public partial class ConnectorItem : ObservableRecipient, IConnectorItem
 
     public List<string>? Interfaces { get; set; }
 
-    public PointItem Source { get; set; }
+    public ScenarioMethodNode Source { get; set; }
 
     public IEnumerable<ConnectorItem> GetSourceOrNextConnectorItems(
         ObservableCollection<ConnectionItem> connectionItems)
@@ -57,28 +57,30 @@ public partial class ConnectorItem : ObservableRecipient, IConnectorItem
         if (IsOut)
         {
             return connectionItems.Where((e) => e.Source == this)
-                                  .Select(e => e.Target);
+                .Select(e => e.Target);
         }
 
         return connectionItems.Where((e) => e.Target == this)
-                              .Select(e => e.Source);
+            .Select(e => e.Source);
     }
 
-    public IEnumerable<PointItem> GetSourceOrNextPointItems(ObservableCollection<ConnectionItem> connectionItems)
+    public IEnumerable<ScenarioMethodNode> GetSourceOrNextPointItems(
+        ObservableCollection<ConnectionItem> connectionItems)
     {
         if (IsOut)
         {
             return connectionItems.Where((e) => e.Source == this)
-                                  .Select(e => e.Target.Source);
+                .Select(e => e.Target.Source);
         }
 
         return connectionItems.Where((e) => e.Target == this)
-                              .Select(e => e.Source.Source);
+            .Select(e => e.Source.Source);
     }
 
     partial void OnInputObjectChanged(object? value)
     {
-        WeakReferenceMessenger.Default.Send(new CustomScenarioChangeMsg() { PointItem = Source, ConnectorItem = this });
+        WeakReferenceMessenger.Default.Send(new CustomScenarioChangeMsg()
+            { ScenarioMethodNode = Source, ConnectorItem = this });
     }
 
     //插件自定义输入连接器

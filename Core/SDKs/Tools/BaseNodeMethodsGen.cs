@@ -33,7 +33,7 @@ public class BaseNodeMethodsGen
         var nodes = new ObservableCollection<object>();
         foreach (var (key, value) in _baseType)
         {
-            var String = new PointItem()
+            var String = new ScenarioMethodNode()
             {
                 Plugin = "Kitopia",
                 MerthodName = value.FullName,
@@ -73,7 +73,7 @@ public class BaseNodeMethodsGen
         } //基本数值类型
 
         //打开/运行本地项目
-        var point = new PointItem()
+        var point = new ScenarioMethodNode()
         {
             Plugin = "Kitopia",
             MerthodName = "打开/运行本地项目",
@@ -107,7 +107,7 @@ public class BaseNodeMethodsGen
         nodes.Add(point);
 
         //选择本地项目
-        var point1 = new PointItem()
+        var point1 = new ScenarioMethodNode()
         {
             Plugin = "Kitopia",
             MerthodName = "选择本地项目",
@@ -149,7 +149,7 @@ public class BaseNodeMethodsGen
         nodes.Add(point1);
         //if
         {
-            var String = new PointItem()
+            var String = new ScenarioMethodNode()
             {
                 Plugin = "Kitopia",
                 MerthodName = "判断",
@@ -197,7 +197,7 @@ public class BaseNodeMethodsGen
         }
         //==
         {
-            var String = new PointItem()
+            var String = new ScenarioMethodNode()
             {
                 Plugin = "Kitopia",
                 MerthodName = "相等",
@@ -244,7 +244,7 @@ public class BaseNodeMethodsGen
         }
         //1 to 2
         {
-            var String = new PointItem()
+            var String = new ScenarioMethodNode()
             {
                 Plugin = "Kitopia",
                 MerthodName = "一对二",
@@ -285,7 +285,7 @@ public class BaseNodeMethodsGen
         }
         //1 to n
         {
-            var String = new PointItem()
+            var String = new ScenarioMethodNode()
             {
                 Plugin = "Kitopia",
                 MerthodName = "一对N",
