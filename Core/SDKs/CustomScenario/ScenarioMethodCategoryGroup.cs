@@ -1,10 +1,82 @@
-﻿using PluginCore.Attribute.Scenario;
+﻿using System.Collections.ObjectModel;
+using Core.SDKs.Tools;
+using PluginCore.Attribute.Scenario;
 
 namespace Core.SDKs.CustomScenario;
 
 public class ScenarioMethodCategoryGroup
 {
-    public static ScenarioMethodCategoryGroup RootScenarioMethodCategoryGroup = new();
+    public static ScenarioMethodCategoryGroup RootScenarioMethodCategoryGroup = GenBaseScenarioMethodCategoryGroup();
+
+    private static ScenarioMethodCategoryGroup GenBaseScenarioMethodCategoryGroup()
+    {
+        var scenarioMethodCategoryGroup = new ScenarioMethodCategoryGroup();
+
+        //基本数值类型
+        var valueScenarioMethodCategoryGroup = new ScenarioMethodCategoryGroup();
+        scenarioMethodCategoryGroup.Childrens.Add("基本数据类型", valueScenarioMethodCategoryGroup);
+        foreach (var (key, value) in ScenarioMethodI18nTool._baseType)
+        {
+            var String = new ScenarioMethodNode()
+            {
+                ScenarioMethod = new ScenarioMethod(ScenarioMethodType.默认),
+                Title = key,
+            };
+            ObservableCollection<ConnectorItem> StringoutItems = new()
+            {
+                new ConnectorItem()
+                {
+                    Source = String,
+                    Type = value,
+                    Title = ScenarioMethodI18nTool.GetI18N(value.FullName),
+                    TypeName = ScenarioMethodI18nTool.GetI18N(value.FullName),
+                    IsOut = true
+                }
+            };
+            String.Output = StringoutItems;
+            ObservableCollection<ConnectorItem> StringinItems = new()
+            {
+                new ConnectorItem()
+                {
+                    Source = String,
+                    Type = value,
+                    InputObject = value.IsValueType ? Activator.CreateInstance(value) : null,
+                    Title = ScenarioMethodI18nTool.GetI18N(value.FullName),
+                    TypeName = ScenarioMethodI18nTool.GetI18N(value.FullName),
+                    IsSelf = true
+                }
+            };
+            if (value.FullName == "System.Int32")
+            {
+                StringinItems[0].InputObject = (double)0;
+            }
+
+            String.Input = StringinItems;
+            valueScenarioMethodCategoryGroup.Methods.Add(key, String);
+        }
+
+        //节点控制
+        var controlScenarioMethodCategoryGroup = new ScenarioMethodCategoryGroup();
+        scenarioMethodCategoryGroup.Childrens.Add("节点控制", controlScenarioMethodCategoryGroup);
+
+        var scenarioMethodNode1 = new ScenarioMethod(ScenarioMethodType.判断).GenerateNode();
+        controlScenarioMethodCategoryGroup.Methods.Add("判断", scenarioMethodNode1);
+
+        var scenarioMethodNode2 = new ScenarioMethod(ScenarioMethodType.一对二).GenerateNode();
+        controlScenarioMethodCategoryGroup.Methods.Add("一对二", scenarioMethodNode2);
+
+        var scenarioMethodNode3 = new ScenarioMethod(ScenarioMethodType.一对多).GenerateNode();
+        controlScenarioMethodCategoryGroup.Methods.Add("一对多", scenarioMethodNode3);
+
+        var scenarioMethodNode4 = new ScenarioMethod(ScenarioMethodType.相等).GenerateNode();
+        controlScenarioMethodCategoryGroup.Methods.Add("相等", scenarioMethodNode4);
+
+        var scenarioMethodNode5 = new ScenarioMethod(ScenarioMethodType.打开运行本地项目).GenerateNode();
+        controlScenarioMethodCategoryGroup.Methods.Add("打开运行本地项目", scenarioMethodNode5);
+
+
+        return scenarioMethodCategoryGroup;
+    }
 
     public static ScenarioMethodCategoryGroup GetScenarioMethodCategoryGroupByAttribute(
         ScenarioMethodCategoryAttribute attribute, ScenarioMethodCategoryGroup? scenarioMethodCategoryGroup = null)

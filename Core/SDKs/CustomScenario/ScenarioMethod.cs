@@ -12,12 +12,13 @@ namespace Core.SDKs.CustomScenario;
 public class ScenarioMethod
 {
     public ScenarioMethod(MethodInfo method, PluginInfo pluginInfo, ScenarioMethodAttribute attribute,
-        ScenarioMethodType type)
+        ScenarioMethodType type, IServiceProvider serviceProvider)
     {
         Method = method;
         PluginInfo = pluginInfo;
         Attribute = attribute;
         Type = type;
+        ServiceProvider = serviceProvider;
     }
 
     public ScenarioMethod(ScenarioMethodType type)
@@ -26,7 +27,7 @@ public class ScenarioMethod
     }
 
 
-    public IServiceProvider ServiceProvider => PluginManager.EnablePlugin[PluginInfo.ToPlgString()].ServiceProvider;
+    public IServiceProvider ServiceProvider { get; set; }
     public bool IsFromPlugin => PluginInfo is not null;
 
     public ScenarioMethodType Type { get; }
@@ -406,7 +407,7 @@ public class ScenarioMethod
                 }
                 case ScenarioMethodType.变量设置:
                 {
-                    pointItem.Title = "变量设置";
+                    pointItem.Title = $"变量{TypeDate}";
                     ObservableCollection<ConnectorItem> inpItems = new();
                     inpItems.Add(new ConnectorItem()
                     {
@@ -436,7 +437,7 @@ public class ScenarioMethod
                 }
                 case ScenarioMethodType.变量获取:
                 {
-                    pointItem.Title = "变量获取";
+                    pointItem.Title = $"变量{TypeDate}";
                     ObservableCollection<ConnectorItem> inpItems = new();
                     inpItems.Add(new ConnectorItem()
                     {

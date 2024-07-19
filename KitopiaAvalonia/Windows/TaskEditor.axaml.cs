@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -17,7 +16,6 @@ using Core.ViewModel.TaskEditor;
 using FluentAvalonia.UI.Windowing;
 using KitopiaAvalonia.Controls;
 using Microsoft.Extensions.DependencyInjection;
-using PluginCore;
 using Vanara.PInvoke;
 using DataObject = Avalonia.Input.DataObject;
 using DragDrop = Avalonia.Input.DragDrop;
@@ -82,45 +80,16 @@ public partial class TaskEditor : AppWindow
                 try
                 {
                     var keyValuePair = (KeyValuePair<string, object>)borderDataContext;
-                    var pointItem = new ScenarioMethodNode()
-                    {
-                        Title = $"变量:{keyValuePair.Key}",
-                        MerthodName = "valueSet",
-                        ValueRef = keyValuePair.Key,
-                        Plugin = "Kitopia"
-                    };
+                    ScenarioMethodNode pointItem = null!;
                     if ((string)border.Tag == "Set")
                     {
-                        ObservableCollection<ConnectorItem> inpItems = new();
-                        inpItems.Add(new ConnectorItem()
-                        {
-                            Source = pointItem,
-                            Type = typeof(NodeConnectorClass),
-                            Title = "流输入",
-                            TypeName = "节点"
-                        });
-                        inpItems.Add(new ConnectorItem()
-                        {
-                            Source = pointItem,
-                            Type = typeof(object),
-                            Title = "设置",
-                            TypeName = "变量"
-                        });
-                        pointItem.Input = inpItems;
+                        pointItem = new ScenarioMethod(ScenarioMethodType.变量设置) { TypeDate = keyValuePair.Key }
+                            .GenerateNode();
                     }
                     else if ((string)border.Tag == "Get")
                     {
-                        ObservableCollection<ConnectorItem> inpItems = new();
-                        inpItems.Add(new ConnectorItem()
-                        {
-                            Source = pointItem,
-                            Type = typeof(object),
-                            Title = "获取",
-                            IsOut = true,
-                            TypeName = "变量"
-                        });
-                        pointItem.MerthodName = "valueGet";
-                        pointItem.Output = inpItems;
+                        pointItem = new ScenarioMethod(ScenarioMethodType.变量获取) { TypeDate = keyValuePair.Key }
+                            .GenerateNode();
                     }
 
                     var data = new DataObject();

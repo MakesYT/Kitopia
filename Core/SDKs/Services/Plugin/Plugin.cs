@@ -145,7 +145,7 @@ public class Plugin
                     }
 
                     var scenarioMethodInfo = new ScenarioMethod(methodInfo, PluginInfo, scenarioMethodAttribute,
-                        ScenarioMethodType.插件方法);
+                        ScenarioMethodType.插件方法, ServiceProvider);
                     scenarioMethodCategoryGroup.Methods.Add(scenarioMethodInfo.MethodAbsolutelyName,
                         scenarioMethodInfo.GenerateNode());
                 }

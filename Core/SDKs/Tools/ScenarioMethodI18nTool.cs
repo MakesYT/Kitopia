@@ -4,7 +4,7 @@ namespace Core.SDKs.Tools;
 
 public class ScenarioMethodI18nTool
 {
-    private static readonly Dictionary<string, Type> _baseType = new()
+    public static readonly Dictionary<string, Type> _baseType = new()
     {
         { "字符串", typeof(string) },
         { "布尔", typeof(bool) },
