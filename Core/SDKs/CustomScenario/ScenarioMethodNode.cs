@@ -1,8 +1,12 @@
 ﻿using System.Collections.ObjectModel;
+using System.Reflection;
 using System.Text.Json.Serialization;
 using Avalonia;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Core.SDKs.CustomType;
 using Core.SDKs.Services.Config;
+using PluginCore;
+using PluginCore.Attribute;
 
 namespace Core.SDKs.CustomScenario;
 
@@ -26,7 +30,209 @@ public partial class ScenarioMethodNode : ObservableRecipient
     [ObservableProperty] private ObservableCollection<ConnectorItem> output = new();
     [ObservableProperty] private s节点状态 status = s节点状态.未验证;
 
-    public ScenarioMethodInfo ScenarioMethodInfo { get; set; }
+    public ScenarioMethod ScenarioMethod { get; set; }
 
-    public string? ValueRef { get; set; }
+    public bool Invoke(CancellationToken cancellationToken, ObservableCollection<ConnectionItem> connections,
+        ObservableDictionary<string, object> values)
+    {
+        //生成本节点所有数据
+        switch (ScenarioMethod.Type)
+        {
+            case ScenarioMethodType.插件方法:
+            {
+                List<object> list = new();
+                var index = 1;
+                foreach (var parameterInfo in ScenarioMethod.Method.GetParameters())
+                {
+                    if (parameterInfo.ParameterType.GetCustomAttribute(typeof(AutoUnbox)) is not null)
+                    {
+                        var autoUnboxIndex = Input[index].AutoUnboxIndex;
+                        var parameterList = new List<object>();
+                        List<Type> parameterTypesList = new();
+                        while (Input.Count >= index && Input[index].AutoUnboxIndex == autoUnboxIndex)
+                        {
+                            var item = Input[index].InputObject;
+                            if (item != null)
+                            {
+                                parameterList.Add(item);
+                                parameterTypesList.Add(item.GetType());
+                            }
+                            else
+                            {
+                                return false;
+                            }
+
+                            index++;
+                        }
+
+                        var instance = parameterInfo.ParameterType.GetConstructor(parameterTypesList.ToArray())
+                            ?.Invoke(parameterList.ToArray());
+                        if (instance != null)
+                        {
+                            list.Add(instance);
+                        }
+                        else
+                        {
+                            return false;
+                        }
+
+                        continue;
+                    }
+
+                    if (index == Input.Count)
+                    {
+                        list.Add(cancellationToken);
+                        break;
+                    }
+
+                    var inputObject = Input[index].InputObject;
+                    if (inputObject != null)
+                    {
+                        list.Add(inputObject);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+
+                    index++;
+                }
+
+                var invoke = ScenarioMethod.Method.Invoke(
+                    ScenarioMethod.ServiceProvider!.GetService(ScenarioMethod.Method.DeclaringType!),
+                    list.ToArray());
+                if (invoke is null)
+                    return false;
+                if (ScenarioMethod.Method.ReturnParameter.ParameterType.GetCustomAttribute(typeof(AutoUnbox)) is not
+                    null)
+                {
+                    var type = ScenarioMethod.Method.ReturnParameter.ParameterType;
+                    foreach (var memberInfo in type.GetProperties())
+                    {
+                        foreach (var connectorItem in Output)
+                        {
+                            if (connectorItem.Type == memberInfo.PropertyType)
+                            {
+                                var value = invoke.GetType()
+                                    .InvokeMember(memberInfo.Name,
+                                        BindingFlags.Instance | BindingFlags.IgnoreCase |
+                                        BindingFlags.Public | BindingFlags.NonPublic |
+                                        BindingFlags.GetProperty, null, invoke, null);
+
+                                connectorItem.InputObject = value;
+                                break;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (Output.Any())
+                    {
+                        Output[1].InputObject = invoke;
+                    }
+                }
+
+                break;
+            }
+            case ScenarioMethodType.一对二:
+            {
+                Output[0].InputObject = "流1";
+                Output[1].InputObject = "流2";
+                break;
+            }
+            case ScenarioMethodType.一对多:
+            {
+                for (var i = 0; i < Output.Count; i++)
+                {
+                    Output[i].InputObject = $"流{i + 1}";
+                }
+
+                break;
+            }
+            case ScenarioMethodType.相等:
+            {
+                if (Input[1].InputObject is null)
+                {
+                    Output[0].InputObject = false;
+                }
+                else if (Input[2].InputObject is null)
+                {
+                    Output[0].InputObject = false;
+                }
+                else
+                {
+                    Output[0].InputObject = Input[1].InputObject!.Equals(Input[2].InputObject);
+                }
+
+                break;
+            }
+            case ScenarioMethodType.变量设置:
+            {
+                if (values.ContainsKey((string)ScenarioMethod.TypeDate))
+                {
+                    values.SetValueWithoutNotify((string)ScenarioMethod.TypeDate!, Input[1].InputObject!);
+                }
+
+                break;
+            }
+            case ScenarioMethodType.变量获取:
+            {
+                if (values.ContainsKey((string)ScenarioMethod.TypeDate))
+                {
+                    Output[0].InputObject = values[(string)ScenarioMethod.TypeDate];
+                }
+
+                break;
+            }
+            case ScenarioMethodType.判断:
+            {
+                if (Input[1].InputObject is bool b1)
+                {
+                    if (b1)
+                    {
+                        Output[0].IsNotUsed = false;
+                        Output[0].InputObject = "当前流";
+                        Output[1].IsNotUsed = true;
+                        Output[1].InputObject = "未使用的流";
+                    }
+                    else
+                    {
+                        Output[0].IsNotUsed = true;
+                        Output[0].InputObject = "未使用的流";
+                        Output[1].IsNotUsed = false;
+                        Output[1].InputObject = "当前流";
+                    }
+                }
+
+                break;
+            }
+            case ScenarioMethodType.默认:
+            {
+                var connectorItem = Input.First(e => e.RealType != typeof(NodeConnectorClass));
+                foreach (var item in Output)
+                {
+                    item.InputObject = connectorItem.InputObject;
+                }
+
+                break;
+            }
+        }
+
+        //将节点数据赋值给下一个节点
+        foreach (var connectorItem in Output)
+        {
+            if (connectorItem.RealType == typeof(NodeConnectorClass))
+            {
+                continue;
+            }
+
+            foreach (var sourceOrNextConnectorItem in connectorItem.GetSourceOrNextConnectorItems(connections))
+            {
+                sourceOrNextConnectorItem.InputObject = connectorItem.InputObject;
+            }
+        }
+
+        return true;
+    }
 }

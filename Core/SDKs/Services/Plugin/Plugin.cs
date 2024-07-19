@@ -2,7 +2,6 @@
 
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.Json;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.HotKey;
@@ -10,6 +9,7 @@ using Core.SDKs.Services.Config;
 using log4net;
 using PluginCore;
 using PluginCore.Attribute;
+using PluginCore.Attribute.Scenario;
 using PluginCore.Config;
 
 #endregion
@@ -77,7 +77,9 @@ public class Plugin
             .Last() + "_plugin");
         Log.Debug($"加载插件:{path}");
         var t = _dll.GetExportedTypes();
-        Dictionary<string, (MethodInfo, object)> methodInfos = new();
+        //Dictionary<string, (MethodInfo, object)> methodInfos = new();
+        ScenarioMethodCategoryGroup pluginMainScenarioMethodCategoryGroup = new();
+
         List<Func<string, SearchViewItem?>> searchViews = new();
         foreach (var type in t)
         {
@@ -96,6 +98,14 @@ public class Plugin
                 break;
             }
         }
+
+        if (PluginInfo is null)
+        {
+            Log.Error("未找到插件信息");
+            return;
+        }
+
+        pluginMainScenarioMethodCategoryGroup.Name = PluginInfo.PluginName;
 
         foreach (var type in t)
         {
@@ -119,16 +129,25 @@ public class Plugin
 
             foreach (var methodInfo in type.GetMethods())
             {
-                if (methodInfo.GetCustomAttributes(typeof(ScenarioMethodAttribute))
-                    .Any()) //情景的可用节点
+                ScenarioMethodCategoryGroup scenarioMethodCategoryGroup = pluginMainScenarioMethodCategoryGroup;
+                if (type.GetCustomAttribute<ScenarioMethodCategoryAttribute>() is { } scenarioMethodCategoryAttribute)
+                {
+                    scenarioMethodCategoryGroup =
+                        ScenarioMethodCategoryGroup.GetScenarioMethodCategoryGroupByAttribute(
+                            scenarioMethodCategoryAttribute, pluginMainScenarioMethodCategoryGroup);
+                }
+
+                if (methodInfo.GetCustomAttribute<ScenarioMethodAttribute>() is { } scenarioMethodAttribute) //情景的可用节点
                 {
                     if (methodInfo.GetParameters()[^1].ParameterType.FullName != "System.Threading.CancellationToken")
                     {
                         continue;
                     }
 
-                    methodInfos.Add(ToMtdString(methodInfo),
-                        (methodInfo, GetPointItemByMethodInfo(methodInfo)));
+                    var scenarioMethodInfo = new ScenarioMethod(methodInfo, PluginInfo, scenarioMethodAttribute,
+                        ScenarioMethodType.插件方法);
+                    scenarioMethodCategoryGroup.Methods.Add(scenarioMethodInfo.MethodAbsolutelyName,
+                        scenarioMethodInfo);
                 }
 
                 if (methodInfo.GetCustomAttributes(typeof(SearchMethod))
@@ -150,41 +169,13 @@ public class Plugin
             }
         }
 
-        PluginOverall.SearchActions.Add(ToPlgString(), searchViews);
-        PluginOverall.CustomScenarioNodeMethods.Add(ToPlgString(), methodInfos);
+        PluginOverall.SearchActions.Add(PluginInfo.ToPlgString(), searchViews);
     }
 
     public Assembly? _dll => _plugin.Assembly;
 
     public PluginInfo PluginInfo { set; get; }
 
-    public string ToPlgString() => $"{PluginInfo.Author}_{PluginInfo.PluginId}";
-
-    public string ToMtdString(MethodInfo methodInfo)
-    {
-        StringBuilder sb = new StringBuilder();
-        sb.Append("|");
-        foreach (var genericArgument in methodInfo.GetParameters())
-        {
-            var plugin = PluginManager.EnablePlugin
-                .FirstOrDefault((e) => e.Value._dll == genericArgument.ParameterType.Assembly)
-                .Value;
-            // type.Assembly.
-            // var a = PluginManager.GetPlugnNameByTypeName(type.FullName);
-            if (plugin is null)
-            {
-                sb.Append($"System {genericArgument.ParameterType.FullName}");
-                sb.Append("|");
-                continue;
-            }
-
-            sb.Append($"{plugin.ToPlgString()} {genericArgument.ParameterType.FullName}");
-            sb.Append("|");
-        }
-
-        sb.Remove(sb.Length - 1, 1);
-        return $"{PluginInfo.Author}_{PluginInfo.PluginId}/{methodInfo.DeclaringType!.FullName}/{methodInfo.Name}{sb}";
-    }
 
     public Type GetType(string typeName)
     {

@@ -9,17 +9,27 @@ using PluginCore.Attribute.Scenario;
 
 namespace Core.SDKs.CustomScenario;
 
-public class ScenarioMethodInfo
+public class ScenarioMethod
 {
-    public ScenarioMethodInfo(MethodInfo method, PluginInfo pluginInfo, ScenarioMethodAttribute attribute)
+    public ScenarioMethod(MethodInfo method, PluginInfo pluginInfo, ScenarioMethodAttribute attribute,
+        ScenarioMethodType type)
     {
         Method = method;
         PluginInfo = pluginInfo;
         Attribute = attribute;
+        Type = type;
     }
 
+
+    public IServiceProvider ServiceProvider => PluginManager.EnablePlugin[PluginInfo.ToPlgString()].ServiceProvider;
+    public bool IsFromPlugin => PluginInfo is not null;
+
+    public ScenarioMethodType Type { get; }
+
+    //某些特殊的类型需要存储一定的数据，例如（变量读取/设置 需要对应的变量名）
+    public object TypeDate { get; set; }
     public MethodInfo Method { get; }
-    public PluginInfo PluginInfo { get; }
+    public PluginInfo? PluginInfo { get; }
     public ScenarioMethodAttribute Attribute { get; }
 
     public string MethodAbsolutelyName
@@ -42,7 +52,7 @@ public class ScenarioMethodInfo
                     continue;
                 }
 
-                sb.Append($"{plugin.ToPlgString()} {genericArgument.ParameterType.FullName}");
+                sb.Append($"{PluginInfo.ToPlgString()} {genericArgument.ParameterType.FullName}");
                 sb.Append("|");
             }
 
@@ -61,7 +71,7 @@ public class ScenarioMethodInfo
     {
         var pointItem = new ScenarioMethodNode()
         {
-            ScenarioMethodInfo = this,
+            ScenarioMethod = this,
             Title = MethodTitle
         };
         ObservableCollection<ConnectorItem> inpItems = new();
@@ -132,8 +142,7 @@ public class ScenarioMethodInfo
                     connectorItem.IsSelf = true;
                     try
                     {
-                        var service = PluginManager.EnablePlugin[PluginInfo.ToPlgString()].ServiceProvider
-                            .GetService(customNodeInputType.Type);
+                        var service = ServiceProvider.GetService(customNodeInputType.Type);
                         connectorItem.PluginInputConnector = service as INodeInputConnector;
                     }
                     catch (Exception e)
@@ -152,6 +161,14 @@ public class ScenarioMethodInfo
         if (Method.ReturnParameter.ParameterType != typeof(void))
         {
             ObservableCollection<ConnectorItem> outItems = new();
+            inpItems.Add(new ConnectorItem()
+            {
+                Source = pointItem,
+                IsOut = true,
+                Type = typeof(NodeConnectorClass),
+                Title = "流输出",
+                TypeName = "节点"
+            });
             if (Method.ReturnParameter.ParameterType.GetCustomAttribute(typeof(AutoUnbox)) is not null)
             {
                 autoUnboxIndex++;
@@ -207,6 +224,7 @@ public class ScenarioMethodInfo
 
 
         pointItem.Input = inpItems;
+
 
         return pointItem;
     }
