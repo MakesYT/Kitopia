@@ -32,7 +32,7 @@ public partial class CustomScenario : ObservableRecipient
     [JsonIgnore] [ObservableProperty] private DateTime _lastRun;
 
     [JsonIgnore] [ObservableProperty] private string _name = "情景";
-    public Dictionary<string, int> _plugs = new();
+    public Dictionary<string, int> PluginUsedCount = new();
     private Dictionary<ScenarioMethodNode, Thread?> _tickTasks = new();
     private TickUtil? _tickUtil;
 
@@ -101,7 +101,7 @@ public partial class CustomScenario : ObservableRecipient
                     IsOut = true,
                     Source = nodes.First(),
                     Type = value.GetType(),
-                    TypeName = BaseNodeMethodsGen.GetI18N(value.GetType()
+                    TypeName = ScenarioMethodI18nTool.GetI18N(value.GetType()
                         .FullName),
                     Title = key
                 });

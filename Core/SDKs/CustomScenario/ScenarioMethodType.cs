@@ -9,5 +9,6 @@ public enum ScenarioMethodType
     相等,
     变量设置,
     变量获取,
+    打开运行本地项目,
     默认
 }

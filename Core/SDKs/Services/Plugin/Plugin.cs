@@ -147,7 +147,7 @@ public class Plugin
                     var scenarioMethodInfo = new ScenarioMethod(methodInfo, PluginInfo, scenarioMethodAttribute,
                         ScenarioMethodType.插件方法);
                     scenarioMethodCategoryGroup.Methods.Add(scenarioMethodInfo.MethodAbsolutelyName,
-                        scenarioMethodInfo);
+                        scenarioMethodInfo.GenerateNode());
                 }
 
                 if (methodInfo.GetCustomAttributes(typeof(SearchMethod))

@@ -10,28 +10,10 @@ namespace Core.SDKs.Tools;
 
 public class BaseNodeMethodsGen
 {
-    private static readonly Dictionary<string, Type> _baseType = new()
-    {
-        { "字符串", typeof(string) },
-        { "布尔", typeof(bool) },
-        { "整型", typeof(int) },
-        { "双精度浮点数", typeof(double) },
-    };
-
-    public static string GetI18N(string key)
-    {
-        if (CustomScenarioGloble._i18n.TryGetValue(key, out var n))
-        {
-            return n;
-        }
-
-        return key;
-    }
-
     public static void GenBaseNodeMethods(ObservableCollection<ObservableCollection<object>> nodeMethods)
     {
         var nodes = new ObservableCollection<object>();
-        foreach (var (key, value) in _baseType)
+        foreach (var (key, value) in ScenarioMethodI18nTool._baseType)
         {
             var String = new ScenarioMethodNode()
             {
@@ -45,8 +27,8 @@ public class BaseNodeMethodsGen
                 {
                     Source = String,
                     Type = value,
-                    Title = GetI18N(value.FullName),
-                    TypeName = GetI18N(value.FullName),
+                    Title = ScenarioMethodI18nTool.GetI18N(value.FullName),
+                    TypeName = ScenarioMethodI18nTool.GetI18N(value.FullName),
                     IsOut = true
                 }
             };
@@ -58,8 +40,8 @@ public class BaseNodeMethodsGen
                     Source = String,
                     Type = value,
                     InputObject = value.IsValueType ? Activator.CreateInstance(value) : null,
-                    Title = GetI18N(value.FullName),
-                    TypeName = GetI18N(value.FullName),
+                    Title = ScenarioMethodI18nTool.GetI18N(value.FullName),
+                    TypeName = ScenarioMethodI18nTool.GetI18N(value.FullName),
                     IsSelf = true
                 }
             };
@@ -162,7 +144,7 @@ public class BaseNodeMethodsGen
                     Source = String,
                     Type = typeof(NodeConnectorClass),
                     Title = "真",
-                    TypeName = GetI18N(typeof(NodeConnectorClass).FullName),
+                    TypeName = ScenarioMethodI18nTool.GetI18N(typeof(NodeConnectorClass).FullName),
                     IsOut = true
                 },
                 new ConnectorItem()
@@ -170,7 +152,7 @@ public class BaseNodeMethodsGen
                     Source = String,
                     Type = typeof(NodeConnectorClass),
                     Title = "假",
-                    TypeName = GetI18N(typeof(NodeConnectorClass).FullName),
+                    TypeName = ScenarioMethodI18nTool.GetI18N(typeof(NodeConnectorClass).FullName),
                     IsOut = true
                 }
             };
@@ -188,8 +170,8 @@ public class BaseNodeMethodsGen
                 {
                     Source = String,
                     Type = typeof(bool),
-                    Title = GetI18N(typeof(bool).FullName),
-                    TypeName = GetI18N(typeof(bool).FullName)
+                    Title = ScenarioMethodI18nTool.GetI18N(typeof(bool).FullName),
+                    TypeName = ScenarioMethodI18nTool.GetI18N(typeof(bool).FullName)
                 }
             };
             String.Input = StringinItems;
@@ -209,8 +191,8 @@ public class BaseNodeMethodsGen
                 {
                     Source = String,
                     Type = typeof(bool),
-                    Title = GetI18N(typeof(bool).FullName),
-                    TypeName = GetI18N(typeof(bool).FullName),
+                    Title = ScenarioMethodI18nTool.GetI18N(typeof(bool).FullName),
+                    TypeName = ScenarioMethodI18nTool.GetI18N(typeof(bool).FullName),
                     IsOut = true
                 }
             };
@@ -228,15 +210,15 @@ public class BaseNodeMethodsGen
                 {
                     Source = String,
                     Type = typeof(object),
-                    Title = GetI18N(typeof(object).FullName),
-                    TypeName = GetI18N(typeof(object).FullName)
+                    Title = ScenarioMethodI18nTool.GetI18N(typeof(object).FullName),
+                    TypeName = ScenarioMethodI18nTool.GetI18N(typeof(object).FullName)
                 },
                 new ConnectorItem()
                 {
                     Source = String,
                     Type = typeof(object),
-                    Title = GetI18N(typeof(object).FullName),
-                    TypeName = GetI18N(typeof(object).FullName)
+                    Title = ScenarioMethodI18nTool.GetI18N(typeof(object).FullName),
+                    TypeName = ScenarioMethodI18nTool.GetI18N(typeof(object).FullName)
                 }
             };
             String.Input = StringinItems;

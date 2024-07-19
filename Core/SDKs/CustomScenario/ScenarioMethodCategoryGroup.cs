@@ -48,7 +48,7 @@ public class ScenarioMethodCategoryGroup
 
     //
     public Dictionary<string, ScenarioMethodCategoryGroup> Childrens { get; set; } = new();
-    public Dictionary<string, ScenarioMethod> Methods { get; set; } = new();
+    public Dictionary<string, ScenarioMethodNode> Methods { get; set; } = new();
     public ScenarioMethodCategoryGroup? GetParent() => Parent;
     public ScenarioMethodCategoryGroup GetRoot() => Parent?.GetRoot() ?? this;
 

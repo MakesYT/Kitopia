@@ -5,7 +5,6 @@ using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.HotKey;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
-using Core.SDKs.Services.Plugin;
 using Core.ViewModel;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,7 +21,8 @@ public static class CustomScenarioManger
 
     public static void Init()
     {
-        WeakReferenceMessenger.Default.Register<string, string>("null", "CustomScenarioTrigger", (_, e) => {
+        WeakReferenceMessenger.Default.Register<string, string>("null", "CustomScenarioTrigger", (_, e) =>
+        {
             //设置当前线程最高优先级
             Thread.CurrentThread.Priority = ThreadPriority.Highest;
             StringBuilder sb = new();
@@ -84,55 +84,27 @@ public static class CustomScenarioManger
         try
         {
             var deserializeObject = JsonSerializer.Deserialize<CustomScenario>(json, ConfigManger.DefaultOptions);
-            // for (var index = 0; index < deserializeObject.InputValue.Count; index++)
-            // {
-            //     var (key, value) = deserializeObject.InputValue[index];
-            //     if (value is JsonElement jsonElement)
-            //     {
-            //         if (jsonElement.ValueKind == JsonValueKind.Object)
-            //         {
-            //             deserializeObject.InputValue[deserializeObject.InputValue[index].Key]= new object();
-            //            
-            //         }
-            //     }
-            // }
-            //
-            // for (var index = 0; index < deserializeObject.Values.Count; index++)
-            // {
-            //     var (key, value) = deserializeObject.Values[index];
-            //     if (value is JsonElement jsonElement)
-            //     {
-            //         if (jsonElement.ValueKind == JsonValueKind.Object)
-            //         {
-            //             deserializeObject.Values[deserializeObject.Values[index].Key]= new object();
-            //             
-            //         }
-            //     }
-            // }
 
             deserializeObject.OnDeserialized();
 
             foreach (var node in deserializeObject.nodes)
             {
-                var nodePlugin = node.Plugin;
-                switch (nodePlugin)
-                {
-                    case null:
-                    case "Kitopia":
-                        continue;
-                }
-
-                if (!PluginOverall.CustomScenarioNodeMethods.TryGetValue(nodePlugin, out var method))
-                {
-                    throw new CustomScenarioLoadFromJsonException(nodePlugin, node.MerthodName);
-                }
-
-                if (method.ContainsKey(node.MerthodName))
+                if (!node.ScenarioMethod.IsFromPlugin)
                 {
                     continue;
                 }
 
-                throw new CustomScenarioLoadFromJsonException(nodePlugin, node.MerthodName);
+                // if (!PluginOverall.CustomScenarioNodeMethods.TryGetValue(nodePlugin, out var method))
+                // {
+                //     throw new CustomScenarioLoadFromJsonException(nodePlugin, node.MerthodName);
+                // }
+                //
+                // if (method.ContainsKey(node.MerthodName))
+                // {
+                //     continue;
+                // }
+                //
+                // throw new CustomScenarioLoadFromJsonException(nodePlugin, node.MerthodName);
             }
 
             //
@@ -204,8 +176,8 @@ public static class CustomScenarioManger
         }
 
         keys.AddRange(ServiceManager.Services.GetService<IAppToolService>()
-                                    .GetPinyin(scenario.Name)
-                                    .Keys);
+            .GetPinyin(scenario.Name)
+            .Keys);
         var viewItem1 = new SearchViewItem()
         {
             ItemDisplayName = "执行自定义情景:" + scenario.Name,
@@ -220,7 +192,7 @@ public static class CustomScenarioManger
             IsVisible = true
         };
         ((SearchWindowViewModel)ServiceManager.Services.GetService(typeof(SearchWindowViewModel))!)
-           ._collection.TryAdd(onlyKey, viewItem1);
+            ._collection.TryAdd(onlyKey, viewItem1);
 
 
         var configF = new FileInfo(AppDomain.CurrentDomain.BaseDirectory +
@@ -258,7 +230,7 @@ public static class CustomScenarioManger
 
         toRemove = null;
         ((SearchWindowViewModel)ServiceManager.Services.GetService(typeof(SearchWindowViewModel))!)
-           ._collection.TryRemove($"{nameof(CustomScenario)}:{scenario.UUID}", out _);
+            ._collection.TryRemove($"{nameof(CustomScenario)}:{scenario.UUID}", out _);
         ConfigManger.Save();
         if (deleteFile)
         {
@@ -274,7 +246,7 @@ public static class CustomScenarioManger
         for (int i = CustomScenarios.Count - 1; i >= 0; i--)
         {
             if (CustomScenarios[i]
-               ._plugs.ContainsKey(plugStr))
+                .PluginUsedCount.ContainsKey(plugStr))
             {
                 var customScenario = CustomScenarios[i];
                 CustomScenarios.RemoveAt(i);

@@ -4,7 +4,11 @@ using System.Text.Json.Serialization;
 using Avalonia;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Core.SDKs.CustomType;
+using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
+using Core.SDKs.Services.Plugin;
+using Core.SDKs.Tools.Ex;
+using Microsoft.Extensions.DependencyInjection;
 using PluginCore;
 using PluginCore.Attribute;
 
@@ -207,6 +211,28 @@ public partial class ScenarioMethodNode : ObservableRecipient
 
                 break;
             }
+            case ScenarioMethodType.打开运行本地项目:
+            {
+                if (Input.Count() >= 3)
+                {
+                    List<object> parameterList = new();
+                    for (var index = 2; index < Input.Count; index++)
+                    {
+                        parameterList.Add(Input[index].InputObject);
+                    }
+
+                    ServiceManager.Services.GetService<ISearchItemTool>()
+                        .OpenSearchItemByOnlyKey((string)Input[1].InputObject,
+                            parameterList.ToArray());
+                }
+                else
+                {
+                    ServiceManager.Services.GetService<ISearchItemTool>()
+                        .OpenSearchItemByOnlyKey((string)Input[1].InputObject);
+                }
+
+                break;
+            }
             case ScenarioMethodType.默认:
             {
                 var connectorItem = Input.First(e => e.RealType != typeof(NodeConnectorClass));
@@ -234,5 +260,102 @@ public partial class ScenarioMethodNode : ObservableRecipient
         }
 
         return true;
+    }
+
+    public ScenarioMethodNode Copy(Dictionary<string, int> pluginUsedCount)
+    {
+        var item = new ScenarioMethodNode
+        {
+            Title = this.Title,
+            ScenarioMethod = this.ScenarioMethod,
+            Location = new Point(Location.X, Location.Y)
+        };
+        if (!ScenarioMethod.IsFromPlugin)
+        {
+            pluginUsedCount.AddOrIncrease(ScenarioMethod.PluginInfo!.ToPlgString());
+        }
+
+        ObservableCollection<ConnectorItem> input = new();
+        foreach (var connectorItem in Input)
+        {
+            input.Add(new ConnectorItem
+            {
+                Anchor = new Point(connectorItem.Anchor.X, connectorItem.Anchor.Y),
+                Source = item,
+                TypeName = connectorItem.TypeName,
+                Title = connectorItem.Title,
+                Type = connectorItem.Type,
+                RealType = connectorItem.RealType,
+                InputObject = connectorItem.InputObject,
+                AutoUnboxIndex = connectorItem.AutoUnboxIndex,
+                IsSelf = connectorItem.IsSelf,
+                SelfInputAble = connectorItem.SelfInputAble,
+                IsOut = connectorItem.IsOut,
+                isPluginInputConnector = connectorItem.isPluginInputConnector,
+                PluginInputConnector = connectorItem.PluginInputConnector
+            });
+            var plugin = PluginManager.EnablePlugin.FirstOrDefault((e) => e.Value._dll == connectorItem.Type.Assembly)
+                .Value;
+            if (plugin is not null)
+            {
+                pluginUsedCount.AddOrIncrease(ScenarioMethod.PluginInfo!.ToPlgString());
+            }
+
+            var plugin2 = PluginManager.EnablePlugin
+                .FirstOrDefault((e) => e.Value._dll == connectorItem.RealType.Assembly)
+                .Value;
+            if (plugin2 is not null)
+            {
+                pluginUsedCount.AddOrIncrease(ScenarioMethod.PluginInfo!.ToPlgString());
+            }
+        }
+
+        ObservableCollection<ConnectorItem> output = new();
+        foreach (var connectorItem in Output)
+        {
+            var connectorItem1 = new ConnectorItem
+            {
+                Anchor = new Point(connectorItem.Anchor.X, connectorItem.Anchor.Y),
+                Source = item,
+                Title = connectorItem.Title,
+                TypeName = connectorItem.TypeName,
+                RealType = connectorItem.RealType,
+                AutoUnboxIndex = connectorItem.AutoUnboxIndex,
+                Type = connectorItem.Type,
+                IsConnected = connectorItem.IsConnected,
+                IsOut = connectorItem.IsOut
+            };
+            if (connectorItem.Interfaces is { Count: > 0 })
+            {
+                List<string> interfaces = new();
+                foreach (var connectorItemInterface in connectorItem.Interfaces)
+                {
+                    interfaces.Add(connectorItemInterface);
+                }
+
+                connectorItem1.Interfaces = interfaces;
+            }
+
+            var plugin = PluginManager.EnablePlugin.FirstOrDefault((e) => e.Value._dll == connectorItem.Type.Assembly)
+                .Value;
+            if (plugin is not null)
+            {
+                pluginUsedCount.AddOrIncrease(ScenarioMethod.PluginInfo!.ToPlgString());
+            }
+
+            var plugin2 = PluginManager.EnablePlugin
+                .FirstOrDefault((e) => e.Value._dll == connectorItem.RealType.Assembly)
+                .Value;
+            if (plugin2 is not null)
+            {
+                pluginUsedCount.AddOrIncrease(ScenarioMethod.PluginInfo!.ToPlgString());
+            }
+
+            output.Add(connectorItem1);
+        }
+
+        item.Input = input;
+        item.Output = output;
+        return item;
     }
 }

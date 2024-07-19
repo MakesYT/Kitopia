@@ -11,7 +11,7 @@ public class TypeJsonConverter : JsonConverter<Type>
     {
         return objectType == typeof(Type);
     }
-    
+
     public override Type? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         var typeName = (string)reader.GetString();
@@ -57,7 +57,7 @@ public class TypeJsonConverter : JsonConverter<Type>
             writer.WriteStringValue($"System {type.FullName}");
             return;
         }
-        
-        writer.WriteStringValue($"{plugin.ToPlgString()} {type.FullName}");
+
+        writer.WriteStringValue($"{plugin.PluginInfo} {type.FullName}");
     }
 }

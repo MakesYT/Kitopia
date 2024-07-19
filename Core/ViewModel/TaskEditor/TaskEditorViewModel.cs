@@ -40,12 +40,10 @@ public partial class TaskEditorViewModel : ObservableRecipient
     public TaskEditorViewModel()
     {
         PendingConnection = new PendingConnectionViewModel(this);
-        GetAllMethods();
         var nodify2 = new ScenarioMethodNode
         {
             Title = "任务1",
-            MerthodName = "Main",
-            Plugin = "Kitopia"
+            ScenarioMethod = new ScenarioMethod(ScenarioMethodType.默认)
         };
         nodify2.Output = new ObservableCollection<ConnectorItem>
         {
@@ -54,7 +52,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 IsOut = true,
                 Source = nodify2,
                 Type = typeof(NodeConnectorClass),
-                TypeName = BaseNodeMethodsGen.GetI18N(typeof(NodeConnectorClass).FullName),
+                TypeName = ScenarioMethodI18nTool.GetI18N(typeof(NodeConnectorClass).FullName),
                 Title = "开始"
             }
         };
@@ -62,7 +60,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
         var nodify3 = new ScenarioMethodNode
         {
             Title = "Tick",
-            Plugin = "Kitopia",
+            ScenarioMethod = new ScenarioMethod(ScenarioMethodType.默认),
             Location = new Point(0, 100)
         };
         nodify3.Output = new ObservableCollection<ConnectorItem>
@@ -72,7 +70,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 IsOut = true,
                 Source = nodify3,
                 Type = typeof(NodeConnectorClass),
-                TypeName = BaseNodeMethodsGen.GetI18N(typeof(NodeConnectorClass).FullName),
+                TypeName = ScenarioMethodI18nTool.GetI18N(typeof(NodeConnectorClass).FullName),
                 Title = "开始"
             }
         };
@@ -116,7 +114,8 @@ public partial class TaskEditorViewModel : ObservableRecipient
                     return;
                 }
 
-                if (e.ScenarioMethodNode.MerthodName == "一对N" && e.ConnectorItem.Title == "输出数量")
+                if (e.ScenarioMethodNode.ScenarioMethod.Type == ScenarioMethodType.一对多 &&
+                    e.ConnectorItem.Title == "输出数量")
                 {
                     int? value = null;
                     if (e.ConnectorItem.InputObject is int inputObject)
@@ -178,7 +177,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                     }
                 }
 
-                if (e.ScenarioMethodNode.MerthodName == "打开/运行本地项目")
+                if (e.ScenarioMethodNode.ScenarioMethod.Type == ScenarioMethodType.打开运行本地项目)
                 {
                     var o = e.ScenarioMethodNode.Input[1].InputObject;
                     if (o is string inputObject)
@@ -199,7 +198,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                                             IsOut = false,
                                             Source = e.ScenarioMethodNode,
                                             Type = value.GetType(),
-                                            TypeName = BaseNodeMethodsGen.GetI18N(value.GetType()
+                                            TypeName = ScenarioMethodI18nTool.GetI18N(value.GetType()
                                                 .FullName),
                                             Title = key
                                         });
@@ -209,7 +208,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                                     {
                                         e.ScenarioMethodNode.Input[index + 2].Title = key;
                                         e.ScenarioMethodNode.Input[index + 2].Type = value.GetType();
-                                        e.ScenarioMethodNode.Input[index + 2].TypeName = BaseNodeMethodsGen.GetI18N(
+                                        e.ScenarioMethodNode.Input[index + 2].TypeName = ScenarioMethodI18nTool.GetI18N(
                                             value
                                                 .GetType()
                                                 .FullName);
@@ -305,102 +304,9 @@ public partial class TaskEditorViewModel : ObservableRecipient
     private void AddNodes(ScenarioMethodNode scenarioMethodNode)
     {
         IsModified = true;
+        var methodNode = scenarioMethodNode.Copy(Scenario.PluginUsedCount);
 
-        var item = new ScenarioMethodNode
-        {
-            Title = scenarioMethodNode.Title,
-            Plugin = scenarioMethodNode.Plugin,
-            ValueRef = scenarioMethodNode.ValueRef,
-            MerthodName = scenarioMethodNode.MerthodName,
-            Location = new Point(scenarioMethodNode.Location.X, scenarioMethodNode.Location.Y)
-        };
-        if (scenarioMethodNode.Plugin != "Kitopia")
-        {
-            Scenario._plugs!.AddOrIncrease(scenarioMethodNode.Plugin);
-        }
-
-        ObservableCollection<ConnectorItem> input = new();
-        foreach (var connectorItem in scenarioMethodNode.Input)
-        {
-            input.Add(new ConnectorItem
-            {
-                Anchor = new Point(connectorItem.Anchor.X, connectorItem.Anchor.Y),
-                Source = item,
-                TypeName = connectorItem.TypeName,
-                Title = connectorItem.Title,
-                Type = connectorItem.Type,
-                RealType = connectorItem.RealType,
-                InputObject = connectorItem.InputObject,
-                AutoUnboxIndex = connectorItem.AutoUnboxIndex,
-                IsSelf = connectorItem.IsSelf,
-                SelfInputAble = connectorItem.SelfInputAble,
-                IsOut = connectorItem.IsOut,
-                isPluginInputConnector = connectorItem.isPluginInputConnector,
-                PluginInputConnector = connectorItem.PluginInputConnector
-            });
-            var plugin = PluginManager.EnablePlugin.FirstOrDefault((e) => e.Value._dll == connectorItem.Type.Assembly)
-                .Value;
-            if (plugin is not null)
-            {
-                Scenario._plugs.AddOrIncrease(plugin.ToPlgString());
-            }
-
-            var plugin2 = PluginManager.EnablePlugin
-                .FirstOrDefault((e) => e.Value._dll == connectorItem.RealType.Assembly)
-                .Value;
-            if (plugin2 is not null)
-            {
-                Scenario._plugs.AddOrIncrease(plugin2.ToPlgString());
-            }
-        }
-
-        ObservableCollection<ConnectorItem> output = new();
-        foreach (var connectorItem in scenarioMethodNode.Output)
-        {
-            var connectorItem1 = new ConnectorItem
-            {
-                Anchor = new Point(connectorItem.Anchor.X, connectorItem.Anchor.Y),
-                Source = item,
-                Title = connectorItem.Title,
-                TypeName = connectorItem.TypeName,
-                RealType = connectorItem.RealType,
-                AutoUnboxIndex = connectorItem.AutoUnboxIndex,
-                Type = connectorItem.Type,
-                IsConnected = connectorItem.IsConnected,
-                IsOut = connectorItem.IsOut
-            };
-            if (connectorItem.Interfaces is { Count: > 0 })
-            {
-                List<string> interfaces = new();
-                foreach (var connectorItemInterface in connectorItem.Interfaces)
-                {
-                    interfaces.Add(connectorItemInterface);
-                }
-
-                connectorItem1.Interfaces = interfaces;
-            }
-
-            var plugin = PluginManager.EnablePlugin.FirstOrDefault((e) => e.Value._dll == connectorItem.Type.Assembly)
-                .Value;
-            if (plugin is not null)
-            {
-                Scenario._plugs.AddOrIncrease(plugin.ToPlgString());
-            }
-
-            var plugin2 = PluginManager.EnablePlugin
-                .FirstOrDefault((e) => e.Value._dll == connectorItem.RealType.Assembly)
-                .Value;
-            if (plugin2 is not null)
-            {
-                Scenario._plugs.AddOrIncrease(plugin2.ToPlgString());
-            }
-
-            output.Add(connectorItem1);
-        }
-
-        item.Input = input;
-        item.Output = output;
-        Scenario.nodes.Add(item);
+        Scenario.nodes.Add(methodNode);
     }
 
     [RelayCommand]
@@ -412,67 +318,9 @@ public partial class TaskEditorViewModel : ObservableRecipient
             return;
         }
 
-        var item = new ScenarioMethodNode
-        {
-            Title = scenarioMethodNode.Title,
-            Plugin = scenarioMethodNode.Plugin,
-            ValueRef = scenarioMethodNode.ValueRef,
-            MerthodName = scenarioMethodNode.MerthodName,
-            Location = new Point(scenarioMethodNode.Location.X + 40, scenarioMethodNode.Location.Y + 40)
-        };
-        ObservableCollection<ConnectorItem> input = new();
-        foreach (var connectorItem in scenarioMethodNode.Input)
-        {
-            input.Add(new ConnectorItem
-            {
-                Anchor = new Point(connectorItem.Anchor.X, connectorItem.Anchor.Y),
-                Source = item,
-                TypeName = connectorItem.TypeName,
-                Title = connectorItem.Title,
-                Type = connectorItem.Type,
-                RealType = connectorItem.RealType,
-                InputObject = connectorItem.InputObject,
-                AutoUnboxIndex = connectorItem.AutoUnboxIndex,
-                IsSelf = connectorItem.IsSelf,
-                SelfInputAble = connectorItem.SelfInputAble,
-                IsOut = connectorItem.IsOut,
-                isPluginInputConnector = connectorItem.isPluginInputConnector,
-                PluginInputConnector = connectorItem.PluginInputConnector
-            });
-        }
-
-        ObservableCollection<ConnectorItem> output = new();
-        foreach (var connectorItem in scenarioMethodNode.Output)
-        {
-            var connectorItem1 = new ConnectorItem
-            {
-                Anchor = new Point(connectorItem.Anchor.X, connectorItem.Anchor.Y),
-                Source = item,
-                Title = connectorItem.Title,
-                TypeName = connectorItem.TypeName,
-                RealType = connectorItem.RealType,
-                AutoUnboxIndex = connectorItem.AutoUnboxIndex,
-                Type = connectorItem.Type,
-                IsConnected = connectorItem.IsConnected,
-                IsOut = connectorItem.IsOut
-            };
-            if (connectorItem.Interfaces is { Count: > 0 })
-            {
-                List<string> interfaces = new();
-                foreach (var connectorItemInterface in connectorItem.Interfaces)
-                {
-                    interfaces.Add(connectorItemInterface);
-                }
-
-                connectorItem1.Interfaces = interfaces;
-            }
-
-            output.Add(connectorItem1);
-        }
-
-        item.Input = input;
-        item.Output = output;
-        Scenario.nodes.Add(item);
+        var methodNode = scenarioMethodNode.Copy(Scenario.PluginUsedCount);
+        methodNode.Location = new Point(scenarioMethodNode.Location.X + 50, scenarioMethodNode.Location.Y + 50);
+        Scenario.nodes.Add(methodNode);
     }
 
     [RelayCommand]
@@ -502,14 +350,14 @@ public partial class TaskEditorViewModel : ObservableRecipient
             }
         }
 
-        Scenario._plugs.DelOrDecrease(scenarioMethodNode.Plugin);
+        Scenario.PluginUsedCount.DelOrDecrease(scenarioMethodNode.ScenarioMethod.PluginInfo!.ToPlgString());
         foreach (var connectorItem in scenarioMethodNode.Input)
         {
             var plugin = PluginManager.EnablePlugin.FirstOrDefault((e) => e.Value._dll == connectorItem.Type.Assembly)
                 .Value;
             if (plugin is not null)
             {
-                Scenario._plugs.DelOrDecrease(plugin.ToPlgString());
+                Scenario.PluginUsedCount.DelOrDecrease(scenarioMethodNode.ScenarioMethod.PluginInfo!.ToPlgString());
             }
 
             var plugin2 = PluginManager.EnablePlugin
@@ -517,7 +365,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 .Value;
             if (plugin2 is not null)
             {
-                Scenario._plugs.DelOrDecrease(plugin2.ToPlgString());
+                Scenario.PluginUsedCount.DelOrDecrease(scenarioMethodNode.ScenarioMethod.PluginInfo!.ToPlgString());
             }
         }
 
@@ -527,7 +375,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 .Value;
             if (plugin is not null)
             {
-                Scenario._plugs.DelOrDecrease(plugin.ToPlgString());
+                Scenario.PluginUsedCount.DelOrDecrease(scenarioMethodNode.ScenarioMethod.PluginInfo!.ToPlgString());
             }
 
             var plugin2 = PluginManager.EnablePlugin
@@ -535,7 +383,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                 .Value;
             if (plugin2 is not null)
             {
-                Scenario._plugs.DelOrDecrease(plugin2.ToPlgString());
+                Scenario.PluginUsedCount.DelOrDecrease(scenarioMethodNode.ScenarioMethod.PluginInfo!.ToPlgString());
             }
         }
 
@@ -660,21 +508,6 @@ public partial class TaskEditorViewModel : ObservableRecipient
         ToFirstVerify();
     }
 
-    private void GetAllMethods()
-    {
-        BaseNodeMethodsGen.GenBaseNodeMethods(NodeMethods);
-
-        foreach (var customScenarioNodeMethod in PluginOverall.CustomScenarioNodeMethods)
-        {
-            var methods = new ObservableCollection<object>();
-            foreach (var keyValuePair in customScenarioNodeMethod.Value)
-            {
-                methods.Add(keyValuePair.Value.Item2);
-            }
-
-            NodeMethods.Add(methods);
-        }
-    }
 
     public void Load(CustomScenario customScenario)
     {
