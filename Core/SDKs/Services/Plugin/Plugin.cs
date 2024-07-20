@@ -105,6 +105,8 @@ public class Plugin
             return;
         }
 
+        ScenarioMethodCategoryGroup.RootScenarioMethodCategoryGroup.Childrens.Add(this.PluginInfo.ToPlgString(),
+            pluginMainScenarioMethodCategoryGroup);
         pluginMainScenarioMethodCategoryGroup.Name = PluginInfo.PluginName;
 
         foreach (var type in t)
@@ -146,7 +148,7 @@ public class Plugin
 
                     var scenarioMethodInfo = new ScenarioMethod(methodInfo, PluginInfo, scenarioMethodAttribute,
                         ScenarioMethodType.插件方法, ServiceProvider);
-                    scenarioMethodCategoryGroup.Methods.Add(scenarioMethodInfo.MethodAbsolutelyName,
+                    scenarioMethodCategoryGroup.Methods.Add(scenarioMethodInfo.MethodTitle,
                         scenarioMethodInfo.GenerateNode());
                 }
 

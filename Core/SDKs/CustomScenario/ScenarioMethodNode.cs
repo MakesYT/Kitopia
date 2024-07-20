@@ -235,7 +235,17 @@ public partial class ScenarioMethodNode : ObservableRecipient
             }
             case ScenarioMethodType.默认:
             {
+                if (Input == null || Input.Count == 0)
+                {
+                    break;
+                }
+
                 var connectorItem = Input.First(e => e.RealType != typeof(NodeConnectorClass));
+                if (connectorItem == null)
+                {
+                    break;
+                }
+
                 foreach (var item in Output)
                 {
                     item.InputObject = connectorItem.InputObject;
@@ -270,7 +280,7 @@ public partial class ScenarioMethodNode : ObservableRecipient
             ScenarioMethod = this.ScenarioMethod,
             Location = new Point(Location.X, Location.Y)
         };
-        if (!ScenarioMethod.IsFromPlugin)
+        if (ScenarioMethod.IsFromPlugin)
         {
             pluginUsedCount.AddOrIncrease(ScenarioMethod.PluginInfo!.ToPlgString());
         }

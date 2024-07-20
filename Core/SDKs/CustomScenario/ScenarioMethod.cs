@@ -11,6 +11,10 @@ namespace Core.SDKs.CustomScenario;
 
 public class ScenarioMethod
 {
+    public ScenarioMethod()
+    {
+    }
+
     public ScenarioMethod(MethodInfo method, PluginInfo pluginInfo, ScenarioMethodAttribute attribute,
         ScenarioMethodType type, IServiceProvider serviceProvider)
     {
@@ -34,42 +38,47 @@ public class ScenarioMethod
 
     //某些特殊的类型需要存储一定的数据，例如（变量读取/设置 需要对应的变量名）
     public object TypeDate { get; set; }
-    public MethodInfo Method { get; }
-    public PluginInfo? PluginInfo { get; }
-    public ScenarioMethodAttribute Attribute { get; }
+    public MethodInfo Method { get; set; }
+    public PluginInfo? PluginInfo { get; set; }
+    public ScenarioMethodAttribute Attribute { get; set; }
 
     public string MethodAbsolutelyName
     {
         get
         {
-            StringBuilder sb = new StringBuilder("|");
-
-            foreach (var genericArgument in Method.GetParameters())
+            if (Type == ScenarioMethodType.插件方法)
             {
-                var plugin = PluginManager.EnablePlugin
-                    .FirstOrDefault((e) => e.Value._dll == genericArgument.ParameterType.Assembly)
-                    .Value;
-                // type.Assembly.
-                // var a = PluginManager.GetPlugnNameByTypeName(type.FullName);
-                if (plugin is null)
+                StringBuilder sb = new StringBuilder("|");
+
+                foreach (var genericArgument in Method.GetParameters())
                 {
-                    sb.Append($"System {genericArgument.ParameterType.FullName}");
+                    var plugin = PluginManager.EnablePlugin
+                        .FirstOrDefault((e) => e.Value._dll == genericArgument.ParameterType.Assembly)
+                        .Value;
+                    // type.Assembly.
+                    // var a = PluginManager.GetPlugnNameByTypeName(type.FullName);
+                    if (plugin is null)
+                    {
+                        sb.Append($"System {genericArgument.ParameterType.FullName}");
+                        sb.Append("|");
+                        continue;
+                    }
+
+                    sb.Append($"{PluginInfo.ToPlgString()} {genericArgument.ParameterType.FullName}");
                     sb.Append("|");
-                    continue;
                 }
 
-                sb.Append($"{PluginInfo.ToPlgString()} {genericArgument.ParameterType.FullName}");
-                sb.Append("|");
+                sb.Remove(sb.Length - 1, 1);
+                return $"{PluginInfo.Author}_{PluginInfo.PluginId}#{Method.DeclaringType!.FullName}#{Method.Name}{sb}";
             }
 
-            sb.Remove(sb.Length - 1, 1);
-            return $"{PluginInfo.Author}_{PluginInfo.PluginId}#{Method.DeclaringType!.FullName}#{Method.Name}{sb}";
+            return Type.ToString();
         }
     }
 
 
     public string MethodTitle => IsFromPlugin
-        ? $"{PluginInfo!.Author}_{PluginInfo.PluginId}#{Method.DeclaringType!.FullName}#{Attribute.Name}"
+        ? Attribute.Name
         : Type.ToString();
 
     public ScenarioMethodNode GenerateNode()

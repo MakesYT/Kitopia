@@ -55,41 +55,36 @@ public partial class TaskEditor : AppWindow
     private void ListBox_OnMouseMove(object? sender, PointerEventArgs e)
     {
         var point = e.GetCurrentPoint(this);
-        if (sender is ListBox listBox)
-        {
-            if (point.Properties.IsLeftButtonPressed && listBox.SelectedItem != null)
-            {
-                try
-                {
-                    var data = new DataObject();
-                    data.Set("KitopiaPointItem", listBox.SelectedItem);
 
-                    DragDrop.DoDragDrop(e, data, DragDropEffects.Copy);
-                }
-                catch (Exception exception)
-                {
-                    Console.WriteLine(exception);
-                }
-            }
-        }
-        else if (sender is Border border)
+        if (sender is Border border)
         {
             if (point.Properties.IsLeftButtonPressed)
             {
                 var borderDataContext = border.DataContext;
                 try
                 {
-                    var keyValuePair = (KeyValuePair<string, object>)borderDataContext;
                     ScenarioMethodNode pointItem = null!;
-                    if ((string)border.Tag == "Set")
+                    switch ((string)border.Tag)
                     {
-                        pointItem = new ScenarioMethod(ScenarioMethodType.变量设置) { TypeDate = keyValuePair.Key }
-                            .GenerateNode();
-                    }
-                    else if ((string)border.Tag == "Get")
-                    {
-                        pointItem = new ScenarioMethod(ScenarioMethodType.变量获取) { TypeDate = keyValuePair.Key }
-                            .GenerateNode();
+                        case "Node":
+                        {
+                            pointItem = (ScenarioMethodNode)border.DataContext;
+                            break;
+                        }
+                        case "Set":
+                        {
+                            var keyValuePair = (KeyValuePair<string, object>)borderDataContext;
+                            pointItem = new ScenarioMethod(ScenarioMethodType.变量设置) { TypeDate = keyValuePair.Key }
+                                .GenerateNode();
+                            break;
+                        }
+                        case "Get":
+                        {
+                            var keyValuePair = (KeyValuePair<string, object>)borderDataContext;
+                            pointItem = new ScenarioMethod(ScenarioMethodType.变量获取) { TypeDate = keyValuePair.Key }
+                                .GenerateNode();
+                            break;
+                        }
                     }
 
                     var data = new DataObject();

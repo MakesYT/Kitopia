@@ -10,8 +10,11 @@ public class ScenarioMethodCategoryGroup
 
     private static ScenarioMethodCategoryGroup GenBaseScenarioMethodCategoryGroup()
     {
-        var scenarioMethodCategoryGroup = new ScenarioMethodCategoryGroup();
+        var rootScenarioMethodCategoryGroup = new ScenarioMethodCategoryGroup();
 
+        var scenarioMethodCategoryGroup = new ScenarioMethodCategoryGroup();
+        rootScenarioMethodCategoryGroup.Childrens.Add("Kitopia", scenarioMethodCategoryGroup);
+        scenarioMethodCategoryGroup.Name = "Kitopia";
         //基本数值类型
         var valueScenarioMethodCategoryGroup = new ScenarioMethodCategoryGroup();
         scenarioMethodCategoryGroup.Childrens.Add("基本数据类型", valueScenarioMethodCategoryGroup);
@@ -75,7 +78,7 @@ public class ScenarioMethodCategoryGroup
         controlScenarioMethodCategoryGroup.Methods.Add("打开运行本地项目", scenarioMethodNode5);
 
 
-        return scenarioMethodCategoryGroup;
+        return rootScenarioMethodCategoryGroup;
     }
 
     public static ScenarioMethodCategoryGroup GetScenarioMethodCategoryGroupByAttribute(
@@ -124,8 +127,24 @@ public class ScenarioMethodCategoryGroup
     public ScenarioMethodCategoryGroup? GetParent() => Parent;
     public ScenarioMethodCategoryGroup GetRoot() => Parent?.GetRoot() ?? this;
 
+
+    private void Clear()
+    {
+        for (var i = 0; i < Childrens.Count; i++)
+        {
+            Childrens.GetValueOrDefault(Childrens.Keys.ElementAt(i)).Clear();
+        }
+
+        Methods.Clear();
+    }
+
     public void RemoveMethodsByPluginName(string pluginName)
     {
+        if (Childrens.TryGetValue(pluginName, out var categoryGroup))
+        {
+            categoryGroup.Clear();
+        }
+
         Childrens.Remove(pluginName);
         for (var i = 0; i < MixinInfos.Count; i++)
         {

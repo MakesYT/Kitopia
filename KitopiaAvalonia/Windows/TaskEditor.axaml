@@ -12,7 +12,6 @@
 
                      xmlns:taskEditor1="clr-namespace:Core.ViewModel.TaskEditor;assembly=Core"
 
-                     xmlns:objectModel="clr-namespace:System.Collections.ObjectModel;assembly=System.ObjectModel"
                      xmlns:generic="clr-namespace:System.Collections.Generic;assembly=System.Runtime"
                      xmlns:controls2="clr-namespace:NodifyM.Avalonia.Controls;assembly=NodifyM.Avalonia"
                      xmlns:pages="clr-namespace:KitopiaAvalonia.Pages"
@@ -34,6 +33,7 @@
 
 
         <converter:ReverseBool x:Key="ReverseBool" />
+        <taskEditor:ScenarioMethodCategoryGroupCtr x:Key="ScenarioMethodCategoryGroupCtr" />
     </windowing:AppWindow.Resources>
     <windowing:AppWindow.Styles>
         <Style Selector="RepeatButton /template/ ContentPresenter">
@@ -705,374 +705,321 @@
                             </StackPanel>
                         </Expander.Content>
                     </Expander>
-                    <ListBox Padding="0" Margin="0" PointerMoved="ListBox_OnMouseMove"
-                             ItemsSource="{Binding NodeMethods, Mode=OneWay}">
-                        <ListBox.ItemContainerTheme>
-                            <ControlTheme TargetType="ListBoxItem">
-                                <Setter Property="Template">
-                                    <ControlTemplate>
-                                        <ContentPresenter Name="PART_ContentPresenter"
-                                                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                          Background="{TemplateBinding Background}"
-                                                          BorderBrush="{TemplateBinding BorderBrush}"
-                                                          BorderThickness="{TemplateBinding BorderThickness}"
-                                                          Content="{TemplateBinding Content}"
-                                                          ContentTemplate="{TemplateBinding ContentTemplate}"
-                                                          CornerRadius="{TemplateBinding CornerRadius}" />
-                                    </ControlTemplate>
+                    <ContentPresenter x:Name="ContentPresenter">
+                        <ContentPresenter.Resources>
+                            <taskEditor:InterfacesToString x:Key="InterfacesToString" />
+                            <DataTemplate x:Key="DataTemplate" DataType="{x:Type customScenario:ScenarioMethodNode}">
+                                <Border Tag="Node" BorderBrush="LightGray" BorderThickness="1" CornerRadius="3"
+                                        PointerMoved="ListBox_OnMouseMove">
+                                    <DockPanel Panel.ZIndex="1">
+                                        <Border DockPanel.Dock="Top" CornerRadius="3 3 0 0">
 
-                                </Setter>
-                            </ControlTheme>
-                        </ListBox.ItemContainerTheme>
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <DataTemplate.DataType>
-                                    <x:Type TypeName="objectModel:ObservableCollection"
-                                            x:TypeArguments="x:Object" />
-                                </DataTemplate.DataType>
-                                <Expander Header="{ReflectionBinding [0].Plugin}" Margin="0">
-                                    <ListBox Margin="0"
-                                             PointerMoved="ListBox_OnMouseMove"
-                                             ItemsSource="{Binding }">
-                                        <ListBox.ItemContainerTheme>
-                                            <ControlTheme TargetType="ListBoxItem">
-                                                <Setter Property="Template">
-                                                    <ControlTemplate>
-                                                        <ContentPresenter Name="PART_ContentPresenter"
-                                                                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                                          Background="{TemplateBinding Background}"
-                                                                          BorderBrush="{TemplateBinding BorderBrush}"
-                                                                          BorderThickness="{TemplateBinding BorderThickness}"
-                                                                          Content="{TemplateBinding Content}"
-                                                                          Margin="0,0,0,5"
-                                                                          ContentTemplate="{TemplateBinding ContentTemplate}"
-                                                                          CornerRadius="{TemplateBinding CornerRadius}" />
-                                                    </ControlTemplate>
+                                            <Border Height="20"
 
-                                                </Setter>
-                                            </ControlTheme>
-                                        </ListBox.ItemContainerTheme>
-                                        <ListBox.Resources>
+                                                    CornerRadius="3 3 0 0">
+                                                <Border.Background>
+                                                    <SolidColorBrush Opacity="0.5"
+                                                                     Color="{DynamicResource SystemAccentColor}" />
+                                                </Border.Background>
+                                                <TextBlock HorizontalAlignment="Center"
+                                                           Text="{Binding Title}"
+                                                           Foreground="White" />
+                                            </Border>
 
-                                            <!-- Declare some data templates for different types of data -->
-                                            <taskEditor:InterfacesToString x:Key="InterfacesToString" />
+                                        </Border>
+                                        <Border CornerRadius="0 0 3 3">
+                                            <Grid>
+                                                <Rectangle>
+                                                    <Rectangle.Fill>
+                                                        <SolidColorBrush
+                                                            Color="{DynamicResource Node.BackgroundColor}"
+                                                            Opacity="0.5" />
+                                                    </Rectangle.Fill>
+                                                </Rectangle>
+                                                <DockPanel>
+                                                    <ItemsControl DockPanel.Dock="Left"
+                                                                  ItemsSource="{Binding Input}">
+                                                        <!-- Set the ItemsPanel to a StackPanel with horizontal orientation -->
+                                                        <ItemsControl.ItemsPanel>
+                                                            <ItemsPanelTemplate>
+                                                                <StackPanel Orientation="Vertical"
+                                                                            VerticalAlignment="Center" />
+                                                            </ItemsPanelTemplate>
+                                                        </ItemsControl.ItemsPanel>
+                                                        <!-- Set the ItemTemplate to a Button with the content bound to the item -->
+                                                        <ItemsControl.ItemTemplate>
+                                                            <pages:MyDataTemplateSelector>
+                                                                <DataTemplate x:Key="InputTemplate"
+                                                                              DataType="{x:Type customScenario:ConnectorItem}">
 
-                                            <!-- Declare a data template selector and assign it to a resource key -->
+                                                                    <StackPanel
+                                                                        Orientation="Horizontal"
+                                                                        VerticalAlignment="Center">
+                                                                        <Border
+                                                                            Background="Transparent">
+                                                                            <!-- Set the border color to red -->
+                                                                            <Border.BorderBrush>
+                                                                                <SolidColorBrush
+                                                                                    Color="{DynamicResource SystemAccentColor}"
+                                                                                    Opacity="0.5" />
+                                                                            </Border.BorderBrush>
+                                                                            <!-- Set the border thickness to 2 -->
+                                                                            <Border.BorderThickness>2</Border.BorderThickness>
+                                                                            <!-- Set the border corner radius to 10 -->
+                                                                            <Border.CornerRadius>10</Border.CornerRadius>
+                                                                            <!-- Set the padding to 10 -->
+                                                                            <Border.Padding>5</Border.Padding>
+                                                                            <!-- Set the margin to 20 -->
+                                                                            <Border.Margin>5</Border.Margin>
+                                                                        </Border>
+                                                                        <!-- Declare a TextBlock element and give it a name -->
 
-                                        </ListBox.Resources>
-                                        <ListBox.ItemTemplate>
-                                            <DataTemplate DataType="{x:Type customScenario:ScenarioMethodNode}">
-                                                <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="3">
-                                                    <DockPanel Panel.ZIndex="1">
-                                                        <Border DockPanel.Dock="Top" CornerRadius="3 3 0 0">
+                                                                        <TextBlock
+                                                                            VerticalAlignment="Center"
+                                                                            x:Name="textBlock"
+                                                                            FontSize="12"
 
-                                                            <Border Height="20"
-
-                                                                    CornerRadius="3 3 0 0">
-                                                                <Border.Background>
-                                                                    <SolidColorBrush Opacity="0.5"
-                                                                        Color="{DynamicResource SystemAccentColor}" />
-                                                                </Border.Background>
-                                                                <TextBlock HorizontalAlignment="Center"
-                                                                           Text="{Binding Title}"
-                                                                           Foreground="White" />
-                                                            </Border>
-
-                                                        </Border>
-                                                        <Border CornerRadius="0 0 3 3">
-                                                            <Grid>
-                                                                <Rectangle>
-                                                                    <Rectangle.Fill>
-                                                                        <SolidColorBrush
-                                                                            Color="{DynamicResource Node.BackgroundColor}"
-                                                                            Opacity="0.5" />
-                                                                    </Rectangle.Fill>
-                                                                </Rectangle>
-                                                                <DockPanel>
-                                                                    <ItemsControl DockPanel.Dock="Left"
-                                                                        ItemsSource="{Binding Input}">
-                                                                        <!-- Set the ItemsPanel to a StackPanel with horizontal orientation -->
-                                                                        <ItemsControl.ItemsPanel>
-                                                                            <ItemsPanelTemplate>
-                                                                                <StackPanel Orientation="Vertical"
-                                                                                    VerticalAlignment="Center" />
-                                                                            </ItemsPanelTemplate>
-                                                                        </ItemsControl.ItemsPanel>
-                                                                        <!-- Set the ItemTemplate to a Button with the content bound to the item -->
-                                                                        <ItemsControl.ItemTemplate>
-                                                                            <pages:MyDataTemplateSelector>
-                                                                                <DataTemplate x:Key="InputTemplate"
-                                                                                    DataType="{x:Type customScenario:ConnectorItem}">
-
-                                                                                    <StackPanel
-                                                                                        Orientation="Horizontal"
-                                                                                        VerticalAlignment="Center">
-                                                                                        <Border
-                                                                                            Background="Transparent">
-                                                                                            <!-- Set the border color to red -->
-                                                                                            <Border.BorderBrush>
-                                                                                                <SolidColorBrush
-                                                                                                    Color="{DynamicResource SystemAccentColor}"
-                                                                                                    Opacity="0.5" />
-                                                                                            </Border.BorderBrush>
-                                                                                            <!-- Set the border thickness to 2 -->
-                                                                                            <Border.BorderThickness>2</Border.BorderThickness>
-                                                                                            <!-- Set the border corner radius to 10 -->
-                                                                                            <Border.CornerRadius>10</Border.CornerRadius>
-                                                                                            <!-- Set the padding to 10 -->
-                                                                                            <Border.Padding>5</Border.Padding>
-                                                                                            <!-- Set the margin to 20 -->
-                                                                                            <Border.Margin>5</Border.Margin>
-                                                                                        </Border>
-                                                                                        <!-- Declare a TextBlock element and give it a name -->
-
-                                                                                        <TextBlock
-                                                                                            VerticalAlignment="Center"
-                                                                                            x:Name="textBlock"
-                                                                                            FontSize="12"
-
-                                                                                            Text="{Binding TypeName}">
-                                                                                            <TextBlock.Background>
-                                                                                                <SolidColorBrush
-                                                                                                    Color="{DynamicResource TextFillColorPrimary}"
-                                                                                                    Opacity="0.6" />
-                                                                                            </TextBlock.Background>
-                                                                                            <TextBlock.Foreground>
-                                                                                                <SolidColorBrush
-                                                                                                    Color="{DynamicResource TextFillColorInverse}" />
-                                                                                            </TextBlock.Foreground>
-                                                                                        </TextBlock>
+                                                                            Text="{Binding TypeName}">
+                                                                            <TextBlock.Background>
+                                                                                <SolidColorBrush
+                                                                                    Color="{DynamicResource TextFillColorPrimary}"
+                                                                                    Opacity="0.6" />
+                                                                            </TextBlock.Background>
+                                                                            <TextBlock.Foreground>
+                                                                                <SolidColorBrush
+                                                                                    Color="{DynamicResource TextFillColorInverse}" />
+                                                                            </TextBlock.Foreground>
+                                                                        </TextBlock>
 
 
-                                                                                        <TextBlock
-                                                                                            VerticalAlignment="Center"
-                                                                                            Text="{Binding Title}">
-                                                                                            <TextBlock.Foreground>
-                                                                                                <SolidColorBrush
-                                                                                                    Color="{DynamicResource TextFillColorPrimary}" />
-                                                                                            </TextBlock.Foreground>
-                                                                                        </TextBlock>
-                                                                                    </StackPanel>
+                                                                        <TextBlock
+                                                                            VerticalAlignment="Center"
+                                                                            Text="{Binding Title}">
+                                                                            <TextBlock.Foreground>
+                                                                                <SolidColorBrush
+                                                                                    Color="{DynamicResource TextFillColorPrimary}" />
+                                                                            </TextBlock.Foreground>
+                                                                        </TextBlock>
+                                                                    </StackPanel>
 
 
-                                                                                </DataTemplate>
-                                                                                <DataTemplate x:Key="StringTemplate"
-                                                                                    DataType="{x:Type customScenario:ConnectorItem}">
-                                                                                    <StackPanel Margin="10,0,0,0"
-                                                                                        Orientation="Horizontal"
-                                                                                        VerticalAlignment="Center"
-                                                                                        HorizontalAlignment="Right">
-                                                                                        <TextBlock
-                                                                                            VerticalAlignment="Center"
-                                                                                            x:Name="textBlock"
-                                                                                            Text="{Binding Title}"
-                                                                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                                                                                        <TextBox Margin="10,5,10,5"
-                                                                                            MinWidth="40"
-                                                                                            Text="{Binding InputObject}"
-                                                                                            Watermark="字符串" />
-                                                                                    </StackPanel>
-
-                                                                                </DataTemplate>
-                                                                                <DataTemplate x:Key="EnumTemplate"
-                                                                                    DataType="{x:Type customScenario:ConnectorItem}">
-                                                                                    <StackPanel Margin="10,0,0,0"
-                                                                                        Orientation="Horizontal"
-                                                                                        VerticalAlignment="Center"
-                                                                                        HorizontalAlignment="Right">
-                                                                                        <TextBlock
-                                                                                            VerticalAlignment="Center"
-                                                                                            x:Name="textBlock"
-                                                                                            Text="{Binding Title}"
-                                                                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                                                                                        <ComboBox Margin="10,5,10,5"
-                                                                                            x:Name="ComboBox"
-                                                                                            MinWidth="40"
-                                                                                            SelectedValue="{Binding InputObject,Mode=TwoWay}" />
-                                                                                    </StackPanel>
-
-                                                                                </DataTemplate>
-                                                                                <DataTemplate x:Key="IntTemplate"
-                                                                                    DataType="{x:Type customScenario:ConnectorItem}">
-                                                                                    <StackPanel Margin="10,0,0,0"
-                                                                                        Orientation="Horizontal"
-                                                                                        VerticalAlignment="Center"
-                                                                                        HorizontalAlignment="Right">
-                                                                                        <TextBlock
-                                                                                            VerticalAlignment="Center"
-                                                                                            x:Name="textBlock"
-                                                                                            Text="{Binding Title}"
-                                                                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                                                                                        <controls:NumberBox
-                                                                                            Margin="10,5,10,5"
-                                                                                            MinWidth="40"
-                                                                                            ValidationMode="InvalidInputOverwritten"
-                                                                                            SpinButtonPlacementMode="Inline"
-                                                                                            Maximum="2147483647"
-                                                                                            Minimum="-2147483648"
-                                                                                            Value="{Binding InputObject, Mode=TwoWay}"
-                                                                                            PlaceholderText="整型" />
-                                                                                    </StackPanel>
-
-                                                                                </DataTemplate>
-                                                                                <DataTemplate x:Key="DoubleTemplate"
-                                                                                    DataType="{x:Type customScenario:ConnectorItem}">
-                                                                                    <StackPanel Margin="10,0,0,0"
-                                                                                        Orientation="Horizontal"
-                                                                                        VerticalAlignment="Center"
-                                                                                        HorizontalAlignment="Right">
-                                                                                        <TextBlock
-                                                                                            VerticalAlignment="Center"
-                                                                                            x:Name="textBlock"
-                                                                                            Text="{Binding Title}"
-                                                                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                                                                                        <controls:NumberBox
-                                                                                            Margin="10,5,10,5"
-                                                                                            MinWidth="40"
-                                                                                            SimpleNumberFormat="F2"
-                                                                                            SpinButtonPlacementMode="Inline"
-                                                                                            ValidationMode="InvalidInputOverwritten"
-                                                                                            Value="{Binding InputObject, Mode=TwoWay}"
-                                                                                            PlaceholderText="浮点" />
-                                                                                    </StackPanel>
-
-                                                                                </DataTemplate>
-                                                                                <DataTemplate x:Key="BoolTemplate"
-                                                                                    DataType="{x:Type customScenario:ConnectorItem}">
-                                                                                    <StackPanel Margin="10,0,0,0"
-                                                                                        Orientation="Horizontal"
-                                                                                        VerticalAlignment="Center"
-                                                                                        HorizontalAlignment="Right">
-                                                                                        <TextBlock
-                                                                                            VerticalAlignment="Center"
-                                                                                            x:Name="textBlock"
-                                                                                            Text="{Binding Title}"
-                                                                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                                                                                        <ToggleSwitch
-                                                                                            Margin="10,5,10,5"
-                                                                                            MinWidth="40"
-                                                                                            IsChecked="{Binding InputObject, Mode=TwoWay}" />
-                                                                                    </StackPanel>
-
-                                                                                </DataTemplate>
-                                                                                <DataTemplate
-                                                                                    x:Key="SearchItemTemplate"
-                                                                                    DataType="{x:Type customScenario:ConnectorItem}">
-                                                                                    <StackPanel Margin="10,0,0,0"
-                                                                                        Orientation="Horizontal"
-                                                                                        VerticalAlignment="Center"
-                                                                                        HorizontalAlignment="Right">
-                                                                                        <TextBlock
-                                                                                            VerticalAlignment="Center"
-                                                                                            x:Name="textBlock"
-                                                                                            Text="{Binding Title}"
-                                                                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                                                                                        <controls1:SearchItemShow
-                                                                                            Margin="10,5,10,5"
-                                                                                            ToolTip.Tip="{Binding RelativeSource={RelativeSource Self},Path=OnlyKey}"
-                                                                                            Click="SearchItemShow_OnClick"
-                                                                                            OnlyKey="{Binding InputObject, Mode=TwoWay}" />
-                                                                                    </StackPanel>
-
-                                                                                </DataTemplate>
-
-                                                                            </pages:MyDataTemplateSelector>
-                                                                        </ItemsControl.ItemTemplate>
-                                                                    </ItemsControl>
-
-
-                                                                    <ItemsControl DockPanel.Dock="Right"
+                                                                </DataTemplate>
+                                                                <DataTemplate x:Key="StringTemplate"
+                                                                              DataType="{x:Type customScenario:ConnectorItem}">
+                                                                    <StackPanel Margin="10,0,0,0"
+                                                                        Orientation="Horizontal"
                                                                         VerticalAlignment="Center"
-                                                                        ItemsSource="{Binding Output}">
-                                                                        <!-- Set the ItemsPanel to a StackPanel with horizontal orientation -->
-                                                                        <ItemsControl.ItemsPanel>
-                                                                            <ItemsPanelTemplate>
-                                                                                <StackPanel Orientation="Vertical"
-                                                                                    HorizontalAlignment="Right" />
-                                                                            </ItemsPanelTemplate>
-                                                                        </ItemsControl.ItemsPanel>
-                                                                        <!-- Set the ItemTemplate to a Button with the content bound to the item -->
-                                                                        <ItemsControl.ItemTemplate>
-                                                                            <DataTemplate>
-                                                                                <StackPanel Orientation="Horizontal"
-                                                                                    VerticalAlignment="Center"
-                                                                                    HorizontalAlignment="Right">
+                                                                        HorizontalAlignment="Right">
+                                                                        <TextBlock
+                                                                            VerticalAlignment="Center"
+                                                                            x:Name="textBlock"
+                                                                            Text="{Binding Title}"
+                                                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                                        <TextBox Margin="10,5,10,5"
+                                                                            MinWidth="40"
+                                                                            Text="{Binding InputObject}"
+                                                                            Watermark="字符串" />
+                                                                    </StackPanel>
 
-                                                                                    <TextBlock
-                                                                                        VerticalAlignment="Center"
-                                                                                        x:Name="textBlock"
-                                                                                        Text="{Binding Title}">
-                                                                                        <TextBlock.Foreground>
-                                                                                            <SolidColorBrush
-                                                                                                Color="{DynamicResource TextFillColorPrimary}" />
-                                                                                        </TextBlock.Foreground>
-                                                                                    </TextBlock>
-                                                                                    <TextBlock
-                                                                                        VerticalAlignment="Center"
-                                                                                        FontSize="12"
+                                                                </DataTemplate>
+                                                                <DataTemplate x:Key="EnumTemplate"
+                                                                              DataType="{x:Type customScenario:ConnectorItem}">
+                                                                    <StackPanel Margin="10,0,0,0"
+                                                                        Orientation="Horizontal"
+                                                                        VerticalAlignment="Center"
+                                                                        HorizontalAlignment="Right">
+                                                                        <TextBlock
+                                                                            VerticalAlignment="Center"
+                                                                            x:Name="textBlock"
+                                                                            Text="{Binding Title}"
+                                                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                                        <ComboBox Margin="10,5,10,5"
+                                                                            x:Name="ComboBox"
+                                                                            MinWidth="40"
+                                                                            SelectedValue="{Binding InputObject,Mode=TwoWay}" />
+                                                                    </StackPanel>
 
-                                                                                        Text="{Binding TypeName}">
-                                                                                        <TextBlock.Background>
-                                                                                            <SolidColorBrush
-                                                                                                Color="{DynamicResource TextFillColorPrimary}"
-                                                                                                Opacity="0.6" />
+                                                                </DataTemplate>
+                                                                <DataTemplate x:Key="IntTemplate"
+                                                                              DataType="{x:Type customScenario:ConnectorItem}">
+                                                                    <StackPanel Margin="10,0,0,0"
+                                                                        Orientation="Horizontal"
+                                                                        VerticalAlignment="Center"
+                                                                        HorizontalAlignment="Right">
+                                                                        <TextBlock
+                                                                            VerticalAlignment="Center"
+                                                                            x:Name="textBlock"
+                                                                            Text="{Binding Title}"
+                                                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                                        <controls:NumberBox
+                                                                            Margin="10,5,10,5"
+                                                                            MinWidth="40"
+                                                                            ValidationMode="InvalidInputOverwritten"
+                                                                            SpinButtonPlacementMode="Inline"
+                                                                            Maximum="2147483647"
+                                                                            Minimum="-2147483648"
+                                                                            Value="{Binding InputObject, Mode=TwoWay}"
+                                                                            PlaceholderText="整型" />
+                                                                    </StackPanel>
 
-                                                                                        </TextBlock.Background>
-                                                                                        <TextBlock.Foreground>
-                                                                                            <SolidColorBrush
-                                                                                                Color="{DynamicResource TextFillColorInverse}" />
-                                                                                        </TextBlock.Foreground>
-                                                                                    </TextBlock>
-                                                                                    <controls:FontIcon
-                                                                                        FontFamily="{StaticResource FluentFont}"
-                                                                                        Glyph="&#xf10c;"
-                                                                                        ToolTip.Tip="{Binding Interfaces, Converter={StaticResource InterfacesToString}}"
-                                                                                        ToolTip.ShowDelay="0"
-                                                                                        IsVisible="{Binding Interfaces, Converter={StaticResource IfNullVisibilityHidden}}" />
-                                                                                    <Border Background="Transparent">
-                                                                                        <!-- Set the border color to red -->
-                                                                                        <Border.BorderBrush>
-                                                                                            <SolidColorBrush
-                                                                                                Color="{DynamicResource SystemAccentColor}"
-                                                                                                Opacity="0.5" />
-                                                                                        </Border.BorderBrush>
-                                                                                        <!-- Set the border thickness to 2 -->
-                                                                                        <Border.BorderThickness>2</Border.BorderThickness>
-                                                                                        <!-- Set the border corner radius to 10 -->
-                                                                                        <Border.CornerRadius>10</Border.CornerRadius>
-                                                                                        <!-- Set the padding to 10 -->
-                                                                                        <Border.Padding>5</Border.Padding>
-                                                                                        <!-- Set the margin to 20 -->
-                                                                                        <Border.Margin>5</Border.Margin>
-                                                                                    </Border>
-                                                                                    <!-- Declare a TextBlock element and give it a name -->
+                                                                </DataTemplate>
+                                                                <DataTemplate x:Key="DoubleTemplate"
+                                                                              DataType="{x:Type customScenario:ConnectorItem}">
+                                                                    <StackPanel Margin="10,0,0,0"
+                                                                        Orientation="Horizontal"
+                                                                        VerticalAlignment="Center"
+                                                                        HorizontalAlignment="Right">
+                                                                        <TextBlock
+                                                                            VerticalAlignment="Center"
+                                                                            x:Name="textBlock"
+                                                                            Text="{Binding Title}"
+                                                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                                        <controls:NumberBox
+                                                                            Margin="10,5,10,5"
+                                                                            MinWidth="40"
+                                                                            SimpleNumberFormat="F2"
+                                                                            SpinButtonPlacementMode="Inline"
+                                                                            ValidationMode="InvalidInputOverwritten"
+                                                                            Value="{Binding InputObject, Mode=TwoWay}"
+                                                                            PlaceholderText="浮点" />
+                                                                    </StackPanel>
 
-                                                                                </StackPanel>
-                                                                            </DataTemplate>
-                                                                        </ItemsControl.ItemTemplate>
-                                                                    </ItemsControl>
-                                                                </DockPanel>
-                                                            </Grid>
-                                                        </Border>
+                                                                </DataTemplate>
+                                                                <DataTemplate x:Key="BoolTemplate"
+                                                                              DataType="{x:Type customScenario:ConnectorItem}">
+                                                                    <StackPanel Margin="10,0,0,0"
+                                                                        Orientation="Horizontal"
+                                                                        VerticalAlignment="Center"
+                                                                        HorizontalAlignment="Right">
+                                                                        <TextBlock
+                                                                            VerticalAlignment="Center"
+                                                                            x:Name="textBlock"
+                                                                            Text="{Binding Title}"
+                                                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                                        <ToggleSwitch
+                                                                            Margin="10,5,10,5"
+                                                                            MinWidth="40"
+                                                                            IsChecked="{Binding InputObject, Mode=TwoWay}" />
+                                                                    </StackPanel>
+
+                                                                </DataTemplate>
+                                                                <DataTemplate
+                                                                    x:Key="SearchItemTemplate"
+                                                                    DataType="{x:Type customScenario:ConnectorItem}">
+                                                                    <StackPanel Margin="10,0,0,0"
+                                                                        Orientation="Horizontal"
+                                                                        VerticalAlignment="Center"
+                                                                        HorizontalAlignment="Right">
+                                                                        <TextBlock
+                                                                            VerticalAlignment="Center"
+                                                                            x:Name="textBlock"
+                                                                            Text="{Binding Title}"
+                                                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                                        <controls1:SearchItemShow
+                                                                            Margin="10,5,10,5"
+                                                                            ToolTip.Tip="{Binding RelativeSource={RelativeSource Self},Path=OnlyKey}"
+                                                                            Click="SearchItemShow_OnClick"
+                                                                            OnlyKey="{Binding InputObject, Mode=TwoWay}" />
+                                                                    </StackPanel>
+
+                                                                </DataTemplate>
+
+                                                            </pages:MyDataTemplateSelector>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
 
 
-                                                    </DockPanel>
-                                                </Border>
+                                                    <ItemsControl DockPanel.Dock="Right"
+                                                                  VerticalAlignment="Center"
+                                                                  ItemsSource="{Binding Output}">
+                                                        <!-- Set the ItemsPanel to a StackPanel with horizontal orientation -->
+                                                        <ItemsControl.ItemsPanel>
+                                                            <ItemsPanelTemplate>
+                                                                <StackPanel Orientation="Vertical"
+                                                                            HorizontalAlignment="Right" />
+                                                            </ItemsPanelTemplate>
+                                                        </ItemsControl.ItemsPanel>
+                                                        <!-- Set the ItemTemplate to a Button with the content bound to the item -->
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <StackPanel Orientation="Horizontal"
+                                                                            VerticalAlignment="Center"
+                                                                            HorizontalAlignment="Right">
+
+                                                                    <TextBlock
+                                                                        VerticalAlignment="Center"
+                                                                        x:Name="textBlock"
+                                                                        Text="{Binding Title}">
+                                                                        <TextBlock.Foreground>
+                                                                            <SolidColorBrush
+                                                                                Color="{DynamicResource TextFillColorPrimary}" />
+                                                                        </TextBlock.Foreground>
+                                                                    </TextBlock>
+                                                                    <TextBlock
+                                                                        VerticalAlignment="Center"
+                                                                        FontSize="12"
+
+                                                                        Text="{Binding TypeName}">
+                                                                        <TextBlock.Background>
+                                                                            <SolidColorBrush
+                                                                                Color="{DynamicResource TextFillColorPrimary}"
+                                                                                Opacity="0.6" />
+
+                                                                        </TextBlock.Background>
+                                                                        <TextBlock.Foreground>
+                                                                            <SolidColorBrush
+                                                                                Color="{DynamicResource TextFillColorInverse}" />
+                                                                        </TextBlock.Foreground>
+                                                                    </TextBlock>
+                                                                    <controls:FontIcon
+                                                                        FontFamily="{StaticResource FluentFont}"
+                                                                        Glyph="&#xf10c;"
+                                                                        ToolTip.Tip="{Binding Interfaces, Converter={StaticResource InterfacesToString}}"
+                                                                        ToolTip.ShowDelay="0"
+                                                                        IsVisible="{Binding Interfaces, Converter={StaticResource IfNullVisibilityHidden}}" />
+                                                                    <Border Background="Transparent">
+                                                                        <!-- Set the border color to red -->
+                                                                        <Border.BorderBrush>
+                                                                            <SolidColorBrush
+                                                                                Color="{DynamicResource SystemAccentColor}"
+                                                                                Opacity="0.5" />
+                                                                        </Border.BorderBrush>
+                                                                        <!-- Set the border thickness to 2 -->
+                                                                        <Border.BorderThickness>2</Border.BorderThickness>
+                                                                        <!-- Set the border corner radius to 10 -->
+                                                                        <Border.CornerRadius>10</Border.CornerRadius>
+                                                                        <!-- Set the padding to 10 -->
+                                                                        <Border.Padding>5</Border.Padding>
+                                                                        <!-- Set the margin to 20 -->
+                                                                        <Border.Margin>5</Border.Margin>
+                                                                    </Border>
+                                                                    <!-- Declare a TextBlock element and give it a name -->
+
+                                                                </StackPanel>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </DockPanel>
+                                            </Grid>
+                                        </Border>
 
 
-                                            </DataTemplate>
-                                        </ListBox.ItemTemplate>
-                                    </ListBox>
-                                </Expander>
+                                    </DockPanel>
+                                </Border>
+
 
                             </DataTemplate>
+                        </ContentPresenter.Resources>
+                        <ContentPresenter.Content>
+                            <Binding
+                                Source="{x:Static customScenario:ScenarioMethodCategoryGroup.RootScenarioMethodCategoryGroup}"
+                                Converter="{StaticResource ScenarioMethodCategoryGroupCtr}"
+                                ConverterParameter="{Binding #ContentPresenter}">
+                            </Binding>
+                        </ContentPresenter.Content>
+                    </ContentPresenter>
 
-                        </ListBox.ItemTemplate>
 
-
-                    </ListBox>
                 </ListBox>
             </ScrollViewer>
 

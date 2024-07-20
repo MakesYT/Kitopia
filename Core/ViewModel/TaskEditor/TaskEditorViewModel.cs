@@ -31,7 +31,6 @@ public partial class TaskEditorViewModel : ObservableRecipient
     [NotifyCanExecuteChangedFor(nameof(SaveAndQuitCustomScenarioCommand))]
     public bool _isModified = false;
 
-    [ObservableProperty] private ObservableCollection<ObservableCollection<object>> _nodeMethods = new();
 
     [ObservableProperty] private CustomScenario _scenario = new CustomScenario { IsActive = true };
 
@@ -103,8 +102,7 @@ public partial class TaskEditorViewModel : ObservableRecipient
                     return;
                 }
 
-                if (!Scenario.nodes.Contains(e.ScenarioMethodNode) &&
-                    !NodeMethods.Any(a => a.Contains(e.ScenarioMethodNode)))
+                if (!Scenario.nodes.Contains(e.ScenarioMethodNode))
                 {
                     return;
                 }
@@ -350,7 +348,11 @@ public partial class TaskEditorViewModel : ObservableRecipient
             }
         }
 
-        Scenario.PluginUsedCount.DelOrDecrease(scenarioMethodNode.ScenarioMethod.PluginInfo!.ToPlgString());
+        if (scenarioMethodNode.ScenarioMethod.IsFromPlugin)
+        {
+            Scenario.PluginUsedCount.DelOrDecrease(scenarioMethodNode.ScenarioMethod.PluginInfo!.ToPlgString());
+        }
+
         foreach (var connectorItem in scenarioMethodNode.Input)
         {
             var plugin = PluginManager.EnablePlugin.FirstOrDefault((e) => e.Value._dll == connectorItem.Type.Assembly)
