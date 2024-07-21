@@ -32,6 +32,19 @@ public partial class TaskEditorViewModel : ObservableRecipient
     public bool _isModified = false;
 
 
+    public ScenarioMethodCategoryGroup ScenarioMethodCategoryGroup
+    {
+        get
+        {
+            var rootScenarioMethodCategoryGroup = ScenarioMethodCategoryGroup.RootScenarioMethodCategoryGroup;
+            rootScenarioMethodCategoryGroup.PropertyChanged += (sender, args) =>
+            {
+                OnPropertyChanged(nameof(ScenarioMethodCategoryGroup));
+            };
+            return rootScenarioMethodCategoryGroup;
+        }
+    }
+
     [ObservableProperty] private CustomScenario _scenario = new CustomScenario { IsActive = true };
 
     private Window _window;

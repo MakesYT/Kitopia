@@ -1,8 +1,10 @@
 ﻿#region
 
 using System.Reflection;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Unicode;
 using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.HotKey;
 using Core.ViewModel;
@@ -27,7 +29,8 @@ public static class ConfigManger
         IncludeFields = true,
         WriteIndented = true,
         ReferenceHandler = ReferenceHandler.Preserve,
-        Converters = { new ObjectJsonConverter() }
+        Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+
         // DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 
@@ -62,31 +65,33 @@ public static class ConfigManger
         }
 
         Config.GetType()
-              .GetFields(BindingFlags.Instance | BindingFlags.Public)
-              .ToList()
-              .ForEach(x => {
-                   if (x.GetCustomAttribute<ConfigField>() is { } configField)
-                   {
-                       if (configField.FieldType == ConfigFieldType.快捷键)
-                       {
-                           HotKeyManager.HotKeys.Add(x.GetValue(Config) as HotKeyModel);
-                       }
-                   }
-               });
-        Config.ConfigChanged += (sender, args) => {
+            .GetFields(BindingFlags.Instance | BindingFlags.Public)
+            .ToList()
+            .ForEach(x =>
+            {
+                if (x.GetCustomAttribute<ConfigField>() is { } configField)
+                {
+                    if (configField.FieldType == ConfigFieldType.快捷键)
+                    {
+                        HotKeyManager.HotKeys.Add(x.GetValue(Config) as HotKeyModel);
+                    }
+                }
+            });
+        Config.ConfigChanged += (sender, args) =>
+        {
             switch (args.Name)
             {
                 case "autoStart":
                 {
                     ServiceManager.Services.GetService<IAutoStartService>()
-                                  .ChangeAutoStart(args.Value as bool? ?? false);
+                        .ChangeAutoStart(args.Value as bool? ?? false);
 
                     break;
                 }
                 case "autoStartEverything":
                 {
                     ((SearchWindowViewModel)ServiceManager.Services.GetService(typeof(SearchWindowViewModel)))
-                       .EverythingIsOk =
+                        .EverythingIsOk =
                         !(bool)args.Value;
                     break;
                 }
@@ -97,23 +102,23 @@ public static class ConfigManger
                         case ThemeEnum.跟随系统:
                         {
                             ServiceManager.Services.GetService<IThemeChange>()
-                                          .followSys(true);
+                                .followSys(true);
                             break;
                         }
                         case ThemeEnum.深色:
                         {
                             ServiceManager.Services.GetService<IThemeChange>()
-                                          .followSys(false);
+                                .followSys(false);
                             ServiceManager.Services.GetService<IThemeChange>()
-                                          .changeTo("theme_dark");
+                                .changeTo("theme_dark");
                             break;
                         }
                         case ThemeEnum.浅色:
                         {
                             ServiceManager.Services.GetService<IThemeChange>()
-                                          .followSys(false);
+                                .followSys(false);
                             ServiceManager.Services.GetService<IThemeChange>()
-                                          .changeTo("theme_light");
+                                .changeTo("theme_light");
                             break;
                         }
                     }
@@ -129,8 +134,8 @@ public static class ConfigManger
         foreach (var (s, value) in ConfigManger.Configs.Where(x => x.Key.StartsWith(key)))
         {
             value.GetType()
-                 .BaseType.GetField("Instance")
-                 .SetValue(value, null);
+                .BaseType.GetField("Instance")
+                .SetValue(value, null);
             ConfigManger.Configs.Remove(s);
         }
     }

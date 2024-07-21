@@ -40,6 +40,7 @@ public class KitopiaEx : IPlugin
         services.AddSingleton<ImageTools>();
         services.AddSingleton<Test1>();
         services.AddSingleton<NodeInputConnector1>();
+        services.AddSingleton<KeyboardSimulation>();
         return services.BuildServiceProvider();
     }
 }

@@ -17,7 +17,12 @@ public partial class ConnectorItem : ObservableRecipient, IConnectorItem
     [ObservableProperty]
     private Point _anchor;
 
-    [ObservableProperty] private object? _inputObject; //数据
+#pragma warning disable CS0657 // Not a valid attribute location for this declaration
+    [property: JsonConverter(typeof(ObjectJsonConverter))]
+    [JsonIgnore]
+#pragma warning restore CS0657 // Not a valid attribute location for this declaration
+    [ObservableProperty]
+    private object? _inputObject; //数据
 
     [ObservableProperty] private bool _isConnected;
     [ObservableProperty] private bool _isNotUsed = false;

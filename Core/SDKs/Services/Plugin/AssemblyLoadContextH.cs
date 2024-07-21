@@ -2,8 +2,10 @@
 
 using System.Reflection;
 using System.Runtime.Loader;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Unicode;
 using Avalonia;
 using Core.SDKs.Services.Config;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,13 +24,14 @@ public class AssemblyLoadContextH : AssemblyLoadContext
         _resolver = new AssemblyDependencyResolver(pluginPath);
         _assembly = this.LoadFromAssemblyPath(pluginPath);
 
-        Unloading += (sender) => {
+        Unloading += (sender) =>
+        {
             AppDomain.CurrentDomain.GetAssemblies()
-                     .FirstOrDefault(x => x.GetName()
-                                           .Name == "System.Text.Json")
-                    ?.GetType("System.Text.Json.Serialization.Metadata.ReflectionEmitCachingMemberAccessor")
-                    ?.GetMethod("Clear")
-                    ?.Invoke(null, null);
+                .FirstOrDefault(x => x.GetName()
+                    .Name == "System.Text.Json")
+                ?.GetType("System.Text.Json.Serialization.Metadata.ReflectionEmitCachingMemberAccessor")
+                ?.GetMethod("Clear")
+                ?.Invoke(null, null);
             // var fieldInfo = ConfigManger.DefaultOptions.GetType().GetField("_cachingContext", BindingFlags.NonPublic | BindingFlags.Instance);
             // fieldInfo.FieldType.GetMethod("Clear")?.Invoke(fieldInfo.GetValue(ConfigManger.DefaultOptions), null);
             ConfigManger.DefaultOptions = new JsonSerializerOptions
@@ -36,12 +39,12 @@ public class AssemblyLoadContextH : AssemblyLoadContext
                 IncludeFields = true,
                 WriteIndented = true,
                 ReferenceHandler = ReferenceHandler.Preserve,
-                Converters = { new ObjectJsonConverter() }
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
                 //DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
             _assembly = null;
             AvaloniaPropertyRegistry.Instance.UnregisterByModule(sender.Assemblies.First()
-                                                                       .DefinedTypes);
+                .DefinedTypes);
             ServiceManager.Services.GetService<IPluginToolService>()!.RequestUninstallPlugin(pluginPath);
         };
     }

@@ -49,7 +49,11 @@ public class TypeJsonConverter : JsonConverter<Type>
     public override void Write(Utf8JsonWriter writer, Type value, JsonSerializerOptions options)
     {
         var type = (Type)value;
-        var plugin = PluginManager.EnablePlugin.FirstOrDefault((e) => e.Value._dll == type.Assembly).Value;
+        if (type.FullName.Contains("Native.KeyCode"))
+        {
+        }
+
+        var plugin = PluginManager.EnablePlugin.FirstOrDefault((e) => e.Value.IsPluginAssembly(type.Assembly)).Value;
         // type.Assembly.
         // var a = PluginManager.GetPlugnNameByTypeName(type.FullName);
         if (plugin is null)

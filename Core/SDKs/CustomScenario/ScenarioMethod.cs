@@ -1,6 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Text;
+using System.Text.Json.Serialization;
+using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
 using Core.SDKs.Tools;
 using PluginCore;
@@ -31,16 +33,20 @@ public class ScenarioMethod
     }
 
 
-    public IServiceProvider ServiceProvider { get; set; }
+    [JsonIgnore] public IServiceProvider ServiceProvider { get; set; }
     public bool IsFromPlugin => PluginInfo is not null;
 
-    public ScenarioMethodType Type { get; }
+    public ScenarioMethodType Type { get; set; }
 
     //某些特殊的类型需要存储一定的数据，例如（变量读取/设置 需要对应的变量名）
     public object TypeDate { get; set; }
-    public MethodInfo Method { get; set; }
+    [JsonIgnore] public MethodInfo Method { get; set; }
     public PluginInfo? PluginInfo { get; set; }
+
+    [JsonConverter(typeof(ScenarioMethodAttributeJsonCtr))]
     public ScenarioMethodAttribute Attribute { get; set; }
+
+    public string _methodAbsolutelyName;
 
     public string MethodAbsolutelyName
     {
@@ -69,11 +75,15 @@ public class ScenarioMethod
                 }
 
                 sb.Remove(sb.Length - 1, 1);
-                return $"{PluginInfo.Author}_{PluginInfo.PluginId}#{Method.DeclaringType!.FullName}#{Method.Name}{sb}";
+                var methodAbsolutelyName =
+                    $"{PluginInfo.Author}_{PluginInfo.PluginId}#{Method.DeclaringType!.FullName}#{Method.Name}{sb}";
+                _methodAbsolutelyName = methodAbsolutelyName;
+                return methodAbsolutelyName;
             }
 
             return Type.ToString();
         }
+        set { _methodAbsolutelyName = value; }
     }
 
 

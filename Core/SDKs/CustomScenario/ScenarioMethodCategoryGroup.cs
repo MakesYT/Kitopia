@@ -1,10 +1,12 @@
 ﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Core.SDKs.Tools;
 using PluginCore.Attribute.Scenario;
 
 namespace Core.SDKs.CustomScenario;
 
-public class ScenarioMethodCategoryGroup
+public class ScenarioMethodCategoryGroup : INotifyPropertyChanged
 {
     public static ScenarioMethodCategoryGroup RootScenarioMethodCategoryGroup = GenBaseScenarioMethodCategoryGroup();
 
@@ -161,6 +163,23 @@ public class ScenarioMethodCategoryGroup
 
             nowScenarioMethodCategoryGroup.Methods.Remove(target.Last());
         }
+
+        OnPropertyChanged(nameof(ScenarioMethodCategoryGroup));
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    public virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+        field = value;
+        OnPropertyChanged(propertyName);
+        return true;
     }
 }
 

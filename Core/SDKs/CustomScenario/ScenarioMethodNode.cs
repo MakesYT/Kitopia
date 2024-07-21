@@ -34,6 +34,7 @@ public partial class ScenarioMethodNode : ObservableRecipient
     [ObservableProperty] private ObservableCollection<ConnectorItem> output = new();
     [ObservableProperty] private s节点状态 status = s节点状态.未验证;
 
+    [JsonConverter(typeof(ScenarioMethodJsonCtr))]
     public ScenarioMethod ScenarioMethod { get; set; }
 
     public bool Invoke(CancellationToken cancellationToken, ObservableCollection<ConnectionItem> connections,

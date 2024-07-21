@@ -181,15 +181,46 @@ public class Plugin
 
     public Type GetType(string typeName)
     {
-        foreach (var type in _dll.GetTypes())
+        foreach (var pluginAssembly in _plugin.Assemblies)
         {
-            if (type.FullName == typeName)
-            {
-                return type;
-            }
+            return pluginAssembly.GetType(typeName);
         }
 
         return null;
+    }
+
+    public bool IsPluginAssembly(Assembly assembly)
+    {
+        return _plugin.Assemblies.Any(x => x == assembly);
+    }
+
+    public MethodInfo GetMethod(string methodAbsolutelyName)
+    {
+        var strings = methodAbsolutelyName.Split("#");
+        var split = strings[2].Split("|");
+        return _dll.GetType(strings[1]).GetMethods().First(x =>
+        {
+            if (x.Name != split[0])
+            {
+                return false;
+            }
+
+            if (x.GetParameters().Length != split.Length - 1)
+            {
+                return false;
+            }
+
+            for (var index = 0; index < x.GetParameters().Length; index++)
+            {
+                var parameterInfo = x.GetParameters()[index];
+                if (parameterInfo.ParameterType.FullName != split[index + 1].Split(" ").Last())
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        });
     }
 
 
