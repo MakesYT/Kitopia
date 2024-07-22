@@ -10,6 +10,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.Services;
 using Core.ViewModel;
 using KitopiaAvalonia.Tools;
+using log4net;
 using Microsoft.Extensions.DependencyInjection;
 using PluginCore;
 
@@ -17,6 +18,8 @@ namespace KitopiaAvalonia.Windows;
 
 public partial class SearchWindow : Window
 {
+    private static readonly ILog log = LogManager.GetLogger(nameof(SearchWindow));
+
     public SearchWindow()
     {
         InitializeComponent();
@@ -93,7 +96,7 @@ public partial class SearchWindow : Window
         {
             var realizedContainers = dataGrid.GetRealizedContainers();
             if (realizedContainers.First()
-                                  .DataContext == dataGrid.SelectedItem)
+                    .DataContext == dataGrid.SelectedItem)
             {
                 tx.Focus();
             }
@@ -118,7 +121,7 @@ public partial class SearchWindow : Window
     private void DataGrid_OnPointerMoved(object? sender, PointerEventArgs e)
     {
         var listBoxItem = dataGrid.GetVisualAt<ListBoxItem>(e.GetCurrentPoint(dataGrid)
-                                                             .Position);
+            .Position);
         if (listBoxItem != null)
         {
             listBoxItem.IsSelected = true;

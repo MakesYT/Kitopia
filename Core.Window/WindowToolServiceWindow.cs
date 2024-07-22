@@ -1,16 +1,17 @@
-﻿using System.Runtime.InteropServices;
-using Avalonia;
+﻿using Avalonia;
 using Core.SDKs.Services;
+using log4net;
 using Vanara.PInvoke;
 
 namespace Core.Window;
 
 public class WindowToolServiceWindow : IWindowTool
 {
+    private static readonly ILog log = LogManager.GetLogger(nameof(WindowToolServiceWindow));
 
     public void SetForegroundWindow(IntPtr hWnd)
     {
-        User32.SetForegroundWindow(hWnd);
+        User32.SetActiveWindow(hWnd);
     }
 
     public void MoveWindowToMouseScreenCenter(Avalonia.Controls.Window window)
@@ -20,7 +21,10 @@ public class WindowToolServiceWindow : IWindowTool
         var monitorInfo = new User32.MONITORINFO();
         monitorInfo.cbSize = 40;
         User32.GetMonitorInfo(hmonitor, ref monitorInfo);
-        
-       window.Position = new PixelPoint((monitorInfo.rcMonitor.Left+(int)((monitorInfo.rcMonitor.Width-window.Bounds.Width  ) / 2)), monitorInfo.rcMonitor.Top+monitorInfo.rcMonitor.Height / 4);
+
+        window.Position =
+            new PixelPoint(
+                (monitorInfo.rcMonitor.Left + (int)((monitorInfo.rcMonitor.Width - window.Bounds.Width) / 2)),
+                monitorInfo.rcMonitor.Top + monitorInfo.rcMonitor.Height / 4);
     }
 }
