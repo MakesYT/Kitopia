@@ -16,14 +16,14 @@ public class KeyboardSimulation
     }
 
     [ScenarioMethod("释放键盘按键", "key=按键")]
-    public void ReleaseKey(KeyCode key, CancellationToken ct)
+    public void ReleaseKey([SelfInput] KeyCode key, CancellationToken ct)
     {
         var eventSimulator = new EventSimulator();
         eventSimulator.SimulateKeyRelease(key);
     }
 
     [ScenarioMethod("按下键盘按键并延迟释放", "key=按键")]
-    public void PressAndReleaseKey(KeyCode key, CancellationToken ct)
+    public void PressAndReleaseKey([SelfInput] KeyCode key, CancellationToken ct)
     {
         PressKey(key, ct);
         Task.Delay(200).GetAwaiter().GetResult();
