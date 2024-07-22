@@ -9,9 +9,6 @@ public class ScenarioMethodJsonCtr : JsonConverter<ScenarioMethod>
 {
     public override ScenarioMethod? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        Console.WriteLine("OnDeserializing");
-
-
         ScenarioMethod scenario = JsonSerializer.Deserialize<ScenarioMethod>(ref reader, options);
         if (scenario.IsFromPlugin)
         {
@@ -25,12 +22,6 @@ public class ScenarioMethodJsonCtr : JsonConverter<ScenarioMethod>
 
     public override void Write(Utf8JsonWriter writer, ScenarioMethod value, JsonSerializerOptions options)
     {
-        Console.WriteLine("OnSerializing");
-
-        // Don't pass in options when recursively calling Serialize.
         JsonSerializer.Serialize(writer, value, options);
-
-        // Place "after" code here (OnSerialized)
-        Console.WriteLine("OnSerialized");
     }
 }

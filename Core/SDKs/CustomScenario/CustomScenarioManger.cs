@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.HotKey;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
+using Core.SDKs.Services.Plugin;
 using Core.ViewModel;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
@@ -111,6 +112,48 @@ public static class CustomScenarioManger
 
             deserializeObject.HasInit = true;
             deserializeObject.IsRunning = false;
+
+            void ConnectorInit(ConnectorItem connectorItem)
+            {
+                if (connectorItem.RealType == typeof(NodeConnectorClass))
+                {
+                    return;
+                }
+
+                if (connectorItem.InputObject is null)
+                {
+                    return;
+                }
+
+                foreach (var keyValuePair in PluginManager.EnablePlugin)
+                {
+                    if (keyValuePair.Value.GetType(connectorItem.RealType) is { } a)
+                    {
+                        if (a.BaseType.FullName == "System.Enum")
+                        {
+                            connectorItem.InputObject = Enum.Parse(a, connectorItem.InputObject.ToString());
+                            break;
+                        }
+
+                        connectorItem.InputObject = Convert.ChangeType(connectorItem.InputObject, a);
+                        break;
+                    }
+                }
+            }
+
+            foreach (var deserializeObjectNode in deserializeObject.nodes)
+            {
+                foreach (var connectorItem in deserializeObjectNode.Input)
+                {
+                    ConnectorInit(connectorItem);
+                }
+
+                foreach (var connectorItem in deserializeObjectNode.Output)
+                {
+                    ConnectorInit(connectorItem);
+                }
+            }
+
             CustomScenarios.Add(deserializeObject);
         }
         catch (Exception e1)

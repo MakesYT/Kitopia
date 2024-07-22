@@ -183,7 +183,26 @@ public class Plugin
     {
         foreach (var pluginAssembly in _plugin.Assemblies)
         {
-            return pluginAssembly.GetType(typeName);
+            if (pluginAssembly.GetType(typeName) != null)
+            {
+                return pluginAssembly.GetType(typeName);
+            }
+        }
+
+        return null;
+    }
+
+    public Type GetType(Type type)
+    {
+        foreach (var pluginAssembly in _plugin.Assemblies)
+        {
+            foreach (var type1 in pluginAssembly.GetTypes())
+            {
+                if (type1 == type)
+                {
+                    return type1;
+                }
+            }
         }
 
         return null;

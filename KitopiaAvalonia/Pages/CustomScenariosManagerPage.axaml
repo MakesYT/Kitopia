@@ -20,7 +20,7 @@
         </TextBlock>
         <StackPanel Grid.Row="1" Orientation="Horizontal">
             <Button Content="新建情景" Command="{Binding NewCustomScenariosCommand}" />
-            <Button Content="Debug" Click="Button_OnClick" />
+
         </StackPanel>
         <ListBox Grid.Row="2" Classes="draggableVirtualizing"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"

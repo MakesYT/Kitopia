@@ -8,6 +8,7 @@ public class ObjectJsonConverter : JsonConverter<object>
 {
     public override object Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
+        //return reader.GetString();
         // 根据ValueKind判断数据类型
         if (reader.TokenType ==
             // 若为JsonElement类型，再根据ValueKind属性判断
@@ -18,7 +19,10 @@ public class ObjectJsonConverter : JsonConverter<object>
         }
 
         if (reader.TokenType == JsonTokenType.Number)
-            return reader.TryGetInt64(out long l) ? l : reader.GetDouble();
+            if (reader.TryGetInt32(out int l))
+                return l;
+            else
+                return reader.GetDouble();
         if (reader.TokenType == JsonTokenType.String)
             return reader.TryGetDateTime(out DateTime datetime) ? datetime : reader.GetString();
         if (reader.TokenType == JsonTokenType.True)
