@@ -2,9 +2,23 @@
 
 public class NameSolver
 {
+    public struct MyStruct
+    {
+        public MyStruct()
+        {
+            Console.WriteLine(Name);
+        }
+
+        public string Name { get; set; }
+    }
+
     [SetUp]
     public void Setup()
     {
+        new MyStruct()
+        {
+            Name = "2"
+        };
     }
 
     [Test]

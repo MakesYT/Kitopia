@@ -123,7 +123,7 @@ public partial class CustomScenario : ObservableRecipient
         };
     }
 
-    public string UUID { get; set; } = Guid.NewGuid()
+    public string UUID { get; init; } = Guid.NewGuid()
         .ToString();
 
     public ObservableCollection<ScenarioMethodNode> nodes { get; set; } = new();
