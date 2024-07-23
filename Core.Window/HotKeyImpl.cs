@@ -1,7 +1,9 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Threading;
 using Core.SDKs.CustomType;
 using Core.SDKs.HotKey;
 using Core.SDKs.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Vanara.PInvoke;
 
 namespace Core.Window;
@@ -22,22 +24,27 @@ public class HotKeyImpl : IHotKetImpl
 
     public void Init()
     {
-        globalHotKeyWindow = new Avalonia.Controls.Window()
+        Dispatcher.UIThread.Invoke(() =>
         {
-            Height = 1,
-            Width = 1,
-            ShowInTaskbar = false,
-            IsVisible = false
-        };
-        globalHotKeyWindow.Show();
-        globalHotKeyWindow.Hide();
-        Win32Properties.AddWndProcHookCallback(globalHotKeyWindow, OnWndProc);
+            globalHotKeyWindow = new Avalonia.Controls.Window()
+            {
+                Height = 1,
+                Width = 1,
+                ShowInTaskbar = false,
+            };
+            globalHotKeyWindow.Show();
+            globalHotKeyWindow.Hide();
+            Win32Properties.AddWndProcHookCallback(globalHotKeyWindow, OnWndProc);
+        });
     }
 
     private static IntPtr OnWndProc(IntPtr hwnd, uint msg, IntPtr wparam, IntPtr lparam, ref bool handled)
     {
         if (msg == (uint)User32.WindowMessage.WM_HOTKEY)
         {
+            var int32 = wparam.ToInt32();
+            var keyValuePair = HotKeys.First(e => e.Value.Id == int32);
+            keyValuePair.Value.RallBack.Invoke(keyValuePair.Value.HotKeyModel);
         }
 
         return IntPtr.Zero;
@@ -67,9 +74,14 @@ public class HotKeyImpl : IHotKetImpl
         }
 
         id++;
-        var registerHotKey = User32.RegisterHotKey(globalHotKeyWindow.TryGetPlatformHandle().Handle, id,
-            hotkeyModifiers,
-            (uint)hotKeyModel.SelectKey);
+        var registerHotKey = false;
+        Dispatcher.UIThread.Invoke(() =>
+        {
+            registerHotKey = User32.RegisterHotKey(globalHotKeyWindow.TryGetPlatformHandle().Handle, id,
+                hotkeyModifiers,
+                (uint)hotKeyModel.SelectKey);
+        });
+
         if (registerHotKey)
         {
             HotKeys.Add(hotKeyModel.UUID, new HotkeyInfo()
@@ -85,11 +97,61 @@ public class HotKeyImpl : IHotKetImpl
 
     public bool Del(HotKeyModel hotKeyModel)
     {
-        return User32.UnregisterHotKey(globalHotKeyWindow.TryGetPlatformHandle().Handle, HotKeys[hotKeyModel.UUID].Id);
+        return Del(hotKeyModel.UUID);
     }
 
     public bool Del(string uuid)
     {
-        return User32.UnregisterHotKey(globalHotKeyWindow.TryGetPlatformHandle().Handle, HotKeys[uuid].Id);
+        var unregisterHotKey =
+            User32.UnregisterHotKey(globalHotKeyWindow.TryGetPlatformHandle().Handle, HotKeys[uuid].Id);
+        if (unregisterHotKey)
+        {
+            HotKeys.Remove(uuid);
+        }
+
+        return unregisterHotKey;
+    }
+
+    public bool RequestUserModify(string uuid)
+    {
+        if (HotKeys.ContainsKey(uuid))
+        {
+            ServiceManager.Services.GetService<IHotKeyEditor>().EditByUuid(uuid, null);
+            return true;
+        }
+
+        return false;
+    }
+
+    public bool Modify(HotKeyModel hotKeyModel)
+    {
+        if (HotKeys.ContainsKey(hotKeyModel.UUID))
+        {
+            var rallback = HotKeys[hotKeyModel.UUID].RallBack;
+            Del(hotKeyModel);
+            if (!Add(hotKeyModel, rallback))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public HotKeyModel? GetByUuid(string uuid)
+    {
+        if (HotKeys.ContainsKey(uuid))
+        {
+            return HotKeys[uuid].HotKeyModel;
+        }
+
+        return null;
+    }
+
+    public IEnumerable<HotKeyModel> GetAllRegistered()
+    {
+        return HotKeys.Values.Select(x => x.HotKeyModel);
     }
 }

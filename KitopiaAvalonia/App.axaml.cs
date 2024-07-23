@@ -74,7 +74,8 @@ public partial class App : Application
         services.AddTransient<IPluginToolService, PluginToolService>();
 
         services.AddTransient<INavigationPageService, NavigationPageService>();
-#if WINDOWS
+        #if WINDOWS
+        services.AddTransient<IHotKetImpl, HotKeyImpl>();
         services.AddTransient<IScreenCapture, ScreenCaptureByDx11>();
         services.AddTransient<IEverythingService, EverythingService>();
         services.AddTransient<IAppToolService, AppToolService>();
@@ -82,11 +83,12 @@ public partial class App : Application
         services.AddTransient<IClipboardService, ClipboardWindow>();
         services.AddTransient<IWindowTool, WindowToolServiceWindow>();
         services.AddTransient<IAutoStartService, AutoStartService>();
-#endif
+        #endif
 
-#if LINUX
-            services.AddTransient<IAppToolService, AppToolLinuxService>();
-#endif
+        #if LINUX
+           services.AddTransient<IAppToolService, AppToolLinuxService>();
+
+        #endif
 
 
         services.AddTransient<TaskEditorViewModel>();

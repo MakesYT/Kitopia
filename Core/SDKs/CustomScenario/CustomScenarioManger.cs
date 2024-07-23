@@ -205,8 +205,25 @@ public static class CustomScenarioManger
         if (!CustomScenarios.Contains(scenario))
         {
             CustomScenarios.Add(scenario);
-            HotKeyManager.HotKeys.Add(scenario.RunHotKey);
-            HotKeyManager.HotKeys.Add(scenario.StopHotKey);
+            if (HotKeyManager.HotKetImpl.Add(scenario.RunHotKey, e => scenario.Run()))
+            {
+                ServiceManager.Services.GetService<IContentDialog>().ShowDialog(null, new DialogContent()
+                {
+                    Title = $"快捷键{scenario.RunHotKey.SignName}设置失败",
+                    Content = "请重新设置快捷键，按键与系统其他程序冲突",
+                    CloseButtonText = "关闭"
+                });
+            }
+
+            if (HotKeyManager.HotKetImpl.Add(scenario.StopHotKey, e => scenario.Stop()))
+            {
+                ServiceManager.Services.GetService<IContentDialog>().ShowDialog(null, new DialogContent()
+                {
+                    Title = $"快捷键{scenario.StopHotKey.SignName}设置失败",
+                    Content = "请重新设置快捷键，按键与系统其他程序冲突",
+                    CloseButtonText = "关闭"
+                });
+            }
         }
 
 
@@ -253,25 +270,8 @@ public static class CustomScenarioManger
             CustomScenarios.Remove(scenario);
         }
 
-        List<HotKeyModel> toRemove = new();
-        foreach (var item in HotKeyManager.HotKeys)
-        {
-            if (item.MainName == "Kitopia情景")
-            {
-                if (scenario.UUID == item.Name!.Split("_")[0])
-                {
-                    toRemove.Add(item);
-                }
-            }
-        }
-
-        foreach (var hotKeyModel in toRemove)
-        {
-            ((IHotKeyEditor)ServiceManager.Services.GetService(typeof(IHotKeyEditor))!).RemoveByHotKeyModel(
-                hotKeyModel);
-        }
-
-        toRemove = null;
+        HotKeyManager.HotKetImpl.Del(scenario.RunHotKey.UUID);
+        HotKeyManager.HotKetImpl.Del(scenario.StopHotKey.UUID);
         ((SearchWindowViewModel)ServiceManager.Services.GetService(typeof(SearchWindowViewModel))!)
             ._collection.TryRemove($"{nameof(CustomScenario)}:{scenario.UUID}", out _);
         ConfigManger.Save();

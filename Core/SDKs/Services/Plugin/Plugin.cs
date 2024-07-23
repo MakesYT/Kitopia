@@ -7,6 +7,7 @@ using Core.SDKs.CustomScenario;
 using Core.SDKs.HotKey;
 using Core.SDKs.Services.Config;
 using log4net;
+using Microsoft.Extensions.DependencyInjection;
 using PluginCore;
 using PluginCore.Attribute;
 using PluginCore.Attribute.Scenario;
@@ -65,7 +66,19 @@ public class Plugin
                 {
                     if (configField.FieldType == ConfigFieldType.快捷键)
                     {
-                        HotKeyManager.HotKeys.Add(x.GetValue(configBase) as HotKeyModel);
+                        var hotKeyModel = (HotKeyModel)x.GetValue(configBase)!;
+
+                        if (HotKeyManager.HotKetImpl.Add(hotKeyModel,
+                                (Action<HotKeyModel>)configBase.GetType().GetProperty($"{x.Name}Action")
+                                    .GetValue(configBase, null)))
+                        {
+                            ServiceManager.Services.GetService<IContentDialog>().ShowDialog(null, new DialogContent()
+                            {
+                                Title = $"快捷键{hotKeyModel.SignName}设置失败",
+                                Content = "请重新设置快捷键，按键与系统其他程序冲突",
+                                CloseButtonText = "关闭"
+                            });
+                        }
                     }
                 }
             });

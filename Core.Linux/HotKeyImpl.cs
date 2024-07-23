@@ -1,5 +1,4 @@
-﻿using Avalonia.Threading;
-using Core.SDKs.CustomScenario;
+﻿using Core.SDKs.CustomScenario;
 using Core.SDKs.CustomType;
 using Core.SDKs.HotKey;
 using Core.SDKs.Services;
@@ -70,7 +69,7 @@ public class HotKeyImpl : IHotKetImpl
 
         foreach (var (key, configHotKey) in HotKeys)
         {
-            if (!configHotKey.IsUsable || configHotKey.IsSelectAlt != AltIsPressed ||
+            if (configHotKey.IsSelectAlt != AltIsPressed ||
                 configHotKey.IsSelectCtrl != CtrlIsPressed || configHotKey.IsSelectShift != ShiftIsPressed ||
                 configHotKey.IsSelectWin != MetaIsPressed)
             {
@@ -91,28 +90,10 @@ public class HotKeyImpl : IHotKetImpl
                     {
                         case "截图":
                         {
-                            log.Debug("截图热键被触发");
-                            Dispatcher.UIThread.InvokeAsync(() =>
-                                {
-                                    ServiceManager.Services.GetService<IScreenCaptureWindow>()!.CaptureScreen();
-                                })
-                                .GetTask()
-                                .ContinueWith((e) =>
-                                {
-                                    if (e.IsFaulted)
-                                    {
-                                        log.Error(e.Exception);
-                                        ServiceManager.Services.GetService<IErrorWindow>()!.ShowErrorWindow(
-                                            "截图失败", e.Exception.Message);
-                                    }
-                                });
                             break;
                         }
                         case "显示搜索框":
                         {
-                            log.Debug("显示搜索框热键被触发");
-                            ServiceManager.Services.GetService<ISearchWindowService>()!.ShowOrHiddenSearchWindow();
-
                             break;
                         }
                     }
@@ -217,6 +198,26 @@ public class HotKeyImpl : IHotKetImpl
     }
 
     public bool Del(string uuid)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool RequestUserModify(string hotKeyModel)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool Modify(HotKeyModel hotKeyModel)
+    {
+        throw new NotImplementedException();
+    }
+
+    public HotKeyModel? GetByUuid(string uuid)
+    {
+        throw new NotImplementedException();
+    }
+
+    public IEnumerable<HotKeyModel> GetAllRegistered()
     {
         throw new NotImplementedException();
     }

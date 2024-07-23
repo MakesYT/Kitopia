@@ -6,6 +6,7 @@
              xmlns:pages="clr-namespace:Core.ViewModel.Pages;assembly=Core"
              xmlns:controls1="clr-namespace:KitopiaAvalonia.Controls"
              xmlns:hotkey="clr-namespace:Core.SDKs.HotKey;assembly=Core"
+             xmlns:hotKey="clr-namespace:Core.SDKs.HotKey;assembly=PluginCore"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="pages:HotKeyManagerPageViewModel"
              x:Class="KitopiaAvalonia.Pages.HotKeyManagerPage">
@@ -21,9 +22,10 @@
         <ScrollViewer Grid.Row="1">
             <ItemsControl
 
-                Margin="0,10,0,0" ItemsSource="{Binding Source={x:Static hotkey:HotKeyManager.HotKeys}}">
+                Margin="0,10,0,0"
+                ItemsSource="{Binding Source={x:Static hotkey:HotKeyManager.HotKetImpl},Path=AllRegistered}">
                 <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="hotkey:HotKeyModel">
+                    <DataTemplate x:DataType="hotKey:HotKeyModel">
                         <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="4">
                             <StackPanel HorizontalAlignment="Center" Margin="5,0,5,5">
                                 <TextBlock Margin="0,5,0,0" Foreground="{DynamicResource TextFillColorPrimaryBrush}"

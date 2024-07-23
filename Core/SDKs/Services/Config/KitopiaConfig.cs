@@ -1,6 +1,9 @@
 ﻿using System.Collections.ObjectModel;
+using System.Text.Json.Serialization;
+using Avalonia.Threading;
 using Core.SDKs.HotKey;
 using log4net;
+using Microsoft.Extensions.DependencyInjection;
 using PluginCore;
 using PluginCore.Attribute;
 using PluginCore.Config;
@@ -28,9 +31,16 @@ public class KitopiaConfig : ConfigBase
     [ConfigFieldCategory("搜索框")] [ConfigField("搜索框快捷键", "显示搜索框快捷键", 0xF4B8, ConfigFieldType.快捷键)]
     public HotKeyModel searchHotKey = new()
     {
-        MainName = "Kitopia", Name = "显示搜索框", IsUsable = true, IsSelectCtrl = false, IsSelectAlt = true,
+        MainName = "Kitopia", Name = "显示搜索框", IsSelectCtrl = false, IsSelectAlt = true,
         IsSelectWin = false,
         IsSelectShift = false, SelectKey = EKey.空格,
+    };
+
+    [JsonIgnore]
+    public Action<HotKeyModel> searchHotKeyAction => e =>
+    {
+        log.Debug("显示搜索框热键被触发");
+        ServiceManager.Services.GetService<ISearchWindowService>()!.ShowOrHiddenSearchWindow();
     };
 
     [ConfigField("允许程序调用Everything索引文档", "索引文档依赖于此功能", 0xF3AE, ConfigFieldType.布尔)]
@@ -77,8 +87,28 @@ public class KitopiaConfig : ConfigBase
     [ConfigField("截图快捷键", "修改截图快捷键", 0xF4B8, ConfigFieldType.快捷键)]
     public HotKeyModel screenShotHotKey = new()
     {
-        MainName = "Kitopia", Name = "截图", IsUsable = true, IsSelectCtrl = true, IsSelectAlt = true,
+        MainName = "Kitopia", Name = "截图", IsSelectCtrl = true, IsSelectAlt = true,
         IsSelectWin = false,
         IsSelectShift = false, SelectKey = EKey.Q,
+    };
+
+    [JsonIgnore]
+    public Action<HotKeyModel> screenShotHotKeyAction => e =>
+    {
+        log.Debug("截图热键被触发");
+        Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                ServiceManager.Services.GetService<IScreenCaptureWindow>()!.CaptureScreen();
+            })
+            .GetTask()
+            .ContinueWith((e) =>
+            {
+                if (e.IsFaulted)
+                {
+                    log.Error(e.Exception);
+                    ServiceManager.Services.GetService<IErrorWindow>()!.ShowErrorWindow(
+                        "截图失败", e.Exception.Message);
+                }
+            });
     };
 }

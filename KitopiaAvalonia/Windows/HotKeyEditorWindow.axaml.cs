@@ -2,9 +2,12 @@
 using Avalonia.Interactivity;
 using Avalonia.Win32.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using Core.SDKs;
 using Core.SDKs.HotKey;
+using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using log4net;
+using Microsoft.Extensions.DependencyInjection;
 using Window = Avalonia.Controls.Window;
 
 namespace KitopiaAvalonia.Windows;
@@ -131,54 +134,37 @@ public partial class HotKeyEditorWindow : Window
 
     private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
     {
-        if (Alt.IsVisible)
-        {
-            _hotKeyModel.IsSelectAlt = true;
-        }
-        else
-        {
-            _hotKeyModel.IsSelectAlt = false;
-        }
-
-        if (Win.IsVisible)
-        {
-            _hotKeyModel.IsSelectWin = true;
-        }
-        else
-        {
-            _hotKeyModel.IsSelectWin = false;
-        }
-
-        if (Shift.IsVisible)
-        {
-            _hotKeyModel.IsSelectShift = true;
-        }
-        else
-        {
-            _hotKeyModel.IsSelectShift = false;
-        }
-
-        if (Ctrl.IsVisible)
-        {
-            _hotKeyModel.IsSelectCtrl = true;
-        }
-        else
-        {
-            _hotKeyModel.IsSelectCtrl = false;
-        }
-
         if (selectedKey is null)
         {
             return;
         }
 
-        _hotKeyModel.SelectKey = selectedKey.Value;
-        _hotKeyModel.IsUsable = true;
-        ConfigManger.Save();
+        var hotKeyModel = new HotKeyModel(_hotKeyModel.Value.UUID)
+        {
+            MainName = _hotKeyModel.Value.MainName,
+            Name = _hotKeyModel.Value.Name,
+            IsSelectAlt = Alt.IsVisible,
+            IsSelectWin = Win.IsVisible,
+            IsSelectShift = Shift.IsVisible,
+            IsSelectCtrl = Ctrl.IsVisible,
+            SelectKey = selectedKey.Value,
+        };
+        if (!HotKeyManager.HotKetImpl.Modify(hotKeyModel))
+        {
+            ServiceManager.Services.GetService<IContentDialog>().ShowDialog(this, new DialogContent()
+            {
+                Title = $"快捷键{hotKeyModel.SignName}设置失败",
+                Content = "请重新设置快捷键，按键与系统其他程序冲突"
+            });
+        }
+        else
+        {
+            ConfigManger.Save();
 
-        isFinnish = true;
-        WeakReferenceMessenger.Default.Send(_hotKeyModel.SignName, "hotkey");
-        Close();
+            isFinnish = true;
+            WeakReferenceMessenger.Default.Send(_hotKeyModel.Value.UUID, "hotkey");
+            Close();
+        }
     }
 
     private void ButtonCancle_OnClick(object sender, RoutedEventArgs e)

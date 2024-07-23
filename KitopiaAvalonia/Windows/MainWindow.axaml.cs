@@ -75,7 +75,8 @@ public partial class MainWindow : AppWindow
     {
         InitializeComponent();
         Task.Run(() => { OnStartup(); });
-        Dispatcher.UIThread.UnhandledException += (sender, e) => {
+        Dispatcher.UIThread.UnhandledException += (sender, e) =>
+        {
             e.Handled = true;
             log.Fatal(e.Exception);
         };
@@ -158,7 +159,8 @@ public partial class MainWindow : AppWindow
         log.Info("启动");
 
 
-        log.Info("Ioc初始化完成");
+        HotKeyManager.Init();
+        log.Debug("注册热键管理器完成");
         ConfigManger.Init();
         log.Info("配置文件初始化完成");
         PluginManager.Init();
@@ -170,30 +172,28 @@ public partial class MainWindow : AppWindow
             case ThemeEnum.跟随系统:
             {
                 ServiceManager.Services.GetService<IThemeChange>()
-                              .followSys(true);
+                    .followSys(true);
                 break;
             }
             case ThemeEnum.深色:
             {
                 ServiceManager.Services.GetService<IThemeChange>()
-                              .followSys(false);
+                    .followSys(false);
                 ServiceManager.Services.GetService<IThemeChange>()
-                              .changeTo("theme_dark");
+                    .changeTo("theme_dark");
                 break;
             }
             case ThemeEnum.浅色:
             {
                 ServiceManager.Services.GetService<IThemeChange>()
-                              .followSys(false);
+                    .followSys(false);
                 ServiceManager.Services.GetService<IThemeChange>()
-                              .changeTo("theme_light");
+                    .changeTo("theme_light");
                 break;
             }
         }
 
         log.Info("主题初始化完成");
-        log.Debug("注册热键");
-        HotKeyManager.Init();
 
 
         ServicePointManager.DefaultConnectionLimit = 10240;
@@ -221,8 +221,8 @@ public partial class MainWindow : AppWindow
 
         // 获取目录下的所有日志文件，按照最后修改时间排序
         var logFiles = Directory.EnumerateFiles(logDirectory)
-                                .Select(f => new FileInfo(f))
-                                .OrderByDescending(f => f.LastWriteTime);
+            .Select(f => new FileInfo(f))
+            .OrderByDescending(f => f.LastWriteTime);
 
         // 遍历每个日志文件
         foreach (var logFile in logFiles)
@@ -256,7 +256,7 @@ public partial class MainWindow : AppWindow
     private void SetAutoStartupWindow()
     {
         ServiceManager.Services.GetService<IAutoStartService>()
-                      .ChangeAutoStart(true);
+            .ChangeAutoStart(true);
     }
 
     private void SetAutoStartupLinux()

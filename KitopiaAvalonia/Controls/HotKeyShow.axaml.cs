@@ -1,18 +1,11 @@
-﻿using System;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.InteropServices;
+﻿using System.ComponentModel;
 using System.Windows.Input;
 using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Primitives;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.HotKey;
-using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
-using KitopiaAvalonia.SDKs;
-using Vanara.PInvoke;
 
 namespace KitopiaAvalonia.Controls;
 
@@ -33,11 +26,15 @@ public class HotKeyShow : TemplatedControl
         WinAlt = 0011,
         Shift = 0100
     }
-    
+
     public static readonly StyledProperty<HotKeyModel> HotKeyModelProperty =
         AvaloniaProperty.Register<HotKeyShow, HotKeyModel>(nameof(HotKeyModel), coerce: (o, s) =>
         {
-            HotKeyModelChanged(s, (HotKeyShow)o);
+            if (s.UUID is not null)
+            {
+                HotKeyModelChanged(s, (HotKeyShow)o);
+            }
+
             return s;
         });
 
@@ -52,16 +49,16 @@ public class HotKeyShow : TemplatedControl
 
     public static readonly StyledProperty<ICommand> EditHotKeyProperty =
         AvaloniaProperty.Register<HotKeyShow, ICommand>(nameof(EditHotKey));
+
     //IsActivated
     public static readonly StyledProperty<bool> IsActivatedProperty =
         AvaloniaProperty.Register<HotKeyShow, bool>(nameof(IsActivated), false);
+
     public bool IsActivated
     {
         get => (bool)GetValue(IsActivatedProperty);
         set => SetValue(IsActivatedProperty, value);
     }
-    
-
 
     private HotKeyShow Default;
 
@@ -70,15 +67,20 @@ public class HotKeyShow : TemplatedControl
         Default = this;
         WeakReferenceMessenger.Default.Register<string, string>(this, "hotkey", (_, s) =>
         {
-            if (s == HotKeyModel.SignName)
+            if (!HotKeyModel.HasValue)
             {
-                HotKeyModelChanged(HotKeyModel, this);
+                return;
+            }
+
+            if (s == HotKeyModel.Value.UUID)
+            {
+                HotKeyModelChanged(HotKeyManager.HotKetImpl.GetByUuid(s), this);
             }
         });
         SetValue(RemoveHotKeyProperty, new RelayCommand(Remove));
         SetValue(EditHotKeyProperty, new RelayCommand(Edit));
     }
-    
+
 
     [Bindable(true)]
     [Category("KeyType")]
@@ -120,15 +122,16 @@ public class HotKeyShow : TemplatedControl
         private set => SetValue(EditHotKeyProperty, value);
     }
 
-    private static void HotKeyModelChanged(HotKeyModel? hotKeyModel, HotKeyShow hotKeyShow)
+    private static void HotKeyModelChanged(HotKeyModel? hotKeyModelN, HotKeyShow hotKeyShow)
     {
         var type = 0000;
-        if (hotKeyModel == null)
+        if (hotKeyModelN == null)
         {
             hotKeyShow.KeyType = (HotKeyShow.KeyTypeE)type;
             return;
         }
 
+        var hotKeyModel = hotKeyModelN.Value;
         if (hotKeyModel.IsSelectAlt)
         {
             type += 10;
@@ -154,7 +157,7 @@ public class HotKeyShow : TemplatedControl
             type = 10000;
         }
 
-        hotKeyShow.IsActivated = hotKeyModel.IsUsable;
+        hotKeyShow.IsActivated = HotKeyManager.HotKetImpl.GetByUuid(hotKeyModel.UUID) != null;
         hotKeyShow.KeyType = (HotKeyShow.KeyTypeE)type;
         hotKeyShow.KeyName = hotKeyModel.SelectKey.ToString();
     }
@@ -163,8 +166,8 @@ public class HotKeyShow : TemplatedControl
     {
         if (HotKeyModel != null)
         {
-            HotKeyModel.IsUsable = false;
             IsActivated = false;
+            HotKeyManager.HotKetImpl.Del(HotKeyModel.Value.UUID);
             ConfigManger.Save(ConfigManger.Config.Name);
         }
     }
@@ -177,30 +180,12 @@ public class HotKeyShow : TemplatedControl
             return;
         }
 
-        if (HotKeyModel.IsUsable == false&& HotKeyModel.SelectKey != EKey.未设置)
+        if (HotKeyModel.Value.SelectKey != EKey.未设置)
         {
             IsActivated = true;
-            HotKeyModel.IsUsable = true;
+            HotKeyManager.HotKetImpl.RequestUserModify(HotKeyModel.Value.UUID);
             ConfigManger.Save();
             return;
         }
-        
-        if (App.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-        {
-            foreach (var desktopWindow in desktop.Windows)
-            {
-                if (desktopWindow.TryGetPlatformHandle().Handle == User32.GetForegroundWindow())
-                {
-                    ((IHotKeyEditor)ServiceManager.Services.GetService(typeof(IHotKeyEditor))!).EditByHotKeyModel(
-                        HotKeyModel,
-                        desktopWindow);
-                    return;
-                }
-            }
-        }
-        
-
-        ((IHotKeyEditor)ServiceManager.Services.GetService(typeof(IHotKeyEditor))!).EditByHotKeyModel(HotKeyModel,
-            null);
     }
 }

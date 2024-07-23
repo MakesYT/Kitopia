@@ -73,7 +73,20 @@ public static class ConfigManger
                 {
                     if (configField.FieldType == ConfigFieldType.快捷键)
                     {
-                        HotKeyManager.HotKeys.Add(x.GetValue(Config) as HotKeyModel);
+                        var hotKeyModel = (HotKeyModel)x.GetValue(Config);
+
+
+                        if (!HotKeyManager.HotKetImpl.Add(hotKeyModel,
+                                (Action<HotKeyModel>)Config.GetType().GetProperty($"{x.Name}Action")
+                                    .GetValue(Config, null)))
+                        {
+                            ServiceManager.Services.GetService<IContentDialog>().ShowDialog(null, new DialogContent()
+                            {
+                                Title = $"快捷键{hotKeyModel.SignName}设置失败",
+                                Content = "请重新设置快捷键，按键与系统其他程序冲突",
+                                CloseButtonText = "关闭"
+                            });
+                        }
                     }
                 }
             });

@@ -11,6 +11,7 @@ using Core.SDKs.HotKey;
 using Core.SDKs.Services;
 using Core.SDKs.Tools;
 using log4net;
+using Microsoft.Extensions.DependencyInjection;
 using PluginCore;
 
 #endregion
@@ -57,27 +58,45 @@ public partial class CustomScenario : ObservableRecipient
     [JsonIgnore] [ObservableProperty] private ObservableDictionary<string, object> values = new();
 
     //ActiveHotKey
-    [JsonIgnore] [ObservableProperty] public HotKeyModel runHotKey = new()
-    {
-        MainName = "Kitopia情景", Name = "情景", IsUsable = false, IsSelectCtrl = false, IsSelectAlt = false,
-        IsSelectWin = false,
-        IsSelectShift = false, SelectKey = EKey.未设置,
-    };
+    [JsonIgnore] [ObservableProperty] public HotKeyModel runHotKey;
 
-    [JsonIgnore] [ObservableProperty] public HotKeyModel stopHotKey = new()
-    {
-        MainName = "Kitopia情景", Name = "情景", IsUsable = false, IsSelectCtrl = false, IsSelectAlt = false,
-        IsSelectWin = false,
-        IsSelectShift = false, SelectKey = EKey.未设置,
-    };
+    [JsonIgnore] [ObservableProperty] public HotKeyModel stopHotKey;
 
     public CustomScenario()
     {
         PropertyChanged += PropertyChangedEventHandler();
+        runHotKey = new()
+        {
+            MainName = "Kitopia情景", Name = $"{UUID}_开始快捷键", IsSelectCtrl = false, IsSelectAlt = false,
+            IsSelectWin = false,
+            IsSelectShift = false, SelectKey = EKey.未设置,
+        };
 
-        runHotKey.Name = $"{UUID}_激活快捷键";
-        stopHotKey.Name = $"{UUID}_停止快捷键";
+        stopHotKey = new()
+        {
+            MainName = "Kitopia情景", Name = $"{UUID}_停止快捷键", IsSelectCtrl = false, IsSelectAlt = false,
+            IsSelectWin = false,
+            IsSelectShift = false, SelectKey = EKey.未设置,
+        };
+        if (HotKeyManager.HotKetImpl.Add(RunHotKey, e => Run()))
+        {
+            ServiceManager.Services.GetService<IContentDialog>().ShowDialog(null, new DialogContent()
+            {
+                Title = $"快捷键{RunHotKey.SignName}设置失败",
+                Content = "请重新设置快捷键，按键与系统其他程序冲突",
+                CloseButtonText = "关闭"
+            });
+        }
 
+        if (HotKeyManager.HotKetImpl.Add(StopHotKey, e => Stop()))
+        {
+            ServiceManager.Services.GetService<IContentDialog>().ShowDialog(null, new DialogContent()
+            {
+                Title = $"快捷键{StopHotKey.SignName}设置失败",
+                Content = "请重新设置快捷键，按键与系统其他程序冲突",
+                CloseButtonText = "关闭"
+            });
+        }
 
         InputValue.CollectionChanged += OnInputValueOnCollectionChanged;
     }
