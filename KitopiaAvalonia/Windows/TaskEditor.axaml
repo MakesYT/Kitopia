@@ -1166,16 +1166,15 @@
                                 </controls2:Node.Header>
                                 <controls2:Node.InputConnectorTemplate>
                                     <DataTemplate DataType="{x:Type customScenario:ConnectorItem}">
-
                                         <ContentPresenter Content="{Binding .}" Name="ContentPresenter1">
                                             <ContentPresenter.ContextFlyout>
-                                                <MenuFlyout>
+                                                <controls:FAMenuFlyout>
                                                     <!-- ReSharper disable once Xaml.RedundantResource -->
-                                                    <MenuItem Header="切换自输入/连接器"
-                                                              Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                                              Command="{Binding $parent[controls2:NodifyEditor].((taskEditor1:TaskEditorViewModel)DataContext).SwitchConnectorCommand}"
-                                                              CommandParameter="{Binding #ContentPresenter1  }" />
-                                                </MenuFlyout>
+                                                    <controls:MenuFlyoutItem Text="切换自输入/连接器"
+                                                                             Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                                                             Command="{Binding $parent[controls2:NodifyEditor].((taskEditor1:TaskEditorViewModel)DataContext).SwitchConnectorCommand}"
+                                                                             CommandParameter="{Binding #ContentPresenter1  }" />
+                                                </controls:FAMenuFlyout>
                                             </ContentPresenter.ContextFlyout>
                                             <ContentPresenter.DataTemplates>
                                                 <pages:MyDataTemplateSelector>

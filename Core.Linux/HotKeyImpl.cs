@@ -217,6 +217,11 @@ public class HotKeyImpl : IHotKetImpl
         throw new NotImplementedException();
     }
 
+    public bool IsActive(string uuid)
+    {
+        throw new NotImplementedException();
+    }
+
     public IEnumerable<HotKeyModel> GetAllRegistered()
     {
         throw new NotImplementedException();
