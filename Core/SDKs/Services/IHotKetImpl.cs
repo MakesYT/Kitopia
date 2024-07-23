@@ -11,6 +11,8 @@ public interface IHotKetImpl
     public bool RequestUserModify(string uuid);
     public bool Modify(HotKeyModel hotKeyModel);
     public HotKeyModel? GetByUuid(string uuid);
+
+    public bool IsActive(string uuid);
     public IEnumerable<HotKeyModel> GetAllRegistered();
 
     public IEnumerable<HotKeyModel> AllRegistered

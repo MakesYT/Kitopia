@@ -4,8 +4,11 @@ using Avalonia;
 using Avalonia.Controls.Primitives;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using Core.SDKs;
 using Core.SDKs.HotKey;
+using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace KitopiaAvalonia.Controls;
 
@@ -157,7 +160,8 @@ public class HotKeyShow : TemplatedControl
             type = 10000;
         }
 
-        hotKeyShow.IsActivated = HotKeyManager.HotKetImpl.GetByUuid(hotKeyModel.UUID) != null;
+
+        hotKeyShow.IsActivated = HotKeyManager.HotKetImpl.IsActive(hotKeyModel.UUID);
         hotKeyShow.KeyType = (HotKeyShow.KeyTypeE)type;
         hotKeyShow.KeyName = hotKeyModel.SelectKey.ToString();
     }
@@ -182,10 +186,29 @@ public class HotKeyShow : TemplatedControl
 
         if (HotKeyModel.Value.SelectKey != EKey.未设置)
         {
-            IsActivated = true;
-            HotKeyManager.HotKetImpl.RequestUserModify(HotKeyModel.Value.UUID);
-            ConfigManger.Save();
-            return;
+            if (!IsActivated)
+            {
+                if (!HotKeyManager.HotKetImpl.Modify(HotKeyModel.Value))
+                {
+                    ServiceManager.Services.GetService<IContentDialog>().ShowDialogAsync(null, new DialogContent()
+                    {
+                        Title = $"快捷键{HotKeyModel.Value.SignName}设置失败",
+                        Content = "请重新设置快捷键，按键与系统其他程序冲突",
+                        CloseButtonText = "关闭"
+                    });
+                    HotKeyManager.HotKetImpl.RequestUserModify(HotKeyModel.Value.UUID);
+                    ConfigManger.Save();
+                    return;
+                }
+
+                IsActivated = true;
+            }
+            else
+            {
+                HotKeyManager.HotKetImpl.RequestUserModify(HotKeyModel.Value.UUID);
+                ConfigManger.Save();
+                return;
+            }
         }
     }
 }

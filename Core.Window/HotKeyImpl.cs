@@ -91,6 +91,15 @@ public class HotKeyImpl : IHotKetImpl
                 RallBack = rallBack
             });
         }
+        else
+        {
+            HotKeys.Add(hotKeyModel.UUID, new HotkeyInfo()
+            {
+                HotKeyModel = hotKeyModel,
+                Id = -1,
+                RallBack = rallBack
+            });
+        }
 
         return registerHotKey;
     }
@@ -104,10 +113,7 @@ public class HotKeyImpl : IHotKetImpl
     {
         var unregisterHotKey =
             User32.UnregisterHotKey(globalHotKeyWindow.TryGetPlatformHandle().Handle, HotKeys[uuid].Id);
-        if (unregisterHotKey)
-        {
-            HotKeys.Remove(uuid);
-        }
+        HotKeys.Remove(uuid);
 
         return unregisterHotKey;
     }
@@ -148,6 +154,16 @@ public class HotKeyImpl : IHotKetImpl
         }
 
         return null;
+    }
+
+    public bool IsActive(string uuid)
+    {
+        if (HotKeys.ContainsKey(uuid))
+        {
+            return HotKeys[uuid].Id != -1;
+        }
+
+        return false;
     }
 
     public IEnumerable<HotKeyModel> GetAllRegistered()
