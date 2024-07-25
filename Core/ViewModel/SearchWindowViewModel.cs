@@ -88,7 +88,8 @@ public partial class SearchWindowViewModel : ObservableRecipient
 
             if (!EverythingIsOk.Value)
             {
-                ServiceManager.Services.GetService<IAppToolService>()!.AutoStartEverything(_collection, () => {
+                ServiceManager.Services.GetService<IAppToolService>()!.AutoStartEverything(_collection, () =>
+                {
                     Thread.Sleep(1500);
                     var everythingService = ServiceManager.Services.GetService<IEverythingService>()!;
                     EverythingIsOk = everythingService.isRun();
@@ -107,8 +108,8 @@ public partial class SearchWindowViewModel : ObservableRecipient
             }
 
             keys.AddRange(ServiceManager.Services.GetService<IAppToolService>()
-                                        .GetPinyin(scenario.Name)
-                                        .Keys);
+                .GetPinyin(scenario.Name)
+                .Keys);
             var viewItem1 = new SearchViewItem()
             {
                 ItemDisplayName = "执行自定义情景:" + scenario.Name,
@@ -138,19 +139,19 @@ public partial class SearchWindowViewModel : ObservableRecipient
         }
 
         if (Items.Count > 0 && (Items[0].FileType == FileType.剪贴板图像 || Items[0]
-                                                                      .ItemDisplayName.StartsWith("打开")))
+                .ItemDisplayName.StartsWith("打开")))
         {
             Items.RemoveAt(0);
         }
 
         var data = ServiceManager.Services.GetService<IClipboardService>()
-                                 .HasText();
+            .HasText();
         try
         {
             if (data)
             {
                 var text = ServiceManager.Services.GetService<IClipboardService>()
-                                         .GetText();
+                    .GetText();
                 if (text.StartsWith("\""))
                 {
                     text = text.Replace("\"", "");
@@ -162,7 +163,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     Log.Debug("检测路径");
                     ConcurrentDictionary<string, SearchViewItem> a = new();
                     ServiceManager.Services.GetService<IAppToolService>()!.AppSolverA(a, text)
-                                  .Wait();
+                        .Wait();
                     foreach (var (key, value) in a)
                     {
                         if (value.FileType == FileType.文件夹)
@@ -206,7 +207,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
             });
         }
         else if (Items.Count > 0 && Items.First()
-                                         .FileType == FileType.剪贴板图像)
+                     .FileType == FileType.剪贴板图像)
         {
             Log.Debug("剪贴板没有图像信息,但第一项是图片信息删除");
 
@@ -260,7 +261,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
         {
             Log.Debug("加载历史");
             var sortedDict = ConfigManger.Config.lastOpens.OrderByDescending(p => p.Value)
-                                         .ToDictionary(p => p.Key, p => p.Value);
+                .ToDictionary(p => p.Key, p => p.Value);
             foreach (var (key, value) in sortedDict)
             {
                 if (limit >= ConfigManger.Config.maxHistory)
@@ -315,7 +316,8 @@ public partial class SearchWindowViewModel : ObservableRecipient
         }
 
         //Log.Debug("搜索");
-        _searchDelayAction.Debounce(ConfigManger.Config.inputSmoothingMilliseconds, _scheduler, () => {
+        _searchDelayAction.Debounce(ConfigManger.Config.inputSmoothingMilliseconds, _scheduler, () =>
+        {
             //Log.Debug("搜索开始");
             if (string.IsNullOrEmpty(Search))
             {
@@ -366,7 +368,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
             var operators = new[] { '*', '+', '-', '/', '^' };
             var pattern = @"[\u4e00-\u9fa5a-zA-Z]+";
             if (Regex.Match(value, pattern, RegexOptions.NonBacktracking)
-                     .Value == "" &&
+                    .Value == "" &&
                 value.IndexOfAny(operators) > -1)
             {
                 try
@@ -402,7 +404,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
             #region 从文件索引检索并排序
 
             var filtered = _pinyinSearcher.Search(value)
-                                          .ToList();
+                .ToList();
             /*foreach (var item in CustomScenarioManger.CustomScenarios)
             {
                 if (item.IsHaveInputValue&& !nowInSelectMode)
@@ -460,7 +462,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
             }*/
 
             var sorted = filtered.OrderByDescending(x => x.Weight)
-                                 .ToList();
+                .ToList();
 
             #endregion
 
@@ -479,7 +481,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
             }
 
             var sortedDict = nowHasLastOpens.OrderByDescending(p => p.Value)
-                                            .ToDictionary(p => p.Key, p => p.Value);
+                .ToDictionary(p => p.Key, p => p.Value);
             foreach (var (searchViewItem, i) in sortedDict)
             {
                 //Log.Debug("添加搜索结果" + searchViewItem.OnlyKey);
@@ -533,7 +535,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                         Log.Debug("检测路径");
                         ConcurrentDictionary<string, SearchViewItem> a = new();
                         ServiceManager.Services.GetService<IAppToolService>()!.AppSolverA(a, originalValue)
-                                      .Wait();
+                            .Wait();
                         foreach (var (key, value) in a)
                         {
                             if (value.FileType == FileType.文件夹)
@@ -636,7 +638,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
             }
 
             var first = value.Split(" ")
-                             .First();
+                .First();
             foreach (var se in knownCommand)
             {
                 if (se.Equals(first))
@@ -677,7 +679,8 @@ public partial class SearchWindowViewModel : ObservableRecipient
     [RelayCommand]
     public void OpenFile(SearchViewItem? item)
     {
-        Task.Run(() => {
+        Task.Run(() =>
+        {
             if (nowInSelectMode)
             {
                 selectAction.Invoke(item);
@@ -723,8 +726,6 @@ public partial class SearchWindowViewModel : ObservableRecipient
     {
         var item = (SearchViewItem)searchViewItem;
         Log.Debug("添加常驻" + item.OnlyKey);
-        var index = Items.IndexOf(item);
-        Items[index].IsPined = !Items[index].IsPined;
         //Items.ResetItem(index);
 
         ServiceManager.Services.GetService<ISearchItemTool>()!.Pin(item);
