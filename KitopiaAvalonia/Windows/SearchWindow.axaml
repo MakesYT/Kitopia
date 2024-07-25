@@ -38,6 +38,7 @@
         <searchWindow:SymbolToVisible x:Key="SymbolToVisible" />
         <searchWindow:ItemNameMatchCtr x:Key="ItemNameMatchCtr" />
         <converter1:ControlContentSize x:Key="ControlContentSize" />
+        <controls1:TextCommandBarFlyout x:Key="TextCommandBarFlyout" />
     </windowing:AppWindow.Resources>
     <Panel>
         <Panel.Background>
@@ -51,9 +52,16 @@
             </StackPanel.Resources>
             <TextBox VerticalContentAlignment="Center" VerticalAlignment="Center" IsTabStop="False"
                      Watermark="搜索..." AcceptsReturn="False" KeyDown="tx_KeyDown"
-                     Name="tx"
+                     Name="tx" ContextFlyout="{StaticResource TextCommandBarFlyout}"
                      AcceptsTab="False" FontSize="32"
-                     Text="{Binding Search}" />
+                     Text="{Binding Search}">
+
+                <TextBox.InnerLeftContent>
+                    <controls:FontIcon Margin="10,0,0,0" HorizontalAlignment="Center"
+                                       FontFamily="{StaticResource FluentFont}"
+                                       Glyph="&#xf691;" />
+                </TextBox.InnerLeftContent>
+            </TextBox>
 
 
             <controls:InfoBar Focusable="False" Title="警告" Message="Everything服务未运行,无法搜索文档,请检查" Severity="Warning"

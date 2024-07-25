@@ -162,15 +162,15 @@
                                                 <ScrollViewer HorizontalScrollBarVisibility="Disabled"
                                                               VerticalScrollBarVisibility="Auto"
                                                               MaxHeight="450">
-                                                    <ui:ItemsRepeater Margin="5"
-                                                                      ItemsSource="{TemplateBinding CustomPaletteColors}">
-                                                        <ui:ItemsRepeater.Layout>
-                                                            <ui:UniformGridLayout
+                                                    <ItemsRepeater Margin="5"
+                                                                   ItemsSource="{TemplateBinding CustomPaletteColors}">
+                                                        <ItemsRepeater.Layout>
+                                                            <UniformGridLayout
                                                                 MaximumRowsOrColumns="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=PaletteColumnCount}"
                                                                 Orientation="Horizontal"
                                                                 ItemsStretch="Fill" />
-                                                        </ui:ItemsRepeater.Layout>
-                                                        <ui:ItemsRepeater.ItemTemplate>
+                                                        </ItemsRepeater.Layout>
+                                                        <ItemsRepeater.ItemTemplate>
                                                             <DataTemplate x:DataType="Color">
                                                                 <ui:ColorPaletteItem Color="{Binding}"
                                                                     BorderBrushPointerOver="{DynamicResource ColorPickerColorPaletteItemBorderBrushPointerOver}"
@@ -178,8 +178,8 @@
                                                                     Margin="{DynamicResource ColorPaletteItemMargin}"
                                                                     Height="{Binding $self.Bounds.Width}" />
                                                             </DataTemplate>
-                                                        </ui:ItemsRepeater.ItemTemplate>
-                                                    </ui:ItemsRepeater>
+                                                        </ItemsRepeater.ItemTemplate>
+                                                    </ItemsRepeater>
                                                 </ScrollViewer>
                                             </Panel>
                                         </TabItem>
