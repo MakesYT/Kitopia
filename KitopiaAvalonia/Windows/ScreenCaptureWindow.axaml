@@ -103,7 +103,8 @@
                           StrokeThickness="1"
                           StartPoint="0.5,0"
                           EndPoint="0.5,32" />
-                    <Button BorderThickness="1" ToolTip.Tip="撤销" Width="32" Height="32" Padding="1,3,0,0"
+                    <Button HotKey="Ctrl+Z" BorderThickness="1" ToolTip.Tip="撤销" Width="32" Height="32"
+                            Padding="1,3,0,0"
                             Click="RedoButton_OnClick">
                         <controls:FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" Width="24"
                                            Height="24"
