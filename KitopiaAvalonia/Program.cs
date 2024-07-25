@@ -3,11 +3,9 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Media;
-using KitopiaAvalonia.Services;
 using log4net;
 using log4net.Config;
 using Microsoft.Toolkit.Uwp.Notifications;
-using ReactiveUI;
 
 namespace KitopiaAvalonia;
 
@@ -27,16 +25,17 @@ class Program
         XmlConfigurator.Configure(logConfigStream);
         try
         {
-            RxApp.DefaultExceptionHandler = new MyCoolObservableExceptionHandler();
+            // RxApp.DefaultExceptionHandler = new MyCoolObservableExceptionHandler();
             TaskScheduler.UnobservedTaskException += (sender, eventArgs) => { Log.Error(eventArgs.Exception); };
 
             AppDomain.CurrentDomain.UnhandledException += (sender, e) => { Log.Fatal(e.ExceptionObject); };
-            AppDomain.CurrentDomain.ProcessExit += (sender, e) => {
+            AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
+            {
                 Log.Info("程序退出");
                 ToastNotificationManagerCompat.Uninstall();
             };
             BuildAvaloniaApp()
-               .StartWithClassicDesktopLifetime(args);
+                .StartWithClassicDesktopLifetime(args);
         }
         catch (Exception e)
         {

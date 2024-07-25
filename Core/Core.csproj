@@ -10,7 +10,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <AvaloniaVersion>11.2.999-cibuild0050044-alpha</AvaloniaVersion>
+        <AvaloniaVersion>11.2.999-cibuild0050397-alpha</AvaloniaVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">

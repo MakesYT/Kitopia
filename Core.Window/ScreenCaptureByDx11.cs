@@ -1,8 +1,9 @@
-﻿using System.Buffers;
+﻿using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Core.SDKs.Services;
+using Core.SDKs.Tools.ImageTools;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
 using PluginCore;
@@ -21,7 +22,6 @@ using SixLabors.ImageSharp.Formats.Tga;
 using SixLabors.ImageSharp.Formats.Tiff;
 using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
 using IScreenCapture = PluginCore.IScreenCapture;
 
 namespace Core.Window;
@@ -176,41 +176,43 @@ public class ScreenCaptureByDx11 : IScreenCapture
                         outputDuplication->ReleaseFrame();
                         var loadPixelData = Image.LoadPixelData<Bgra32>(Configuration, span,
                             desc.DesktopCoordinates.Size.X, desc.DesktopCoordinates.Size.Y);
+
+                        var array = span.ToArray();
+                        var writeableBitmap = new WriteableBitmap(
+                            new PixelSize(desc.DesktopCoordinates.Size.X, desc.DesktopCoordinates.Size.Y),
+                            new Vector(96, 96), PixelFormat.Bgra8888);
+                        using (var l = writeableBitmap.Lock())
+                        {
+                            for (var r = 0; r < desc.DesktopCoordinates.Size.Y; r++)
+                            {
+                                Marshal.Copy(array, r * desc.DesktopCoordinates.Size.X * 4,
+                                    new IntPtr(l.Address.ToInt64() + r * l.RowBytes),
+                                    desc.DesktopCoordinates.Size.X * 4);
+                            }
+                        }
+
                         span = null;
 
-                        if (!loadPixelData.DangerousTryGetSinglePixelMemory(out Memory<Bgra32> memory))
+                        bitmaps.Enqueue(writeableBitmap);
+
+                        var process = GaussianBlur1.GaussianBlur(array, desc.DesktopCoordinates.Size.X,
+                            desc.DesktopCoordinates.Size.Y, 4);
+                        var writeableBitmap2 = new WriteableBitmap(
+                            new PixelSize(desc.DesktopCoordinates.Size.X, desc.DesktopCoordinates.Size.Y),
+                            new Vector(96, 96), PixelFormat.Bgra8888);
+                        using (var l = writeableBitmap2.Lock())
                         {
-                            throw new Exception(
-                                "This can only happen with multi-GB images or when PreferContiguousImageBuffers is not set to true.");
+                            for (var r = 0; r < desc.DesktopCoordinates.Size.Y; r++)
+                            {
+                                Marshal.Copy(process, r * desc.DesktopCoordinates.Size.X * 4,
+                                    new IntPtr(l.Address.ToInt64() + r * l.RowBytes),
+                                    desc.DesktopCoordinates.Size.X * 4);
+                            }
                         }
 
-                        using (MemoryHandle pinHandle = memory.Pin())
-                        {
-                            var bitmap1 = new Bitmap(PixelFormat.Bgra8888, AlphaFormat.Unpremul,
-                                (IntPtr)pinHandle.Pointer,
-                                new PixelSize(desc.DesktopCoordinates.Size.X, desc.DesktopCoordinates.Size.Y),
-                                new Vector(96, 96),
-                                (desc.DesktopCoordinates.Size.Y * PixelFormat.Bgra8888.BitsPerPixel + 7) / 8);
-                            bitmaps.Enqueue(bitmap1);
-                        }
-
-                        loadPixelData.Mutate(x => x.BoxBlur(10));
-
-                        if (!loadPixelData.DangerousTryGetSinglePixelMemory(out Memory<Bgra32> memory1))
-                        {
-                            throw new Exception(
-                                "This can only happen with multi-GB images or when PreferContiguousImageBuffers is not set to true.");
-                        }
-
-                        using (MemoryHandle pinHandle = memory1.Pin())
-                        {
-                            var bitmap1 = new Bitmap(PixelFormat.Bgra8888, AlphaFormat.Unpremul,
-                                (IntPtr)pinHandle.Pointer,
-                                new PixelSize(desc.DesktopCoordinates.Size.X, desc.DesktopCoordinates.Size.Y),
-                                new Vector(96, 96),
-                                (desc.DesktopCoordinates.Size.Y * PixelFormat.Bgra8888.BitsPerPixel + 7) / 8);
-                            mosaics.Enqueue(bitmap1);
-                        }
+                        mosaics.Enqueue(writeableBitmap2);
+                        array = null;
+                        process = null;
 
                         loadPixelData.Dispose();
                     }

@@ -30,7 +30,7 @@
         <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
         <DebugType Condition="'$(Configuration)' == 'Release'">none</DebugType>
         <Version>0.0.2.056</Version>
-        <AvaloniaVersion>11.2.999-cibuild0050044-alpha</AvaloniaVersion>
+        <AvaloniaVersion>11.2.999-cibuild0050397-alpha</AvaloniaVersion>
     </PropertyGroup>
 
 
