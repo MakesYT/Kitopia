@@ -2,9 +2,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
              xmlns:plugin="clr-namespace:Core.ViewModel.Pages.plugin;assembly=Core"
              xmlns:plugin1="clr-namespace:Kitopia.View.Pages.Plugin"
+             xmlns:controls="clr-namespace:KitopiaAvalonia.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="plugin:PluginManagerPageViewModel"
              x:Class="KitopiaAvalonia.Pages.PluginManagerPage">
@@ -14,10 +14,8 @@
 
     </UserControl.Resources>
     <Grid RowDefinitions="Auto,*" Margin="42">
-        <TextBlock Margin="0" FontSize="18" FontWeight="DemiBold" Text="插件列表">
-            <TextBlock.Foreground>
-                <SolidColorBrush Color="{DynamicResource TextFillColorPrimary}" />
-            </TextBlock.Foreground>
+        <TextBlock Margin="0" FontSize="18" FontWeight="Bold" Text="插件列表">
+
         </TextBlock>
         <ListBox Grid.Row="1"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -47,6 +45,7 @@
                             Command="{Binding Path=$parent[ListBox].((plugin:PluginManagerPageViewModel)DataContext).ToPluginSettingPageCommand}"
                             CommandParameter="{Binding }"
                             Background="Transparent"
+                            Foreground="{DynamicResource TextControlForeground}"
                             Height="72" Margin="0"
                             Padding="3">
 
@@ -78,9 +77,9 @@
                                 Margin="0,0,10,0" Grid.Column="3"
                                 Command="{Binding Path=$parent[ListBox].((plugin:PluginManagerPageViewModel)DataContext).SwitchCommand}"
                                 CommandParameter="{Binding}" />
-                            <controls:SymbolIcon Grid.Column="4" Symbol="ChevronRight" FontSize="20"
-                                                 IsVisible="{Binding IsEnabled}"
-                                                 Margin="0,0,10,0" />
+                            <controls:FontIcon Grid.Column="4" Glyph="&#xf2b2;" FontSize="20"
+                                               IsVisible="{Binding IsEnabled}"
+                                               Margin="0,0,10,0" />
                         </Grid>
 
 

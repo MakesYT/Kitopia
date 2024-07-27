@@ -1,6 +1,7 @@
 ﻿using System;
+using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.Services;
-using Microsoft.Extensions.DependencyInjection;
+using Core.ViewModel;
 
 namespace KitopiaAvalonia.Services;
 
@@ -13,7 +14,8 @@ public class NavigationPageService : INavigationPageService
 
     public bool Navigate(string pageIdOrTargetTag)
     {
-        ServiceManager.Services.GetService<MainWindow>().FrameView.NavigateFromObject(pageIdOrTargetTag);
+        WeakReferenceMessenger.Default.Send<PageChangeEventArgs>(new PageChangeEventArgs(pageIdOrTargetTag));
+
         return true;
     }
 }

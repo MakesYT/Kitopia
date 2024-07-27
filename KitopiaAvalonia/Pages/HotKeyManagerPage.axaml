@@ -14,10 +14,7 @@
         <converter:HotKeySignNameToStringCtr x:Key="HotKeySignNameToStringCtr" />
     </UserControl.Resources>
     <Grid RowDefinitions="Auto,*" Margin="42">
-        <TextBlock Margin="0" FontSize="18" FontWeight="DemiBold" Text="快捷键列表">
-            <TextBlock.Foreground>
-                <SolidColorBrush Color="{DynamicResource TextFillColorPrimary}" />
-            </TextBlock.Foreground>
+        <TextBlock Margin="0" FontSize="18" FontWeight="Bold" Text="快捷键列表">
         </TextBlock>
         <ScrollViewer Grid.Row="1">
             <ItemsControl
@@ -31,6 +28,7 @@
                                 <TextBlock Margin="0,5,0,0" Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                            Text="{Binding SignName,Converter={StaticResource HotKeySignNameToStringCtr}}" />
                                 <controls1:HotKeyShow Margin="0,5,0,0"
+                                                      Foreground="{DynamicResource TextControlForeground}"
                                                       HotKeyModel="{Binding RelativeSource={RelativeSource AncestorType=StackPanel},Path=DataContext}" />
                             </StackPanel>
 

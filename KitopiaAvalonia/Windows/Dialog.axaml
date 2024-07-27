@@ -22,10 +22,7 @@
 
         TransparencyLevelHint="AcrylicBlur"
         Title="Dialog">
-    <Window.Background>
-        <SolidColorBrush Color="{DynamicResource SolidBackgroundFillColorBase}" Opacity="0.65" />
 
-    </Window.Background>
 
     <!-- Even in WinUI, shadow is always black regardless of light/dark mode -->
 
@@ -92,7 +89,7 @@
                     </Grid.ColumnDefinitions>
                     <Button Name="PrimaryButton"
                             IsDefault="True"
-                            Classes="accent"
+                            Classes="Primary"
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Stretch"
                             HorizontalContentAlignment="Center"

@@ -3,7 +3,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Threading;
 using Core.ViewModel;
@@ -11,11 +10,12 @@ using log4net;
 using PluginCore;
 using SharpHook;
 using SharpHook.Native;
+using Ursa.Controls;
 using Vanara.PInvoke;
 
 namespace KitopiaAvalonia.Windows;
 
-public partial class MouseQuickWindow : Window
+public partial class MouseQuickWindow : UrsaWindow
 {
     private static readonly ILog log = LogManager.GetLogger(nameof(MouseQuickWindow));
 

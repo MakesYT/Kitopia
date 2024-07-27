@@ -1,14 +1,13 @@
 ﻿#region
 
-using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Threading;
 using Core.SDKs;
 using Core.SDKs.Services;
-using FluentAvalonia.UI.Controls;
 using KitopiaAvalonia.Controls;
-using Microsoft.Extensions.DependencyInjection;
+using Ursa.Controls;
+using Dialog = KitopiaAvalonia.Controls.Dialog;
 
 #endregion
 
@@ -16,7 +15,7 @@ namespace KitopiaAvalonia.Services;
 
 public class ContentDialogService : IContentDialog
 {
-    public void ShowDialogAsync(object? contentPresenter, DialogContent dialogContent)
+    public async Task ShowDialogAsync(object? contentPresenter, DialogContent dialogContent)
     {
         if (contentPresenter is null)
         {
@@ -28,36 +27,70 @@ public class ContentDialogService : IContentDialog
             return;
         }
 
-        var dialog = new ContentDialog()
+        DialogButton button = DialogButton.None;
+        if (dialogContent.CloseButtonText is null && dialogContent.PrimaryButtonText is null &&
+            dialogContent.SecondaryButtonText is null)
+        {
+            button = DialogButton.None;
+        }
+        else if (dialogContent.PrimaryButtonText is null && dialogContent.SecondaryButtonText is null &&
+                 dialogContent.CloseButtonText is not null)
+        {
+            button = DialogButton.None;
+        }
+        else if (dialogContent.CloseButtonText is null && dialogContent.PrimaryButtonText is null &&
+                 dialogContent.SecondaryButtonText is not null)
+        {
+            button = DialogButton.OKCancel;
+        }
+        else if (dialogContent.CloseButtonText is null && dialogContent.PrimaryButtonText is not null &&
+                 dialogContent.SecondaryButtonText is null)
+        {
+            button = DialogButton.OK;
+        }
+        else if (dialogContent.CloseButtonText is null && dialogContent.PrimaryButtonText is not null &&
+                 dialogContent.SecondaryButtonText is not null)
+        {
+            button = DialogButton.YesNo;
+        }
+        else if (dialogContent.CloseButtonText is not null && dialogContent.PrimaryButtonText is not null &&
+                 dialogContent.SecondaryButtonText is not null)
+        {
+            button = DialogButton.YesNoCancel;
+        }
+
+        var dialog = new DefaultDialogWindow()
         {
             Title = dialogContent.Title,
             Content = dialogContent.Content,
-            CloseButtonText = dialogContent.CloseButtonText,
-            SecondaryButtonText = dialogContent.SecondaryButtonText,
-            PrimaryButtonText = dialogContent.PrimaryButtonText,
-            DefaultButton = ContentDialogButton.Primary
+            Buttons = button,
         };
-        dialog.ShowAsync((TopLevel)contentPresenter!).ContinueWith(e =>
-        {
-            switch (e.Result)
+        dialog.Resources.Add("STRING_MENU_DIALOG_NO", dialogContent.CloseButtonText);
+        var result = await Ursa.Controls.Dialog.ShowModal<TextDialog, TextDialogViewModel>(
+            new TextDialogViewModel() { Text = dialogContent.Content }, (Window)contentPresenter, new DialogOptions()
             {
-                case ContentDialogResult.Primary:
-                {
-                    dialogContent.PrimaryAction?.Invoke();
-                    break;
-                }
-                case ContentDialogResult.Secondary:
-                {
-                    dialogContent.SecondaryAction?.Invoke();
-                    break;
-                }
-                case ContentDialogResult.None:
-                {
-                    dialogContent.CloseAction?.Invoke();
-                    break;
-                }
+                Title = dialogContent.Title,
+                Button = button,
+            });
+
+        switch (result)
+        {
+            case DialogResult.Yes:
+            {
+                dialogContent.PrimaryAction?.Invoke();
+                break;
             }
-        });
+            case DialogResult.No:
+            {
+                dialogContent.SecondaryAction?.Invoke();
+                break;
+            }
+            case DialogResult.Cancel:
+            {
+                dialogContent.CloseAction?.Invoke();
+                break;
+            }
+        }
     }
 
     public void ShowDialog(object? contentPresenter, DialogContent dialogContent)
@@ -65,58 +98,86 @@ public class ContentDialogService : IContentDialog
         if (contentPresenter is null)
         {
             var tcs = new TaskCompletionSource();
-            
-            Dispatcher.UIThread.InvokeAsync( () =>
+
+            Dispatcher.UIThread.InvokeAsync(() =>
             {
-                                   
                 var dialog = new Dialog(dialogContent);
                 dialog.Show();
                 var frame = new DispatcherFrame();
-                dialog.Closed += (sender, args) =>
-                {
-                    tcs.SetResult();
-                };
+                dialog.Closed += (sender, args) => { tcs.SetResult(); };
                 dialog.Show();
-
             }).Wait();
             tcs.Task.Wait();
-            
-            
-
         }
         else
         {
             Dispatcher.UIThread.InvokeAsync(() =>
             {
-                var dialog = new ContentDialog()
+                DialogButton button = DialogButton.None;
+                if (dialogContent.CloseButtonText is null && dialogContent.PrimaryButtonText is null &&
+                    dialogContent.SecondaryButtonText is null)
+                {
+                    button = DialogButton.None;
+                }
+                else if (dialogContent.PrimaryButtonText is null && dialogContent.SecondaryButtonText is null &&
+                         dialogContent.CloseButtonText is not null)
+                {
+                    button = DialogButton.None;
+                }
+                else if (dialogContent.CloseButtonText is null && dialogContent.PrimaryButtonText is null &&
+                         dialogContent.SecondaryButtonText is not null)
+                {
+                    button = DialogButton.OKCancel;
+                }
+                else if (dialogContent.CloseButtonText is null && dialogContent.PrimaryButtonText is not null &&
+                         dialogContent.SecondaryButtonText is null)
+                {
+                    button = DialogButton.OK;
+                }
+                else if (dialogContent.CloseButtonText is null && dialogContent.PrimaryButtonText is not null &&
+                         dialogContent.SecondaryButtonText is not null)
+                {
+                    button = DialogButton.YesNo;
+                }
+                else if (dialogContent.CloseButtonText is not null && dialogContent.PrimaryButtonText is not null &&
+                         dialogContent.SecondaryButtonText is not null)
+                {
+                    button = DialogButton.YesNoCancel;
+                }
+
+                var dialog = new DefaultDialogWindow()
                 {
                     Title = dialogContent.Title,
                     Content = dialogContent.Content,
-                    CloseButtonText = dialogContent.CloseButtonText,
-                    PrimaryButtonText = dialogContent.PrimaryButtonText,
-                    DefaultButton = ContentDialogButton.Primary
+                    Buttons = button,
                 };
-                dialog.ShowAsync((TopLevel)contentPresenter!).ContinueWith(e =>
-                {
-                    switch (e.Result)
+                dialog.Resources.Add("STRING_MENU_DIALOG_NO", dialogContent.CloseButtonText);
+                var result = Ursa.Controls.Dialog.ShowModal<TextDialog, TextDialogViewModel>(
+                    new TextDialogViewModel() { Text = dialogContent.Content }, (Window)contentPresenter,
+                    new DialogOptions()
                     {
-                        case ContentDialogResult.Primary:
-                        {
-                            dialogContent.PrimaryAction?.Invoke();
-                            break;
-                        }
-                        case ContentDialogResult.Secondary:
-                        {
-                            dialogContent.SecondaryAction?.Invoke();
-                            break;
-                        }
-                        case ContentDialogResult.None:
-                        {
-                            dialogContent.CloseAction?.Invoke();
-                            break;
-                        }
+                        Title = dialogContent.Title,
+                        Button = button,
+                    }).Result;
+
+                switch (result)
+                {
+                    case DialogResult.Yes:
+                    {
+                        dialogContent.PrimaryAction?.Invoke();
+                        break;
                     }
-                }).Wait();
+                    case DialogResult.No:
+                    {
+                        dialogContent.SecondaryAction?.Invoke();
+                        break;
+                    }
+                    case DialogResult.Cancel:
+                    {
+                        dialogContent.CloseAction?.Invoke();
+                        break;
+                    }
+                }
             }).Wait();
         }
     }

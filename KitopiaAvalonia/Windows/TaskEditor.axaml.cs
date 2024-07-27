@@ -13,9 +13,9 @@ using Core.SDKs.CustomScenario;
 using Core.SDKs.Services;
 using Core.ViewModel;
 using Core.ViewModel.TaskEditor;
-using FluentAvalonia.UI.Windowing;
 using KitopiaAvalonia.Controls;
 using Microsoft.Extensions.DependencyInjection;
+using Ursa.Controls;
 using Vanara.PInvoke;
 using DataObject = Avalonia.Input.DataObject;
 using DragDrop = Avalonia.Input.DragDrop;
@@ -28,7 +28,7 @@ using RoutedEventArgs = Avalonia.Interactivity.RoutedEventArgs;
 
 namespace KitopiaAvalonia.Windows;
 
-public partial class TaskEditor : AppWindow
+public partial class TaskEditor : UrsaWindow
 {
     public TaskEditor()
     {

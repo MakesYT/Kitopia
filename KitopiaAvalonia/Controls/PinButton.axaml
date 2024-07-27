@@ -1,7 +1,6 @@
 ﻿<Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:controls="using:KitopiaAvalonia.Controls"
-        xmlns:controls1="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia">
+        xmlns:controls="using:KitopiaAvalonia.Controls">
     <Design.PreviewWith>
         <controls:PinButton />
     </Design.PreviewWith>
@@ -10,25 +9,25 @@
         <!-- Set Defaults -->
         <Setter Property="Template">
             <ControlTemplate>
-                <controls1:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xF604;" Name="Icon" FontSize="24" RenderTransform="rotate(0)">
-                    <controls1:FontIcon.Transitions>
+                <controls:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xF604;" GlyphFilled="&#xF60C;"
+                                   Name="Icon" FontSize="24" RenderTransform="rotate(0)">
+                    <controls:FontIcon.Transitions>
                         <Transitions>
-                            <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.2"/>
+                            <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.2" />
                         </Transitions>
-                    </controls1:FontIcon.Transitions>
-                </controls1:FontIcon>
+                    </controls:FontIcon.Transitions>
+                </controls:FontIcon>
             </ControlTemplate>
         </Setter>
     </Style>
-    <Style Selector="controls|PinButton[IsChecked=True] /template/ controls1|FontIcon#Icon">
-        <Setter Property="Glyph" Value="&#xF60C;" />
-        <Setter Property="FontFamily" Value="{StaticResource FluentFontFilled}"></Setter>
-        <Setter Property="RenderTransform" Value="rotate(-45deg)"/>
-        
+    <Style Selector="controls|PinButton[IsChecked=True] /template/ controls|FontIcon#Icon">
+
+        <Setter Property="RenderTransform" Value="rotate(-45deg)" />
+
     </Style>
-    <Style Selector="controls|PinButton:pointerover[IsChecked=False] /template/ controls1|FontIcon#Icon">
-        <Setter Property="RenderTransform" Value="rotate(-45deg)"/>
-        <Setter Property="Glyph" Value="&#xF602;" />
+    <Style Selector="controls|PinButton:pointerover[IsChecked=False] /template/ controls|FontIcon#Icon">
+        <Setter Property="RenderTransform" Value="rotate(-45deg)" />
+
     </Style>
 
 </Styles>

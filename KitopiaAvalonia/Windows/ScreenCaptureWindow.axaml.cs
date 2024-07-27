@@ -41,7 +41,8 @@ public partial class ScreenCaptureWindow : Window
     {
         InitializeComponent();
         Index = index;
-        WeakReferenceMessenger.Default.Register<string, string>(this, "ScreenCapture", (sender, message) => {
+        WeakReferenceMessenger.Default.Register<string, string>(this, "ScreenCapture", (sender, message) =>
+        {
             switch (message)
             {
                 case "Close":
@@ -88,7 +89,8 @@ public partial class ScreenCaptureWindow : Window
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        ColorPicker.CustomPaletteColors = new[]
+
+        ColorPicker.PaletteColors = new[]
         {
             Colors.Red,
             Colors.Yellow,
@@ -186,7 +188,7 @@ public partial class ScreenCaptureWindow : Window
             SelectBox.IsVisible = true;
             IsSelected = true;
             if (!Cursor.ToString()
-                       .Equals("Default"))
+                    .Equals("Default"))
             {
                 Cursor?.Dispose();
                 Cursor = Cursor.Default;
@@ -231,8 +233,8 @@ public partial class ScreenCaptureWindow : Window
                         ((int)(SelectBox.Width)), ((int)(SelectBox.Height)))));
                     image.Dispose();
                     ServiceManager.Services.GetService<IClipboardService>()
-                                  .SetImageAsync(clone)
-                                  .ContinueWith((e) => clone.Dispose());
+                        .SetImageAsync(clone)
+                        .ContinueWith((e) => clone.Dispose());
 
                     bitmap.Dispose();
                 }
@@ -254,7 +256,7 @@ public partial class ScreenCaptureWindow : Window
         base.OnPointerPressed(e);
 
         if (e.GetCurrentPoint(this)
-             .Properties.IsLeftButtonPressed && !IsSelected)
+                .Properties.IsLeftButtonPressed && !IsSelected)
         {
             Selecting = true;
             X.IsVisible = false;
@@ -303,12 +305,12 @@ public partial class ScreenCaptureWindow : Window
     {
         base.OnPointerMoved(e);
         if (e.GetCurrentPoint(this)
-             .Properties.IsLeftButtonPressed && Selecting)
+                .Properties.IsLeftButtonPressed && Selecting)
         {
             var selectBoxHeight = e.GetPosition(this)
-                                   .Y - _startPoint.Y;
+                .Y - _startPoint.Y;
             var selectBoxWidth = e.GetPosition(this)
-                                  .X - _startPoint.X;
+                .X - _startPoint.X;
             if (selectBoxHeight < 0)
             {
                 SelectBox.Height = -selectBoxHeight;
@@ -339,15 +341,15 @@ public partial class ScreenCaptureWindow : Window
             X.IsVisible = true;
             Y.IsVisible = true;
             X.StartPoint = new Point(0, e.GetPosition(this)
-                                         .Y);
+                .Y);
 
             X.EndPoint = new Point(this.Width, e.GetPosition(this)
-                                                .Y);
+                .Y);
 
             Y.StartPoint = new Point(e.GetPosition(this)
-                                      .X, 0);
+                .X, 0);
             Y.EndPoint = new Point(e.GetPosition(this)
-                                    .X, this.Height);
+                .X, this.Height);
         }
         else
         {
@@ -373,7 +375,7 @@ public partial class ScreenCaptureWindow : Window
 
         SelectBox.IsSelected = true;
         if (e.GetCurrentPoint(this)
-             .Properties.IsLeftButtonPressed)
+            .Properties.IsLeftButtonPressed)
         {
             if (!(StrokeWidth.Value > 1))
             {
@@ -399,8 +401,8 @@ public partial class ScreenCaptureWindow : Window
                     var rectangle = new Avalonia.Controls.Shapes.Rectangle();
                     dragarea.Content = rectangle;
 
-                    rectangle.Stroke = new SolidColorBrush(ColorPicker.Color!.Value);
-                    rectangle.StrokeThickness = StrokeWidth.Value;
+                    rectangle.Stroke = new SolidColorBrush(ColorPicker.Color!);
+                    rectangle.StrokeThickness = (double)StrokeWidth.Value;
 
                     Canvas.Children.Add(dragarea);
                     Adding截图工具 = true;
@@ -421,8 +423,8 @@ public partial class ScreenCaptureWindow : Window
                     var rectangle = new Ellipse();
                     dragarea.Content = rectangle;
                     dragarea.IsSelected = true;
-                    rectangle.Stroke = new SolidColorBrush(ColorPicker.Color!.Value);
-                    rectangle.StrokeThickness = StrokeWidth.Value;
+                    rectangle.Stroke = new SolidColorBrush(ColorPicker.Color!);
+                    rectangle.StrokeThickness = (double)StrokeWidth.Value;
 
                     Canvas.Children.Add(dragarea);
                     Adding截图工具 = true;
@@ -438,9 +440,9 @@ public partial class ScreenCaptureWindow : Window
                     dragarea.IsSelected = true;
                     dragarea.Source = position;
                     dragarea.Target = position;
-                    dragarea.Stroke = new SolidColorBrush(ColorPicker.Color!.Value);
-                    dragarea.Fill = new SolidColorBrush(ColorPicker.Color!.Value);
-                    dragarea.StrokeThickness = StrokeWidth.Value;
+                    dragarea.Stroke = new SolidColorBrush(ColorPicker.Color!);
+                    dragarea.Fill = new SolidColorBrush(ColorPicker.Color!);
+                    dragarea.StrokeThickness = (double)StrokeWidth.Value;
                     dragarea.ArrowSize = new Size(8 * dragarea.StrokeThickness, 8 * dragarea.StrokeThickness);
                     Canvas.Children.Add(dragarea);
                     Adding截图工具 = true;
@@ -455,9 +457,9 @@ public partial class ScreenCaptureWindow : Window
 
                     var rectangle = new PenCaptureTool();
                     rectangle.Points.Add(position);
-                    rectangle.StrokeThickness = StrokeWidth.Value;
-                    rectangle.Stroke = new SolidColorBrush(ColorPicker.Color!.Value);
-                    rectangle.Fill = new SolidColorBrush(ColorPicker.Color!.Value);
+                    rectangle.StrokeThickness = (double)StrokeWidth.Value;
+                    rectangle.Stroke = new SolidColorBrush(ColorPicker.Color!);
+                    rectangle.Fill = new SolidColorBrush(ColorPicker.Color!);
                     rectangle.Width = Width;
                     rectangle.Height = Height;
                     Canvas.Children.Add(rectangle);
@@ -477,9 +479,9 @@ public partial class ScreenCaptureWindow : Window
 
 
                     dragarea.IsSelected = true;
-                    dragarea.Foreground = new SolidColorBrush(ColorPicker.Color!.Value);
+                    dragarea.Foreground = new SolidColorBrush(ColorPicker.Color!);
                     dragarea.Text = "文本1";
-                    dragarea.FontSize = 13 + StrokeWidth.Value;
+                    dragarea.FontSize = (double)(13 + StrokeWidth.Value);
                     Canvas.Children.Add(dragarea);
                     Adding截图工具 = true;
                     Now截图工具 = dragarea;
@@ -497,7 +499,7 @@ public partial class ScreenCaptureWindow : Window
                         points = new List<Point>() { position }
                     });
                     MosaicCanvas.Points.Add(position);
-                    MosaicCanvas.StrokeThickness = 5 + StrokeWidth.Value;
+                    MosaicCanvas.StrokeThickness = (double)(5 + StrokeWidth.Value);
                     Adding截图工具 = true;
 
                     break;
@@ -525,7 +527,7 @@ public partial class ScreenCaptureWindow : Window
                 case 截图工具.无:
                 {
                     if (!SelectBox.Cursor.ToString()
-                                  .Equals("SizeAll"))
+                            .Equals("SizeAll"))
                     {
                         SelectBox.Cursor?.Dispose();
                         SelectBox.Cursor = new Cursor(StandardCursorType.SizeAll);
@@ -536,12 +538,12 @@ public partial class ScreenCaptureWindow : Window
                 case 截图工具.马赛克:
                 {
                     if (!SelectBox.Cursor.ToString()
-                                  .Equals("BitmapCursor"))
+                            .Equals("BitmapCursor"))
                     {
-                        var round = (int)Math.Round(StrokeWidth.Value, MidpointRounding.AwayFromZero) + 7;
+                        var round = (int)Math.Round((decimal)StrokeWidth.Value, MidpointRounding.AwayFromZero) + 7;
                         var renderTargetBitmap = new RenderTargetBitmap(new PixelSize(round, round));
                         Ellipse ellipse = new Ellipse();
-                        ellipse.Stroke = new SolidColorBrush(ColorPicker.Color!.Value);
+                        ellipse.Stroke = new SolidColorBrush(ColorPicker.Color!);
                         ellipse.StrokeThickness = 2;
                         ellipse.Width = round;
                         ellipse.Height = round;
@@ -558,12 +560,12 @@ public partial class ScreenCaptureWindow : Window
                 case 截图工具.批准:
                 {
                     if (!SelectBox.Cursor.ToString()
-                                  .Equals("BitmapCursor"))
+                            .Equals("BitmapCursor"))
                     {
-                        var round = (int)Math.Round(StrokeWidth.Value, MidpointRounding.AwayFromZero) + 2;
+                        var round = (int)Math.Round((decimal)StrokeWidth.Value, MidpointRounding.AwayFromZero) + 2;
                         var renderTargetBitmap = new RenderTargetBitmap(new PixelSize(round, round));
                         Ellipse ellipse = new Ellipse();
-                        ellipse.Stroke = new SolidColorBrush(ColorPicker.Color!.Value);
+                        ellipse.Stroke = new SolidColorBrush(ColorPicker.Color!);
                         ellipse.StrokeThickness = 2;
                         ellipse.Width = round;
                         ellipse.Height = round;
@@ -580,7 +582,7 @@ public partial class ScreenCaptureWindow : Window
                 default:
                 {
                     if (!SelectBox.Cursor.ToString()
-                                  .Equals("SizeAll"))
+                            .Equals("SizeAll"))
                     {
                         SelectBox.Cursor?.Dispose();
                         SelectBox.Cursor = Avalonia.Input.Cursor.Default;
@@ -625,7 +627,7 @@ public partial class ScreenCaptureWindow : Window
                 else
                 {
                     redoStack.Peek()
-                             .points.Add(e.GetPosition(this));
+                        .points.Add(e.GetPosition(this));
                 }
             }
             else
@@ -645,9 +647,9 @@ public partial class ScreenCaptureWindow : Window
         else
         {
             var selectBoxHeight = e.GetPosition(this)
-                                   .Y - _startPoint.Y;
+                .Y - _startPoint.Y;
             var selectBoxWidth = e.GetPosition(this)
-                                  .X - _startPoint.X;
+                .X - _startPoint.X;
 
             if (selectBoxHeight < 0)
             {
@@ -752,7 +754,7 @@ public partial class ScreenCaptureWindow : Window
                     if (result.Type == 截图工具.马赛克)
                     {
                         redoStack.Peek()
-                                 .points.Add(new Point(-1, -1));
+                            .points.Add(new Point(-1, -1));
                     }
                 }
 
@@ -816,7 +818,7 @@ public partial class ScreenCaptureWindow : Window
         if (IsSelected)
         {
             if (!Cursor.ToString()
-                       .Equals("Default"))
+                    .Equals("Default"))
             {
                 Cursor?.Dispose();
                 Cursor = Cursor.Default;
@@ -863,8 +865,8 @@ public partial class ScreenCaptureWindow : Window
                 ((int)(SelectBox.Width)), ((int)(SelectBox.Height)))));
             image.Dispose();
             ServiceManager.Services.GetService<IClipboardService>()
-                          .SetImageAsync(clone)
-                          .ContinueWith((e) => clone.Dispose());
+                .SetImageAsync(clone)
+                .ContinueWith((e) => clone.Dispose());
 
             bitmap.Dispose();
             renderTargetBitmap.Dispose();
@@ -1041,10 +1043,10 @@ public partial class ScreenCaptureWindow : Window
                             {
                                 ((DraggableResizeableControl)Canvas.Children[
                                         Canvas.Children.IndexOf((Control)item.Target)])
-                                   ._dragTransform.X = item.startPoint.X;
+                                    ._dragTransform.X = item.startPoint.X;
                                 ((DraggableResizeableControl)Canvas.Children[
                                         Canvas.Children.IndexOf((Control)item.Target)])
-                                   ._dragTransform.Y = item.startPoint.Y;
+                                    ._dragTransform.Y = item.startPoint.Y;
                             }
 
                             break;
@@ -1052,9 +1054,9 @@ public partial class ScreenCaptureWindow : Window
                         case 截图工具.箭头:
                         {
                             ((DraggableArrowControl)Canvas.Children[Canvas.Children.IndexOf((Control)item.Target)])
-                               .Source = item.Point1;
+                                .Source = item.Point1;
                             ((DraggableArrowControl)Canvas.Children[Canvas.Children.IndexOf((Control)item.Target)])
-                               .Target = item.Point2;
+                                .Target = item.Point2;
 
                             break;
                         }
@@ -1094,16 +1096,16 @@ public partial class ScreenCaptureWindow : Window
                             {
                                 ((DraggableResizeableControl)Canvas.Children[
                                         Canvas.Children.IndexOf((Control)item.Target)])
-                                   ._dragTransform.X = item.startPoint.X;
+                                    ._dragTransform.X = item.startPoint.X;
                                 ((DraggableResizeableControl)Canvas.Children[
                                         Canvas.Children.IndexOf((Control)item.Target)])
-                                   ._dragTransform.Y = item.startPoint.Y;
+                                    ._dragTransform.Y = item.startPoint.Y;
                                 ((DraggableResizeableControl)Canvas.Children[
                                         Canvas.Children.IndexOf((Control)item.Target)])
-                                   .Width = item.Size.Width;
+                                    .Width = item.Size.Width;
                                 ((DraggableResizeableControl)Canvas.Children[
                                         Canvas.Children.IndexOf((Control)item.Target)])
-                                   .Height = item.Size.Height;
+                                    .Height = item.Size.Height;
                             }
 
                             break;
@@ -1111,9 +1113,9 @@ public partial class ScreenCaptureWindow : Window
                         case 截图工具.文本:
                         {
                             ((TextCaptureTool)Canvas.Children[Canvas.Children.IndexOf((Control)item.Target)])
-                               .IsRedoing = true;
+                                .IsRedoing = true;
                             ((TextCaptureTool)Canvas.Children[Canvas.Children.IndexOf((Control)item.Target)])
-                               .Text = (string)item.Data;
+                                .Text = (string)item.Data;
                             break;
                         }
                     }

@@ -2,9 +2,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+
         xmlns:controls1="clr-namespace:KitopiaAvalonia.Controls"
         xmlns:capture="clr-namespace:KitopiaAvalonia.Controls.Capture"
+        xmlns:u="https://irihi.tech/ursa"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="KitopiaAvalonia.Windows.ScreenCaptureWindow"
         Title="ScreenCaptureWindow">
@@ -77,24 +78,24 @@
                                  StrokeThickness="1" />
                     </Button>
                     <Button BorderThickness="1" ToolTip.Tip="箭头" Width="32" Height="32" Click="ArrowButton_OnClick">
-                        <controls:FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" Width="24"
-                                           Height="24"
-                                           FontFamily="{StaticResource FluentFont}" Glyph="&#xf14b;" FontSize="24">
-                            <controls:FontIcon.RenderTransform>
+                        <controls1:FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" Width="24"
+                                            Height="24"
+                                            FontFamily="{StaticResource FluentFont}" Glyph="&#xf14b;" FontSize="24">
+                            <controls1:FontIcon.RenderTransform>
                                 <RotateTransform Angle="180" />
-                            </controls:FontIcon.RenderTransform>
-                        </controls:FontIcon>
+                            </controls1:FontIcon.RenderTransform>
+                        </controls1:FontIcon>
                     </Button>
                     <Button BorderThickness="1" ToolTip.Tip="批注" Width="32" Height="32" Padding="0,3,0,0"
                             Click="CommentButton_OnClick">
-                        <controls:FontIcon Width="24" Height="24"
-                                           FontFamily="{StaticResource FluentFont}" Glyph="&#xe8d8;" FontSize="24" />
+                        <controls1:FontIcon Width="24" Height="24"
+                                            FontFamily="{StaticResource FluentFont}" Glyph="&#xe8d8;" FontSize="24" />
                     </Button>
                     <Button BorderThickness="1" ToolTip.Tip="文本" Width="32" Height="32" Padding="1,3,0,0"
                             Click="TextButton_OnClick">
-                        <controls:FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" Width="24"
-                                           Height="24"
-                                           FontFamily="{StaticResource FluentFont}" Glyph="&#xecaf;" FontSize="24" />
+                        <controls1:FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" Width="24"
+                                            Height="24"
+                                            FontFamily="{StaticResource FluentFont}" Glyph="&#xecaf;" FontSize="24" />
                     </Button>
                     <Button BorderThickness="1" ToolTip.Tip="马赛克" Width="32" Height="32" Click="MosaicButton_OnClick">
                         <controls1:MosaicIcon Width="18" Height="18" />
@@ -106,9 +107,9 @@
                     <Button HotKey="Ctrl+Z" BorderThickness="1" ToolTip.Tip="撤销" Width="32" Height="32"
                             Padding="1,3,0,0"
                             Click="RedoButton_OnClick">
-                        <controls:FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" Width="24"
-                                           Height="24"
-                                           FontFamily="{StaticResource FluentFont}" Glyph="&#xf8e6;" FontSize="24" />
+                        <controls1:FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" Width="24"
+                                            Height="24"
+                                            FontFamily="{StaticResource FluentFont}" Glyph="&#xf8e6;" FontSize="24" />
                     </Button>
                     <Button BorderThickness="1" ToolTip.Tip="拓展功能" Width="32" Height="32" Padding="1" />
                     <Line Height="32" Width="1" Stroke="{StaticResource TextFillColorSecondaryBrush}"
@@ -117,15 +118,15 @@
                           EndPoint="0.5,32" />
                     <Button BorderThickness="1" ToolTip.Tip="取消" Width="32" Height="32" Padding="1,3,0,0"
                             Click="Close_Click">
-                        <controls:FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" Width="24"
-                                           Height="24"
-                                           FontFamily="{StaticResource FluentFont}" Glyph="&#xf36a;" FontSize="24" />
+                        <controls1:FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" Width="24"
+                                            Height="24"
+                                            FontFamily="{StaticResource FluentFont}" Glyph="&#xf36a;" FontSize="24" />
                     </Button>
                     <Button BorderThickness="1" ToolTip.Tip="复制到剪贴板" Width="32" Height="32" Padding="1,3,0,0"
                             Click="SaveToClipboard_Click">
-                        <controls:FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" Width="24"
-                                           Height="24"
-                                           FontFamily="{StaticResource FluentFont}" Glyph="&#xf295;" FontSize="24" />
+                        <controls1:FontIcon VerticalAlignment="Center" HorizontalAlignment="Center" Width="24"
+                                            Height="24"
+                                            FontFamily="{StaticResource FluentFont}" Glyph="&#xf295;" FontSize="24" />
                     </Button>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Spacing="2">
@@ -148,18 +149,11 @@
                             </Setter>
                         </Style>
                     </StackPanel.Styles>
-                    <controls:NumberBox ToolTip.Tip="画笔大小" Margin="0,2,0,0" Height="37" Name="StrokeWidth" Minimum="1"
-                                        Maximum="50"
-                                        PlaceholderText="3"
-                                        SpinButtonPlacementMode="Inline" Value="3"
-                                        ValidationMode="InvalidInputOverwritten">
-                        <controls:NumberBox.Styles>
-                            <Style Selector="controls|NumberBox /template/ TextBox#InputBox">
-                                <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
-                            </Style>
-                        </controls:NumberBox.Styles>
-                    </controls:NumberBox>
-                    <controls:ColorPickerButton ToolTip.Tip="画笔颜色" Name="ColorPicker" UseColorPalette="True"></controls:ColorPickerButton>
+                    <u:NumericIntUpDown ToolTip.Tip="画笔大小" Margin="0,2,0,0" Height="37" Name="StrokeWidth" Minimum="1"
+                                        Maximum="50" Value="3">
+                    </u:NumericIntUpDown>
+                    <ColorPicker ToolTip.Tip="画笔颜色" Name="ColorPicker">
+                    </ColorPicker>
 
                 </StackPanel>
             </StackPanel>

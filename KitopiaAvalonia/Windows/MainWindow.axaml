@@ -1,23 +1,29 @@
-<windowing:AppWindow xmlns="https://github.com/avaloniaui"
-                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                     xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
-                     xmlns:windowing="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
-                     mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-                     x:Class="KitopiaAvalonia.MainWindow"
-                     Closing="Window_OnClosing"
-                     TransparencyLevelHint="AcrylicBlur"
-                     xmlns:sty="using:FluentAvalonia.Styling"
-                     Icon="/Assets/icon.png"
-                     Title="Kitopia">
+<u:UrsaWindow xmlns="https://github.com/avaloniaui"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+              x:Class="KitopiaAvalonia.MainWindow"
+              Closing="Window_OnClosing"
+              TransparencyLevelHint="AcrylicBlur"
+              x:DataType="viewModel:MainWindowViewModel"
+              xmlns:u="https://irihi.tech/ursa"
+              xmlns:viewModel="clr-namespace:Core.ViewModel;assembly=Core"
+              xmlns:controls="clr-namespace:KitopiaAvalonia.Controls"
+              xmlns:converter="clr-namespace:KitopiaAvalonia.Converter"
+              Icon="/Assets/icon.png"
+              IsTitleBarVisible="True"
+              Title="Kitopia">
 
-    <windowing:AppWindow.Background>
+    <u:UrsaWindow.Resources>
+        <converter:ViewLocator x:Key="ViewLocator" />
+    </u:UrsaWindow.Resources>
+    <u:UrsaWindow.Background>
         <SolidColorBrush Color="{DynamicResource SolidBackgroundFillColorBase}" Opacity="0.65" />
 
-    </windowing:AppWindow.Background>
-    <Grid RowDefinitions="Auto,*">
-        <Grid Name="TitleBarHost"
+    </u:UrsaWindow.Background>
+    <u:UrsaWindow.TitleBarContent>
+        <Grid ColumnSpan="2" Name="TitleBarHost" PointerPressed="TitleBarHost_OnPointerPressed"
               ColumnDefinitions="Auto,Auto,*,Auto"
               Background="Transparent">
             <Image Margin="12 4"
@@ -49,8 +55,7 @@
             <Border Grid.Column="2" Padding="6">
                 <AutoCompleteBox Name="SearchBox"
                                  MaxWidth="500"
-                                 Watermark="Search"
-                                 Classes="SampleApp">
+                                 Watermark="Search">
                     <!--wnd:AppWindow.AllowInteractionInTitleBar="True"-->
                     <AutoCompleteBox.ItemTemplate>
 
@@ -58,38 +63,63 @@
                 </AutoCompleteBox>
             </Border>
         </Grid>
-
-
-        <ui:NavigationView Name="NavView" PaneDisplayMode="Left" Grid.RowSpan="2" CompactPaneLength="48"
-                           ItemInvoked="NavView_OnItemInvoked" Classes="SampleAppNav"
-                           
-                           IsBackEnabled="{Binding #FrameView.CanGoBack}" AlwaysShowHeader="False"
-                           BackRequested="NavView_OnBackRequested"
-                           IsSettingsVisible="False">
-            <ui:NavigationView.Styles>
-                <Style Selector="ui|NavigationView /template/ Button#NavigationViewBackButton">
-                    <Setter Property="FontFamily" Value="{StaticResource SymbolThemeFontFamily}"/>
+    </u:UrsaWindow.TitleBarContent>
+    <Grid RowDefinitions="Auto,*" ColumnDefinitions="Auto,*" Margin="5,40,5,5">
+        <u:NavMenu Grid.Row="1" Grid.Column="0" Name="NavView"
+                   IsHorizontalCollapsed="True"
+                   CanToggle="False"
+                   ExpandWidth="56"
+                   CollapseWidth="56"
+                   ItemsSource="{Binding MenuItems}"
+                   CommandBinding="{Binding ActivateCommand}"
+                   HeaderBinding="{Binding}"
+                   IconBinding="{Binding}">
+            <u:NavMenu.Styles>
+                <Style Selector="u|NavMenuItem" x:DataType="viewModel:MenuItemViewModel">
+                    <Setter Property="IsSeparator" Value="{Binding IsSeparator}"></Setter>
                 </Style>
-            </ui:NavigationView.Styles>
-            <ui:Frame Name="FrameView" CacheSize="0" Navigated="FrameView_OnNavigated" />
-            <ui:NavigationView.MenuItems>
-                <ui:NavigationViewItem Classes="SampleAppNav" Content="主页"  FontSize="30" Cursor="Hand" Tag="HomePage" />
-                <ui:NavigationViewItem Classes="SampleAppNav" Content="插件"  FontSize="30" Cursor="Hand"
-                                       Tag="PluginManagerPage" />
-                <ui:NavigationViewItem Classes="SampleAppNav" Content="情景"  FontSize="30" Cursor="Hand"
-                                       Tag="CustomScenariosManagerPage" />
-                <ui:NavigationViewItem Classes="SampleAppNav" Content="快捷键"  FontSize="30" Cursor="Hand"
-                                       Tag="HotKeyManagerPage" />
-            </ui:NavigationView.MenuItems>
-            <ui:NavigationView.FooterMenuItems>
-                <ui:NavigationViewItem Classes="SampleAppNav" Content="设置"  FontSize="30" Cursor="Hand"
-                                       Tag="SettingPage" />
-            </ui:NavigationView.FooterMenuItems>
-        </ui:NavigationView>
-        <Panel Name="OverlayHost"
-               Grid.Row="1" />
+            </u:NavMenu.Styles>
+            <u:NavMenu.HeaderTemplate>
+                <DataTemplate x:DataType="viewModel:MenuItemViewModel">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock HorizontalAlignment="Left" Text="{Binding MenuHeader}" />
+                    </StackPanel>
+                </DataTemplate>
+            </u:NavMenu.HeaderTemplate>
+            <u:NavMenu.IconTemplate>
+                <DataTemplate x:DataType="viewModel:MenuItemViewModel">
+                    <controls:FontIcon
+                        Width="24"
+                        Height="24"
+                        FontSize="24"
+                        GlyphFilled="{Binding MenuIconFilledGlyph}"
+                        Glyph="{Binding MenuIconGlyph }" />
+                </DataTemplate>
+            </u:NavMenu.IconTemplate>
+            <u:NavMenu.Footer>
+
+                <Button HorizontalAlignment="Stretch" Height="56" ToolTip.Tip="设置"
+                        Command="{Binding ActivateSettingPageCommand}"
+                        Foreground="{DynamicResource TextControlForeground}">
+                    <Button.Resources>
+                        <SolidColorBrush x:Key="ButtonDefaultBackground" Opacity="0.05" Color="Transparent" />
+                    </Button.Resources>
+                    <controls:FontIcon
+                        Foreground="{DynamicResource TextControlForeground}"
+                        Width="24"
+                        Height="24"
+                        FontSize="24"
+                        GlyphFilled="&#xf6b3;"
+                        Glyph="&#xf6aa;" />
+                </Button>
+            </u:NavMenu.Footer>
+
+        </u:NavMenu>
+        <ContentPresenter Grid.Row="1" Grid.Column="1"
+                          Content="{Binding Content,Converter={StaticResource ViewLocator}}">
+        </ContentPresenter>
 
     </Grid>
 
 
-</windowing:AppWindow>
+</u:UrsaWindow>

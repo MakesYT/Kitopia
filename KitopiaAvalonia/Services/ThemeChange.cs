@@ -5,8 +5,6 @@ using Avalonia;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using Core.SDKs.Services;
-using FluentAvalonia.Styling;
-using KitopiaAvalonia;
 using log4net;
 
 #endregion
@@ -21,7 +19,8 @@ public class ThemeChange : IThemeChange
     {
         log.Debug(nameof(ThemeChange) + "的接口" + nameof(changeTo) + "被调用");
 
-        Dispatcher.UIThread.Post(() => {
+        Dispatcher.UIThread.Post(() =>
+        {
             switch (name)
             {
                 case "theme_light":
@@ -44,8 +43,6 @@ public class ThemeChange : IThemeChange
     public void followSys(bool follow)
     {
         log.Debug(nameof(ThemeChange) + "的接口" + nameof(follow) + "被调用");
-        var fluentAvaloniaTheme = App.Current.Styles[0] as FluentAvaloniaTheme;
-        fluentAvaloniaTheme.PreferSystemTheme = follow;
     }
 
     public bool isDark()

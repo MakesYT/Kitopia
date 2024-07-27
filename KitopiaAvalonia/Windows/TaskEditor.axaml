@@ -1,32 +1,33 @@
-﻿<windowing:AppWindow xmlns="https://github.com/avaloniaui"
-                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                     xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
-                     xmlns:windowing="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
-                     xmlns:converter="clr-namespace:Kitopia.Converter"
-                     xmlns:pluginCore="clr-namespace:PluginCore;assembly=PluginCore"
-                     xmlns:controls1="clr-namespace:KitopiaAvalonia.Controls"
-                     xmlns:taskEditor="clr-namespace:Kitopia.Converter.TaskEditor"
-                     xmlns:customScenario="clr-namespace:Core.SDKs.CustomScenario;assembly=Core"
+﻿<u:UrsaWindow xmlns="https://github.com/avaloniaui"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 
-                     xmlns:taskEditor1="clr-namespace:Core.ViewModel.TaskEditor;assembly=Core"
+              xmlns:converter="clr-namespace:Kitopia.Converter"
+              xmlns:pluginCore="clr-namespace:PluginCore;assembly=PluginCore"
+              xmlns:controls1="clr-namespace:KitopiaAvalonia.Controls"
+              xmlns:taskEditor="clr-namespace:Kitopia.Converter.TaskEditor"
+              xmlns:customScenario="clr-namespace:Core.SDKs.CustomScenario;assembly=Core"
 
-                     xmlns:generic="clr-namespace:System.Collections.Generic;assembly=System.Runtime"
-                     xmlns:controls2="clr-namespace:NodifyM.Avalonia.Controls;assembly=NodifyM.Avalonia"
-                     xmlns:pages="clr-namespace:KitopiaAvalonia.Pages"
-                     mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-                     x:Class="KitopiaAvalonia.Windows.TaskEditor"
-                     Title="情景编排"
-                     WindowStartupLocation="CenterScreen"
-                     TransparencyLevelHint="AcrylicBlur"
-                     Name="TaskEditorWindow"
-                     x:DataType="taskEditor1:TaskEditorViewModel" Height="450" Width="1800">
-    <windowing:AppWindow.Background>
+              xmlns:taskEditor1="clr-namespace:Core.ViewModel.TaskEditor;assembly=Core"
+
+              xmlns:generic="clr-namespace:System.Collections.Generic;assembly=System.Runtime"
+              xmlns:controls2="clr-namespace:NodifyM.Avalonia.Controls;assembly=NodifyM.Avalonia"
+              xmlns:pages="clr-namespace:KitopiaAvalonia.Pages"
+              xmlns:u="https://irihi.tech/ursa"
+              xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls"
+              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+              x:Class="KitopiaAvalonia.Windows.TaskEditor"
+              Title="情景编排"
+              WindowStartupLocation="CenterScreen"
+              TransparencyLevelHint="AcrylicBlur"
+              Name="TaskEditorWindow"
+              x:DataType="taskEditor1:TaskEditorViewModel" Height="450" Width="1800">
+    <u:UrsaWindow.Background>
         <SolidColorBrush Color="{DynamicResource SolidBackgroundFillColorBase}" Opacity="0.65" />
 
-    </windowing:AppWindow.Background>
-    <windowing:AppWindow.Resources>
+    </u:UrsaWindow.Background>
+    <u:UrsaWindow.Resources>
 
         <converter:HotKeySignNameToolCTr x:Key="HotKeySignNameToolCTr" />
         <taskEditor:IfNullVisibilityHidden x:Key="IfNullVisibilityHidden" />
@@ -34,8 +35,8 @@
 
         <converter:ReverseBool x:Key="ReverseBool" />
         <taskEditor:ScenarioMethodCategoryGroupCtr x:Key="ScenarioMethodCategoryGroupCtr" />
-    </windowing:AppWindow.Resources>
-    <windowing:AppWindow.Styles>
+    </u:UrsaWindow.Resources>
+    <u:UrsaWindow.Styles>
         <Style Selector="RepeatButton /template/ ContentPresenter">
             <Setter Property="ContentTemplate">
                 <Setter.Value>
@@ -45,7 +46,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
-    </windowing:AppWindow.Styles>
+    </u:UrsaWindow.Styles>
     <Interaction.Behaviors>
         <EventTriggerBehavior EventName="Closing">
             <InvokeCommandAction Command="{Binding ReloadScenarioCommand}" PassEventArgsToCommand="True" />
@@ -104,8 +105,8 @@
                                         <TextBox Text="{Binding Scenario.Name}" />
                                     </controls:SettingsExpander.Footer>
                                     <controls:SettingsExpander.IconSource>
-                                        <controls:FontIconSource FontFamily="{StaticResource FluentFont}"
-                                                                 Glyph="&#xf669;" />
+                                        <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
+                                                            Glyph="&#xf669;" />
                                     </controls:SettingsExpander.IconSource>
                                 </controls:SettingsExpander>
                                 <controls:SettingsExpander Margin="0" Header="情景描述">
@@ -114,8 +115,8 @@
                                                  Text="{Binding Scenario.Description}" />
                                     </controls:SettingsExpander.Footer>
                                     <controls:SettingsExpander.IconSource>
-                                        <controls:FontIconSource FontFamily="{StaticResource FluentFont}"
-                                                                 Glyph="&#xf4a3;" />
+                                        <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
+                                                            Glyph="&#xf4a3;" />
                                     </controls:SettingsExpander.IconSource>
                                 </controls:SettingsExpander>
                             </StackPanel>
@@ -132,8 +133,8 @@
 
 
                         <controls:SettingsExpander.IconSource>
-                            <controls:FontIconSource FontFamily="{StaticResource FluentFont}"
-                                                     Glyph="&#xf226;" />
+                            <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
+                                                Glyph="&#xf226;" />
                         </controls:SettingsExpander.IconSource>
                         <StackPanel>
                             <ListBox Margin="0,0,10,0" x:Name="inputvalues"
@@ -171,14 +172,14 @@
                                                         CommandParameter="{ReflectionBinding Key}"
                                                         VerticalContentAlignment="Center"
                                                         HorizontalContentAlignment="Center">
-                                                    <controls:FontIcon VerticalAlignment="Center"
-                                                                       HorizontalAlignment="Center"
-                                                                       Margin="0,2,0,0"
-                                                                       Width="24"
-                                                                       Height="24"
-                                                                       FontFamily="{StaticResource FluentFont}"
-                                                                       Glyph="&#xf36a;"
-                                                                       FontSize="24" />
+                                                    <controls1:FontIcon VerticalAlignment="Center"
+                                                                        HorizontalAlignment="Center"
+                                                                        Margin="0,2,0,0"
+                                                                        Width="24"
+                                                                        Height="24"
+                                                                        FontFamily="{StaticResource FluentFont}"
+                                                                        Glyph="&#xf36a;"
+                                                                        FontSize="24" />
                                                     <Button.Styles>
 
                                                         <Style
@@ -209,8 +210,8 @@
                                 <Button Command="{Binding AddInputValueCommand}"
                                         CommandParameter="{Binding InputValueValue}"
                                         Grid.Column="1" Height="40" Width="40">
-                                    <controls:FontIcon FontFamily="{StaticResource FluentFont}"
-                                                       Glyph="&#xf107;" />
+                                    <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
+                                                        Glyph="&#xf107;" />
                                 </Button>
                                 <DockPanel Grid.Column="0" Margin="0,0,0,0" Height="40">
                                     <TextBox Watermark="变量名称"
@@ -228,18 +229,15 @@
                             <StackPanel>
                                 <controls:SettingsExpander Margin="0" Header="执行间隔(秒)">
                                     <controls:SettingsExpander.Footer>
-                                        <controls:NumberBox
-                                            SpinButtonPlacementMode="Inline"
+                                        <u:NumericFloatUpDown
                                             Minimum="0.1"
-                                            ValidationMode="InvalidInputOverwritten"
-                                            Text="{Binding Scenario.TickIntervalSecond}"
                                             Value="{Binding Scenario.TickIntervalSecond}" />
 
                                     </controls:SettingsExpander.Footer>
 
                                     <controls:SettingsExpander.IconSource>
-                                        <controls:FontIconSource FontFamily="{StaticResource FluentFont}"
-                                                                 Glyph="&#xed88;" />
+                                        <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
+                                                            Glyph="&#xed88;" />
                                     </controls:SettingsExpander.IconSource>
                                 </controls:SettingsExpander>
                             </StackPanel>
@@ -305,7 +303,7 @@
                                                                             CornerRadius="3 3 0 0">
                                                                         <Border.Background>
                                                                             <SolidColorBrush Opacity="0.5"
-                                                                                Color="{DynamicResource SystemAccentColor}" />
+                                                                                Color="{DynamicResource SemiBlue5Color}" />
                                                                         </Border.Background>
                                                                         <TextBlock HorizontalAlignment="Center"
 
@@ -334,7 +332,7 @@
                                                                                         <!-- Set the border color to red -->
                                                                                         <Border.BorderBrush>
                                                                                             <SolidColorBrush
-                                                                                                Color="{DynamicResource SystemAccentColor}"
+                                                                                                Color="{DynamicResource SemiBlue5Color}"
                                                                                                 Opacity="0.5" />
                                                                                         </Border.BorderBrush>
                                                                                         <!-- Set the border thickness to 2 -->
@@ -352,17 +350,11 @@
                                                                                         VerticalAlignment="Center"
                                                                                         x:Name="textBlock"
                                                                                         FontSize="12"
-
+                                                                                        Background="{DynamicResource TextBoxForeground}"
+                                                                                        Foreground="{DynamicResource TextBoxDefaultBackground}"
                                                                                         Text="节点">
-                                                                                        <TextBlock.Background>
-                                                                                            <SolidColorBrush
-                                                                                                Color="{DynamicResource TextFillColorPrimary}"
-                                                                                                Opacity="0.6" />
-                                                                                        </TextBlock.Background>
-                                                                                        <TextBlock.Foreground>
-                                                                                            <SolidColorBrush
-                                                                                                Color="{DynamicResource TextFillColorInverse}" />
-                                                                                        </TextBlock.Foreground>
+
+
                                                                                     </TextBlock>
 
 
@@ -381,7 +373,7 @@
                                                                                         <!-- Set the border color to red -->
                                                                                         <Border.BorderBrush>
                                                                                             <SolidColorBrush
-                                                                                                Color="{DynamicResource SystemAccentColor}"
+                                                                                                Color="{DynamicResource SemiBlue5Color}"
                                                                                                 Opacity="0.5" />
                                                                                         </Border.BorderBrush>
                                                                                         <!-- Set the border thickness to 2 -->
@@ -444,7 +436,7 @@
                                                                             CornerRadius="3 3 0 0">
                                                                         <Border.Background>
                                                                             <SolidColorBrush Opacity="0.5"
-                                                                                Color="{DynamicResource SystemAccentColor}" />
+                                                                                Color="{DynamicResource SemiBlue5Color}" />
                                                                         </Border.Background>
                                                                         <TextBlock HorizontalAlignment="Center"
 
@@ -496,7 +488,7 @@
                                                                                 <!-- Set the border color to red -->
                                                                                 <Border.BorderBrush>
                                                                                     <SolidColorBrush
-                                                                                        Color="{DynamicResource SystemAccentColor}"
+                                                                                        Color="{DynamicResource SemiBlue5Color}"
                                                                                         Opacity="0.5" />
                                                                                 </Border.BorderBrush>
                                                                                 <!-- Set the border thickness to 2 -->
@@ -535,8 +527,8 @@
                                     <Button Command="{Binding AddValueCommand}"
                                             CommandParameter="{Binding ValueValue}"
                                             Grid.Column="1" Height="40" Width="40">
-                                        <controls:FontIcon FontFamily="{StaticResource FluentFont}"
-                                                           Glyph="&#xf107;" />
+                                        <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
+                                                            Glyph="&#xf107;" />
                                     </Button>
                                     <DockPanel Grid.Column="0" Margin="0,0,0,0" Height="40">
                                         <TextBox Watermark="变量名称"
@@ -562,15 +554,15 @@
 
 
                                     <controls:SettingsExpander.IconSource>
-                                        <controls:FontIconSource FontFamily="{StaticResource FluentFont}"
-                                                                 Glyph="&#xf226;" />
+                                        <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
+                                                            Glyph="&#xf226;" />
                                     </controls:SettingsExpander.IconSource>
                                     <StackPanel>
                                         <controls:SettingsExpander Margin="0" Header="关键词"
                                                                    BorderThickness="0">
                                             <controls:SettingsExpander.IconSource>
-                                                <controls:FontIconSource FontFamily="{StaticResource FluentFont}"
-                                                                         Glyph="&#xf4b6;" />
+                                                <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
+                                                                    Glyph="&#xf4b6;" />
                                             </controls:SettingsExpander.IconSource>
                                             <Grid ColumnSpan="10" RowSpan="5" Margin="10">
                                                 <Grid.ColumnDefinitions>
@@ -589,14 +581,14 @@
                                                 <Button Command="{Binding DelKeyCommand}"
                                                         CommandParameter="{Binding ElementName=keys,Path=SelectedValue}"
                                                         Grid.Row="0" Grid.Column="1" Height="36" Width="36">
-                                                    <controls:FontIcon FontFamily="{StaticResource FluentFont}"
-                                                                       Glyph="&#xebce;" />
+                                                    <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
+                                                                        Glyph="&#xebce;" />
                                                 </Button>
                                                 <Button Command="{Binding AddKeyCommand}"
                                                         CommandParameter="{Binding KeyValue}" Grid.Row="1"
                                                         Grid.Column="1" Height="36" Width="36">
-                                                    <controls:FontIcon FontFamily="{StaticResource FluentFont}"
-                                                                       Glyph="&#xf107;" />
+                                                    <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
+                                                                        Glyph="&#xf107;" />
                                                 </Button>
                                                 <DockPanel Grid.Row="1" Grid.Column="0" Margin="10" Height="40">
                                                     <TextBox
@@ -613,8 +605,8 @@
                                                            BorderThickness="0">
 
                                     <controls:SettingsExpander.IconSource>
-                                        <controls:FontIconSource FontFamily="{StaticResource FluentFont}"
-                                                                 Glyph="&#xf217;" />
+                                        <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
+                                                            Glyph="&#xf217;" />
                                     </controls:SettingsExpander.IconSource>
 
                                     <ItemsControl Margin="15,0,0,0"
@@ -635,11 +627,11 @@
                                                     <TextBlock VerticalAlignment="Center"
                                                                Text="{Binding Value.Name}" />
 
-                                                    <controls:FontIcon FontFamily="{StaticResource FluentFont}"
-                                                                       Glyph="&#xf4a3;"
-                                                                       ToolTip.Tip="{Binding Value.Description}"
-                                                                       ToolTip.ShowDelay="0"
-                                                                       IsVisible="{Binding Value.Description, Converter={StaticResource IfNullVisibilityHidden}}" />
+                                                    <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
+                                                                        Glyph="&#xf4a3;"
+                                                                        ToolTip.Tip="{Binding Value.Description}"
+                                                                        ToolTip.ShowDelay="0"
+                                                                        IsVisible="{Binding Value.Description, Converter={StaticResource IfNullVisibilityHidden}}" />
                                                 </StackPanel>
                                             </DataTemplate>
 
@@ -650,8 +642,8 @@
                                 <controls:SettingsExpander Margin="0" Header="快捷键触发"
                                                            BorderThickness="0">
                                     <controls:SettingsExpander.IconSource>
-                                        <controls:FontIconSource FontFamily="{StaticResource FluentFont}"
-                                                                 Glyph="&#xf4b8;" />
+                                        <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
+                                                            Glyph="&#xf4b8;" />
                                     </controls:SettingsExpander.IconSource>
                                     <StackPanel Margin="0" Orientation="Vertical">
                                         <controls:SettingsExpander Header="激活快捷键" Description="修改激活快捷键">
@@ -674,8 +666,8 @@
                                             </controls:SettingsExpander.Footer>
 
                                             <controls:SettingsExpander.IconSource>
-                                                <controls:FontIconSource FontFamily="{StaticResource FluentFont}"
-                                                                         Glyph="&#xf4b8;" />
+                                                <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
+                                                                    Glyph="&#xf4b8;" />
                                             </controls:SettingsExpander.IconSource>
                                         </controls:SettingsExpander>
                                         <controls:SettingsExpander Header="停止快捷键" Description="修改停止快捷键">
@@ -696,8 +688,8 @@
                                             </controls:SettingsExpander.Footer>
 
                                             <controls:SettingsExpander.IconSource>
-                                                <controls:FontIconSource FontFamily="{StaticResource FluentFont}"
-                                                                         Glyph="&#xf4b8;" />
+                                                <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
+                                                                    Glyph="&#xf4b8;" />
                                             </controls:SettingsExpander.IconSource>
                                         </controls:SettingsExpander>
                                     </StackPanel>
@@ -719,7 +711,7 @@
                                                     CornerRadius="3 3 0 0">
                                                 <Border.Background>
                                                     <SolidColorBrush Opacity="0.5"
-                                                                     Color="{DynamicResource SystemAccentColor}" />
+                                                                     Color="{DynamicResource SemiBlue5Color}" />
                                                 </Border.Background>
                                                 <TextBlock HorizontalAlignment="Center"
                                                            Text="{Binding Title}"
@@ -760,7 +752,7 @@
                                                                             <!-- Set the border color to red -->
                                                                             <Border.BorderBrush>
                                                                                 <SolidColorBrush
-                                                                                    Color="{DynamicResource SystemAccentColor}"
+                                                                                    Color="{DynamicResource SemiBlue5Color}"
                                                                                     Opacity="0.5" />
                                                                             </Border.BorderBrush>
                                                                             <!-- Set the border thickness to 2 -->
@@ -851,15 +843,13 @@
                                                                             x:Name="textBlock"
                                                                             Text="{Binding Title}"
                                                                             Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                                                                        <controls:NumberBox
+                                                                        <u:NumericIntUpDown
                                                                             Margin="10,5,10,5"
                                                                             MinWidth="40"
-                                                                            ValidationMode="InvalidInputOverwritten"
-                                                                            SpinButtonPlacementMode="Inline"
                                                                             Maximum="2147483647"
                                                                             Minimum="-2147483648"
                                                                             Value="{Binding InputObject, Mode=TwoWay}"
-                                                                            PlaceholderText="整型" />
+                                                                            Watermark="整型" />
                                                                     </StackPanel>
 
                                                                 </DataTemplate>
@@ -874,14 +864,11 @@
                                                                             x:Name="textBlock"
                                                                             Text="{Binding Title}"
                                                                             Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                                                                        <controls:NumberBox
+                                                                        <u:NumericDoubleUpDown
                                                                             Margin="10,5,10,5"
                                                                             MinWidth="40"
-                                                                            SimpleNumberFormat="F2"
-                                                                            SpinButtonPlacementMode="Inline"
-                                                                            ValidationMode="InvalidInputOverwritten"
                                                                             Value="{Binding InputObject, Mode=TwoWay}"
-                                                                            PlaceholderText="浮点" />
+                                                                            Watermark="浮点" />
                                                                     </StackPanel>
 
                                                                 </DataTemplate>
@@ -971,7 +958,7 @@
                                                                                 Color="{DynamicResource TextFillColorInverse}" />
                                                                         </TextBlock.Foreground>
                                                                     </TextBlock>
-                                                                    <controls:FontIcon
+                                                                    <controls1:FontIcon
                                                                         FontFamily="{StaticResource FluentFont}"
                                                                         Glyph="&#xf10c;"
                                                                         ToolTip.Tip="{Binding Interfaces, Converter={StaticResource InterfacesToString}}"
@@ -981,7 +968,7 @@
                                                                         <!-- Set the border color to red -->
                                                                         <Border.BorderBrush>
                                                                             <SolidColorBrush
-                                                                                Color="{DynamicResource SystemAccentColor}"
+                                                                                Color="{DynamicResource SemiBlue5Color}"
                                                                                 Opacity="0.5" />
                                                                         </Border.BorderBrush>
                                                                         <!-- Set the border thickness to 2 -->
@@ -1077,7 +1064,7 @@
                                         </MenuFlyout>
                                     </controls2:Connection.ContextFlyout>
                                     <controls2:Connection.Stroke>
-                                        <SolidColorBrush Color="{DynamicResource SystemAccentColor}"
+                                        <SolidColorBrush Color="{DynamicResource SemiBlue5Color}"
                                                          Opacity="0.5" />
                                     </controls2:Connection.Stroke>
                                 </controls2:Connection>
@@ -1095,11 +1082,11 @@
 
                                                          PreviewTarget="{Binding PreviewTarget, Mode=TwoWay}">
                                 <controls2:PendingConnection.Stroke>
-                                    <SolidColorBrush Color="{DynamicResource SystemAccentColor}"
+                                    <SolidColorBrush Color="{DynamicResource SemiBlue5Color}"
                                                      Opacity="0.5" />
                                 </controls2:PendingConnection.Stroke>
                                 <controls2:PendingConnection.Background>
-                                    <SolidColorBrush Color="{DynamicResource SystemAccentColor}"
+                                    <SolidColorBrush Color="{DynamicResource SemiBlue5Color}"
                                                      Opacity="0.8" />
                                 </controls2:PendingConnection.Background>
                                 <TextBlock Text="{Binding PreviewText}" />
@@ -1157,7 +1144,7 @@
 
 
                                 <controls2:Node.HeaderBrush>
-                                    <SolidColorBrush Color="{DynamicResource SystemAccentColor}"
+                                    <SolidColorBrush Color="{DynamicResource SemiBlue5Color}"
                                                      Opacity="0.5" />
                                 </controls2:Node.HeaderBrush>
                                 <controls2:Node.Header>
@@ -1168,13 +1155,13 @@
                                     <DataTemplate DataType="{x:Type customScenario:ConnectorItem}">
                                         <ContentPresenter Content="{Binding .}" Name="ContentPresenter1">
                                             <ContentPresenter.ContextFlyout>
-                                                <controls:FAMenuFlyout>
+                                                <MenuFlyout>
                                                     <!-- ReSharper disable once Xaml.RedundantResource -->
-                                                    <controls:MenuFlyoutItem Text="切换自输入/连接器"
-                                                                             Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                                                             Command="{Binding $parent[controls2:NodifyEditor].((taskEditor1:TaskEditorViewModel)DataContext).SwitchConnectorCommand}"
-                                                                             CommandParameter="{Binding #ContentPresenter1  }" />
-                                                </controls:FAMenuFlyout>
+                                                    <MenuItem Header="切换自输入/连接器"
+                                                              Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                                              Command="{Binding $parent[controls2:NodifyEditor].((taskEditor1:TaskEditorViewModel)DataContext).SwitchConnectorCommand}"
+                                                              CommandParameter="{Binding #ContentPresenter1  }" />
+                                                </MenuFlyout>
                                             </ContentPresenter.ContextFlyout>
                                             <ContentPresenter.DataTemplates>
                                                 <pages:MyDataTemplateSelector>
@@ -1236,7 +1223,7 @@
                                                             </controls2:NodeInput.Header>
                                                             <controls2:NodeInput.BorderBrush>
                                                                 <SolidColorBrush
-                                                                    Color="{DynamicResource SystemAccentColor}"
+                                                                    Color="{DynamicResource SemiBlue5Color}"
                                                                     Opacity="0.5" />
                                                             </controls2:NodeInput.BorderBrush>
                                                         </controls2:NodeInput>
@@ -1283,13 +1270,12 @@
                                                                        x:Name="textBlock"
                                                                        Text="{Binding Title}"
                                                                        Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                                                            <controls:NumberBox Margin="10,5,10,5" MinWidth="40"
-                                                                ValidationMode="InvalidInputOverwritten"
-                                                                SpinButtonPlacementMode="Inline"
+                                                            <u:NumericIntUpDown Margin="10,5,10,5" MinWidth="40"
+
                                                                 Maximum="2147483647" Minimum="-2147483648"
                                                                 Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                                                 Value="{Binding InputObject, Mode=TwoWay }"
-                                                                PlaceholderText="整型" />
+                                                                Watermark="整型" />
                                                         </StackPanel>
 
                                                     </DataTemplate>
@@ -1302,13 +1288,10 @@
                                                                        x:Name="textBlock"
                                                                        Text="{Binding Title}"
                                                                        Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-                                                            <controls:NumberBox Margin="10,5,10,5" MinWidth="40"
-                                                                SimpleNumberFormat="F2"
-                                                                SpinButtonPlacementMode="Inline"
-                                                                ValidationMode="InvalidInputOverwritten"
+                                                            <u:NumericDoubleUpDown Margin="10,5,10,5" MinWidth="40"
                                                                 Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                                                 Value="{Binding InputObject, Mode=TwoWay}"
-                                                                PlaceholderText="浮点" />
+                                                                Watermark="浮点" />
                                                         </StackPanel>
 
                                                     </DataTemplate>
@@ -1382,16 +1365,16 @@
                                                         </TextBlock.Foreground>
                                                     </TextBlock>
 
-                                                    <controls:FontIcon FontFamily="{StaticResource FluentFont}"
-                                                                       Glyph="&#xf10c;"
-                                                                       ToolTip.Tip="{Binding Interfaces, Converter={StaticResource InterfacesToString}}"
-                                                                       ToolTip.ShowDelay="0"
-                                                                       IsVisible="{Binding Interfaces, Converter={StaticResource IfNullVisibilityHidden}}" />
+                                                    <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
+                                                                        Glyph="&#xf10c;"
+                                                                        ToolTip.Tip="{Binding Interfaces, Converter={StaticResource InterfacesToString}}"
+                                                                        ToolTip.ShowDelay="0"
+                                                                        IsVisible="{Binding Interfaces, Converter={StaticResource IfNullVisibilityHidden}}" />
                                                 </StackPanel>
                                             </controls2:NodeOutput.Header>
                                             <controls2:NodeOutput.BorderBrush>
                                                 <SolidColorBrush
-                                                    Color="{DynamicResource SystemAccentColor}"
+                                                    Color="{DynamicResource SemiBlue5Color}"
                                                     Opacity="0.5" />
                                             </controls2:NodeOutput.BorderBrush>
                                         </controls2:NodeOutput>
@@ -1429,7 +1412,7 @@
                     </StackPanel.Resources>
                     <Button FontSize="25" ToolTip.Tip="清理未连接节点" ToolTip.ShowDelay="100"
                             Command="{Binding CleanUnusedNodeCommand}">
-                        <controls:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xf34c;" />
+                        <controls1:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xf34c;" />
                     </Button>
                     <ItemsControl Grid.Column="4"
                                   IsVisible="{Binding Scenario.IsHaveInputValue,Converter={StaticResource reverseBoolToVisibilityConverter}}">
@@ -1437,26 +1420,26 @@
                                 IsVisible="{Binding Scenario.IsRunning,Converter={StaticResource reverseBoolToVisibilityConverter}}"
                                 Foreground="GreenYellow"
                                 Command="{Binding VerifyNodeCommand}">
-                            <controls:FontIcon Foreground="GreenYellow" FontFamily="{StaticResource FluentFont}"
-                                               Glyph="&#xf605;" />
+                            <controls1:FontIcon Foreground="GreenYellow" FontFamily="{StaticResource FluentFont}"
+                                                Glyph="&#xf605;" />
                         </Button>
                         <Button FontSize="25" ToolTip.Tip="停止测试" ToolTip.ShowDelay="100"
                                 IsVisible="{Binding Scenario.IsRunning}"
 
                                 Command="{Binding StopCustomScenarioCommand}">
-                            <controls:FontIcon Foreground="OrangeRed" FontFamily="{StaticResource FluentFont}"
-                                               Glyph="&#xf72a;" />
+                            <controls1:FontIcon Foreground="OrangeRed" FontFamily="{StaticResource FluentFont}"
+                                                Glyph="&#xf72a;" />
                         </Button>
                     </ItemsControl>
 
                     <Button FontSize="25" ToolTip.Tip="保存" ToolTip.ShowDelay="100"
                             Command="{Binding SaveCustomScenarioCommand}">
-                        <controls:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xf67f;" />
+                        <controls1:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xf67f;" />
                     </Button>
                     <Button FontSize="25" ToolTip.Tip="退出并保存" ToolTip.ShowDelay="100"
                             Command="{Binding SaveAndQuitCustomScenarioCommand}"
-                            CommandParameter="{Binding $parent[windowing:AppWindow]}">
-                        <controls:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xea45;" />
+                            CommandParameter="{Binding $parent[u:UrsaWindow]}">
+                        <controls1:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xea45;" />
                     </Button>
                 </StackPanel>
             </Border>
@@ -1464,4 +1447,4 @@
     </Grid>
 
 
-</windowing:AppWindow>
+</u:UrsaWindow>

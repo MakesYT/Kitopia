@@ -1,28 +1,24 @@
-﻿<windowing:AppWindow xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:windowing="clr-namespace:FluentAvalonia.UI.Windowing;assembly=FluentAvalonia"
-        xmlns:controls="clr-namespace:KitopiaAvalonia.Controls"
-        xmlns:controls1="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="KitopiaAvalonia.Windows.HotKeyEditorWindow"
-        KeyDown="HotKeyEditorWindow_OnKeyDown"
-        KeyUp="HotKeyEditorWindow_OnKeyUp"
-        TransparencyLevelHint="AcrylicBlur"
-        Title="HotKeyEditorWindow">
-    <windowing:AppWindow.Background>
+﻿<u:UrsaWindow xmlns="https://github.com/avaloniaui"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+
+              xmlns:controls="clr-namespace:KitopiaAvalonia.Controls"
+
+              xmlns:u="https://irihi.tech/ursa"
+              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+              x:Class="KitopiaAvalonia.Windows.HotKeyEditorWindow"
+              KeyDown="HotKeyEditorWindow_OnKeyDown"
+              KeyUp="HotKeyEditorWindow_OnKeyUp"
+              TransparencyLevelHint="AcrylicBlur"
+              Title="HotKeyEditorWindow">
+    <u:UrsaWindow.Background>
         <SolidColorBrush Color="{DynamicResource SolidBackgroundFillColorBase}" Opacity="0.65" />
 
-    </windowing:AppWindow.Background>
+    </u:UrsaWindow.Background>
     <Grid>
         <Grid Focusable="False">
-            <Grid.Background>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Offset="0.0" Color="#CF202020" />
-                    <GradientStop Offset="1.0" Color="#8F202020" />
-                </LinearGradientBrush>
-            </Grid.Background>
+
 
             <Border
                 Focusable="False"
@@ -81,14 +77,14 @@
                                                      IsVisible="False"
                                                      Margin="5,0,0,0">
                                 <controls:HotKeyShowItme.Icon>
-                                    <controls1:IconSourceElement IconSource="{StaticResource WinImageIcon}" Width="26"
-                                                                 Height="26" />
+                                    <Image Source="{StaticResource WinImageIcon}" Width="26"
+                                           Height="26" />
                                 </controls:HotKeyShowItme.Icon>
                             </controls:HotKeyShowItme>
                             <controls:HotKeyShowItme x:Name="Shift" FontSize="20"
                                                      IsVisible="False"
                                                      Content="Shift" Margin="5,0,0,0" Height="64" />
-                            <controls:HotKeyShowItme x:Name="Alt"  FontSize="20" Content="Alt"
+                            <controls:HotKeyShowItme x:Name="Alt" FontSize="20" Content="Alt"
                                                      Margin="5,0,0,0" IsVisible="False"
                                                      Height="64" />
                             <controls:HotKeyShowItme x:Name="KeyName" FontSize="20"
@@ -110,7 +106,7 @@
                             <SolidColorBrush Color="{DynamicResource ControlFillColorDefault}" />
                         </Border.Background>
                         <StackPanel>
-                            <Grid Margin="20"  ColumnDefinitions="*,*,*" ColumnSpan="8">
+                            <Grid Margin="20" ColumnDefinitions="*,*,*" ColumnSpan="8">
                                 <Button
                                     Grid.Column="2"
                                     HorizontalAlignment="Stretch"
@@ -133,4 +129,4 @@
             </Border>
         </Grid>
     </Grid>
-</windowing:AppWindow>
+</u:UrsaWindow>

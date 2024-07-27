@@ -2,8 +2,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+
              xmlns:plugin="clr-namespace:Core.ViewModel.Pages.plugin;assembly=Core"
+             xmlns:controls="clr-namespace:KitopiaAvalonia.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="plugin:PluginSettingViewModel"
              x:Class="KitopiaAvalonia.Pages.PluginSettingSelectPage">
@@ -11,7 +12,7 @@
 
     </UserControl.Resources>
     <Grid RowDefinitions="Auto,*" Margin="42">
-        <TextBlock Margin="0" FontSize="18" FontWeight="DemiBold" Text="{Binding PluginName}" />
+        <TextBlock Margin="0" FontSize="18" FontWeight="Bold" Text="{Binding PluginName}" />
         <ListBox Grid.Row="1"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                  MaxHeight="385"
@@ -47,8 +48,8 @@
                         <Grid VerticalAlignment="Center"
                               Width="{Binding Path=$parent.Bounds.Width}" ColumnDefinitions="80,*,*,Auto,Auto">
                             <TextBlock Grid.Column="1" Text="{Binding Title}" FontSize="18" />
-                            <controls:SymbolIcon Grid.Column="4" Symbol="ChevronRight" FontSize="20"
-                                                 Margin="0,0,10,0" />
+                            <controls:FontIcon Grid.Column="4" Glyph="&#xf2b2;" FontSize="20"
+                                               Margin="0,0,10,0" />
                         </Grid>
 
 

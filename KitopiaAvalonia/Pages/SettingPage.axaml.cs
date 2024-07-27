@@ -18,6 +18,7 @@ using KitopiaAvalonia.Controls;
 using PluginCore;
 using PluginCore.Attribute;
 using PluginCore.Config;
+using Ursa.Controls;
 
 namespace KitopiaAvalonia.Pages;
 
@@ -38,8 +39,8 @@ public partial class SettingPage : UserControl
         disposables.Clear();
         _configBase = configBase;
         TextBlock.Text = configBase.GetType()
-                                   .GetCustomAttribute<ConfigName>()
-                                  ?.Name ?? configBase.Name;
+            .GetCustomAttribute<ConfigName>()
+            ?.Name ?? configBase.Name;
         StackPanel.Children.Clear();
         LoadConfig();
     }
@@ -66,7 +67,7 @@ public partial class SettingPage : UserControl
         if (_configBase is not null)
         {
             foreach (var fieldInfo in _configBase.GetType()
-                                                 .GetFields(BindingFlags.Instance | BindingFlags.Public))
+                         .GetFields(BindingFlags.Instance | BindingFlags.Public))
             {
                 var configFieldCategory = fieldInfo.GetCustomAttribute<ConfigFieldCategory>();
                 if (configFieldCategory is not null)
@@ -74,9 +75,13 @@ public partial class SettingPage : UserControl
                     var category = new Expander()
                     {
                         Header = new TextBlock() { Text = configFieldCategory.Category, FontSize = 16 },
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        HorizontalContentAlignment = HorizontalAlignment.Stretch,
                         IsExpanded = true,
                     };
                     var stackPanel = new StackPanel();
+
+                    stackPanel.HorizontalAlignment = HorizontalAlignment.Stretch;
                     category.Content = stackPanel;
                     nowControl = stackPanel;
                     StackPanel.Children.Add(category);
@@ -88,10 +93,12 @@ public partial class SettingPage : UserControl
                     {
                         Header = configField.Tittle,
                         Description = configField.Description,
-                        IconSource = new FontIconSource()
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+
+                        IconSource = new FontIcon()
                         {
-                            FontFamily = (FontFamily)font, Glyph = System.Convert.ToChar(configField.Symbol)
-                                                                         .ToString()
+                            Glyph = System.Convert.ToChar(configField.Symbol)
+                                .ToString()
                         },
                     };
 
@@ -105,31 +112,32 @@ public partial class SettingPage : UserControl
                                 Text = selectedValue?.ToString(),
                             };
                             disposables.Add(textBox.GetObservable(TextBox.TextProperty)
-                                                   .Subscribe((d) => {
-                                                        _configBase.OnConfigChanged(this, fieldInfo.Name, d);
-                                                        fieldInfo.SetValue(_configBase, d);
-                                                        ConfigManger.Save(_configBase.Name);
-                                                    }));
+                                .Subscribe((d) =>
+                                {
+                                    _configBase.OnConfigChanged(this, fieldInfo.Name, d);
+                                    fieldInfo.SetValue(_configBase, d);
+                                    ConfigManger.Save(_configBase.Name);
+                                }));
                             SettingsExpander.Footer = textBox;
                             break;
                         }
                         case ConfigFieldType.整数:
                         {
-                            var textBox = new NumberBox()
+                            var textBox = new NumericIntUpDown()
                             {
-                                Value = (double)selectedValue,
+                                Value = (int)selectedValue,
                                 Maximum = configField.MaxValue,
                                 Minimum = configField.MinValue,
-                                SimpleNumberFormat = "F0"
                             };
 
                             disposables.Add(
-                                textBox.GetObservable(NumberBox.ValueProperty)
-                                       .Subscribe((d) => {
-                                            _configBase.OnConfigChanged(this, fieldInfo.Name, d);
-                                            fieldInfo.SetValue(_configBase, d);
-                                            ConfigManger.Save(_configBase.Name);
-                                        }));
+                                textBox.GetObservable(NumericIntUpDown.ValueProperty)
+                                    .Subscribe((d) =>
+                                    {
+                                        _configBase.OnConfigChanged(this, fieldInfo.Name, d);
+                                        fieldInfo.SetValue(_configBase, d);
+                                        ConfigManger.Save(_configBase.Name);
+                                    }));
 
                             SettingsExpander.Footer = textBox;
                             break;
@@ -139,18 +147,19 @@ public partial class SettingPage : UserControl
                             var comboBox = new ComboBox()
                             {
                                 ItemsSource = Enumerable.Range(configField.MinValue, configField.MaxValue)
-                                                        .Select(x => (int)x % configField.Step == 0 ? x : 0)
-                                                        .Where(x => x != 0)
-                                                        .ToList(),
+                                    .Select(x => (int)x % configField.Step == 0 ? x : 0)
+                                    .Where(x => x != 0)
+                                    .ToList(),
                                 SelectedValue = selectedValue
                             };
                             disposables.Add(
                                 comboBox.GetObservable(ComboBox.SelectedValueProperty)
-                                        .Subscribe((d) => {
-                                             _configBase.OnConfigChanged(this, fieldInfo.Name, d);
-                                             fieldInfo.SetValue(_configBase, d);
-                                             ConfigManger.Save(_configBase.Name);
-                                         }));
+                                    .Subscribe((d) =>
+                                    {
+                                        _configBase.OnConfigChanged(this, fieldInfo.Name, d);
+                                        fieldInfo.SetValue(_configBase, d);
+                                        ConfigManger.Save(_configBase.Name);
+                                    }));
                             SettingsExpander.Footer = comboBox;
                             break;
                         }
@@ -189,11 +198,12 @@ public partial class SettingPage : UserControl
 
                             disposables.Add(
                                 slider.GetObservable(Slider.ValueProperty)
-                                      .Subscribe((d) => {
-                                           _configBase.OnConfigChanged(this, fieldInfo.Name, d);
-                                           fieldInfo.SetValue(_configBase, (int)d);
-                                           ConfigManger.Save(_configBase.Name);
-                                       }));
+                                    .Subscribe((d) =>
+                                    {
+                                        _configBase.OnConfigChanged(this, fieldInfo.Name, d);
+                                        fieldInfo.SetValue(_configBase, (int)d);
+                                        ConfigManger.Save(_configBase.Name);
+                                    }));
                             stackPanel.Children.Add(textBox);
                             stackPanel.Children.Add(slider);
 
@@ -202,21 +212,21 @@ public partial class SettingPage : UserControl
                         }
 
                         case ConfigFieldType.浮点数:
-                            var textBox1 = new NumberBox()
+                            var textBox1 = new NumericDoubleUpDown()
                             {
                                 Value = (double)selectedValue,
                                 Maximum = configField.MaxValue,
                                 Minimum = configField.MinValue,
-                                SimpleNumberFormat = "F2"
                             };
 
                             disposables.Add(
-                                textBox1.GetObservable(NumberBox.ValueProperty)
-                                        .Subscribe((d) => {
-                                             _configBase.OnConfigChanged(this, fieldInfo.Name, d);
-                                             fieldInfo.SetValue(_configBase, d);
-                                             ConfigManger.Save(_configBase.Name);
-                                         }));
+                                textBox1.GetObservable(NumericDoubleUpDown.ValueProperty)
+                                    .Subscribe((d) =>
+                                    {
+                                        _configBase.OnConfigChanged(this, fieldInfo.Name, d);
+                                        fieldInfo.SetValue(_configBase, d);
+                                        ConfigManger.Save(_configBase.Name);
+                                    }));
 
                             SettingsExpander.Footer = textBox1;
                             break;
@@ -231,11 +241,12 @@ public partial class SettingPage : UserControl
                             };
                             disposables.Add(
                                 toggleSwitch.GetObservable(ToggleSwitch.IsCheckedProperty)
-                                            .Subscribe((d) => {
-                                                 _configBase.OnConfigChanged(this, fieldInfo.Name, d);
-                                                 fieldInfo.SetValue(_configBase, d);
-                                                 ConfigManger.Save(_configBase.Name);
-                                             }));
+                                    .Subscribe((d) =>
+                                    {
+                                        _configBase.OnConfigChanged(this, fieldInfo.Name, d);
+                                        fieldInfo.SetValue(_configBase, d);
+                                        ConfigManger.Save(_configBase.Name);
+                                    }));
                             SettingsExpander.Footer = toggleSwitch;
                             break;
                         }
@@ -246,35 +257,37 @@ public partial class SettingPage : UserControl
                             hotKeyControl.HotKeyModel = hotKeyModel;
                             disposables.Add(
                                 hotKeyControl.GetObservable(HotKeyShow.HotKeyModelProperty)
-                                             .Subscribe((d) => {
-                                                  _configBase.OnConfigChanged(this, fieldInfo.Name, d);
-                                                  fieldInfo.SetValue(_configBase, d);
-                                                  ConfigManger.Save(_configBase.Name);
-                                              }));
+                                    .Subscribe((d) =>
+                                    {
+                                        _configBase.OnConfigChanged(this, fieldInfo.Name, d);
+                                        fieldInfo.SetValue(_configBase, d);
+                                        ConfigManger.Save(_configBase.Name);
+                                    }));
                             SettingsExpander.Footer = hotKeyControl;
                             break;
                         }
                         case ConfigFieldType.自定义选项:
                         {
                             if (configField.GetType()
-                                           .IsGenericType)
+                                .IsGenericType)
                             {
                                 Type[] typeArguments = configField.GetType()
-                                                                  .GetGenericArguments();
+                                    .GetGenericArguments();
 
                                 var comboBox = new ComboBox()
                                 {
                                     ItemsSource = typeArguments[0]
-                                       .GetEnumValues(),
+                                        .GetEnumValues(),
                                     SelectedValue = selectedValue
                                 };
                                 disposables.Add(
                                     comboBox.GetObservable(ComboBox.SelectedValueProperty)
-                                            .Subscribe((d) => {
-                                                 _configBase.OnConfigChanged(this, fieldInfo.Name, d);
-                                                 fieldInfo.SetValue(_configBase, d);
-                                                 ConfigManger.Save(_configBase.Name);
-                                             }));
+                                        .Subscribe((d) =>
+                                        {
+                                            _configBase.OnConfigChanged(this, fieldInfo.Name, d);
+                                            fieldInfo.SetValue(_configBase, d);
+                                            ConfigManger.Save(_configBase.Name);
+                                        }));
                                 SettingsExpander.Footer = comboBox;
                             }
 
@@ -297,7 +310,8 @@ public partial class SettingPage : UserControl
                             {
                                 observableCollection.CollectionChanged += ObservableCollectionChange;
                                 disposables.Add(
-                                    new AnonymousDisposable(() => {
+                                    new AnonymousDisposable(() =>
+                                    {
                                         observableCollection.CollectionChanged -= ObservableCollectionChange;
                                     }));
                             }
@@ -323,7 +337,8 @@ public partial class SettingPage : UserControl
                             {
                                 observableCollection.CollectionChanged += ObservableCollectionChange;
                                 disposables.Add(
-                                    new AnonymousDisposable(() => {
+                                    new AnonymousDisposable(() =>
+                                    {
                                         observableCollection.CollectionChanged -= ObservableCollectionChange;
                                     }));
                             }

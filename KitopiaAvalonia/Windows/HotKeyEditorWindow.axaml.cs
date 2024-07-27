@@ -8,11 +8,11 @@ using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
-using Window = Avalonia.Controls.Window;
+using Ursa.Controls;
 
 namespace KitopiaAvalonia.Windows;
 
-public partial class HotKeyEditorWindow : Window
+public partial class HotKeyEditorWindow : UrsaWindow
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(HotKeyEditorWindow));
     private HotKeyModel? _hotKeyModel;

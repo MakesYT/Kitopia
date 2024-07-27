@@ -13,12 +13,11 @@
                         Background="{DynamicResource AccentButtonBackground}"
                         BorderBrush="{DynamicResource AccentButtonBorderBrush}"
                         BorderThickness="{DynamicResource ButtonBorderThemeThickness}"
-                        CornerRadius="{DynamicResource ControlCornerRadius}"
+
                         Width="{TemplateBinding Width}"
                         Height="{TemplateBinding Height}"
                         MinWidth="{TemplateBinding MinWidth}"
                         MinHeight="{TemplateBinding MinHeight}"
-                        Padding="{StaticResource ButtonPadding}"
                         HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
                         VerticalAlignment="{TemplateBinding VerticalAlignment}">
 
