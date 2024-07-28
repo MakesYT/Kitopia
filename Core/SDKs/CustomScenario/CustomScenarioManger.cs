@@ -205,24 +205,30 @@ public static class CustomScenarioManger
         if (!CustomScenarios.Contains(scenario))
         {
             CustomScenarios.Add(scenario);
-            if (HotKeyManager.HotKetImpl.Add(scenario.RunHotKey, e => scenario.Run()))
+            if (scenario.RunHotKey.SelectKey != EKey.未设置)
             {
-                ServiceManager.Services.GetService<IContentDialog>().ShowDialog(null, new DialogContent()
+                if (HotKeyManager.HotKetImpl.Add(scenario.RunHotKey, e => scenario.Run()))
                 {
-                    Title = $"快捷键{scenario.RunHotKey.SignName}设置失败",
-                    Content = "请重新设置快捷键，按键与系统其他程序冲突",
-                    CloseButtonText = "关闭"
-                });
+                    ServiceManager.Services.GetService<IContentDialog>().ShowDialogAsync(null, new DialogContent()
+                    {
+                        Title = $"快捷键{scenario.RunHotKey.SignName}设置失败",
+                        Content = "请重新设置快捷键，按键与系统其他程序冲突",
+                        CloseButtonText = "关闭"
+                    });
+                }
             }
 
-            if (HotKeyManager.HotKetImpl.Add(scenario.StopHotKey, e => scenario.Stop()))
+            if (scenario.StopHotKey.SelectKey != EKey.未设置)
             {
-                ServiceManager.Services.GetService<IContentDialog>().ShowDialog(null, new DialogContent()
+                if (HotKeyManager.HotKetImpl.Add(scenario.StopHotKey, e => scenario.Stop()))
                 {
-                    Title = $"快捷键{scenario.StopHotKey.SignName}设置失败",
-                    Content = "请重新设置快捷键，按键与系统其他程序冲突",
-                    CloseButtonText = "关闭"
-                });
+                    ServiceManager.Services.GetService<IContentDialog>().ShowDialogAsync(null, new DialogContent()
+                    {
+                        Title = $"快捷键{scenario.StopHotKey.SignName}设置失败",
+                        Content = "请重新设置快捷键，按键与系统其他程序冲突",
+                        CloseButtonText = "关闭"
+                    });
+                }
             }
         }
 

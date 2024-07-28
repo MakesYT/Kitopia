@@ -16,6 +16,7 @@
               xmlns:pages="clr-namespace:KitopiaAvalonia.Pages"
               xmlns:u="https://irihi.tech/ursa"
               xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls"
+              xmlns:system="clr-namespace:System;assembly=System.Runtime"
               mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
               x:Class="KitopiaAvalonia.Windows.TaskEditor"
               Title="情景编排"
@@ -37,15 +38,7 @@
         <taskEditor:ScenarioMethodCategoryGroupCtr x:Key="ScenarioMethodCategoryGroupCtr" />
     </u:UrsaWindow.Resources>
     <u:UrsaWindow.Styles>
-        <Style Selector="RepeatButton /template/ ContentPresenter">
-            <Setter Property="ContentTemplate">
-                <Setter.Value>
-                    <DataTemplate DataType="x:String">
-                        <TextBlock FontFamily="{DynamicResource SymbolThemeFontFamily}" Text="{Binding .}"></TextBlock>
-                    </DataTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+
     </u:UrsaWindow.Styles>
     <Interaction.Behaviors>
         <EventTriggerBehavior EventName="Closing">
@@ -624,17 +617,14 @@
                                         <controls:SettingsExpander Header="激活快捷键" Description="修改激活快捷键">
                                             <controls:SettingsExpander.Footer>
                                                 <Panel>
-                                                    <controls1:HotKeyShow x:Name="KeyShow"
-                                                                          HotKeyModel="{Binding Scenario.RunHotKey}"
-                                                                          IsEnabled="{Binding IsSaveInLocal}">
+                                                    <u:DisableContainer DisabledTip="需要先保存一次情景才可设置"
+                                                                        ToolTip.ShowDelay="100">
+                                                        <controls1:HotKeyShow
+                                                            HotKeyModel="{Binding Scenario.RunHotKey}"
+                                                            IsEnabled="{Binding IsSaveInLocal}">
+                                                        </controls1:HotKeyShow>
+                                                    </u:DisableContainer>
 
-                                                    </controls1:HotKeyShow>
-                                                    <Panel Background="{DynamicResource ControlFillColorDisabledBrush}"
-                                                           Width="{Binding #KeyShow.Bounds.Width}"
-                                                           Height="{Binding #KeyShow.Bounds.Height}"
-                                                           IsVisible="{Binding IsSaveInLocal,Converter={StaticResource ReverseBool}}"
-                                                           ToolTip.ShowDelay="100" ToolTip.Tip="需要先保存一次情景才可设置"
-                                                           ZIndex="2" />
                                                 </Panel>
 
 
@@ -648,17 +638,13 @@
                                         <controls:SettingsExpander Header="停止快捷键" Description="修改停止快捷键">
                                             <controls:SettingsExpander.Footer>
                                                 <Panel>
-                                                    <controls1:HotKeyShow x:Name="KeyShow1"
-                                                                          HotKeyModel="{Binding Scenario.StopHotKey}"
-                                                                          IsEnabled="{Binding IsSaveInLocal}">
-
-                                                    </controls1:HotKeyShow>
-                                                    <Panel Background="{DynamicResource ControlFillColorDisabledBrush}"
-                                                           Width="{Binding #KeyShow1.Bounds.Width}"
-                                                           Height="{Binding #KeyShow1.Bounds.Height}"
-                                                           IsVisible="{Binding IsSaveInLocal,Converter={StaticResource ReverseBool}}"
-                                                           ToolTip.ShowDelay="100" ToolTip.Tip="需要先保存一次情景才可设置"
-                                                           ZIndex="2" />
+                                                    <u:DisableContainer DisabledTip="需要先保存一次情景才可设置"
+                                                                        ToolTip.ShowDelay="100">
+                                                        <controls1:HotKeyShow
+                                                            HotKeyModel="{Binding Scenario.StopHotKey}"
+                                                            IsEnabled="{Binding IsSaveInLocal}">
+                                                        </controls1:HotKeyShow>
+                                                    </u:DisableContainer>
                                                 </Panel>
                                             </controls:SettingsExpander.Footer>
 
@@ -1207,7 +1193,30 @@
                                                                 Foreground="{DynamicResource SemiColorText0}" />
                                                             <ComboBox Margin="10,5,10,5" x:Name="ComboBox"
                                                                       MinWidth="40"
-                                                                      SelectedValue="{Binding InputObject,Mode=TwoWay}" />
+                                                                      SelectedValue="{Binding InputObject,Mode=TwoWay}">
+                                                                <ComboBox.DataTemplates>
+                                                                    <DataTemplate DataType="system:Object">
+                                                                        <TextBlock Text="{Binding}"
+                                                                            Foreground="{DynamicResource SemiColorText0}">
+                                                                        </TextBlock>
+                                                                    </DataTemplate>
+                                                                </ComboBox.DataTemplates>
+                                                                <ComboBox.Styles>
+                                                                    <Style
+                                                                        Selector="ComboBox /template/ ContentPresenter#ContentPresenter">
+                                                                        <Setter Property="ContentTemplate">
+                                                                            <Setter.Value>
+                                                                                <DataTemplate DataType="system:Object">
+                                                                                    <TextBlock Text="{Binding}"
+                                                                                        Foreground="{DynamicResource SemiColorText0}">
+                                                                                    </TextBlock>
+                                                                                </DataTemplate>
+                                                                            </Setter.Value>
+                                                                        </Setter>
+                                                                    </Style>
+                                                                </ComboBox.Styles>
+                                                            </ComboBox>
+
                                                         </StackPanel>
 
                                                     </DataTemplate>

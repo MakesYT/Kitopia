@@ -78,25 +78,32 @@ public partial class CustomScenario : ObservableRecipient
             IsSelectWin = false,
             IsSelectShift = false, SelectKey = EKey.未设置,
         };
-        if (HotKeyManager.HotKetImpl.Add(RunHotKey, e => Run()))
+        if (RunHotKey.SelectKey != EKey.未设置)
         {
-            ServiceManager.Services.GetService<IContentDialog>().ShowDialog(null, new DialogContent()
+            if (HotKeyManager.HotKetImpl.Add(RunHotKey, e => Run()))
             {
-                Title = $"快捷键{RunHotKey.SignName}设置失败",
-                Content = "请重新设置快捷键，按键与系统其他程序冲突",
-                CloseButtonText = "关闭"
-            });
+                ServiceManager.Services.GetService<IContentDialog>()!.ShowDialogAsync(null, new DialogContent()
+                {
+                    Title = $"快捷键{RunHotKey.SignName}设置失败",
+                    Content = "请重新设置快捷键，按键与系统其他程序冲突",
+                    CloseButtonText = "关闭"
+                });
+            }
         }
 
-        if (HotKeyManager.HotKetImpl.Add(StopHotKey, e => Stop()))
+        if (StopHotKey.SelectKey != EKey.未设置)
         {
-            ServiceManager.Services.GetService<IContentDialog>().ShowDialog(null, new DialogContent()
+            if (HotKeyManager.HotKetImpl.Add(StopHotKey, e => Stop()))
             {
-                Title = $"快捷键{StopHotKey.SignName}设置失败",
-                Content = "请重新设置快捷键，按键与系统其他程序冲突",
-                CloseButtonText = "关闭"
-            });
+                ServiceManager.Services.GetService<IContentDialog>().ShowDialogAsync(null, new DialogContent()
+                {
+                    Title = $"快捷键{StopHotKey.SignName}设置失败",
+                    Content = "请重新设置快捷键，按键与系统其他程序冲突",
+                    CloseButtonText = "关闭"
+                });
+            }
         }
+
 
         InputValue.CollectionChanged += OnInputValueOnCollectionChanged;
     }

@@ -42,14 +42,16 @@
                                 <Button Width="{Binding $parent.Bounds.Width, Mode=OneWay}"
                                         HorizontalContentAlignment="Stretch">
                                     <DockPanel Margin="15,0,0,0">
-                                        <TextBlock VerticalAlignment="Center" Text="{ReflectionBinding}" />
+                                        <TextBlock VerticalAlignment="Center" Text="{ReflectionBinding}"
+                                                   Foreground="{DynamicResource SemiColorText0}" />
                                         <Button Name="Button" Width="24" Height="24"
                                                 ToolTip.Tip="删除"
                                                 HorizontalAlignment="Right"
                                                 Command="{Binding $parent[controls:ListShow].DelCommand}"
                                                 CommandParameter="{ReflectionBinding}"
                                                 VerticalContentAlignment="Center" HorizontalContentAlignment="Center">
-                                            <controls:FontIcon Margin="0,2,0,0" Glyph="&#xf36a;" />
+                                            <controls:FontIcon FontSize="24" Width="24" Height="24" Margin="0,2,0,0"
+                                                               Glyph="&#xf36a;" />
                                             <Button.Styles>
 
                                                 <Style
@@ -57,7 +59,7 @@
 
                                                     <Setter Property="Background">
                                                         <SolidColorBrush
-                                                            Color="{DynamicResource TextFillColorSecondary}"
+                                                            Color="{DynamicResource SemiGrey9Color}"
                                                             Opacity="0.2" />
                                                     </Setter>
                                                 </Style>
@@ -75,7 +77,8 @@
                         <Button Command="{TemplateBinding AddCommand}"
                                 CommandParameter="{TemplateBinding TextValue}"
                                 Grid.Column="1" Height="36" Width="36">
-                            <controls:FontIcon Foreground="GreenYellow" Glyph="&#xf107;" />
+                            <controls:FontIcon Height="36" Width="36" FontSize="24" HorizontalAlignment="Center"
+                                               VerticalAlignment="Center" Foreground="GreenYellow" Glyph="&#xf107;" />
                         </Button>
                         <DockPanel Grid.Column="0" Margin="0">
                             <TextBox

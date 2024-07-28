@@ -37,6 +37,7 @@
 
                             <TextBlock
                                 IsVisible="{TemplateBinding IsSelected,Converter={StaticResource ReverseBool}}"
+                                Foreground="{DynamicResource SemiColorText0}"
                                 VerticalAlignment="Center" Text="未设置" />
 
 

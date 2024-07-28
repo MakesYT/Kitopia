@@ -27,9 +27,9 @@
 
     <!-- ToggleButton for the Expander -->
     <ControlTheme x:Key="SettingsExpanderToggleButtonStyle" TargetType="ToggleButton">
-        <Setter Property="Background" Value="{DynamicResource ExpanderHeaderBackground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ExpanderHeaderBorderBrush}" />
-        <Setter Property="BorderThickness" Value="{DynamicResource ExpanderHeaderBorderThickness}" />
+        <Setter Property="Background" Value="{DynamicResource SemiBackground2Color}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SemiColorBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -56,10 +56,11 @@
 
                         <controls:FontIcon Name="ExpandCollapseChevron"
                                            FontSize="18"
-                                           Foreground="{DynamicResource ExpanderChevronForeground}"
+                                           Foreground="{DynamicResource SemiColorText0}"
                                            RenderTransform="none"
                                            Margin="{DynamicResource SettingsExpanderExpandCollapseChevronMargin}"
                                            Grid.Column="1"
+                                           Glyph=" &#xf2a4;"
                                            IsVisible="False" />
                     </Grid>
                 </Border>
@@ -68,13 +69,13 @@
 
         <Style Selector="^:allowClick">
             <Style Selector="^:pointerover /template/ Border#Root">
-                <Setter Property="Background" Value="{DynamicResource ControlFillColorSecondaryBrush}" />
-                <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
+                <Setter Property="Background" Value="{DynamicResource SemiBackground4Color}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource SemiColorBorder}" />
             </Style>
             <Style Selector="^:pressed /template/ Border#Root">
                 <Setter Property="Background" Value="{DynamicResource ControlFillColorTertiaryBrush}" />
-                <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
-                <Setter Property="TextElement.Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource SemiColorBorder}" />
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource SemiColorText0}" />
             </Style>
         </Style>
 
@@ -101,8 +102,8 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="MinWidth" Value="0" />
         <Setter Property="MinHeight" Value="{DynamicResource SettingsExpanderMinHeight}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ExpanderContentBorderBrush}" />
-        <Setter Property="BorderThickness" Value="{DynamicResource ExpanderContentDownBorderThickness}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SemiColorBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Template">
             <ControlTemplate>
                 <StackPanel>
@@ -137,9 +138,9 @@
     </ControlTheme>
 
     <ControlTheme x:Key="{x:Type ui:SettingsExpander}" TargetType="ui:SettingsExpander">
-        <Setter Property="Background" Value="{DynamicResource ExpanderBackground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ExpanderHeaderBorderBrush}" />
-        <Setter Property="BorderThickness" Value="{DynamicResource ExpanderHeaderBorderThickness}" />
+        <Setter Property="Background" Value="{DynamicResource SemiBackground4Color}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SemiBackground0Color}" />
+        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="{DynamicResource SettingsExpanderPadding}" />
         <Setter Property="MinHeight" Value="{DynamicResource SettingsExpanderMinHeight}" />
         <Setter Property="ItemsPanel">

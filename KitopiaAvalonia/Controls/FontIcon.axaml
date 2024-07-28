@@ -13,7 +13,9 @@
         <!-- Set Defaults -->
         <Setter Property="Template">
             <ControlTemplate>
-                <TextBlock Name="Icon" Text="{TemplateBinding Glyph}" Foreground="{TemplateBinding Foreground}">
+                <TextBlock HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                           VerticalAlignment="{TemplateBinding VerticalAlignment}" Name="Icon"
+                           Text="{TemplateBinding Glyph}" Foreground="{TemplateBinding Foreground}">
 
                 </TextBlock>
             </ControlTemplate>

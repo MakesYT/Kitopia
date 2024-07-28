@@ -20,12 +20,17 @@
         ShowInTaskbar="False"
         ExtendClientAreaToDecorationsHint="True"
         Width="800"
-        CanResize="False"
+        MaxWidth="800"
+        MinWidth="800"
+        MinHeight="170"
+        MaxHeight="492"
         SizeToContent="Height"
         ExtendClientAreaChromeHints="SystemChrome"
         SystemDecorations="BorderOnly"
+
         KeyDown="InputElement_OnKeyDown"
         Topmost="True"
+        CanResize="False"
         Closing="Window_OnClosing"
         Title="SearchWindow">
     <Window.Resources>
@@ -39,12 +44,12 @@
         <searchWindow:ItemNameMatchCtr x:Key="ItemNameMatchCtr" />
         <converter1:ControlContentSize x:Key="ControlContentSize" />
     </Window.Resources>
-    <Panel>
+    <Panel VerticalAlignment="Stretch">
         <Panel.Background>
             <SolidColorBrush Color="{DynamicResource SemiBackground0Color}" Opacity="0.65" />
         </Panel.Background>
 
-        <StackPanel Margin="10" MinHeight="150">
+        <StackPanel Margin="10" MinHeight="150" VerticalAlignment="Stretch">
 
             <StackPanel.Resources>
                 <converter:ReverseBool x:Key="ReverseBool" />
@@ -66,8 +71,8 @@
             <u:Banner Focusable="False" Type="Warning" Content="Everything服务未运行,无法搜索文档,请检查"
 
                       IsVisible="{Binding !EverythingIsOk}"
-                      CanClose="False" />
-            <ListBox Name="dataGrid" MaxHeight="427"
+                      CanClose="True" />
+            <ListBox Name="dataGrid" MaxHeight="427" VerticalAlignment="Stretch"
                      ItemsSource="{Binding Items,Mode=OneWay }"
                      KeyDown="DataGrid_OnKeyDown"
                      PointerMoved="DataGrid_OnPointerMoved"
