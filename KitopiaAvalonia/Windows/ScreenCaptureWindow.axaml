@@ -43,7 +43,7 @@
         <Border ZIndex="3" Padding="5" CornerRadius="4" IsVisible="False" d:IsHidden="False" Name="ToolBar"
                 Focusable="True">
             <Border.Background>
-                <SolidColorBrush Color="{DynamicResource SolidBackgroundFillColorBase}" Opacity="0.5" />
+                <SolidColorBrush Color="{DynamicResource SemiColorBackground0}" Opacity="0.5" />
             </Border.Background>
             <StackPanel>
                 <StackPanel Orientation="Horizontal" Spacing="2">

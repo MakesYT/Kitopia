@@ -111,11 +111,15 @@ public class HotKeyImpl : IHotKetImpl
 
     public bool Del(string uuid)
     {
-        var unregisterHotKey =
-            User32.UnregisterHotKey(globalHotKeyWindow.TryGetPlatformHandle().Handle, HotKeys[uuid].Id);
-        HotKeys.Remove(uuid);
+        if (HotKeys.ContainsKey(uuid))
+        {
+            var unregisterHotKey =
+                User32.UnregisterHotKey(globalHotKeyWindow.TryGetPlatformHandle().Handle, HotKeys[uuid].Id);
+            HotKeys.Remove(uuid);
+            return unregisterHotKey;
+        }
 
-        return unregisterHotKey;
+        return false;
     }
 
     public bool RequestUserModify(string uuid)

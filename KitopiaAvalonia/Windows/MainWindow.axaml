@@ -19,7 +19,7 @@
         <converter:ViewLocator x:Key="ViewLocator" />
     </u:UrsaWindow.Resources>
     <u:UrsaWindow.Background>
-        <SolidColorBrush Color="{DynamicResource SolidBackgroundFillColorBase}" Opacity="0.65" />
+        <SolidColorBrush Color="{DynamicResource SemiColorBackground0}" Opacity="0.65" />
 
     </u:UrsaWindow.Background>
     <u:UrsaWindow.TitleBarContent>

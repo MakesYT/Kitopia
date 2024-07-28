@@ -13,11 +13,10 @@ using KitopiaAvalonia.Tools;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
 using PluginCore;
-using Ursa.Controls;
 
 namespace KitopiaAvalonia.Windows;
 
-public partial class SearchWindow : UrsaWindow
+public partial class SearchWindow : Window
 {
     private static readonly ILog log = LogManager.GetLogger(nameof(SearchWindow));
 

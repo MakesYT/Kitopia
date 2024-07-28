@@ -24,7 +24,7 @@
               Name="TaskEditorWindow"
               x:DataType="taskEditor1:TaskEditorViewModel" Height="450" Width="1800">
     <u:UrsaWindow.Background>
-        <SolidColorBrush Color="{DynamicResource SolidBackgroundFillColorBase}" Opacity="0.65" />
+        <SolidColorBrush Color="{DynamicResource SemiColorBackground0}" Opacity="0.65" />
 
     </u:UrsaWindow.Background>
     <u:UrsaWindow.Resources>
@@ -391,27 +391,19 @@
                                                                                         VerticalAlignment="Center"
 
                                                                                         FontSize="12"
-
+                                                                                        Background="{DynamicResource TextBoxForeground}"
+                                                                                        Foreground="{DynamicResource SemiColorBackground0}"
                                                                                         Text="变量">
-                                                                                        <TextBlock.Background>
-                                                                                            <SolidColorBrush
-                                                                                                Color="{DynamicResource TextFillColorPrimary}"
-                                                                                                Opacity="0.6" />
-                                                                                        </TextBlock.Background>
-                                                                                        <TextBlock.Foreground>
-                                                                                            <SolidColorBrush
-                                                                                                Color="{DynamicResource TextFillColorInverse}" />
-                                                                                        </TextBlock.Foreground>
+
                                                                                     </TextBlock>
 
 
                                                                                     <TextBlock
                                                                                         VerticalAlignment="Center"
+
+                                                                                        Foreground="{DynamicResource TextBoxForeground}"
                                                                                         Text="设置">
-                                                                                        <TextBlock.Foreground>
-                                                                                            <SolidColorBrush
-                                                                                                Color="{DynamicResource TextFillColorPrimary}" />
-                                                                                        </TextBlock.Foreground>
+
                                                                                     </TextBlock>
                                                                                 </StackPanel>
                                                                             </StackPanel>

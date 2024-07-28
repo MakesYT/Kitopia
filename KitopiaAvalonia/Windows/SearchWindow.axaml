@@ -1,34 +1,34 @@
-﻿<u:UrsaWindow xmlns="https://github.com/avaloniaui"
-              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 
-              xmlns:viewModel="clr-namespace:Core.ViewModel;assembly=Core"
-              xmlns:searchWindow="clr-namespace:Kitopia.Converter.SearchWindow"
-              xmlns:converter="clr-namespace:Kitopia.Converter"
-              xmlns:controls1="clr-namespace:KitopiaAvalonia.Controls"
-              xmlns:pluginCore="clr-namespace:PluginCore;assembly=PluginCore"
-              xmlns:converter1="clr-namespace:KitopiaAvalonia.Converter"
-              xmlns:u="https://irihi.tech/ursa"
-              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-              x:Class="KitopiaAvalonia.Windows.SearchWindow"
-              x:DataType="viewModel:SearchWindowViewModel"
-              Deactivated="w_Deactivated"
-              TransparencyLevelHint="AcrylicBlur"
-              Background="Transparent"
-              Activated="w_Activated"
-              ShowInTaskbar="False"
-              ExtendClientAreaToDecorationsHint="True"
-              Width="800"
-              CanResize="False"
-              SizeToContent="Height"
-              ExtendClientAreaChromeHints="SystemChrome"
-              SystemDecorations="BorderOnly"
-              KeyDown="InputElement_OnKeyDown"
-              Topmost="True"
-              Closing="Window_OnClosing"
-              Title="SearchWindow">
-    <u:UrsaWindow.Resources>
+        xmlns:viewModel="clr-namespace:Core.ViewModel;assembly=Core"
+        xmlns:searchWindow="clr-namespace:Kitopia.Converter.SearchWindow"
+        xmlns:converter="clr-namespace:Kitopia.Converter"
+        xmlns:controls1="clr-namespace:KitopiaAvalonia.Controls"
+        xmlns:pluginCore="clr-namespace:PluginCore;assembly=PluginCore"
+        xmlns:converter1="clr-namespace:KitopiaAvalonia.Converter"
+        xmlns:u="https://irihi.tech/ursa"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="KitopiaAvalonia.Windows.SearchWindow"
+        x:DataType="viewModel:SearchWindowViewModel"
+        Deactivated="w_Deactivated"
+        TransparencyLevelHint="AcrylicBlur"
+        Background="Transparent"
+        Activated="w_Activated"
+        ShowInTaskbar="False"
+        ExtendClientAreaToDecorationsHint="True"
+        Width="800"
+        CanResize="False"
+        SizeToContent="Height"
+        ExtendClientAreaChromeHints="SystemChrome"
+        SystemDecorations="BorderOnly"
+        KeyDown="InputElement_OnKeyDown"
+        Topmost="True"
+        Closing="Window_OnClosing"
+        Title="SearchWindow">
+    <Window.Resources>
         <searchWindow:StarBoolToText x:Key="StarBoolToText" />
         <searchWindow:EnumToVisibilityConverter x:Key="EnumToVisibilityConverter" />
         <searchWindow:PathToImageConverter x:Key="PathToImageConverter" />
@@ -38,10 +38,10 @@
         <searchWindow:SymbolToVisible x:Key="SymbolToVisible" />
         <searchWindow:ItemNameMatchCtr x:Key="ItemNameMatchCtr" />
         <converter1:ControlContentSize x:Key="ControlContentSize" />
-    </u:UrsaWindow.Resources>
+    </Window.Resources>
     <Panel>
         <Panel.Background>
-            <SolidColorBrush Color="{DynamicResource SolidBackgroundFillColorBase}" Opacity="0.65" />
+            <SolidColorBrush Color="{DynamicResource SemiColorBackground0}" Opacity="0.65" />
         </Panel.Background>
 
         <StackPanel Margin="10" MinHeight="150">
@@ -221,4 +221,4 @@
             </ListBox>
         </StackPanel>
     </Panel>
-</u:UrsaWindow>
+</Window>

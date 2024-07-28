@@ -1,9 +1,6 @@
 [submodule "PluginCore"]
 	path = PluginCore
 	url = https://github.com/MakesYT/PluginCore.git
-[submodule "PlugCleanTool"]
-	path = PlugCleanTool
-	url = https://github.com/MakesYT/PlugCleanTool.git
 [submodule "KitopiaWeb"]
 	path = KitopiaWeb
 	url = https://github.com/MakesYT/KitopiaWeb
@@ -13,3 +10,6 @@
 [submodule "PinyinM.NET"]
 	path = PinyinM.NET
 	url = https://github.com/MakesYT/Pinyin.NET
+[submodule "Semi.Avalonia"]
+	path = Semi.Avalonia
+	url = https://github.com/MakesYT/Semi.Avalonia.git
