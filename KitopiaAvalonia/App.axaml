@@ -24,6 +24,7 @@
     </Application.Resources>
     <Application.Styles>
         <StyleInclude Source="avares://Semi.Avalonia/Themes/Index.axaml" />
+        <StyleInclude Source="avares://Semi.Avalonia.ColorPicker/Index.axaml" />
         <u-semi:SemiTheme Locale="zh-CN" />
         <semi:SemiTheme Locale="zh-CN" />
         <StyleInclude Source="Styles/Styles.axaml" />

@@ -39,7 +39,7 @@ public class MosaicIcon : Control
 
         // 设置绘制马赛克的颜色
         //var brush = new SolidColorBrush(Color.Parse("#0078D7"));
-        Application.Current.Styles.TryGetResource("TextFillColorSecondaryBrush", null, out var brush);
+        Application.Current.Styles.TryGetResource("SemiColorText0", null, out var brush);
         var pen = new Pen((IBrush?)brush, 2d);
 
         // 计算每个像素方块的大小

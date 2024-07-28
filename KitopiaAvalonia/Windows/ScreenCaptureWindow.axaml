@@ -69,12 +69,12 @@
 
                     <Button BorderThickness="1" ToolTip.Tip="矩形" Width="32" Height="32" Click="RectangleButton_OnClick">
                         <Rectangle
-                            Width="20" Height="20" Stroke="{StaticResource TextFillColorSecondaryBrush}"
+                            Width="20" Height="20" Stroke="{DynamicResource SemiColorText0}"
                             StrokeThickness="1" />
                     </Button>
                     <Button BorderThickness="1" ToolTip.Tip="圆" Width="32" Height="32" Click="CircleButton_OnClick">
                         <Ellipse VerticalAlignment="Center" HorizontalAlignment="Center"
-                                 Width="20" Height="20" Stroke="{StaticResource TextFillColorSecondaryBrush}"
+                                 Width="20" Height="20" Stroke="{DynamicResource SemiColorText0}"
                                  StrokeThickness="1" />
                     </Button>
                     <Button BorderThickness="1" ToolTip.Tip="箭头" Width="32" Height="32" Click="ArrowButton_OnClick">
@@ -100,7 +100,7 @@
                     <Button BorderThickness="1" ToolTip.Tip="马赛克" Width="32" Height="32" Click="MosaicButton_OnClick">
                         <controls1:MosaicIcon Width="18" Height="18" />
                     </Button>
-                    <Line Height="32" Width="1" Stroke="{StaticResource TextFillColorSecondaryBrush}"
+                    <Line Height="32" Width="1" Stroke="{DynamicResource SemiColorText2}"
                           StrokeThickness="1"
                           StartPoint="0.5,0"
                           EndPoint="0.5,32" />
@@ -112,7 +112,7 @@
                                             FontFamily="{StaticResource FluentFont}" Glyph="&#xf8e6;" FontSize="24" />
                     </Button>
                     <Button BorderThickness="1" ToolTip.Tip="拓展功能" Width="32" Height="32" Padding="1" />
-                    <Line Height="32" Width="1" Stroke="{StaticResource TextFillColorSecondaryBrush}"
+                    <Line Height="32" Width="1" Stroke="{DynamicResource SemiColorText2}"
                           StrokeThickness="1"
                           StartPoint="0.5,0"
                           EndPoint="0.5,32" />
@@ -152,7 +152,8 @@
                     <u:NumericIntUpDown ToolTip.Tip="画笔大小" Margin="0,2,0,0" Height="37" Name="StrokeWidth" Minimum="1"
                                         Maximum="50" Value="3">
                     </u:NumericIntUpDown>
-                    <ColorPicker ToolTip.Tip="画笔颜色" Name="ColorPicker">
+                    <ColorPicker SelectedIndex="1" ToolTip.Tip="画笔颜色" Name="ColorPicker"
+                                 Foreground="{DynamicResource SemiColorText0}">
                     </ColorPicker>
 
                 </StackPanel>

@@ -89,7 +89,6 @@ public partial class ScreenCaptureWindow : Window
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-
         ColorPicker.PaletteColors = new[]
         {
             Colors.Red,
