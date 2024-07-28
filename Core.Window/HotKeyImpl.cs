@@ -84,12 +84,19 @@ public class HotKeyImpl : IHotKetImpl
 
         if (registerHotKey)
         {
-            HotKeys.Add(hotKeyModel.UUID, new HotkeyInfo()
+            if (HotKeys.TryGetValue(hotKeyModel.UUID, out var hotKeyModel1) && hotKeyModel1.Id == -1)
             {
-                HotKeyModel = hotKeyModel,
-                Id = id,
-                RallBack = rallBack
-            });
+                hotKeyModel1.Id = id;
+            }
+            else
+            {
+                HotKeys.Add(hotKeyModel.UUID, new HotkeyInfo()
+                {
+                    HotKeyModel = hotKeyModel,
+                    Id = id,
+                    RallBack = rallBack
+                });
+            }
         }
         else
         {
@@ -115,7 +122,7 @@ public class HotKeyImpl : IHotKetImpl
         {
             var unregisterHotKey =
                 User32.UnregisterHotKey(globalHotKeyWindow.TryGetPlatformHandle().Handle, HotKeys[uuid].Id);
-            HotKeys.Remove(uuid);
+            HotKeys[uuid].Id = -1;
             return unregisterHotKey;
         }
 
