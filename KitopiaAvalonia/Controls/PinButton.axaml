@@ -10,6 +10,7 @@
         <Setter Property="Template">
             <ControlTemplate>
                 <controls:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xF604;" GlyphFilled="&#xF60C;"
+                                   IsFilled="{TemplateBinding IsChecked}"
                                    Name="Icon" FontSize="24" RenderTransform="rotate(0)">
                     <controls:FontIcon.Transitions>
                         <Transitions>

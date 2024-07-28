@@ -32,13 +32,13 @@ public class ItemNameMatchCtr : IValueConverter
 
         for (int i = 0; i < str.PinyinItem.SplitWords.Length; i++)
         {
-            list.Add(new Run(str.PinyinItem.SplitWords[i]
-                                .ToString())
+            var inline = new Run(str.PinyinItem.SplitWords[i]);
+            if (str.PinyinItem.CharMatchResults[i + str.PinyinItem.ZhongWenCount])
             {
-                Foreground = str.PinyinItem.CharMatchResults[i + str.PinyinItem.ZhongWenCount]
-                    ? Brushes.OrangeRed
-                    : Brushes.Black,
-            });
+                inline.Foreground = Brushes.OrangeRed;
+            }
+
+            list.Add(inline);
         }
 
         return list;

@@ -65,7 +65,7 @@
 
             <u:Banner Focusable="False" Type="Warning" Content="Everything服务未运行,无法搜索文档,请检查"
 
-                      IsVisible="{Binding EverythingIsOk}"
+                      IsVisible="{Binding !EverythingIsOk}"
                       CanClose="False" />
             <ListBox Name="dataGrid" MaxHeight="427"
                      ItemsSource="{Binding Items,Mode=OneWay }"
@@ -157,12 +157,14 @@
                                                        FontFamily="HarmonyOS Sans"
                                                        Inlines="{Binding Path=., 
                                                                     Converter={StaticResource ItemNameMatchCtr},
-                                                                    ConverterParameter={ReflectionBinding #Item}}">
-                                                Background="{x:Null}"
-                                                FontWeight="Normal" FontSize="18">
+                                                                    ConverterParameter={ReflectionBinding #Item}}"
+                                                       Background="{x:Null}"
+                                                       Foreground="{DynamicResource SemiColorText0}"
+                                                       FontWeight="Normal" FontSize="18">
                                                 <Run />
                                             </TextBlock>
                                             <TextBlock VerticalAlignment="Top" Margin="0"
+                                                       Foreground="{DynamicResource SemiColorText0}"
                                                        Text="{Binding Path=FileType}" />
                                         </StackPanel>
                                         <StackPanel Grid.Column="3" Orientation="Horizontal" Focusable="False"
@@ -173,6 +175,7 @@
                                                     Command="{Binding $parent[ListBox].((viewModel:SearchWindowViewModel)DataContext).RunAsAdminCommand}"
                                                     CommandParameter="{Binding  }">
                                                 <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
+                                                                    FontWeight="Normal"
                                                                     Glyph="&#xF0B2;" />
 
 
@@ -183,6 +186,7 @@
                                                     Command="{Binding $parent[ListBox].((viewModel:SearchWindowViewModel)DataContext).OpenFolderCommand}"
                                                     CommandParameter="{Binding}">
                                                 <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
+                                                                    FontWeight="Normal"
                                                                     Glyph="&#xF419;" />
                                             </Button>
                                             <Button KeyboardNavigation.TabNavigation="None" FontSize="26"
@@ -191,6 +195,7 @@
                                                     Command="{Binding $parent[ListBox].((viewModel:SearchWindowViewModel)DataContext).OpenFolderInTerminalCommand}"
                                                     CommandParameter="{Binding}">
                                                 <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
+                                                                    FontWeight="Normal"
                                                                     Glyph="&#xEE6F;" />
                                             </Button>
                                             <Button KeyboardNavigation.TabNavigation="None" FontSize="26"
@@ -202,7 +207,7 @@
                                                 <Button.Resources>
                                                     <searchWindow:StarIconCtr x:Key="StarIconCtr" />
                                                 </Button.Resources>
-                                                <controls1:FontIcon x:Name="Source"
+                                                <controls1:FontIcon x:Name="Source" FontWeight="Normal"
                                                                     FontFamily="{Binding IsStared,Converter={StaticResource StarIconCtr},ConverterParameter='FM'}"
                                                                     Glyph="{Binding IsStared,Converter={StaticResource StarIconCtr},ConverterParameter='F'}" />
 
