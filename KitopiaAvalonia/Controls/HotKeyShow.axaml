@@ -52,6 +52,7 @@
                             IsVisible="{Binding RelativeSource={RelativeSource TemplatedParent},
                                                  Path=KeyType,Converter={StaticResource HotKey_KeyTypeToVisible},ConverterParameter='None'}"
                             Name="None" Margin="10" Text="快捷键未设置" VerticalAlignment="Center"
+                            Foreground="{DynamicResource SemiColorText0}"
                             HorizontalAlignment="Center" />
                         <Button Margin="5,0,0,0" Padding="0" IsVisible="{TemplateBinding IsActivated}"
                                 Height="32" Width="32" FontSize="24" ToolTip.Tip="禁用快捷键"

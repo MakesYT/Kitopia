@@ -64,10 +64,6 @@ public partial class MainWindow : UrsaWindow
         log.Debug("注册热键管理器完成");
         ConfigManger.Init();
         log.Info("配置文件初始化完成");
-        PluginManager.Init();
-        log.Info("插件管理器初始化完成");
-        CustomScenarioManger.Init();
-        log.Info("场景管理器初始化完成");
         switch (ConfigManger.Config.themeChoice)
         {
             case ThemeEnum.跟随系统:
@@ -95,6 +91,11 @@ public partial class MainWindow : UrsaWindow
         }
 
         log.Info("主题初始化完成");
+
+        PluginManager.Init();
+        log.Info("插件管理器初始化完成");
+        CustomScenarioManger.Init();
+        log.Info("场景管理器初始化完成");
 
 
         ServicePointManager.DefaultConnectionLimit = 10240;

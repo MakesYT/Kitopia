@@ -19,7 +19,7 @@
         <converter:ViewLocator x:Key="ViewLocator" />
     </u:UrsaWindow.Resources>
     <u:UrsaWindow.Background>
-        <SolidColorBrush Color="{DynamicResource SemiColorBackground0}" Opacity="0.65" />
+        <SolidColorBrush Color="{DynamicResource SemiBackground0Color}" Opacity="0.65" />
 
     </u:UrsaWindow.Background>
     <u:UrsaWindow.TitleBarContent>
@@ -92,6 +92,7 @@
                         Width="24"
                         Height="24"
                         FontSize="24"
+                        Foreground="{DynamicResource SemiColorText0}"
                         GlyphFilled="{Binding MenuIconFilledGlyph}"
                         Glyph="{Binding MenuIconGlyph }" />
                 </DataTemplate>
@@ -100,15 +101,16 @@
 
                 <Button HorizontalAlignment="Stretch" Height="56" ToolTip.Tip="设置"
                         Command="{Binding ActivateSettingPageCommand}"
-                        Foreground="{DynamicResource TextControlForeground}">
+                        Foreground="{DynamicResource SemiColorText0}">
                     <Button.Resources>
                         <SolidColorBrush x:Key="ButtonDefaultBackground" Opacity="0.05" Color="Transparent" />
                     </Button.Resources>
                     <controls:FontIcon
-                        Foreground="{DynamicResource TextControlForeground}"
+                        Foreground="{DynamicResource SemiColorText0}"
                         Width="24"
                         Height="24"
                         FontSize="24"
+                        FontWeight="Normal"
                         GlyphFilled="&#xf6b3;"
                         Glyph="&#xf6aa;" />
                 </Button>

@@ -19,7 +19,7 @@
 
         </TextBlock>
         <StackPanel Grid.Row="1" Orientation="Horizontal">
-            <Button Foreground="{DynamicResource TextControlForeground}" Command="{Binding NewCustomScenariosCommand}">
+            <Button Foreground="{DynamicResource SemiColorText0}" Command="{Binding NewCustomScenariosCommand}">
                 <Button.Content>
                     <Label Content="新建情景"></Label>
                 </Button.Content>
@@ -57,7 +57,7 @@
                             Command="{Binding Path=$parent[ListBox].((customScenario:CustomScenariosManagerPageViewModel)DataContext).ToTaskEditPageCommand}"
                             CommandParameter="{Binding }"
                             Background="Transparent"
-                            Foreground="{DynamicResource TextControlForeground}"
+                            Foreground="{DynamicResource SemiColorText0}"
                             Height="72" Margin="0"
                             Padding="3">
                         <Grid

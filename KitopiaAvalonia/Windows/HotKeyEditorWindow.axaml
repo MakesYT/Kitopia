@@ -13,7 +13,7 @@
               TransparencyLevelHint="AcrylicBlur"
               Title="HotKeyEditorWindow">
     <u:UrsaWindow.Background>
-        <SolidColorBrush Color="{DynamicResource SemiColorBackground0}" Opacity="0.65" />
+        <SolidColorBrush Color="{DynamicResource SemiBackground0Color}" Opacity="0.65" />
 
     </u:UrsaWindow.Background>
     <Grid>

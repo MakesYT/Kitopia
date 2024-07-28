@@ -10,10 +10,10 @@
         <Setter Property="Template">
             <ControlTemplate>
                 <Border Name="Root"
-                        Background="{DynamicResource AccentButtonBackground}"
-                        BorderBrush="{DynamicResource AccentButtonBorderBrush}"
-                        BorderThickness="{DynamicResource ButtonBorderThemeThickness}"
-
+                        Background="{DynamicResource SemiColorPrimary}"
+                        BorderBrush="{DynamicResource SemiColorBorder}"
+                        BorderThickness="1"
+                        CornerRadius="5"
                         Width="{TemplateBinding Width}"
                         Height="{TemplateBinding Height}"
                         MinWidth="{TemplateBinding MinWidth}"
@@ -32,7 +32,7 @@
                             Grid.Column="0"
                             VerticalAlignment="Center"
                             Content="{TemplateBinding Icon}"
-                            Foreground="{DynamicResource AccentButtonForeground}"
+                            Foreground="{DynamicResource SemiColorText0}"
                             Focusable="False">
 
                         </ContentPresenter>
@@ -42,13 +42,13 @@
                             Grid.Column="1"
                             VerticalAlignment="Center"
                             Content="{TemplateBinding Content}"
-                            Foreground="{DynamicResource AccentButtonForeground}">
+                            Foreground="{DynamicResource SemiColorText0}">
 
                         </ContentPresenter>
                     </Grid>
                     <Border.Styles>
                         <Style Selector="Border:disabled">
-                            <Setter Property="Background" Value="{DynamicResource AccentButtonBackgroundDisabled}" />
+                            <Setter Property="Background" Value="{DynamicResource SemiColorPrimaryDisabled}" />
                         </Style>
                     </Border.Styles>
                 </Border>

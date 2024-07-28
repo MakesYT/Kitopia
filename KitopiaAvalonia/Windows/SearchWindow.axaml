@@ -41,7 +41,7 @@
     </Window.Resources>
     <Panel>
         <Panel.Background>
-            <SolidColorBrush Color="{DynamicResource SemiColorBackground0}" Opacity="0.65" />
+            <SolidColorBrush Color="{DynamicResource SemiBackground0Color}" Opacity="0.65" />
         </Panel.Background>
 
         <StackPanel Margin="10" MinHeight="150">

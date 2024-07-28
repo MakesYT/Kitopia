@@ -25,10 +25,10 @@
                     <DataTemplate x:DataType="hotKey:HotKeyModel">
                         <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="4">
                             <StackPanel HorizontalAlignment="Center" Margin="5,0,5,5">
-                                <TextBlock Margin="0,5,0,0" Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                <TextBlock Margin="0,5,0,0" Foreground="{DynamicResource SemiColorText0}"
                                            Text="{Binding SignName,Converter={StaticResource HotKeySignNameToStringCtr}}" />
                                 <controls1:HotKeyShow Margin="0,5,0,0"
-                                                      Foreground="{DynamicResource TextControlForeground}"
+                                                      Foreground="{DynamicResource SemiColorText0}"
                                                       HotKeyModel="{Binding RelativeSource={RelativeSource AncestorType=StackPanel},Path=DataContext}" />
                             </StackPanel>
 

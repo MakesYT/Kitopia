@@ -24,7 +24,7 @@
               Name="TaskEditorWindow"
               x:DataType="taskEditor1:TaskEditorViewModel" Height="450" Width="1800">
     <u:UrsaWindow.Background>
-        <SolidColorBrush Color="{DynamicResource SemiColorBackground0}" Opacity="0.65" />
+        <SolidColorBrush Color="{DynamicResource SemiBackground0Color}" Opacity="0.65" />
 
     </u:UrsaWindow.Background>
     <u:UrsaWindow.Resources>
@@ -61,7 +61,7 @@
         </EventTriggerBehavior>
     </Interaction.Behaviors>
 
-    <Grid>
+    <Grid Margin="0,40,0,0">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="4*" />
             <ColumnDefinition Width="10" />
@@ -97,12 +97,12 @@
                             </Setter>
                         </ControlTheme>
                     </ListBox.ItemContainerTheme>
-                    <Expander Header="情景信息" IsExpanded="True">
+                    <Expander Header="情景信息" IsExpanded="True" HorizontalContentAlignment="Stretch">
                         <Expander.Content>
-                            <StackPanel>
+                            <StackPanel HorizontalAlignment="Stretch">
                                 <controls:SettingsExpander Header="情景名称">
                                     <controls:SettingsExpander.Footer>
-                                        <TextBox Text="{Binding Scenario.Name}" />
+                                        <TextBox MinWidth="80" Text="{Binding Scenario.Name}" />
                                     </controls:SettingsExpander.Footer>
                                     <controls:SettingsExpander.IconSource>
                                         <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
@@ -111,7 +111,7 @@
                                 </controls:SettingsExpander>
                                 <controls:SettingsExpander Margin="0" Header="情景描述">
                                     <controls:SettingsExpander.Footer>
-                                        <TextBox TextWrapping="Wrap"
+                                        <TextBox TextWrapping="Wrap" MinWidth="80"
                                                  Text="{Binding Scenario.Description}" />
                                     </controls:SettingsExpander.Footer>
                                     <controls:SettingsExpander.IconSource>
@@ -187,7 +187,7 @@
 
                                                             <Setter Property="Background">
                                                                 <SolidColorBrush
-                                                                    Color="{DynamicResource TextFillColorSecondary}"
+                                                                    Color="{DynamicResource SemiBackground4Color}"
                                                                     Opacity="0.2" />
                                                             </Setter>
                                                         </Style>
@@ -275,12 +275,12 @@
                                             <Grid>
                                                 <Border BorderBrush="LightGray" BorderThickness="1"
                                                         CornerRadius="3"
-                                                        Background="{DynamicResource ControlFillColorDefaultBrush}">
+                                                        Background="{DynamicResource SemiBackground4Color}">
                                                     <Border.ContextFlyout>
                                                         <MenuFlyout>
                                                             <!-- ReSharper disable once Xaml.RedundantResource -->
                                                             <MenuItem Header="删除此变量"
-                                                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                                                      Foreground="{DynamicResource SemiColorText0}"
                                                                       Command="{Binding $parent[StackPanel].((taskEditor1:TaskEditorViewModel)DataContext).DelValueCommand}"
                                                                       CommandParameter="{Binding Key }" />
                                                         </MenuFlyout>
@@ -350,8 +350,8 @@
                                                                                         VerticalAlignment="Center"
                                                                                         x:Name="textBlock"
                                                                                         FontSize="12"
-                                                                                        Background="{DynamicResource TextBoxForeground}"
-                                                                                        Foreground="{DynamicResource TextBoxDefaultBackground}"
+                                                                                        Background="{DynamicResource SemiColorText0}"
+                                                                                        Foreground="{DynamicResource SemiBackground4Color}"
                                                                                         Text="节点">
 
 
@@ -360,11 +360,8 @@
 
                                                                                     <TextBlock
                                                                                         VerticalAlignment="Center"
+                                                                                        Foreground="{DynamicResource SemiColorText0}"
                                                                                         Text="流节点">
-                                                                                        <TextBlock.Foreground>
-                                                                                            <SolidColorBrush
-                                                                                                Color="{DynamicResource TextFillColorPrimary}" />
-                                                                                        </TextBlock.Foreground>
                                                                                     </TextBlock>
                                                                                 </StackPanel>
                                                                                 <StackPanel Orientation="Horizontal"
@@ -389,10 +386,9 @@
 
                                                                                     <TextBlock
                                                                                         VerticalAlignment="Center"
-
                                                                                         FontSize="12"
-                                                                                        Background="{DynamicResource TextBoxForeground}"
-                                                                                        Foreground="{DynamicResource SemiColorBackground0}"
+                                                                                        Background="{DynamicResource SemiColorText0}"
+                                                                                        Foreground="{DynamicResource SemiBackground4Color}"
                                                                                         Text="变量">
 
                                                                                     </TextBlock>
@@ -400,10 +396,8 @@
 
                                                                                     <TextBlock
                                                                                         VerticalAlignment="Center"
-
-                                                                                        Foreground="{DynamicResource TextBoxForeground}"
+                                                                                        Foreground="{DynamicResource SemiColorText0}"
                                                                                         Text="设置">
-
                                                                                     </TextBlock>
                                                                                 </StackPanel>
                                                                             </StackPanel>
@@ -452,28 +446,17 @@
 
                                                                             <TextBlock
                                                                                 VerticalAlignment="Center"
-
+                                                                                Foreground="{DynamicResource SemiColorText0}"
                                                                                 Text="读取">
-                                                                                <TextBlock.Foreground>
-                                                                                    <SolidColorBrush
-                                                                                        Color="{DynamicResource TextFillColorPrimary}" />
-                                                                                </TextBlock.Foreground>
+
                                                                             </TextBlock>
                                                                             <TextBlock
                                                                                 VerticalAlignment="Center"
                                                                                 FontSize="12"
-
+                                                                                Background="{DynamicResource SemiColorText0}"
+                                                                                Foreground="{DynamicResource SemiBackground4Color}"
                                                                                 Text="变量">
-                                                                                <TextBlock.Background>
-                                                                                    <SolidColorBrush
-                                                                                        Color="{DynamicResource TextFillColorPrimary}"
-                                                                                        Opacity="0.6" />
 
-                                                                                </TextBlock.Background>
-                                                                                <TextBlock.Foreground>
-                                                                                    <SolidColorBrush
-                                                                                        Color="{DynamicResource TextFillColorInverse}" />
-                                                                                </TextBlock.Foreground>
                                                                             </TextBlock>
 
                                                                             <Border Background="Transparent">
@@ -762,27 +745,17 @@
                                                                             VerticalAlignment="Center"
                                                                             x:Name="textBlock"
                                                                             FontSize="12"
-
+                                                                            Background="{DynamicResource SemiColorText0}"
+                                                                            Foreground="{DynamicResource SemiBackground4Color}"
                                                                             Text="{Binding TypeName}">
-                                                                            <TextBlock.Background>
-                                                                                <SolidColorBrush
-                                                                                    Color="{DynamicResource TextFillColorPrimary}"
-                                                                                    Opacity="0.6" />
-                                                                            </TextBlock.Background>
-                                                                            <TextBlock.Foreground>
-                                                                                <SolidColorBrush
-                                                                                    Color="{DynamicResource TextFillColorInverse}" />
-                                                                            </TextBlock.Foreground>
+
                                                                         </TextBlock>
 
 
                                                                         <TextBlock
                                                                             VerticalAlignment="Center"
+                                                                            Foreground="{DynamicResource SemiColorText0}"
                                                                             Text="{Binding Title}">
-                                                                            <TextBlock.Foreground>
-                                                                                <SolidColorBrush
-                                                                                    Color="{DynamicResource TextFillColorPrimary}" />
-                                                                            </TextBlock.Foreground>
                                                                         </TextBlock>
                                                                     </StackPanel>
 
@@ -798,7 +771,7 @@
                                                                             VerticalAlignment="Center"
                                                                             x:Name="textBlock"
                                                                             Text="{Binding Title}"
-                                                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                                            Foreground="{DynamicResource SemiColorText0}" />
                                                                         <TextBox Margin="10,5,10,5"
                                                                             MinWidth="40"
                                                                             Text="{Binding InputObject}"
@@ -816,7 +789,7 @@
                                                                             VerticalAlignment="Center"
                                                                             x:Name="textBlock"
                                                                             Text="{Binding Title}"
-                                                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                                            Foreground="{DynamicResource SemiColorText0}" />
                                                                         <ComboBox Margin="10,5,10,5"
                                                                             x:Name="ComboBox"
                                                                             MinWidth="40"
@@ -834,7 +807,7 @@
                                                                             VerticalAlignment="Center"
                                                                             x:Name="textBlock"
                                                                             Text="{Binding Title}"
-                                                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                                            Foreground="{DynamicResource SemiColorText0}" />
                                                                         <u:NumericIntUpDown
                                                                             Margin="10,5,10,5"
                                                                             MinWidth="40"
@@ -855,7 +828,7 @@
                                                                             VerticalAlignment="Center"
                                                                             x:Name="textBlock"
                                                                             Text="{Binding Title}"
-                                                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                                            Foreground="{DynamicResource SemiColorText0}" />
                                                                         <u:NumericDoubleUpDown
                                                                             Margin="10,5,10,5"
                                                                             MinWidth="40"
@@ -874,7 +847,7 @@
                                                                             VerticalAlignment="Center"
                                                                             x:Name="textBlock"
                                                                             Text="{Binding Title}"
-                                                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                                            Foreground="{DynamicResource SemiColorText0}" />
                                                                         <ToggleSwitch
                                                                             Margin="10,5,10,5"
                                                                             MinWidth="40"
@@ -893,7 +866,7 @@
                                                                             VerticalAlignment="Center"
                                                                             x:Name="textBlock"
                                                                             Text="{Binding Title}"
-                                                                            Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                                            Foreground="{DynamicResource SemiColorText0}" />
                                                                         <controls1:SearchItemShow
                                                                             Margin="10,5,10,5"
                                                                             ToolTip.Tip="{Binding RelativeSource={RelativeSource Self},Path=OnlyKey}"
@@ -928,27 +901,15 @@
                                                                     <TextBlock
                                                                         VerticalAlignment="Center"
                                                                         x:Name="textBlock"
+                                                                        Foreground="{DynamicResource SemiColorText0}"
                                                                         Text="{Binding Title}">
-                                                                        <TextBlock.Foreground>
-                                                                            <SolidColorBrush
-                                                                                Color="{DynamicResource TextFillColorPrimary}" />
-                                                                        </TextBlock.Foreground>
                                                                     </TextBlock>
                                                                     <TextBlock
                                                                         VerticalAlignment="Center"
                                                                         FontSize="12"
-
+                                                                        Background="{DynamicResource SemiColorText0}"
+                                                                        Foreground="{DynamicResource SemiBackground4Color}"
                                                                         Text="{Binding TypeName}">
-                                                                        <TextBlock.Background>
-                                                                            <SolidColorBrush
-                                                                                Color="{DynamicResource TextFillColorPrimary}"
-                                                                                Opacity="0.6" />
-
-                                                                        </TextBlock.Background>
-                                                                        <TextBlock.Foreground>
-                                                                            <SolidColorBrush
-                                                                                Color="{DynamicResource TextFillColorInverse}" />
-                                                                        </TextBlock.Foreground>
                                                                     </TextBlock>
                                                                     <controls1:FontIcon
                                                                         FontFamily="{StaticResource FluentFont}"
@@ -1150,7 +1111,7 @@
                                                 <MenuFlyout>
                                                     <!-- ReSharper disable once Xaml.RedundantResource -->
                                                     <MenuItem Header="切换自输入/连接器"
-                                                              Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                                              Foreground="{DynamicResource SemiColorText0}"
                                                               Command="{Binding $parent[controls2:NodifyEditor].((taskEditor1:TaskEditorViewModel)DataContext).SwitchConnectorCommand}"
                                                               CommandParameter="{Binding #ContentPresenter1  }" />
                                                 </MenuFlyout>
@@ -1172,17 +1133,14 @@
                                                                     <StackPanel.Styles>
                                                                         <Style
                                                                             Selector="TextBlock#TypeNametextBlock">
-                                                                            <Setter Property="Background">
-                                                                                <Setter.Value>
-                                                                                    <SolidColorBrush
-                                                                                        Color="{DynamicResource TextFillColorPrimary}"
-                                                                                        Opacity="0.6" />
-                                                                                </Setter.Value>
+                                                                            <Setter Property="Background"
+                                                                                Value="{DynamicResource SemiColorText0}">
+
                                                                             </Setter>
                                                                             <Setter Property="Foreground">
                                                                                 <Setter.Value>
                                                                                     <SolidColorBrush
-                                                                                        Color="{DynamicResource TextFillColorInverse}" />
+                                                                                        Color="{DynamicResource SemiBackground0Color}" />
                                                                                 </Setter.Value>
                                                                             </Setter>
                                                                         </Style>
@@ -1190,14 +1148,14 @@
                                                                             <Setter Property="Background">
                                                                                 <Setter.Value>
                                                                                     <SolidColorBrush
-                                                                                        Color="{DynamicResource ControlFillColorDisabled}"
+                                                                                        Color="{DynamicResource SemiGrey1Color}"
                                                                                         Opacity="0.6" />
                                                                                 </Setter.Value>
                                                                             </Setter>
                                                                             <Setter Property="Foreground">
                                                                                 <Setter.Value>
                                                                                     <SolidColorBrush
-                                                                                        Color="{DynamicResource TextFillColorTertiary}" />
+                                                                                        Color="{DynamicResource SemiBackground0Color}" />
                                                                                 </Setter.Value>
                                                                             </Setter>
                                                                         </Style>
@@ -1230,9 +1188,9 @@
                                                             <TextBlock VerticalAlignment="Center"
                                                                        x:Name="textBlock"
                                                                        Text="{Binding Title}"
-                                                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                                       Foreground="{DynamicResource SemiColorText0}" />
                                                             <TextBox Margin="10,5,10,5" MinWidth="40"
-                                                                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                                                     Foreground="{DynamicResource SemiColorText0}"
                                                                      Text="{Binding InputObject}" Watermark="字符串" />
                                                         </StackPanel>
                                                     </DataTemplate>
@@ -1246,7 +1204,7 @@
                                                                 VerticalAlignment="Center"
                                                                 x:Name="textBlock"
                                                                 Text="{Binding Title}"
-                                                                Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                                Foreground="{DynamicResource SemiColorText0}" />
                                                             <ComboBox Margin="10,5,10,5" x:Name="ComboBox"
                                                                       MinWidth="40"
                                                                       SelectedValue="{Binding InputObject,Mode=TwoWay}" />
@@ -1261,11 +1219,11 @@
                                                             <TextBlock VerticalAlignment="Center"
                                                                        x:Name="textBlock"
                                                                        Text="{Binding Title}"
-                                                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                                       Foreground="{DynamicResource SemiColorText0}" />
                                                             <u:NumericIntUpDown Margin="10,5,10,5" MinWidth="40"
 
                                                                 Maximum="2147483647" Minimum="-2147483648"
-                                                                Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                                                Foreground="{DynamicResource SemiColorText0}"
                                                                 Value="{Binding InputObject, Mode=TwoWay }"
                                                                 Watermark="整型" />
                                                         </StackPanel>
@@ -1279,9 +1237,9 @@
                                                             <TextBlock VerticalAlignment="Center"
                                                                        x:Name="textBlock"
                                                                        Text="{Binding Title}"
-                                                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                                       Foreground="{DynamicResource SemiColorText0}" />
                                                             <u:NumericDoubleUpDown Margin="10,5,10,5" MinWidth="40"
-                                                                Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                                                Foreground="{DynamicResource SemiColorText0}"
                                                                 Value="{Binding InputObject, Mode=TwoWay}"
                                                                 Watermark="浮点" />
                                                         </StackPanel>
@@ -1295,7 +1253,7 @@
                                                             <TextBlock VerticalAlignment="Center"
                                                                        x:Name="textBlock"
                                                                        Text="{Binding Title}"
-                                                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                                       Foreground="{DynamicResource SemiColorText0}" />
                                                             <ToggleSwitch Margin="10,5,10,5" MinWidth="40"
                                                                           IsChecked="{Binding InputObject, Mode=TwoWay}" />
                                                         </StackPanel>
@@ -1309,7 +1267,7 @@
                                                             <TextBlock VerticalAlignment="Center"
                                                                        x:Name="textBlock"
                                                                        Text="{Binding Title}"
-                                                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+                                                                       Foreground="{DynamicResource SemiColorText0}" />
                                                             <controls1:SearchItemShow Margin="10,5,10,5"
                                                                 ToolTip.Tip="{Binding RelativeSource={RelativeSource Self},Path=OnlyKey}"
                                                                 Click="SearchItemShow_OnClick"
@@ -1345,16 +1303,9 @@
                                                     <TextBlock VerticalAlignment="Center" x:Name="textBlock"
                                                                Text="{Binding Title}" />
                                                     <TextBlock VerticalAlignment="Center" FontSize="12"
+                                                               Background="{DynamicResource SemiColorText0}"
+                                                               Foreground="{DynamicResource SemiBackground4Color}"
                                                                Text="{Binding TypeName}">
-                                                        <TextBlock.Background>
-                                                            <SolidColorBrush
-                                                                Color="{DynamicResource TextFillColorPrimary}"
-                                                                Opacity="0.6" />
-                                                        </TextBlock.Background>
-                                                        <TextBlock.Foreground>
-                                                            <SolidColorBrush
-                                                                Color="{DynamicResource TextFillColorInverse}" />
-                                                        </TextBlock.Foreground>
                                                     </TextBlock>
 
                                                     <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
@@ -1402,36 +1353,38 @@
                     <StackPanel.Resources>
                         <converter:ReverseBoolToVisibilityConverter x:Key="reverseBoolToVisibilityConverter" />
                     </StackPanel.Resources>
-                    <Button FontSize="25" ToolTip.Tip="清理未连接节点" ToolTip.ShowDelay="100"
+                    <Button ToolTip.Tip="清理未连接节点" ToolTip.ShowDelay="100" FontWeight="Normal"
                             Command="{Binding CleanUnusedNodeCommand}">
-                        <controls1:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xf34c;" />
+                        <controls1:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xf34c;" FontSize="24" />
                     </Button>
                     <ItemsControl Grid.Column="4"
                                   IsVisible="{Binding Scenario.IsHaveInputValue,Converter={StaticResource reverseBoolToVisibilityConverter}}">
-                        <Button FontSize="25" ToolTip.Tip="运行测试" ToolTip.ShowDelay="100"
+                        <Button ToolTip.Tip="运行测试" ToolTip.ShowDelay="100" FontWeight="Normal"
                                 IsVisible="{Binding Scenario.IsRunning,Converter={StaticResource reverseBoolToVisibilityConverter}}"
                                 Foreground="GreenYellow"
                                 Command="{Binding VerifyNodeCommand}">
                             <controls1:FontIcon Foreground="GreenYellow" FontFamily="{StaticResource FluentFont}"
+                                                FontSize="24"
                                                 Glyph="&#xf605;" />
                         </Button>
-                        <Button FontSize="25" ToolTip.Tip="停止测试" ToolTip.ShowDelay="100"
+                        <Button ToolTip.Tip="停止测试" ToolTip.ShowDelay="100" FontWeight="Normal"
                                 IsVisible="{Binding Scenario.IsRunning}"
 
                                 Command="{Binding StopCustomScenarioCommand}">
                             <controls1:FontIcon Foreground="OrangeRed" FontFamily="{StaticResource FluentFont}"
+                                                FontSize="24"
                                                 Glyph="&#xf72a;" />
                         </Button>
                     </ItemsControl>
 
-                    <Button FontSize="25" ToolTip.Tip="保存" ToolTip.ShowDelay="100"
+                    <Button ToolTip.Tip="保存" ToolTip.ShowDelay="100" FontWeight="Normal"
                             Command="{Binding SaveCustomScenarioCommand}">
-                        <controls1:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xf67f;" />
+                        <controls1:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xf67f;" FontSize="24" />
                     </Button>
-                    <Button FontSize="25" ToolTip.Tip="退出并保存" ToolTip.ShowDelay="100"
+                    <Button ToolTip.Tip="退出并保存" ToolTip.ShowDelay="100" FontWeight="Normal"
                             Command="{Binding SaveAndQuitCustomScenarioCommand}"
                             CommandParameter="{Binding $parent[u:UrsaWindow]}">
-                        <controls1:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xea45;" />
+                        <controls1:FontIcon FontFamily="{StaticResource FluentFont}" Glyph="&#xea45;" FontSize="24" />
                     </Button>
                 </StackPanel>
             </Border>
