@@ -8,6 +8,7 @@ using System.Text.Json.Serialization;
 using System.Text.Unicode;
 using Avalonia;
 using Core.SDKs.Services.Config;
+using log4net;
 using Microsoft.Extensions.DependencyInjection;
 
 #endregion
@@ -18,6 +19,7 @@ public class AssemblyLoadContextH : AssemblyLoadContext
 {
     private readonly AssemblyDependencyResolver _resolver;
     private Assembly _assembly;
+    private static readonly ILog log = LogManager.GetLogger(nameof(AssemblyLoadContextH));
 
     public AssemblyLoadContextH(string pluginPath, string name) : base(isCollectible: true, name: name)
     {
@@ -43,6 +45,7 @@ public class AssemblyLoadContextH : AssemblyLoadContext
                 //DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
             _assembly = null;
+            log.Info($"Unloading {sender.Assemblies.First()}");
             AvaloniaPropertyRegistry.Instance.UnregisterByModule(sender.Assemblies.First()
                 .DefinedTypes);
             ServiceManager.Services.GetService<IPluginToolService>()!.RequestUninstallPlugin(pluginPath);
@@ -56,7 +59,8 @@ public class AssemblyLoadContextH : AssemblyLoadContext
         var assemblyPath = _resolver.ResolveAssemblyToPath(assemblyName);
         if (assemblyPath != null)
         {
-            if (assemblyPath.EndsWith("WinRT.Runtime.dll") || assemblyPath.EndsWith("Microsoft.Windows.SDK.NET.dll"))
+            if (assemblyPath.EndsWith("WinRT.Runtime.dll") || assemblyPath.EndsWith("Microsoft.Windows.SDK.NET.dll") ||
+                AppDomain.CurrentDomain.GetAssemblies().Any(x => x.GetName().FullName == assemblyName.FullName))
             {
                 return null;
             }

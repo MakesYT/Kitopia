@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using Nuke.Common;
@@ -152,7 +153,7 @@ class Build : NukeBuild
                 archiveFile.DeleteFile();
                 archiveFile_self.DeleteFile();
                 rootDirectory.ZipTo(archiveFile);
-                rootDirectory_self.ZipTo(archiveFile_self);
+                rootDirectory_self.ZipTo(archiveFile_self, compressionLevel: CompressionLevel.SmallestSize);
 
                 if (IsLocalBuild)
                 {
