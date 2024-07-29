@@ -619,28 +619,14 @@ public partial class TaskEditorViewModel : ObservableRecipient
 
     #region 自定义关键词
 
-    [NotifyCanExecuteChangedFor(nameof(DelKeyCommand))] [ObservableProperty]
-    private int _isSelected = -1;
-
-
-    private bool CanDel => IsSelected > -1;
-
-    [RelayCommand(CanExecute = nameof(CanDel))]
+    [RelayCommand()]
     private void DelKey(string key)
     {
         Scenario.Keys.Remove(key);
         IsModified = true;
     }
 
-    [NotifyPropertyChangedFor(nameof(CanAdd))]
-    [NotifyCanExecuteChangedFor(nameof(DelKeyCommand))]
-    [NotifyCanExecuteChangedFor(nameof(AddKeyCommand))]
-    [ObservableProperty]
-    private string _keyValue = String.Empty;
-
-    private bool CanAdd => !string.IsNullOrEmpty(KeyValue);
-
-    [RelayCommand(CanExecute = nameof(CanAdd))]
+    [RelayCommand()]
     private void AddKey(string key)
     {
         if (Scenario.Keys.Contains(key))
@@ -648,7 +634,6 @@ public partial class TaskEditorViewModel : ObservableRecipient
             return;
         }
 
-        KeyValue = null;
         Scenario.Keys.Add(key);
 
         IsModified = true;

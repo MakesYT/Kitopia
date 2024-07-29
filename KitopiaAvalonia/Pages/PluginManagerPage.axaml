@@ -42,15 +42,17 @@
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Button HorizontalAlignment="Stretch" x:Name="Button"
+                            HorizontalContentAlignment="Stretch"
                             Command="{Binding Path=$parent[ListBox].((plugin:PluginManagerPageViewModel)DataContext).ToPluginSettingPageCommand}"
                             CommandParameter="{Binding }"
-                            Background="Transparent"
+                            BorderBrush="{DynamicResource SemiColorBorder}"
+                            BorderThickness="1"
+                            Background="{DynamicResource SemiColorFill0}"
                             Foreground="{DynamicResource SemiColorText0}"
                             Height="72" Margin="0"
                             Padding="3">
 
-                        <Grid VerticalAlignment="Center"
-                              Width="{Binding Path=$parent.Bounds.Width}" ColumnDefinitions="80,*,*,Auto,Auto">
+                        <Grid VerticalAlignment="Center" ColumnDefinitions="80,*,*,Auto,Auto">
                             <Image Grid.Column="0" HorizontalAlignment="Left" Focusable="False" Width="48"
                                    Height="48" Margin="0,0,12,0" />
                             <StackPanel Grid.Column="1" Margin="5" VerticalAlignment="Center"

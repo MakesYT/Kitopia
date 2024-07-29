@@ -99,7 +99,9 @@
                                         Name="Item"
                                         Command="{Binding  $parent[ListBox].((viewModel:SearchWindowViewModel)DataContext).OpenFileCommand}"
                                         CommandParameter="{Binding .}"
-                                        Background="Transparent">
+                                        BorderBrush="{DynamicResource SemiColorBorder}"
+                                        BorderThickness="1"
+                                        Background="{DynamicResource SemiColorFill0}">
                                     <Button.Styles>
                                         <Style
                                             Selector="Button#Item:pointerover /template/ ContentPresenter#PART_ContentPresenter">

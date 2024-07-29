@@ -52,16 +52,18 @@
             <ListBox.ItemTemplate>
                 <DataTemplate x:DataType="customScenario1:CustomScenario">
                     <Button HorizontalAlignment="Stretch" x:Name="Button"
+                            HorizontalContentAlignment="Stretch"
                             IsEnabled="{Binding HasInit}"
                             ToolTip.Tip="{Binding InitError}"
                             Command="{Binding Path=$parent[ListBox].((customScenario:CustomScenariosManagerPageViewModel)DataContext).ToTaskEditPageCommand}"
                             CommandParameter="{Binding }"
-                            Background="Transparent"
+                            BorderBrush="{DynamicResource SemiColorBorder}"
+                            BorderThickness="1"
+                            Background="{DynamicResource SemiColorFill0}"
                             Foreground="{DynamicResource SemiColorText0}"
                             Height="72" Margin="0"
                             Padding="3">
-                        <Grid
-                            Width="{Binding Path=$parent.Bounds.Width}" ColumnDefinitions="Auto,2*,4*,48,48,Auto">
+                        <Grid ColumnDefinitions="Auto,2*,4*,48,48,Auto">
                             <Image Grid.Column="0" HorizontalAlignment="Left" Focusable="False" Width="48"
                                    Height="48" Margin="0,0,12,0" />
 

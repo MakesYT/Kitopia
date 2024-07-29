@@ -2,7 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="using:KitopiaAvalonia.Controls">
     <Design.PreviewWith>
-        <controls:ListShow Width="200" Height="200">
+        <controls:ListShow Width="200" Height="200" WithAdd="True">
             <controls:ListShow.ItemsSource>
                 123
             </controls:ListShow.ItemsSource>
@@ -44,27 +44,16 @@
                                     <DockPanel Margin="15,0,0,0">
                                         <TextBlock VerticalAlignment="Center" Text="{ReflectionBinding}"
                                                    Foreground="{DynamicResource SemiColorText0}" />
-                                        <Button Name="Button" Width="24" Height="24"
+                                        <Button Name="Button"
                                                 ToolTip.Tip="删除"
                                                 HorizontalAlignment="Right"
                                                 Command="{Binding $parent[controls:ListShow].DelCommand}"
-                                                CommandParameter="{ReflectionBinding}"
-                                                VerticalContentAlignment="Center" HorizontalContentAlignment="Center">
-                                            <controls:FontIcon FontSize="24" Width="24" Height="24" Margin="0,2,0,0"
+                                                Padding="3,0,3,0"
+                                                CommandParameter="{ReflectionBinding}" Margin="3">
+
+                                            <controls:FontIcon FontSize="24" HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center"
                                                                Glyph="&#xf36a;" />
-                                            <Button.Styles>
-
-                                                <Style
-                                                    Selector="Button#Button:pointerover /template/ Border#Root">
-
-                                                    <Setter Property="Background">
-                                                        <SolidColorBrush
-                                                            Color="{DynamicResource SemiGrey9Color}"
-                                                            Opacity="0.2" />
-                                                    </Setter>
-                                                </Style>
-
-                                            </Button.Styles>
                                         </Button>
                                     </DockPanel>
                                 </Button>
@@ -73,18 +62,21 @@
                         </ListBox.ItemTemplate>
 
                     </ListBox>
-                    <Grid Margin="0,5,0,0" IsVisible="{TemplateBinding WithAdd}" ColumnDefinitions="*,Auto">
-                        <Button Command="{TemplateBinding AddCommand}"
-                                CommandParameter="{TemplateBinding TextValue}"
-                                Grid.Column="1" Height="36" Width="36">
-                            <controls:FontIcon Height="36" Width="36" FontSize="24" HorizontalAlignment="Center"
-                                               VerticalAlignment="Center" Foreground="GreenYellow" Glyph="&#xf107;" />
-                        </Button>
-                        <DockPanel Grid.Column="0" Margin="0">
-                            <TextBox
-                                Text="{Binding TextValue,Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
-                        </DockPanel>
-                    </Grid>
+
+
+                    <TextBox Margin="0,5,0,0" IsVisible="{TemplateBinding WithAdd}"
+                             Text="{Binding $parent[controls:ListShow].TextValue,Mode=TwoWay}">
+                        <TextBox.InnerRightContent>
+                            <Button Command="{Binding $parent[controls:ListShow].InnerAddCommand}" Padding="2,3,0,0"
+                                    CommandParameter="{Binding $parent[controls:ListShow].TextValue}" Margin="3"
+                                    Grid.Column="1">
+
+                                <controls:FontIcon FontSize="24" HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" Foreground="GreenYellow" Glyph="&#xf107;" />
+                            </Button>
+                        </TextBox.InnerRightContent>
+                    </TextBox>
+
                 </ItemsControl>
 
             </ControlTemplate>
