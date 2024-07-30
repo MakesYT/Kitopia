@@ -21,10 +21,10 @@ public class WindowToolServiceWindow : IWindowTool
         var monitorInfo = new User32.MONITORINFO();
         monitorInfo.cbSize = 40;
         User32.GetMonitorInfo(hmonitor, ref monitorInfo);
-
+        User32.GetWindowRect(window.TryGetPlatformHandle().Handle, out var windowRect);
         window.Position =
             new PixelPoint(
-                (monitorInfo.rcMonitor.Left + (int)((monitorInfo.rcMonitor.Width - window.Bounds.Width) / 2)),
+                (monitorInfo.rcMonitor.Left + (int)((monitorInfo.rcMonitor.Width - windowRect.Width) / 2)),
                 monitorInfo.rcMonitor.Top + monitorInfo.rcMonitor.Height / 4);
     }
 }
