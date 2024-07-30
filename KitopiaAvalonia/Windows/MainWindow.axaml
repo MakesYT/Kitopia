@@ -64,60 +64,66 @@
             </Border>
         </Grid>
     </u:UrsaWindow.TitleBarContent>
-    <Grid RowDefinitions="Auto,*" ColumnDefinitions="Auto,*" Margin="5,40,5,5">
-        <u:NavMenu Grid.Row="1" Grid.Column="0" Name="NavView"
-                   IsHorizontalCollapsed="True"
-                   CanToggle="False"
-                   ExpandWidth="56"
-                   CollapseWidth="56"
-                   ItemsSource="{Binding MenuItems}"
-                   CommandBinding="{Binding ActivateCommand}"
-                   HeaderBinding="{Binding}"
-                   IconBinding="{Binding}">
-            <u:NavMenu.Styles>
-                <Style Selector="u|NavMenuItem" x:DataType="viewModel:MenuItemViewModel">
-                    <Setter Property="IsSeparator" Value="{Binding IsSeparator}"></Setter>
-                </Style>
-            </u:NavMenu.Styles>
-            <u:NavMenu.HeaderTemplate>
-                <DataTemplate x:DataType="viewModel:MenuItemViewModel">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock HorizontalAlignment="Left" Text="{Binding MenuHeader}" />
-                    </StackPanel>
-                </DataTemplate>
-            </u:NavMenu.HeaderTemplate>
-            <u:NavMenu.IconTemplate>
-                <DataTemplate x:DataType="viewModel:MenuItemViewModel">
-                    <controls:FontIcon
-                        Width="24"
-                        Height="24"
-                        FontSize="24"
-                        Foreground="{DynamicResource SemiColorText0}"
-                        GlyphFilled="{Binding MenuIconFilledGlyph}"
-                        Glyph="{Binding MenuIconGlyph }" />
-                </DataTemplate>
-            </u:NavMenu.IconTemplate>
-            <u:NavMenu.Footer>
+    <Grid RowDefinitions="Auto,*" ColumnDefinitions="Auto,*" Margin="5,40,5,5" ColumnSpan="5">
+        <Border Grid.Row="1" Grid.Column="0" Padding="1" VerticalAlignment="Stretch"
+                BorderBrush="{DynamicResource SemiColorBorder}"
+                BorderThickness="1" CornerRadius="3">
+            <u:NavMenu Name="NavView"
+                       IsHorizontalCollapsed="True"
+                       CanToggle="False"
+                       ExpandWidth="56"
+                       CollapseWidth="56"
 
-                <Button HorizontalAlignment="Stretch" Height="56" ToolTip.Tip="设置"
-                        Command="{Binding ActivateSettingPageCommand}"
-                        Foreground="{DynamicResource SemiColorText0}">
-                    <Button.Resources>
-                        <SolidColorBrush x:Key="ButtonDefaultBackground" Opacity="0.05" Color="Transparent" />
-                    </Button.Resources>
-                    <controls:FontIcon
-                        Foreground="{DynamicResource SemiColorText0}"
-                        Width="24"
-                        Height="24"
-                        FontSize="24"
-                        FontWeight="Normal"
-                        GlyphFilled="&#xf6b3;"
-                        Glyph="&#xf6aa;" />
-                </Button>
-            </u:NavMenu.Footer>
+                       ItemsSource="{Binding MenuItems}"
+                       CommandBinding="{Binding ActivateCommand}"
+                       HeaderBinding="{Binding}"
+                       IconBinding="{Binding}">
+                <u:NavMenu.Styles>
+                    <Style Selector="u|NavMenuItem" x:DataType="viewModel:MenuItemViewModel">
+                        <Setter Property="IsSeparator" Value="{Binding IsSeparator}"></Setter>
+                    </Style>
+                </u:NavMenu.Styles>
+                <u:NavMenu.HeaderTemplate>
+                    <DataTemplate x:DataType="viewModel:MenuItemViewModel">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock HorizontalAlignment="Left" Text="{Binding MenuHeader}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </u:NavMenu.HeaderTemplate>
+                <u:NavMenu.IconTemplate>
+                    <DataTemplate x:DataType="viewModel:MenuItemViewModel">
+                        <controls:FontIcon
+                            Width="24"
+                            Height="24"
+                            FontSize="24"
+                            Foreground="{DynamicResource SemiColorText0}"
+                            GlyphFilled="{Binding MenuIconFilledGlyph}"
+                            Glyph="{Binding MenuIconGlyph }" />
+                    </DataTemplate>
+                </u:NavMenu.IconTemplate>
+                <u:NavMenu.Footer>
 
-        </u:NavMenu>
-        <ContentPresenter Grid.Row="1" Grid.Column="1"
+                    <Button HorizontalAlignment="Stretch" Height="56" ToolTip.Tip="设置"
+                            Command="{Binding ActivateSettingPageCommand}"
+                            Foreground="{DynamicResource SemiColorText0}">
+                        <Button.Resources>
+                            <SolidColorBrush x:Key="ButtonDefaultBackground" Opacity="0.05" Color="Transparent" />
+                        </Button.Resources>
+                        <controls:FontIcon
+                            Foreground="{DynamicResource SemiColorText0}"
+                            Width="24"
+                            Height="24"
+                            FontSize="24"
+                            FontWeight="Normal"
+                            GlyphFilled="&#xf6b3;"
+                            Glyph="&#xf6aa;" />
+                    </Button>
+                </u:NavMenu.Footer>
+
+            </u:NavMenu>
+        </Border>
+
+        <ContentPresenter Grid.Row="1" Grid.Column="1" Padding="3"
                           Content="{Binding Content,Converter={StaticResource ViewLocator}}">
         </ContentPresenter>
 
