@@ -1,21 +1,23 @@
-﻿using System;
-using System.Threading;
-using System.Timers;
+﻿using System.Timers;
+using Core.SDKs.HotKey;
 using Timer = System.Timers.Timer;
 
 namespace Kitopia.SDKs;
 
 public class TimerHelper
 {
-    Action action;
+    Action<HotKeyModel> action;
+    private HotKeyModel HotKeyModel;
     bool lastUp = true;
-    Timer timer; // 设置定时时间为1秒
+    Timer timer;
     bool timerActive;
 
-    public TimerHelper(int interval, Action action)
+
+    public TimerHelper(int interval, Action<HotKeyModel> action, HotKeyModel hotKeyModel)
     {
         timer = new Timer(interval);
         this.action = action;
+        this.HotKeyModel = hotKeyModel;
     }
 
 // 当计时器触发时执行的操作
@@ -28,10 +30,7 @@ public class TimerHelper
             timerActive = false;
             if (lastUp)
             {
-                ThreadPool.QueueUserWorkItem((e) =>
-                {
-                    action.Invoke();
-                });
+                ThreadPool.QueueUserWorkItem((e) => { action.Invoke(HotKeyModel); });
             }
 
             lastUp = false;

@@ -3,7 +3,10 @@ using Avalonia.Threading;
 using Core.SDKs.CustomType;
 using Core.SDKs.HotKey;
 using Core.SDKs.Services;
+using Kitopia.SDKs;
 using Microsoft.Extensions.DependencyInjection;
+using SharpHook;
+using SharpHook.Reactive;
 using Vanara.PInvoke;
 
 namespace Core.Window;
@@ -12,18 +15,23 @@ public class HotKeyImpl : IHotKetImpl
 {
     private static Avalonia.Controls.Window globalHotKeyWindow = null!;
     private static ObservableDictionary<string, HotkeyInfo> HotKeys = new();
+    private static SimpleReactiveGlobalHook hook;
 
-    protected class HotkeyInfo
+    private class HotkeyInfo
     {
         public HotKeyModel HotKeyModel;
         public int Id;
-        public Action<HotKeyModel> RallBack;
+        public Action<HotKeyModel>? RallBack;
+        public TimerHelper? Timer;
     }
 
-    private static int id = 0;
+    private static int _id = 0;
 
     public void Init()
     {
+        hook.MousePressed.Subscribe(OnMousePressed);
+        hook.MouseReleased.Subscribe(OnMouseReleased);
+        hook.Run();
         Dispatcher.UIThread.Invoke(() =>
         {
             globalHotKeyWindow = new Avalonia.Controls.Window()
@@ -38,13 +46,44 @@ public class HotKeyImpl : IHotKetImpl
         });
     }
 
+    private static void OnMousePressed(MouseHookEventArgs e)
+    {
+        foreach (var (key, value) in HotKeys)
+        {
+            if (value.HotKeyModel.Type != HotKeyType.Mouse) continue;
+            if (value.Id == -1) continue;
+            if (value.HotKeyModel.MouseButton == (int)e.Data.Button)
+            {
+                if (value.Timer is null)
+                {
+                    value.Timer = new TimerHelper(value.HotKeyModel.PressTimeMillis, value.RallBack, value.HotKeyModel);
+                }
+
+                value.Timer.StartTimer();
+            }
+        }
+    }
+
+    private static void OnMouseReleased(MouseHookEventArgs e)
+    {
+        foreach (var (key, value) in HotKeys)
+        {
+            if (value.HotKeyModel.Type != HotKeyType.Mouse) continue;
+            if (value.Id == -1) continue;
+            if (value.HotKeyModel.MouseButton == (int)e.Data.Button)
+            {
+                value.Timer?.StopTimer();
+            }
+        }
+    }
+
     private static IntPtr OnWndProc(IntPtr hwnd, uint msg, IntPtr wparam, IntPtr lparam, ref bool handled)
     {
         if (msg == (uint)User32.WindowMessage.WM_HOTKEY)
         {
             var int32 = wparam.ToInt32();
             var keyValuePair = HotKeys.First(e => e.Value.Id == int32);
-            keyValuePair.Value.RallBack.Invoke(keyValuePair.Value.HotKeyModel);
+            keyValuePair.Value.RallBack?.Invoke(keyValuePair.Value.HotKeyModel);
         }
 
         return IntPtr.Zero;
@@ -52,63 +91,80 @@ public class HotKeyImpl : IHotKetImpl
 
     public bool Add(HotKeyModel hotKeyModel, Action<HotKeyModel> rallBack)
     {
-        User32.HotKeyModifiers hotkeyModifiers = 0;
-        if (hotKeyModel.IsSelectAlt)
+        switch (hotKeyModel.Type)
         {
-            hotkeyModifiers |= User32.HotKeyModifiers.MOD_ALT;
-        }
-
-        if (hotKeyModel.IsSelectCtrl)
-        {
-            hotkeyModifiers |= User32.HotKeyModifiers.MOD_CONTROL;
-        }
-
-        if (hotKeyModel.IsSelectShift)
-        {
-            hotkeyModifiers |= User32.HotKeyModifiers.MOD_SHIFT;
-        }
-
-        if (hotKeyModel.IsSelectWin)
-        {
-            hotkeyModifiers |= User32.HotKeyModifiers.MOD_WIN;
-        }
-
-        id++;
-        var registerHotKey = false;
-        Dispatcher.UIThread.Invoke(() =>
-        {
-            registerHotKey = User32.RegisterHotKey(globalHotKeyWindow.TryGetPlatformHandle().Handle, id,
-                hotkeyModifiers,
-                (uint)hotKeyModel.SelectKey);
-        });
-
-        if (registerHotKey)
-        {
-            if (HotKeys.TryGetValue(hotKeyModel.UUID, out var hotKeyModel1) && hotKeyModel1.Id == -1)
+            case HotKeyType.Keyboard:
             {
-                hotKeyModel1.Id = id;
+                User32.HotKeyModifiers hotkeyModifiers = 0;
+                if (hotKeyModel.IsSelectAlt)
+                {
+                    hotkeyModifiers |= User32.HotKeyModifiers.MOD_ALT;
+                }
+
+                if (hotKeyModel.IsSelectCtrl)
+                {
+                    hotkeyModifiers |= User32.HotKeyModifiers.MOD_CONTROL;
+                }
+
+                if (hotKeyModel.IsSelectShift)
+                {
+                    hotkeyModifiers |= User32.HotKeyModifiers.MOD_SHIFT;
+                }
+
+                if (hotKeyModel.IsSelectWin)
+                {
+                    hotkeyModifiers |= User32.HotKeyModifiers.MOD_WIN;
+                }
+
+                _id++;
+                var registerHotKey = false;
+                Dispatcher.UIThread.Invoke(() =>
+                {
+                    registerHotKey = User32.RegisterHotKey(globalHotKeyWindow.TryGetPlatformHandle().Handle, _id,
+                        hotkeyModifiers,
+                        (uint)hotKeyModel.SelectKey);
+                });
+                if (registerHotKey)
+                {
+                    if (HotKeys.TryGetValue(hotKeyModel.UUID, out var hotKeyModel1) && hotKeyModel1.Id == -1)
+                    {
+                        hotKeyModel1.Id = _id;
+                    }
+                    else
+                    {
+                        HotKeys.Add(hotKeyModel.UUID, new HotkeyInfo()
+                        {
+                            HotKeyModel = hotKeyModel,
+                            Id = _id,
+                            RallBack = rallBack
+                        });
+                    }
+                }
+                else
+                {
+                    HotKeys.Add(hotKeyModel.UUID, new HotkeyInfo()
+                    {
+                        HotKeyModel = hotKeyModel,
+                        Id = -1,
+                        RallBack = rallBack
+                    });
+                }
+
+                return registerHotKey;
             }
-            else
+            case HotKeyType.Mouse:
             {
                 HotKeys.Add(hotKeyModel.UUID, new HotkeyInfo()
                 {
                     HotKeyModel = hotKeyModel,
-                    Id = id,
+                    Id = 1,
                     RallBack = rallBack
                 });
+                break;
             }
         }
-        else
-        {
-            HotKeys.Add(hotKeyModel.UUID, new HotkeyInfo()
-            {
-                HotKeyModel = hotKeyModel,
-                Id = -1,
-                RallBack = rallBack
-            });
-        }
 
-        return registerHotKey;
+        return false;
     }
 
     public bool Del(HotKeyModel hotKeyModel)
@@ -118,12 +174,24 @@ public class HotKeyImpl : IHotKetImpl
 
     public bool Del(string uuid)
     {
-        if (HotKeys.ContainsKey(uuid))
+        if (HotKeys.TryGetValue(uuid, out var hotkey))
         {
-            var unregisterHotKey =
-                User32.UnregisterHotKey(globalHotKeyWindow.TryGetPlatformHandle().Handle, HotKeys[uuid].Id);
-            HotKeys[uuid].Id = -1;
-            return unregisterHotKey;
+            switch (hotkey.HotKeyModel.Type)
+            {
+                case HotKeyType.Keyboard:
+                {
+                    var unregisterHotKey =
+                        User32.UnregisterHotKey(globalHotKeyWindow.TryGetPlatformHandle().Handle, hotkey.Id);
+                    HotKeys[uuid].Id = -1;
+                    return unregisterHotKey;
+                }
+                case HotKeyType.Mouse:
+                {
+                    hotkey.Timer?.StopTimer();
+                    hotkey.Id = -1;
+                    break;
+                }
+            }
         }
 
         return false;
@@ -169,9 +237,19 @@ public class HotKeyImpl : IHotKetImpl
 
     public bool IsActive(string uuid)
     {
-        if (HotKeys.ContainsKey(uuid))
+        if (HotKeys.TryGetValue(uuid, out var hotkeyInfo))
         {
-            return HotKeys[uuid].Id != -1;
+            switch (hotkeyInfo.HotKeyModel.Type)
+            {
+                case HotKeyType.Keyboard:
+                {
+                    return HotKeys[uuid].Id != -1;
+                }
+                case HotKeyType.Mouse:
+                {
+                    return HotKeys[uuid].Id != -1;
+                }
+            }
         }
 
         return false;
