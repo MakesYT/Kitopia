@@ -39,11 +39,6 @@ class Build : NukeBuild
         {
             Log.Debug("Restoring solution {0}", Solution);
             Log.Debug("Restoring project {0}", AvaloniaProject);
-            if (!IsLocalBuild)
-            {
-                GitTasks.Git("rm KitopiaWeb");
-            }
-
             GitTasks.Git("submodule update --init --recursive --remote");
             DotNetRestore(c => new DotNetRestoreSettings()
                 .SetProjectFile(AvaloniaProject.Path)
