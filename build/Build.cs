@@ -87,7 +87,7 @@ class Build : NukeBuild
         }
 
         return true;
-    }).Executes(() =>
+    }).DependsOn(Compile).Executes(() =>
     {
         
         StringBuilder body = new StringBuilder();
