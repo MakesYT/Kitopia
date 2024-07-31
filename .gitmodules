@@ -1,9 +1,6 @@
 [submodule "PluginCore"]
 	path = PluginCore
 	url = https://github.com/MakesYT/PluginCore.git
-[submodule "KitopiaWeb"]
-	path = KitopiaWeb
-	url = https://github.com/MakesYT/KitopiaWeb
 [submodule "NodifyM.Avalonia"]
 	path = NodifyM.Avalonia
 	url = https://github.com/MakesYT/NodifyM.Avalonia/
