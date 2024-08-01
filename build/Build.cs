@@ -56,7 +56,7 @@ class Build : NukeBuild
                 .SetProjectFile(AvaloniaProject.Path)
                 .SetOutputDirectory(RootDirectory / "buildTest")
                 .SetRuntime("win-x64")
-                .SetFramework("net8.0")
+                .SetFramework("net8.0-windows10.0.17763.0")
                 .SetConfiguration("Release")
             );
         });
