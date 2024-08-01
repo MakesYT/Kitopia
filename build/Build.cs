@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -48,22 +47,24 @@ class Build : NukeBuild
                 .SetRuntime("win-x64"));
         });
 
-    Target Compile => _ => _
+    Target CompileWindowsX64 => _ => _
         .DependsOn(Restore)
         .Executes(() =>
         {
-            // DotNetBuild(c =>
-            // {
-            //     return new DotNetBuildSettings()
-            //           .SetProjectFile(AvaloniaProject.Path)
-            //           .SetOutputDirectory(RootDirectory / "output");
-            // });
+            DotNetBuild(c => new DotNetBuildSettings()
+                .SetProjectFile(AvaloniaProject.Path)
+                .SetOutputDirectory(RootDirectory / "buildTest")
+                .SetRuntime("win-x64")
+                .SetFramework("net8.0")
+                .SetConfiguration("Release")
+            );
         });
 
     GitHubClient _gitHubClient;
+
     Target CreateRelease => _ => _.OnlyWhenDynamic(() =>
     {
-        this._gitHubClient= new GitHubClient(new ProductHeaderValue("Kitopia"))
+        this._gitHubClient = new GitHubClient(new ProductHeaderValue("Kitopia"))
         {
             Credentials = new Credentials(GitHubToken)
         };
@@ -87,9 +88,8 @@ class Build : NukeBuild
         }
 
         return true;
-    }).DependsOn(Compile).Executes(() =>
+    }).DependsOn(Restore).Executes(() =>
     {
-        
         StringBuilder body = new StringBuilder();
         var gitRepository = GitRepository.FromUrl("https://github.com/MakesYT/Kitopia");
         var repositoryTags = _gitHubClient
@@ -98,7 +98,7 @@ class Build : NukeBuild
             .Result;
         if (repositoryTags.Count <= 0)
         {
-            body.AppendLine("Initial release");
+            body.AppendLine("无明确更新说明");
         }
         else
         {
@@ -155,7 +155,9 @@ class Build : NukeBuild
                 newRelease)
             .Result;
     });
+
     Target Pack => _ => _
+        .OnlyWhenDynamic(() => FinishedTargets.Contains(CreateRelease))
         .DependsOn(CreateRelease)
         .Executes(() =>
             {
@@ -190,6 +192,7 @@ class Build : NukeBuild
                         absolutePath.DeleteFile();
                     }
                 }
+
                 var archiveFile = RootDirectory / "Kitopia" + AvaloniaProject.GetProperty("Version") +
                                   "_WithoutContained.zip";
                 archiveFile.DeleteFile();
@@ -202,13 +205,16 @@ class Build : NukeBuild
                     ContentType = "application/octet-stream",
                     RawData = artifactStream,
                 };
-                var release = _gitHubClient.Repository.Release.Get(gitRepository.GetGitHubOwner(),"Kitopia",AvaloniaProject.GetProperty("Version")).Result;
+                var release = _gitHubClient.Repository.Release.Get(gitRepository.GetGitHubOwner(), "Kitopia",
+                    AvaloniaProject.GetProperty("Version")).Result;
                 _gitHubClient.Repository.Release.UploadAsset(release, assetUpload)
                     .Wait();
                 Log.Debug(result);
             }
         );
+
     Target PackSelf => _ => _
+        .OnlyWhenDynamic(() => FinishedTargets.Contains(CreateRelease))
         .DependsOn(CreateRelease)
         .Executes(() =>
             {
@@ -237,7 +243,7 @@ class Build : NukeBuild
                     .Result;
                 Log.Debug("Packing project {0}", AvaloniaProject);
                 Log.Debug("GitHubName {0}", gitRepository.GetGitHubName());
-                
+
                 var archiveFile_self = RootDirectory / "Kitopia" +
                                        AvaloniaProject.GetProperty("Version") + "_SelfContained.zip";
                 archiveFile_self.DeleteFile();
@@ -248,6 +254,7 @@ class Build : NukeBuild
                         absolutePath.DeleteFile();
                     }
                 }
+
                 rootDirectory_self.ZipTo(archiveFile_self, compressionLevel: CompressionLevel.SmallestSize);
                 var assetUpload_self = new ReleaseAssetUpload
                 {
@@ -255,24 +262,25 @@ class Build : NukeBuild
                     ContentType = "application/octet-stream",
                     RawData = File.OpenRead(archiveFile_self),
                 };
-                var release = _gitHubClient.Repository.Release.Get(gitRepository.GetGitHubOwner(),"Kitopia",AvaloniaProject.GetProperty("Version")).Result;
+                var release = _gitHubClient.Repository.Release.Get(gitRepository.GetGitHubOwner(), "Kitopia",
+                    AvaloniaProject.GetProperty("Version")).Result;
                 _gitHubClient.Repository.Release.UploadAsset(release, assetUpload_self)
                     .Wait();
                 Log.Debug(result);
-                
             }
         );
+
     Target Clean => _ => _
         .DependsOn(Pack)
         .DependsOn(PackSelf)
         .Executes(() =>
         {
         });
-    
+
     /// Support plugins are available for:
     ///   - JetBrains ReSharper        https://nuke.build/resharper
     ///   - JetBrains Rider            https://nuke.build/rider
     ///   - Microsoft VisualStudio     https://nuke.build/visualstudio
     ///   - Microsoft VSCode           https://nuke.build/vscode
-    public static int Main() => Execute<Build>(x => x.Compile);
+    public static int Main() => Execute<Build>(x => x.CompileWindowsX64);
 }
