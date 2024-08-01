@@ -34,6 +34,7 @@ class Build : NukeBuild
 
 
     Target Restore => _ => _
+        .Triggers(CompileWindowsX64)
         .Executes(() =>
         {
             Log.Debug("Restoring solution {0}", Solution);
