@@ -1,4 +1,5 @@
-﻿using Avalonia.Input;
+﻿using System;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Win32.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -18,41 +19,113 @@ public partial class HotKeyEditorWindow : UrsaWindow
     private HotKeyModel? _hotKeyModel;
     private bool isFinnish;
     private EKey? selectedKey;
+    private HotKeyType _type = HotKeyType.Keyboard;
+    private ushort? selectedMouseButton;
     private bool setSuccess;
+
+
+    internal HotKeyEditorWindow()
+    {
+        InitializeComponent();
+        _hotKeyModel = new HotKeyModel()
+        {
+            IsSelectAlt = true,
+            IsSelectShift = true,
+            SelectKey = EKey.Shift,
+            Name = "测试",
+            MainName = "测试"
+        };
+        Name.Text = $"快捷键:{_hotKeyModel.Value.SignName}";
+        if (_hotKeyModel.Value.IsSelectAlt)
+        {
+            Alt.IsVisible = true;
+        }
+
+        if (_hotKeyModel.Value.IsSelectCtrl)
+        {
+            Ctrl.IsVisible = true;
+        }
+
+        if (_hotKeyModel.Value.IsSelectShift)
+        {
+            Shift.IsVisible = true;
+        }
+
+        if (_hotKeyModel.Value.IsSelectWin)
+        {
+            Win.IsVisible = true;
+        }
+
+        selectedKey = _hotKeyModel.Value.SelectKey;
+        KeyName.Content = _hotKeyModel.Value.SelectKey.ToString();
+    }
 
     public HotKeyEditorWindow(HotKeyModel hotKeyModel)
     {
         InitializeComponent();
         _hotKeyModel = hotKeyModel;
         Name.Text = $"快捷键:{hotKeyModel.SignName}";
-
-
-        if (hotKeyModel.IsSelectAlt)
+        _type = hotKeyModel.Type;
+        switch (hotKeyModel.Type)
         {
-            Alt.IsVisible = true;
-        }
+            case HotKeyType.Keyboard:
+            {
+                KeyBoard.IsChecked = true;
+                if (hotKeyModel.IsSelectAlt)
+                {
+                    Alt.IsVisible = true;
+                }
 
-        if (hotKeyModel.IsSelectCtrl)
-        {
-            Ctrl.IsVisible = true;
-        }
+                if (hotKeyModel.IsSelectCtrl)
+                {
+                    Ctrl.IsVisible = true;
+                }
 
-        if (hotKeyModel.IsSelectShift)
-        {
-            Shift.IsVisible = true;
-        }
+                if (hotKeyModel.IsSelectShift)
+                {
+                    Shift.IsVisible = true;
+                }
 
-        if (hotKeyModel.IsSelectWin)
-        {
-            Win.IsVisible = true;
-        }
+                if (hotKeyModel.IsSelectWin)
+                {
+                    Win.IsVisible = true;
+                }
 
-        selectedKey = hotKeyModel.SelectKey;
-        KeyName.Content = hotKeyModel.SelectKey.ToString();
+                selectedKey = hotKeyModel.SelectKey;
+                KeyName.Content = hotKeyModel.SelectKey.ToString();
+                break;
+            }
+            case HotKeyType.Mouse:
+            {
+                Mouse.IsChecked = true;
+                Slider.Value = hotKeyModel.PressTimeMillis;
+                selectedMouseButton = hotKeyModel.MouseButton;
+                KeyName.Content = hotKeyModel.MouseButton switch
+                {
+                    0 => "鼠标左键",
+                    1 => "鼠标右键",
+                    2 => "鼠标中键",
+                    _ => $"鼠标按键{hotKeyModel.MouseButton}"
+                };
+                break;
+            }
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 
     private void HotKeyEditorWindow_OnKeyDown(object sender, KeyEventArgs e)
     {
+        if (!_hotKeyModel.HasValue)
+        {
+            return;
+        }
+
+        if (_type != HotKeyType.Keyboard)
+        {
+            return;
+        }
+
         {
             if (e.KeyModifiers.HasFlag(KeyModifiers.Control))
             {
@@ -134,7 +207,12 @@ public partial class HotKeyEditorWindow : UrsaWindow
 
     private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
     {
-        if (selectedKey is null)
+        if (_type == HotKeyType.Keyboard && selectedKey is null)
+        {
+            return;
+        }
+
+        if (_type == HotKeyType.Mouse && selectedMouseButton is null)
         {
             return;
         }
@@ -147,7 +225,9 @@ public partial class HotKeyEditorWindow : UrsaWindow
             IsSelectWin = Win.IsVisible,
             IsSelectShift = Shift.IsVisible,
             IsSelectCtrl = Ctrl.IsVisible,
-            SelectKey = selectedKey.Value,
+            SelectKey = selectedKey ?? EKey.未设置,
+            MouseButton = selectedMouseButton,
+            Type = _type
         };
         if (!HotKeyManager.HotKetImpl.Modify(hotKeyModel))
         {
@@ -160,6 +240,7 @@ public partial class HotKeyEditorWindow : UrsaWindow
         }
         else
         {
+            ConfigManger.RequsetUpdateHotKey(hotKeyModel);
             ConfigManger.Save();
 
             isFinnish = true;
@@ -173,5 +254,71 @@ public partial class HotKeyEditorWindow : UrsaWindow
         isFinnish = true;
         setSuccess = true;
         this.Close();
+    }
+
+    private void InputElement_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (!_hotKeyModel.HasValue)
+        {
+            return;
+        }
+
+        if (_type != HotKeyType.Mouse)
+        {
+            return;
+        }
+
+        ushort id = 0;
+        var pointerPointProperties = e.GetCurrentPoint(this).Properties;
+        if (pointerPointProperties.IsLeftButtonPressed)
+        {
+            id = 0;
+        }
+
+        if (pointerPointProperties.IsRightButtonPressed)
+        {
+            id = 1;
+        }
+
+        if (pointerPointProperties.IsMiddleButtonPressed)
+        {
+            id = 2;
+        }
+
+        if (pointerPointProperties.IsXButton1Pressed)
+        {
+            id = 3;
+        }
+
+        if (pointerPointProperties.IsXButton2Pressed)
+        {
+            id = 4;
+        }
+
+        selectedMouseButton = id;
+        KeyName.IsVisible = true;
+        KeyName.Content = id switch
+        {
+            0 => "鼠标左键",
+            1 => "鼠标右键",
+            2 => "鼠标中键",
+            _ => $"鼠标按键{id}"
+        };
+    }
+
+    private void KeyBoard_OnClick(object? sender, RoutedEventArgs e)
+    {
+        _type = HotKeyType.Keyboard;
+        KeyName.IsVisible = false;
+    }
+
+    private void Mouse_OnClick(object? sender, RoutedEventArgs e)
+    {
+        _type = HotKeyType.Mouse;
+        Ctrl.IsVisible = false;
+        Alt.IsVisible = false;
+        Shift.IsVisible = false;
+        Win.IsVisible = false;
+        KeyName.IsVisible = false;
     }
 }

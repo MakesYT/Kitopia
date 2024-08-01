@@ -135,6 +135,20 @@ public class HotKeyShow : TemplatedControl
         }
 
         var hotKeyModel = hotKeyModelN.Value;
+        if (hotKeyModel.Type == HotKeyType.Mouse)
+        {
+            hotKeyShow.IsActivated = HotKeyManager.HotKetImpl.IsActive(hotKeyModel.UUID);
+            hotKeyShow.KeyType = (KeyTypeE)10000;
+            hotKeyShow.KeyName = hotKeyModel.MouseButton switch
+            {
+                0 => "鼠标左键",
+                1 => "鼠标右键",
+                2 => "鼠标中键",
+                _ => $"鼠标按键{hotKeyModel.MouseButton}"
+            };
+            return;
+        }
+
         if (hotKeyModel.IsSelectAlt)
         {
             type += 10;

@@ -23,6 +23,7 @@ public static class ConfigManger
     public static Dictionary<string, ConfigBase> Configs = new();
     public static KitopiaConfig? Config => Configs["KitopiaConfig"] as KitopiaConfig ?? null;
     private static readonly ILog log = LogManager.GetLogger(nameof(ConfigManger));
+    private static readonly Dictionary<HotKeyModel, (object, FieldInfo)> hotkeysMappings = new();
 
     public static JsonSerializerOptions DefaultOptions = new JsonSerializerOptions
     {
@@ -74,7 +75,7 @@ public static class ConfigManger
                     if (configField.FieldType == ConfigFieldType.快捷键)
                     {
                         var hotKeyModel = (HotKeyModel)x.GetValue(Config);
-
+                        hotkeysMappings.Add(hotKeyModel, (Config, x));
 
                         if (!HotKeyManager.HotKetImpl.Add(hotKeyModel,
                                 (Action<HotKeyModel>)Config.GetType().GetProperty($"{x.Name}Action")
@@ -150,6 +151,26 @@ public static class ConfigManger
                 .BaseType.GetField("Instance")
                 .SetValue(value, null);
             ConfigManger.Configs.Remove(s);
+        }
+    }
+
+    public static void RequsetUpdateHotKey(HotKeyModel hotKeyModel)
+    {
+        foreach (var (key, (item2, fieldInfo)) in hotkeysMappings)
+        {
+            if (key.UUID != hotKeyModel.UUID)
+            {
+                continue;
+            }
+
+            try
+            {
+                fieldInfo.SetValue(item2, hotKeyModel);
+            }
+            catch
+            {
+                // ignored
+            }
         }
     }
 

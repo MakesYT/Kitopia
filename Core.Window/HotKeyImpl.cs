@@ -3,11 +3,11 @@ using Avalonia.Threading;
 using Core.SDKs.CustomType;
 using Core.SDKs.HotKey;
 using Core.SDKs.Services;
-using Kitopia.SDKs;
 using Microsoft.Extensions.DependencyInjection;
 using SharpHook;
 using SharpHook.Reactive;
 using Vanara.PInvoke;
+using Timer = System.Timers.Timer;
 
 namespace Core.Window;
 
@@ -15,14 +15,14 @@ public class HotKeyImpl : IHotKetImpl
 {
     private static Avalonia.Controls.Window globalHotKeyWindow = null!;
     private static ObservableDictionary<string, HotkeyInfo> HotKeys = new();
-    private static SimpleReactiveGlobalHook hook;
+    private static SimpleReactiveGlobalHook hook = new SimpleReactiveGlobalHook(GlobalHookType.Mouse);
 
     private class HotkeyInfo
     {
         public HotKeyModel HotKeyModel;
         public int Id;
         public Action<HotKeyModel>? RallBack;
-        public TimerHelper? Timer;
+        public Timer? Timer;
     }
 
     private static int _id = 0;
@@ -31,7 +31,7 @@ public class HotKeyImpl : IHotKetImpl
     {
         hook.MousePressed.Subscribe(OnMousePressed);
         hook.MouseReleased.Subscribe(OnMouseReleased);
-        hook.Run();
+        hook.RunAsync();
         Dispatcher.UIThread.Invoke(() =>
         {
             globalHotKeyWindow = new Avalonia.Controls.Window()
@@ -52,14 +52,27 @@ public class HotKeyImpl : IHotKetImpl
         {
             if (value.HotKeyModel.Type != HotKeyType.Mouse) continue;
             if (value.Id == -1) continue;
-            if (value.HotKeyModel.MouseButton == (int)e.Data.Button)
+            var dataButton = (int)e.Data.Button;
+            if (dataButton == 0)
+            {
+                continue;
+            }
+
+            if (value.HotKeyModel.MouseButton == dataButton - 1)
             {
                 if (value.Timer is null)
                 {
-                    value.Timer = new TimerHelper(value.HotKeyModel.PressTimeMillis, value.RallBack, value.HotKeyModel);
+                    value.Timer = new Timer(value.HotKeyModel.PressTimeMillis)
+                    {
+                        AutoReset = false,
+                    };
+                    value.Timer.Elapsed += (_, _) =>
+                    {
+                        ThreadPool.QueueUserWorkItem((_) => { value.RallBack.Invoke(value.HotKeyModel); });
+                    };
                 }
 
-                value.Timer.StartTimer();
+                value.Timer.Start();
             }
         }
     }
@@ -72,7 +85,7 @@ public class HotKeyImpl : IHotKetImpl
             if (value.Id == -1) continue;
             if (value.HotKeyModel.MouseButton == (int)e.Data.Button)
             {
-                value.Timer?.StopTimer();
+                value.Timer?.Stop();
             }
         }
     }
@@ -129,6 +142,7 @@ public class HotKeyImpl : IHotKetImpl
                     if (HotKeys.TryGetValue(hotKeyModel.UUID, out var hotKeyModel1) && hotKeyModel1.Id == -1)
                     {
                         hotKeyModel1.Id = _id;
+                        hotKeyModel1.HotKeyModel = hotKeyModel;
                     }
                     else
                     {
@@ -154,13 +168,22 @@ public class HotKeyImpl : IHotKetImpl
             }
             case HotKeyType.Mouse:
             {
-                HotKeys.Add(hotKeyModel.UUID, new HotkeyInfo()
+                if (HotKeys.TryGetValue(hotKeyModel.UUID, out var hotKeyModel1) && hotKeyModel1.Id == -1)
                 {
-                    HotKeyModel = hotKeyModel,
-                    Id = 1,
-                    RallBack = rallBack
-                });
-                break;
+                    hotKeyModel1.Id = 1;
+                    hotKeyModel1.HotKeyModel = hotKeyModel;
+                }
+                else
+                {
+                    HotKeys.Add(hotKeyModel.UUID, new HotkeyInfo()
+                    {
+                        HotKeyModel = hotKeyModel,
+                        Id = 1,
+                        RallBack = rallBack
+                    });
+                }
+
+                return true;
             }
         }
 
@@ -187,7 +210,7 @@ public class HotKeyImpl : IHotKetImpl
                 }
                 case HotKeyType.Mouse:
                 {
-                    hotkey.Timer?.StopTimer();
+                    hotkey.Timer?.Stop();
                     hotkey.Id = -1;
                     break;
                 }

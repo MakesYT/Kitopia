@@ -29,7 +29,7 @@
         <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
         <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
         <DebugType Condition="'$(Configuration)' == 'Release'">none</DebugType>
-        <Version>0.0.2.063-1</Version>
+        <Version>0.0.2.064</Version>
         <AvaloniaVersion>11.2.999-cibuild0050397-alpha</AvaloniaVersion>
     </PropertyGroup>
 

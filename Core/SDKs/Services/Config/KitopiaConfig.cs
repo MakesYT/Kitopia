@@ -72,11 +72,23 @@ public class KitopiaConfig : ConfigBase
     [ConfigField("最大历史记录", "最大历史记录数", 0xF2D7, ConfigFieldType.整数列表, null, 10, 1, 1)]
     public int maxHistory = 6;
 
-    [ConfigFieldCategory("鼠标快捷操作")] [ConfigField<MouseHookType>("鼠标快捷键", "修改鼠标快捷菜单激活按键", 0xF4B8)]
-    public MouseHookType mouseKey = MouseHookType.鼠标侧键2;
+    [ConfigFieldCategory("鼠标快捷操作")] [ConfigField("鼠标快捷键", "激活鼠标快捷菜单快捷键", 0xF4B8, ConfigFieldType.快捷键)]
+    public HotKeyModel mouseHotkey = new()
+    {
+        MainName = "Kitopia", Name = "激活鼠标快捷菜单", IsSelectCtrl = false, IsSelectAlt = true,
+        Type = HotKeyType.Mouse,
+        MouseButton = 1,
+        PressTimeMillis = 1500,
+        IsSelectWin = false,
+        IsSelectShift = false, SelectKey = EKey.未设置,
+    };
 
-    [ConfigField("鼠标快捷键间隔", "按下按键指定时间后触发", 0xED9B, ConfigFieldType.整数滑块, null, 3000, 100, 50)]
-    public int mouseKeyInverval = 1000;
+    [JsonIgnore]
+    public Action<HotKeyModel> mouseHotkeyAction => e =>
+    {
+        log.Debug("鼠标快捷菜单快捷键触发");
+        ServiceManager.Services.GetService<IMouseQuickWindowService>()!.Open();
+    };
 
     public List<string> mouseQuickItems = new();
 
