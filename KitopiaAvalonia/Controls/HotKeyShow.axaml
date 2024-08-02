@@ -9,7 +9,7 @@
     <Style Selector="controls|HotKeyShow">
         <!-- Set Defaults -->
         <Style.Resources>
-            <converter:HotKey_KeyTypeToVisible x:Key="HotKey_KeyTypeToVisible" />
+            <converter:HotKey_KeyTypeToVisible x:Key="HotKeyKeyTypeToVisible" />
         </Style.Resources>
         <Setter Property="Template">
             <ControlTemplate>
@@ -25,11 +25,11 @@
                                 IsEnabled="{TemplateBinding IsActivated}">
                         <controls:HotKeyShowItme Name="Ctrl"
                                                  IsVisible="{Binding RelativeSource={RelativeSource TemplatedParent},
-                                                 Path=KeyType,Converter={StaticResource HotKey_KeyTypeToVisible},ConverterParameter='Ctrl'}"
+                                                 Path=KeyType,Converter={StaticResource HotKeyKeyTypeToVisible},ConverterParameter='Ctrl'}"
                                                  FontSize="20" Content="Ctrl" Margin="0" Height="40" />
                         <controls:HotKeyShowItme Name="Win" Height="40"
                                                  IsVisible="{Binding RelativeSource={RelativeSource TemplatedParent},
-                                                 Path=KeyType,Converter={StaticResource HotKey_KeyTypeToVisible},ConverterParameter='Win'}"
+                                                 Path=KeyType,Converter={StaticResource HotKeyKeyTypeToVisible},ConverterParameter='Win'}"
                                                  Margin="5,0,0,0">
                             <controls:HotKeyShowItme.Icon>
                                 <Image Source="{StaticResource WinImageIcon}" Width="26" Height="26" />
@@ -37,20 +37,20 @@
                         </controls:HotKeyShowItme>
                         <controls:HotKeyShowItme Name="Shift" FontSize="20"
                                                  IsVisible="{Binding RelativeSource={RelativeSource TemplatedParent},
-                                                 Path=KeyType,Converter={StaticResource HotKey_KeyTypeToVisible},ConverterParameter='Shift'}"
+                                                 Path=KeyType,Converter={StaticResource HotKeyKeyTypeToVisible},ConverterParameter='Shift'}"
                                                  Content="Shift" Margin="5,0,0,0" Height="40" />
                         <controls:HotKeyShowItme Name="Alt" FontSize="20" Content="Alt"
                                                  IsVisible="{Binding RelativeSource={RelativeSource TemplatedParent},
-                                                 Path=KeyType,Converter={StaticResource HotKey_KeyTypeToVisible},ConverterParameter='Alt'}"
+                                                 Path=KeyType,Converter={StaticResource HotKeyKeyTypeToVisible},ConverterParameter='Alt'}"
                                                  Margin="5,0,0,0"
                                                  Height="40" />
                         <controls:HotKeyShowItme Name="KeyName" FontSize="20"
                                                  IsVisible="{Binding RelativeSource={RelativeSource TemplatedParent},
-                                                 Path=KeyType,Converter={StaticResource HotKey_KeyTypeToVisible},ConverterParameter='KeyName'}"
+                                                 Path=KeyType,Converter={StaticResource HotKeyKeyTypeToVisible},ConverterParameter='KeyName'}"
                                                  Content="{TemplateBinding KeyName}" Margin="5,0,0,0" Height="40" />
                         <TextBlock
                             IsVisible="{Binding RelativeSource={RelativeSource TemplatedParent},
-                                                 Path=KeyType,Converter={StaticResource HotKey_KeyTypeToVisible},ConverterParameter='None'}"
+                                                 Path=KeyType,Converter={StaticResource HotKeyKeyTypeToVisible},ConverterParameter='None'}"
                             Name="None" Margin="10" Text="快捷键未设置" VerticalAlignment="Center"
                             Foreground="{DynamicResource SemiColorText0}"
                             HorizontalAlignment="Center" />

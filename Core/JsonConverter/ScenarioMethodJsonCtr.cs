@@ -7,10 +7,10 @@ namespace Core.JsonConverter;
 
 public class ScenarioMethodJsonCtr : JsonConverter<ScenarioMethod>
 {
-    public override ScenarioMethod? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override ScenarioMethod Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         ScenarioMethod scenario = JsonSerializer.Deserialize<ScenarioMethod>(ref reader, options)!;
-        if (scenario!.IsFromPlugin)
+        if (scenario.IsFromPlugin)
         {
             scenario.ServiceProvider = PluginManager.EnablePlugin[scenario.PluginInfo!.ToPlgString()].ServiceProvider!;
             scenario.Method = PluginManager.EnablePlugin[scenario.PluginInfo.ToPlgString()]
