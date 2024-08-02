@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.Services.Plugin;
 
-namespace Core.SDKs.Services.Config;
+namespace Core.JsonCtrs;
 
 public class TypeJsonConverter : JsonConverter<Type>
 {

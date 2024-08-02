@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using Avalonia;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Core.JsonCtrs;
 using Core.SDKs.CustomType;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;

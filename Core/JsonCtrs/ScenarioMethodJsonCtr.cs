@@ -3,16 +3,16 @@ using System.Text.Json.Serialization;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.Services.Plugin;
 
-namespace Core.SDKs.Services.Config;
+namespace Core.JsonCtrs;
 
 public class ScenarioMethodJsonCtr : JsonConverter<ScenarioMethod>
 {
     public override ScenarioMethod? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        ScenarioMethod scenario = JsonSerializer.Deserialize<ScenarioMethod>(ref reader, options);
-        if (scenario.IsFromPlugin)
+        ScenarioMethod scenario = JsonSerializer.Deserialize<ScenarioMethod>(ref reader, options)!;
+        if (scenario!.IsFromPlugin)
         {
-            scenario.ServiceProvider = PluginManager.EnablePlugin[scenario.PluginInfo.ToPlgString()].ServiceProvider;
+            scenario.ServiceProvider = PluginManager.EnablePlugin[scenario.PluginInfo!.ToPlgString()].ServiceProvider!;
             scenario.Method = PluginManager.EnablePlugin[scenario.PluginInfo.ToPlgString()]
                 .GetMethod(scenario._methodAbsolutelyName);
         }

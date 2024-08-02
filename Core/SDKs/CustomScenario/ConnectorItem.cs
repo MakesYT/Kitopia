@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using Avalonia;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
+using Core.JsonCtrs;
 using Core.SDKs.Services.Config;
 using PluginCore;
 
@@ -11,16 +12,16 @@ namespace Core.SDKs.CustomScenario;
 public partial class ConnectorItem : ObservableRecipient, IConnectorItem
 {
     [JsonConverter(typeof(PointJsonConverter))]
-#pragma warning disable CS0657 // 不是此声明的有效特性位置
+    #pragma warning disable CS0657 // 不是此声明的有效特性位置
     [property: JsonConverter(typeof(PointJsonConverter))]
-#pragma warning restore CS0657 // 不是此声明的有效特性位置
+    #pragma warning restore CS0657 // 不是此声明的有效特性位置
     [ObservableProperty]
     private Point _anchor;
 
-#pragma warning disable CS0657 // Not a valid attribute location for this declaration
+    #pragma warning disable CS0657 // Not a valid attribute location for this declaration
     [property: JsonConverter(typeof(ObjectJsonConverter))]
     [JsonIgnore]
-#pragma warning restore CS0657 // Not a valid attribute location for this declaration
+    #pragma warning restore CS0657 // Not a valid attribute location for this declaration
     [ObservableProperty]
     private object? _inputObject; //数据
 
