@@ -1,5 +1,6 @@
 ﻿using System.Timers;
 using Core.SDKs.HotKey;
+using PluginCore;
 using Timer = System.Timers.Timer;
 
 namespace Kitopia.SDKs;

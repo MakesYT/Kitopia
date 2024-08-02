@@ -9,6 +9,7 @@ using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
+using PluginCore;
 using Ursa.Controls;
 
 namespace KitopiaAvalonia.Windows;

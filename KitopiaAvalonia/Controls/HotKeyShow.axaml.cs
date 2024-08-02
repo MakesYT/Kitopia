@@ -9,6 +9,7 @@ using Core.SDKs.HotKey;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using Microsoft.Extensions.DependencyInjection;
+using PluginCore;
 
 namespace KitopiaAvalonia.Controls;
 

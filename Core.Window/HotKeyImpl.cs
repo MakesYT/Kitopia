@@ -4,6 +4,7 @@ using Core.SDKs.CustomType;
 using Core.SDKs.HotKey;
 using Core.SDKs.Services;
 using Microsoft.Extensions.DependencyInjection;
+using PluginCore;
 using SharpHook;
 using SharpHook.Reactive;
 using Vanara.PInvoke;

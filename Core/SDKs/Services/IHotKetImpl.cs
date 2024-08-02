@@ -1,4 +1,5 @@
 ﻿using Core.SDKs.HotKey;
+using PluginCore;
 
 namespace Core.SDKs.Services;
 

@@ -61,9 +61,9 @@ public partial class SearchWindowViewModel : ObservableRecipient
         LoadLast();
     }
 
-    public async Task AddCollection(string search)
+    public  void AddCollection(string search)
     {
-        await ServiceManager.Services.GetService<IAppToolService>()!.AppSolverA(_collection, search, false);
+         ServiceManager.Services.GetService<IAppToolService>()!.AppSolverA(_collection, search, false);
     }
 
     public void ReloadApps(bool logging = false)
@@ -130,7 +130,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
     }
 
 
-    public void CheckClipboard(bool loadLast = false)
+    public void CheckClipboard()
     {
         if (!ConfigManger.Config.canReadClipboard)
         {
@@ -144,13 +144,13 @@ public partial class SearchWindowViewModel : ObservableRecipient
             Items.RemoveAt(0);
         }
 
-        var data = ServiceManager.Services.GetService<IClipboardService>()
+        var data = ServiceManager.Services.GetService<IClipboardService>()!
             .HasText();
         try
         {
             if (data)
             {
-                var text = ServiceManager.Services.GetService<IClipboardService>()
+                var text = ServiceManager.Services.GetService<IClipboardService>()!
                     .GetText();
                 if (text.StartsWith("\""))
                 {
@@ -162,8 +162,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                 {
                     Log.Debug("检测路径");
                     ConcurrentDictionary<string, SearchViewItem> a = new();
-                    ServiceManager.Services.GetService<IAppToolService>()!.AppSolverA(a, text)
-                        .Wait();
+                    ServiceManager.Services.GetService<IAppToolService>()!.AppSolverA(a, text);
                     foreach (var (key, value) in a)
                     {
                         if (value.FileType == FileType.文件夹)
@@ -534,8 +533,7 @@ public partial class SearchWindowViewModel : ObservableRecipient
                     {
                         Log.Debug("检测路径");
                         ConcurrentDictionary<string, SearchViewItem> a = new();
-                        ServiceManager.Services.GetService<IAppToolService>()!.AppSolverA(a, originalValue)
-                            .Wait();
+                        ServiceManager.Services.GetService<IAppToolService>()!.AppSolverA(a, originalValue);
                         foreach (var (key, value) in a)
                         {
                             if (value.FileType == FileType.文件夹)
