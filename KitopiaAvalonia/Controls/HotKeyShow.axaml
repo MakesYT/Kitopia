@@ -55,10 +55,10 @@
                             Foreground="{DynamicResource SemiColorText0}"
                             HorizontalAlignment="Center" />
                         <Button Margin="5,0,0,0" Padding="0" IsVisible="{TemplateBinding IsActivated}"
-                                Height="32" Width="32" FontSize="24" ToolTip.Tip="禁用快捷键"
+                                Height="32" Width="32" ToolTip.Tip="禁用快捷键"
                                 Foreground="{DynamicResource TextControlForeground}"
                                 Command="{TemplateBinding RemoveHotKey}">
-                            <controls:FontIcon Glyph="&#xf36a;" />
+                            <controls:FontIcon FontSize="24" Glyph="&#xf36a;" />
                         </Button>
                         <controls:FontIcon Glyph="&#xf3de;" />
 
