@@ -6,7 +6,7 @@ namespace Core.SDKs.Services;
 
 public interface IAppToolService
 {
-    public Task AppSolverA(ConcurrentDictionary<string, SearchViewItem> _collection, string search,
+    public void AppSolverA(ConcurrentDictionary<string, SearchViewItem> _collection, string search,
         bool isSearch = false);
 
     public void DelNullFile(ConcurrentDictionary<string, SearchViewItem> _collection);

@@ -7,7 +7,7 @@ namespace Core.Window;
 
 public class AppToolService : IAppToolService
 {
-    public async Task AppSolverA(ConcurrentDictionary<string, SearchViewItem> _collection, string search,
+    public void AppSolverA(ConcurrentDictionary<string, SearchViewItem> _collection, string search,
         bool isSearch = false)
     {
         Window.AppTools.AppSolverA(_collection, search, isSearch);

@@ -28,7 +28,7 @@ internal class IconTools
             Delay = TimeSpan.FromSeconds(1),
             MaxRetryAttempts = 5,
             BackoffType = DelayBackoffType.Linear,
-            UseJitter = true
+            UseJitter = true,
         }).Build();
 
     private const uint SHGFI_ICON = 0x100;
