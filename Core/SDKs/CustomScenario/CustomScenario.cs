@@ -257,7 +257,7 @@ public partial class CustomScenario : ObservableRecipient
 
             if (toRemove)
             {
-                nodes[i].Status = s节点状态.未验证;
+                nodes[i].Status = S节点状态.未验证;
             }
         }
 
@@ -446,11 +446,11 @@ public partial class CustomScenario : ObservableRecipient
         {
             if (connectionItem.Source.Source == scenarioMethodNode)
             {
-                connectionItem.Source.Source.Status = s节点状态.已验证;
+                connectionItem.Source.Source.Status = S节点状态.已验证;
             }
             else
             {
-                connectionItem.Source.Source.Status = s节点状态.未验证;
+                connectionItem.Source.Source.Status = S节点状态.未验证;
             }
         }
     }
@@ -532,7 +532,7 @@ public partial class CustomScenario : ObservableRecipient
         {
             foreach (var sourceSource in connectorItem.GetSourceOrNextPointItems(connections))
             {
-                if (sourceSource.Status == s节点状态.错误)
+                if (sourceSource.Status == S节点状态.错误)
                 {
                     valid = false;
                 }
@@ -598,12 +598,12 @@ public partial class CustomScenario : ObservableRecipient
         finnish:
         if (valid)
         {
-            nowScenarioMethodNode.Status = notRealTime ? s节点状态.已验证 : s节点状态.初步验证;
+            nowScenarioMethodNode.Status = notRealTime ? S节点状态.已验证 : S节点状态.初步验证;
             Log.Debug($"解析节点完成:{nowScenarioMethodNode.Title}");
         }
         else
         {
-            nowScenarioMethodNode.Status = s节点状态.错误;
+            nowScenarioMethodNode.Status = S节点状态.错误;
             Log.Debug($"解析节点失败:{nowScenarioMethodNode.Title}");
         }
     }

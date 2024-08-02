@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using Avalonia;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Core.JsonCtrs;
+using Core.JsonConverter;
 using Core.SDKs.CustomType;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
@@ -15,7 +15,7 @@ using PluginCore.Attribute;
 
 namespace Core.SDKs.CustomScenario;
 
-public enum s节点状态
+public enum S节点状态
 {
     未验证,
     已验证,
@@ -33,7 +33,7 @@ public partial class ScenarioMethodNode : ObservableRecipient
     [ObservableProperty] private string _title;
     [ObservableProperty] private ObservableCollection<ConnectorItem> input = new();
     [ObservableProperty] private ObservableCollection<ConnectorItem> output = new();
-    [ObservableProperty] private s节点状态 status = s节点状态.未验证;
+    [ObservableProperty] private S节点状态 status = S节点状态.未验证;
 
     [JsonConverter(typeof(ScenarioMethodJsonCtr))]
     public ScenarioMethod ScenarioMethod { get; set; }

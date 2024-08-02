@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using Avalonia;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
-using Core.JsonCtrs;
+using Core.JsonConverter;
 using Core.SDKs.Services.Config;
 using PluginCore;
 
