@@ -29,9 +29,9 @@ public class AppToolService : IAppToolService
         Window.AppTools.AutoStartEverything(_collection, action);
     }
 
-    public async Task GetIconByItemAsync(SearchViewItem item)
+    public void GetIconByItem(SearchViewItem item)
     {
-        await IconTools.GetIconByItemAsync(item);
+        IconTools.GetIconByItem(item);
     }
 
     public PinyinItem GetPinyin(string input)

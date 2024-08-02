@@ -15,6 +15,6 @@ public interface IAppToolService
         bool useEverything = false);
 
     public void AutoStartEverything(ConcurrentDictionary<string, SearchViewItem> _collection, Action action);
-    public Task GetIconByItemAsync(SearchViewItem item);
+    public void GetIconByItem(SearchViewItem item);
     public PinyinItem GetPinyin(string input);
 }
