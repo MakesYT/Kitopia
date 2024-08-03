@@ -187,7 +187,6 @@ public class HotKeyShow : TemplatedControl
         {
             IsActivated = false;
             HotKeyManager.HotKetImpl.Del(HotKeyModel.Value.UUID);
-            ConfigManger.Save(ConfigManger.Config.Name);
         }
     }
 
@@ -199,31 +198,33 @@ public class HotKeyShow : TemplatedControl
             return;
         }
 
-        if (HotKeyModel.Value.SelectKey != EKey.未设置)
-        {
-            if (!IsActivated)
-            {
-                if (!HotKeyManager.HotKetImpl.Modify(HotKeyModel.Value))
-                {
-                    ServiceManager.Services.GetService<IContentDialog>().ShowDialogAsync(null, new DialogContent()
-                    {
-                        Title = $"快捷键{HotKeyModel.Value.SignName}设置失败",
-                        Content = "请重新设置快捷键，按键与系统其他程序冲突",
-                        CloseButtonText = "关闭"
-                    });
-                    HotKeyManager.HotKetImpl.RequestUserModify(HotKeyModel.Value.UUID);
-                    ConfigManger.Save();
-                    return;
-                }
+        if (HotKeyModel.Value.Type == HotKeyType.Mouse && HotKeyModel.Value.MouseButton == ushort.MaxValue)
+            return;
+        if (HotKeyModel.Value.Type == HotKeyType.Keyboard && HotKeyModel.Value.SelectKey == EKey.未设置)
+            return;
 
-                IsActivated = true;
-            }
-            else
+        if (!IsActivated)
+        {
+            if (!HotKeyManager.HotKetImpl.Modify(HotKeyModel.Value))
             {
+                ServiceManager.Services.GetService<IContentDialog>().ShowDialogAsync(null, new DialogContent()
+                {
+                    Title = $"快捷键{HotKeyModel.Value.SignName}设置失败",
+                    Content = "请重新设置快捷键，按键与系统其他程序冲突",
+                    CloseButtonText = "关闭"
+                });
                 HotKeyManager.HotKetImpl.RequestUserModify(HotKeyModel.Value.UUID);
                 ConfigManger.Save();
                 return;
             }
+
+            IsActivated = true;
+        }
+        else
+        {
+            HotKeyManager.HotKetImpl.RequestUserModify(HotKeyModel.Value.UUID);
+            ConfigManger.Save();
+            return;
         }
     }
 }

@@ -1,8 +1,8 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Threading;
 using Core.SDKs.CustomType;
-using Core.SDKs.HotKey;
 using Core.SDKs.Services;
+using Core.SDKs.Services.Config;
 using Microsoft.Extensions.DependencyInjection;
 using PluginCore;
 using SharpHook;
@@ -105,6 +105,17 @@ public class HotKeyImpl : IHotKetImpl
 
     public bool Add(HotKeyModel hotKeyModel, Action<HotKeyModel> rallBack)
     {
+        if (!hotKeyModel.IsEnabled)
+        {
+            HotKeys.Add(hotKeyModel.UUID, new HotkeyInfo()
+            {
+                HotKeyModel = hotKeyModel,
+                Id = -1,
+                RallBack = rallBack
+            });
+            return true;
+        }
+
         switch (hotKeyModel.Type)
         {
             case HotKeyType.Keyboard:
@@ -169,6 +180,7 @@ public class HotKeyImpl : IHotKetImpl
             }
             case HotKeyType.Mouse:
             {
+                hotKeyModel.IsEnabled = true;
                 if (HotKeys.TryGetValue(hotKeyModel.UUID, out var hotKeyModel1) && hotKeyModel1.Id == -1)
                 {
                     hotKeyModel1.Id = 1;
@@ -200,6 +212,10 @@ public class HotKeyImpl : IHotKetImpl
     {
         if (HotKeys.TryGetValue(uuid, out var hotkey))
         {
+            hotkey.HotKeyModel.IsEnabled = false;
+
+            ConfigManger.RequsetUpdateHotKey(hotkey.HotKeyModel);
+            ConfigManger.Save();
             switch (hotkey.HotKeyModel.Type)
             {
                 case HotKeyType.Keyboard:
@@ -238,6 +254,9 @@ public class HotKeyImpl : IHotKetImpl
         {
             var rallback = HotKeys[hotKeyModel.UUID].RallBack;
             Del(hotKeyModel);
+            hotKeyModel.IsEnabled = true;
+            ConfigManger.RequsetUpdateHotKey(hotKeyModel);
+            ConfigManger.Save();
             if (!Add(hotKeyModel, rallback))
             {
                 return false;
