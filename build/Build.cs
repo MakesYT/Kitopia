@@ -214,6 +214,63 @@ class Build : NukeBuild
             }
         );
 
+    Target PackDebug => _ => _
+        .OnlyWhenDynamic(() => FinishedTargets.Contains(CreateRelease))
+        .DependsOn(CreateRelease)
+        .Executes(() =>
+            {
+                var rootDirectory = RootDirectory / "Publish_DEBUG";
+                rootDirectory.DeleteDirectory();
+                DotNetPublish(c => new DotNetPublishSettings()
+                    .SetProject("KitopiaEx")
+                    .SetOutput(RootDirectory / "Publish_DEBUG" / "plugins" / "KitopiaEx")
+                    .SetRuntime("win-x64")
+                    .SetFramework("net8.0")
+                    .SetConfiguration("Debug")
+                    .SetSelfContained(false)
+                );
+                DotNetPublish(c => new DotNetPublishSettings()
+                    .SetProject(AvaloniaProject.Name)
+                    .SetOutput(RootDirectory / "Publish_DEBUG")
+                    .SetPublishSingleFile(true)
+                    .SetRuntime("win-x64")
+                    .SetFramework("net8.0-windows10.0.17763.0")
+                    .SetConfiguration("Debug")
+                    .SetSelfContained(false)
+                );
+                var gitRepository = GitRepository.FromUrl("https://github.com/MakesYT/Kitopia");
+                var result = GitHubTasks.GetLatestRelease(gitRepository, true)
+                    .Result;
+                Log.Debug("Packing project {0}", AvaloniaProject);
+                Log.Debug("GitHubName {0}", gitRepository.GetGitHubName());
+                foreach (var absolutePath in rootDirectory.GetFiles())
+                {
+                    if (absolutePath.Extension is ".pdb" or ".xml")
+                    {
+                        absolutePath.DeleteFile();
+                    }
+                }
+
+                var archiveFile = RootDirectory / "Kitopia" + AvaloniaProject.GetProperty("Version") +
+                                  "_DEBUG_WithoutContained.zip";
+                archiveFile.DeleteFile();
+                rootDirectory.ZipTo(archiveFile);
+                Log.Debug("Uploading artifact {0}", archiveFile);
+                using var artifactStream = File.OpenRead(archiveFile);
+                var assetUpload = new ReleaseAssetUpload
+                {
+                    FileName = archiveFile.Name,
+                    ContentType = "application/octet-stream",
+                    RawData = artifactStream,
+                };
+                var release = _gitHubClient.Repository.Release.Get(gitRepository.GetGitHubOwner(), "Kitopia",
+                    AvaloniaProject.GetProperty("Version")).Result;
+                _gitHubClient.Repository.Release.UploadAsset(release, assetUpload)
+                    .Wait();
+                Log.Debug(result);
+            }
+        );
+
     Target PackSelf => _ => _
         .OnlyWhenDynamic(() => FinishedTargets.Contains(CreateRelease))
         .DependsOn(CreateRelease)
@@ -274,6 +331,7 @@ class Build : NukeBuild
     Target Clean => _ => _
         .DependsOn(Pack)
         .DependsOn(PackSelf)
+        .DependsOn(PackDebug)
         .Executes(() =>
         {
         });
