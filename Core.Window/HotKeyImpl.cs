@@ -84,7 +84,13 @@ public class HotKeyImpl : IHotKetImpl
         {
             if (value.HotKeyModel.Type != HotKeyType.Mouse) continue;
             if (value.Id == -1) continue;
-            if (value.HotKeyModel.MouseButton == (int)e.Data.Button)
+            var dataButton = (int)e.Data.Button;
+            if (dataButton == 0)
+            {
+                continue;
+            }
+
+            if (value.HotKeyModel.MouseButton == dataButton - 1)
             {
                 value.Timer?.Stop();
             }
