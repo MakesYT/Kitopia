@@ -119,7 +119,7 @@ public class KitopiaConfig : ConfigBase
                 {
                     log.Error(e.Exception);
                     ServiceManager.Services.GetService<IErrorWindow>()!.ShowErrorWindow(
-                        "截图失败", e.Exception.Message);
+                        "截图失败", e.Exception.Message + e.Exception.StackTrace);
                 }
             });
     };

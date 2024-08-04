@@ -130,8 +130,8 @@ public class ScreenCaptureByDx11 : IScreenCapture
                         }
 
                         OutduplFrameInfo outduplFrameInfo = new OutduplFrameInfo();
-                        Thread.Sleep(10);
-                        if (outputDuplication->AcquireNextFrame(2000, &outduplFrameInfo, &desktopResource) != 0 ||
+                        Thread.Sleep(20);
+                        if (outputDuplication->AcquireNextFrame(3000, &outduplFrameInfo, &desktopResource) != 0 ||
                             outduplFrameInfo.LastPresentTime == 0)
                         {
                             throw new Exception("Failed to acquire next frame");
@@ -218,7 +218,7 @@ public class ScreenCaptureByDx11 : IScreenCapture
                     }
                     catch (Exception e)
                     {
-                        log.Error(e);
+                        log.Error("错误", e);
                     }
                     finally
                     {
