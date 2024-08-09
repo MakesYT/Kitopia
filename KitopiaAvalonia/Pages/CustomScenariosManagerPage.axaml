@@ -26,106 +26,65 @@
             </Button>
 
         </StackPanel>
-        <ListBox Grid.Row="2" Classes="draggableVirtualizing"
-                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-
-                 ItemsSource="{Binding CustomScenarios,Mode=OneWay}"
-                 Margin="0,10,0,0">
-            <ListBox.ItemContainerTheme>
-                <ControlTheme TargetType="ListBoxItem">
-                    <Setter Property="Template">
-                        <ControlTemplate>
-                            <ContentPresenter Name="PART_ContentPresenter"
-                                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                              Background="{TemplateBinding Background}"
-                                              BorderBrush="{TemplateBinding BorderBrush}"
-                                              BorderThickness="{TemplateBinding BorderThickness}"
-                                              Content="{TemplateBinding Content}"
-                                              ContentTemplate="{TemplateBinding ContentTemplate}"
-                                              CornerRadius="{TemplateBinding CornerRadius}" />
-                        </ControlTemplate>
-
-                    </Setter>
-                </ControlTheme>
-            </ListBox.ItemContainerTheme>
-            <ListBox.ItemTemplate>
-                <DataTemplate x:DataType="customScenario1:CustomScenario">
-                    <Button HorizontalAlignment="Stretch" x:Name="Button"
-                            HorizontalContentAlignment="Stretch"
-                            IsEnabled="{Binding HasInit}"
-                            ToolTip.Tip="{Binding InitError}"
-                            Command="{Binding Path=$parent[ListBox].((customScenario:CustomScenariosManagerPageViewModel)DataContext).ToTaskEditPageCommand}"
-                            CommandParameter="{Binding }"
-                            BorderBrush="{DynamicResource SemiColorBorder}"
-                            BorderThickness="1"
-                            Background="{DynamicResource SemiColorFill0}"
-                            Foreground="{DynamicResource SemiColorText0}"
-                            Height="72" Margin="0"
-                            Padding="3">
-                        <Grid ColumnDefinitions="Auto,2*,4*,48,48,Auto">
-                            <Image Grid.Column="0" HorizontalAlignment="Left" Focusable="False" Width="48"
-                                   Height="48" Margin="0,0,12,0" />
-
-                            <StackPanel Grid.Column="1" Margin="5" VerticalAlignment="Center"
-                                        HorizontalAlignment="Left">
-                                <TextBlock VerticalAlignment="Center" Margin="0" Focusable="False"
-                                           Text="{Binding Name}"
-
+        <ItemsControl Grid.Row="2" ItemsSource="{Binding CustomScenarios}" Margin="0,10,0,0">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel></WrapPanel>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border BorderBrush="{DynamicResource SemiColorBorder}" BorderThickness="1" Width="300" CornerRadius="{DynamicResource RadiusCardCornerRadius}"
+                            Height="180">
+                        <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ColumnDefinitions="80,*"
+                              RowDefinitions="*,48">
+                            <Image Grid.Column="0" HorizontalAlignment="Left" Focusable="False" Width="64" Height="64"  />
+                            <StackPanel Grid.Column="1" Margin="5,15,5,5" VerticalAlignment="Top" Spacing="5"
+                                        HorizontalAlignment="Stretch">
+                                <TextBlock VerticalAlignment="Center" Focusable="False"
+                                           Text="{Binding Path=Name}"
                                            Background="{x:Null}"
                                            FontWeight="Normal" FontSize="18" />
-                                <TextBlock VerticalAlignment="Top" Margin="0"
-                                           Text="{Binding Description}" />
+                                <ScrollViewer IsHitTestVisible="False"
+                                              VerticalAlignment="Stretch"
+                                              HorizontalAlignment="Stretch"
+                                              HorizontalScrollBarVisibility="Hidden">
+                                    <TextBlock VerticalAlignment="Center"
+                                               MaxWidth="{Binding $parent.Bounds.Width}"
+                                               TextWrapping="Wrap"
+                                               Text="{Binding Description}" />
+                                </ScrollViewer>
+
+
                             </StackPanel>
-                            <DockPanel Grid.Column="2" Height="60">
-                                <TextBlock DockPanel.Dock="Bottom" VerticalAlignment="Center"
-                                           TextWrapping="Wrap"
-                                           Text="{Binding LastRun, StringFormat=上次执行时间:yyyy/MM/dd HH:mm:ss}" />
-                            </DockPanel>
-
-                            <Button Grid.Column="3" FontSize="24" ToolTip.Tip="删除情景"
-                                    Foreground="OrangeRed"
-                                    ToolTip.ShowDelay="100"
-                                    Command="{Binding Path=$parent[ListBox].((customScenario:CustomScenariosManagerPageViewModel)DataContext).RemoveCustomScenarioCommand}"
-                                    CommandParameter="{Binding }">
-                                <controls:FontIcon Glyph="&#xf34d;" Foreground="OrangeRed" FontWeight="Normal" />
-                            </Button>
-                            <ItemsControl VerticalAlignment="Center" Grid.Column="4"
-                                          IsVisible="{Binding IsHaveInputValue,Converter={StaticResource reverseBoolToVisibilityConverter}}">
-                                <Button FontSize="24" ToolTip.Tip="停止"
-                                        Foreground="OrangeRed"
-                                        ToolTip.ShowDelay="100"
+                            <StackPanel Grid.Column="0" Margin="5,0,5,0" Spacing="5" Grid.ColumnSpan="2" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" >
+                                <Button Content="编辑"  
+                                        Command="{Binding Path=$parent[ItemsControl].((customScenario:CustomScenariosManagerPageViewModel)DataContext).ToTaskEditPageCommand}"
+                                        CommandParameter="{Binding }"></Button>
+                                <Button Classes="Danger"
+                                        Content="停止"
                                         IsVisible="{Binding IsRunning}"
-                                        Command="{Binding Path=$parent[ListBox].((customScenario:CustomScenariosManagerPageViewModel)DataContext).StopCustomScenarioCommand}"
+                                        Command="{Binding Path=$parent[ItemsControl].((customScenario:CustomScenariosManagerPageViewModel)DataContext).StopCustomScenarioCommand}"
                                         CommandParameter="{Binding }">
-
-                                    <controls:FontIcon Glyph="&#xf75b;" Foreground="OrangeRed" FontWeight="Normal" />
-
                                 </Button>
-                                <Button FontSize="24" ToolTip.Tip="执行"
-
-                                        Foreground="GreenYellow"
-                                        ToolTip.ShowDelay="100"
+                                <Button Content="运行" Classes="Success"
                                         IsVisible="{Binding IsRunning,Converter={StaticResource reverseBoolToVisibilityConverter}}"
-                                        Command="{Binding Path=$parent[ListBox].((customScenario:CustomScenariosManagerPageViewModel)DataContext).RunCustomScenarioCommand}"
+                                        Command="{Binding Path=$parent[ItemsControl].((customScenario:CustomScenariosManagerPageViewModel)DataContext).RunCustomScenarioCommand}"
                                         CommandParameter="{Binding }">
-
-                                    <controls:FontIcon Glyph="&#xf606;" Foreground="GreenYellow" FontWeight="Normal" />
-
                                 </Button>
-                            </ItemsControl>
-                            <controls:FontIcon Grid.Column="5" FontSize="20"
-                                               Margin="0,0,10,0" Glyph="&#xf2b2;" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="0" Margin="5,0,5,0" Spacing="5" Grid.ColumnSpan="2" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left" >
+                                <Button Classes="Danger" Content="删除" 
+                                        Command="{Binding Path=$parent[ItemsControl].((customScenario:CustomScenariosManagerPageViewModel)DataContext).RemoveCustomScenarioCommand}"
+                                        CommandParameter="{Binding }"></Button>
+                            </StackPanel>
 
                         </Grid>
+                    </Border>
 
-
-                    </Button>
                 </DataTemplate>
-            </ListBox.ItemTemplate>
-
-
-        </ListBox>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
 
 
     </Grid>
