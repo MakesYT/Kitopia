@@ -3,8 +3,10 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Core.SDKs;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
@@ -31,6 +33,7 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
 
     private void LoadPluginsInfo()
     {
+        Items.Clear();
         var pluginsDirectoryInfo = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "plugins");
         if (!pluginsDirectoryInfo.Exists)
         {
@@ -40,9 +43,10 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
 
         foreach (var directoryInfo in pluginsDirectoryInfo.EnumerateDirectories())
         {
-            if (File.Exists($"{directoryInfo.FullName}{Path.DirectorySeparatorChar}{directoryInfo.Name}.dll"))
+            var last = directoryInfo.Name.Split("_").Last();
+            if (File.Exists($"{directoryInfo.FullName}{Path.DirectorySeparatorChar}{last}.dll"))
             {
-                var pluginInfoEx = PluginInfoTool.GetPluginInfoEx($"{directoryInfo.FullName}{Path.DirectorySeparatorChar}{directoryInfo.Name}.dll",
+                var pluginInfoEx = PluginInfoTool.GetPluginInfoEx($"{directoryInfo.FullName}{Path.DirectorySeparatorChar}{last}.dll",
                     out var alcWeakRef);
                 if (pluginInfoEx.Version != "error")
                 {
@@ -70,6 +74,32 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
     private void RestartApp()
     {
         ServiceManager.Services.GetService<IApplicationService>()!.Restart();
+    }
+
+    [RelayCommand]
+    private void Delete(PluginInfo pluginInfoEx)
+    {
+        var dialog = new DialogContent()
+        {
+            Title = $"删除{pluginInfoEx.PluginName}?",
+            Content = "是否确定删除?\n他真的会丢失很久很久(不可恢复)",
+            PrimaryButtonText = "确定",
+            CloseButtonText = "取消",
+            PrimaryAction = () =>
+            {
+                Switch(pluginInfoEx);
+                if (!pluginInfoEx.UnloadFailed)
+                {
+                    var pluginsDirectoryInfo = new DirectoryInfo($"{AppDomain.CurrentDomain.BaseDirectory}plugins{Path.DirectorySeparatorChar}{pluginInfoEx.ToPlgString()}");
+                    pluginsDirectoryInfo.Delete(true);
+                    Task.Run(LoadPluginsInfo);
+                }
+            }
+        };
+        ((IContentDialog)ServiceManager.Services!.GetService(typeof(IContentDialog))!).ShowDialogAsync(null,
+            dialog);
+        
+        
     }
     [RelayCommand]
     public void Switch(PluginInfo pluginInfoEx)

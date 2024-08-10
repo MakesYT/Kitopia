@@ -81,7 +81,9 @@
                                 </StackPanel>
                                 <StackPanel Grid.Column="0" Margin="5,0,5,0" Spacing="5" Grid.ColumnSpan="2"
                                             Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left">
-                                    <Button Classes="Danger" Content="删除"></Button>
+                                    <Button Classes="Danger" Content="删除"  
+                                            Command="{Binding Path=$parent[ItemsControl].((plugin:PluginManagerPageViewModel)DataContext).DeleteCommand}"
+                                            CommandParameter="{Binding }"></Button>
                                     <Button Content="更新" IsEnabled="False"></Button>
                                 </StackPanel>
 

@@ -30,11 +30,12 @@ public class PluginManager
 
         foreach (var directoryInfo in pluginsDirectoryInfo.EnumerateDirectories())
         {
-            if (File.Exists($"{directoryInfo.FullName}{Path.DirectorySeparatorChar}{directoryInfo.Name}.dll"))
+            var last = directoryInfo.Name.Split("_").Last();
+            if (File.Exists($"{directoryInfo.FullName}{Path.DirectorySeparatorChar}{last}.dll"))
             {
-                Log.Debug($"加载插件:{directoryInfo.Name}.dll");
+                Log.Debug($"加载插件:{last}.dll");
 
-                var pluginInfoEx = PluginInfoTool.GetPluginInfoEx($"{directoryInfo.FullName}{Path.DirectorySeparatorChar}{directoryInfo.Name}.dll",
+                var pluginInfoEx = PluginInfoTool.GetPluginInfoEx($"{directoryInfo.FullName}{Path.DirectorySeparatorChar}{last}.dll",
                     out var alcWeakRef);
 
 
