@@ -30,7 +30,7 @@
                                  if we put ClipToBounds=True on BackgroundElement above, it clips the shadow -->
     <Border ClipToBounds="True" HorizontalAlignment="Center" Name="BackgroundElement"
             Background="{DynamicResource ContentDialogBackground}"
-            VerticalAlignment="Center">
+            VerticalAlignment="Center" Margin="5,5,5,0">
         <Grid Name="DialogSpace" ClipToBounds="True"
               RowDefinitions="Auto,*,Auto">
             <Panel Background="{DynamicResource ContentDialogTopOverlay}"

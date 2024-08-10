@@ -25,58 +25,76 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Border BorderBrush="{DynamicResource SemiColorBorder}" BorderThickness="1" Width="300" CornerRadius="{DynamicResource RadiusCardCornerRadius}"
+                    <Border BorderBrush="{DynamicResource SemiColorBorder}" BorderThickness="1" Width="300"
+                            CornerRadius="{DynamicResource RadiusCardCornerRadius}"
                             Height="200">
-                        <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ColumnDefinitions="80,*"
-                              RowDefinitions="*,48">
-                            <Image Grid.Column="0" HorizontalAlignment="Left" Focusable="False" Width="64" Height="64"  />
-                            <StackPanel Grid.Column="1" Margin="5,15,5,5" VerticalAlignment="Top" Spacing="5"
-                                        HorizontalAlignment="Stretch">
-                                <TextBlock VerticalAlignment="Center" Focusable="False"
-                                           Text="{Binding Path=PluginName}"
-                                           Background="{x:Null}"
-                                           FontWeight="Normal" FontSize="18" />
-                                <StackPanel Orientation="Horizontal" Spacing="5">
-                                    <TextBlock VerticalAlignment="Top"
-                                               Text="{Binding Version}" />
-                                    <TextBlock VerticalAlignment="Top" 
-                                               Text="{Binding Author}" />
+                        <Panel>
+                            <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ColumnDefinitions="80,*"
+                                  IsEnabled="{Binding !UnloadFailed}"
+                                  RowDefinitions="*,48">
+                                <Image Grid.Column="0" HorizontalAlignment="Left" Focusable="False" Width="64"
+                                       Height="64" />
+                                <StackPanel Grid.Column="1" Margin="5,15,5,5" VerticalAlignment="Top" Spacing="5"
+                                            HorizontalAlignment="Stretch">
+                                    <TextBlock VerticalAlignment="Center" Focusable="False"
+                                               Text="{Binding Path=PluginName}"
+                                               Background="{x:Null}"
+                                               FontWeight="Normal" FontSize="18" />
+                                    <StackPanel Orientation="Horizontal" Spacing="5">
+                                        <TextBlock VerticalAlignment="Top"
+                                                   Text="{Binding Version}" />
+                                        <TextBlock VerticalAlignment="Top"
+                                                   Text="{Binding Author}" />
+                                    </StackPanel>
+                                    <ScrollViewer IsHitTestVisible="False"
+                                                  VerticalAlignment="Stretch"
+                                                  HorizontalAlignment="Stretch"
+                                                  HorizontalScrollBarVisibility="Hidden">
+                                        <TextBlock VerticalAlignment="Center"
+                                                   MaxWidth="{Binding $parent.Bounds.Width}"
+                                                   TextWrapping="Wrap"
+                                                   Text="{Binding Description}" />
+                                    </ScrollViewer>
+
+
                                 </StackPanel>
-                                <ScrollViewer IsHitTestVisible="False"
-                                              VerticalAlignment="Stretch"
-                                              HorizontalAlignment="Stretch"
-                                              HorizontalScrollBarVisibility="Hidden">
-                                    <TextBlock VerticalAlignment="Center"
-                                               MaxWidth="{Binding $parent.Bounds.Width}"
-                                               TextWrapping="Wrap"
-                                               Text="{Binding Description}" />
-                                </ScrollViewer>
+                                <StackPanel Grid.Column="0" Margin="5,0,5,0" Spacing="5" Grid.ColumnSpan="2"
+                                            Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <Button IsVisible="{Binding IsEnabled}" Content="配置"
+                                            Command="{Binding Path=$parent[ItemsControl].((plugin:PluginManagerPageViewModel)DataContext).ToPluginSettingPageCommand}"
+                                            CommandParameter="{Binding }">
+                                    </Button>
+                                    <ToggleButton Classes.Success="{Binding !IsEnabled}"
+                                                  Classes.Danger="{Binding IsEnabled}"
+                                                  IsChecked="{Binding IsEnabled,Mode=OneWay}" FontWeight="Normal"
+                                                  Command="{Binding Path=$parent[ItemsControl].((plugin:PluginManagerPageViewModel)DataContext).SwitchCommand}"
+                                                  CommandParameter="{Binding}">
+                                        <ToggleButton.Styles>
+                                            <Style Selector="ToggleButton[IsChecked=True]">
+                                                <Setter Property="Content" Value="禁用"></Setter>
+                                            </Style>
+                                            <Style Selector="ToggleButton[IsChecked=False]">
+                                                <Setter Property="Content" Value="启用"></Setter>
+                                            </Style>
+                                        </ToggleButton.Styles>
+                                    </ToggleButton>
+                                </StackPanel>
+                                <StackPanel Grid.Column="0" Margin="5,0,5,0" Spacing="5" Grid.ColumnSpan="2"
+                                            Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left">
+                                    <Button Classes="Danger" Content="删除"></Button>
+                                    <Button Content="更新" IsEnabled="False"></Button>
+                                </StackPanel>
 
+                            </Grid>
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" ZIndex="1" IsVisible="{Binding UnloadFailed}">
+                                <StackPanel.Background>
+                                    <SolidColorBrush Color="{DynamicResource SemiBackground0Color}" Opacity="0.4"></SolidColorBrush>
+                                </StackPanel.Background>
+                                <TextBlock Text="插件动态卸载失败,重启后完成卸载"></TextBlock>
+                                <Button Content="重启" Command="{Binding Path=$parent[ItemsControl].((plugin:PluginManagerPageViewModel)DataContext).RestartAppCommand}"></Button>
+                            </StackPanel>
+                        </Panel>
 
-                            </StackPanel>
-                            <StackPanel Grid.Column="0" Margin="5,0,5,0" Spacing="5" Grid.ColumnSpan="2" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" >
-                                <Button IsVisible="{Binding IsEnabled}" Content="配置"  
-                                        Command="{Binding Path=$parent[ItemsControl].((plugin:PluginManagerPageViewModel)DataContext).ToPluginSettingPageCommand}"
-                                        CommandParameter="{Binding }"></Button>
-                                <ToggleButton Classes.Success="{Binding !IsEnabled}" Classes.Danger="{Binding IsEnabled}" IsChecked="{Binding IsEnabled,Mode=OneWay}" FontWeight="Normal"
-                                              Command="{Binding Path=$parent[ItemsControl].((plugin:PluginManagerPageViewModel)DataContext).SwitchCommand}"
-                                              CommandParameter="{Binding}">
-                                    <ToggleButton.Styles>
-                                        <Style Selector="ToggleButton[IsChecked=True]">
-                                            <Setter Property="Content" Value="禁用"></Setter>
-                                        </Style>
-                                        <Style Selector="ToggleButton[IsChecked=False]">
-                                            <Setter Property="Content" Value="启用"></Setter>
-                                        </Style>
-                                    </ToggleButton.Styles>
-                                </ToggleButton>
-                            </StackPanel>
-                            <StackPanel Grid.Column="0" Margin="5,0,5,0" Spacing="5" Grid.ColumnSpan="2" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left" >
-                                <Button Classes="Danger" Content="删除"></Button>
-                                <Button  Content="更新" IsEnabled="False"></Button>
-                            </StackPanel>
-
-                        </Grid>
                     </Border>
 
                 </DataTemplate>

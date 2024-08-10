@@ -82,6 +82,7 @@ public partial class App : Application
         services.AddTransient<IClipboardService, ClipboardWindow>();
         services.AddTransient<IWindowTool, WindowToolServiceWindow>();
         services.AddTransient<IAutoStartService, AutoStartService>();
+        services.AddTransient<IApplicationService, ApplicationService>();
         #endif
 
         #if LINUX

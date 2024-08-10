@@ -10,6 +10,7 @@ using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
 using log4net;
+using Microsoft.Extensions.DependencyInjection;
 using PluginCore;
 
 #endregion
@@ -66,6 +67,11 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
     }
 
     [RelayCommand]
+    private void RestartApp()
+    {
+        ServiceManager.Services.GetService<IApplicationService>()!.Restart();
+    }
+    [RelayCommand]
     public void Switch(PluginInfo pluginInfoEx)
     {
         if (pluginInfoEx.IsEnabled)
@@ -74,17 +80,23 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
 
             Plugin.UnloadByPluginInfo(pluginInfoEx.ToPlgString(), out var weakReference);
             PluginManager.EnablePlugin.Remove(pluginInfoEx.ToPlgString());
-            while (weakReference.IsAlive)
+            for (int i = 0; i < 10; i++)
             {
                 GC.Collect(2, GCCollectionMode.Aggressive);
                 GC.WaitForPendingFinalizers();
+                Task.Delay(10).Wait();
             }
+            
 
             ConfigManger.Config.EnabledPluginInfos.RemoveAll(e =>
                 e.PluginId == pluginInfoEx.PluginId && e.Author == pluginInfoEx.Author &&
                 e.VersionInt == pluginInfoEx.VersionInt);
             ConfigManger.Save();
             pluginInfoEx.IsEnabled = false;
+            if (weakReference.IsAlive)
+            {
+                pluginInfoEx.UnloadFailed = true;
+            }
             // Items.ResetBindings();
             CustomScenarioManger.LoadAll();
         }
