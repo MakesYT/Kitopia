@@ -76,7 +76,7 @@ public class ScenarioMethod
 
                 sb.Remove(sb.Length - 1, 1);
                 var methodAbsolutelyName =
-                    $"{PluginInfo.Author}_{PluginInfo.PluginId}#{Method.DeclaringType!.FullName}#{Method.Name}{sb}";
+                    $"{PluginInfo}#{Method.DeclaringType!.FullName}#{Method.Name}{sb}";
                 _methodAbsolutelyName = methodAbsolutelyName;
                 return methodAbsolutelyName;
             }

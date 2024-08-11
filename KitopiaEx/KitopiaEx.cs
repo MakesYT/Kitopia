@@ -6,16 +6,6 @@ namespace KitopiaEx;
 
 public class KitopiaEx : IPlugin
 {
-    public static PluginInfo PluginInfo = new()
-    {
-        PluginName = "Kitopia拓展",
-        PluginId = "KitopiaEx",
-        Description = "Kitopia拓展",
-        Author = "Kitopia",
-        VersionInt = 1,
-        Version = "1.0.0"
-    };
-
     public static IServiceProvider ServiceProvider;
 
     private IPlugin _pluginImplementation;

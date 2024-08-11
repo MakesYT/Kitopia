@@ -3,14 +3,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:plugin="clr-namespace:Core.ViewModel.Pages.plugin;assembly=Core"
-             xmlns:plugin1="clr-namespace:Kitopia.View.Pages.Plugin"
-             xmlns:controls="clr-namespace:KitopiaAvalonia.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="plugin:PluginManagerPageViewModel"
              x:Class="KitopiaAvalonia.Pages.PluginManagerPage">
 
     <UserControl.Resources>
-        <plugin1:PluginInfoToInfo x:Key="PluginInfoToInfo" />
 
     </UserControl.Resources>
     <Grid RowDefinitions="Auto,*" Margin="42">
@@ -37,14 +34,14 @@
                                 <StackPanel Grid.Column="1" Margin="5,15,5,5" VerticalAlignment="Top" Spacing="5"
                                             HorizontalAlignment="Stretch">
                                     <TextBlock VerticalAlignment="Center" Focusable="False"
-                                               Text="{Binding Path=PluginName}"
+                                               Text="{Binding Path=DisplayName}"
                                                Background="{x:Null}"
                                                FontWeight="Normal" FontSize="18" />
                                     <StackPanel Orientation="Horizontal" Spacing="5">
                                         <TextBlock VerticalAlignment="Top"
                                                    Text="{Binding Version}" />
                                         <TextBlock VerticalAlignment="Top"
-                                                   Text="{Binding Author}" />
+                                                   Text="{Binding AuthorName}" />
                                     </StackPanel>
                                     <ScrollViewer IsHitTestVisible="False"
                                                   VerticalAlignment="Stretch"

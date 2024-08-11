@@ -132,21 +132,21 @@ public class ScenarioMethodCategoryGroup : INotifyPropertyChanged
 
     private void Clear()
     {
+        
         for (var i = 0; i < Childrens.Count; i++)
         {
-            Childrens.GetValueOrDefault(Childrens.Keys.ElementAt(i)).Clear();
+            Childrens.ElementAt(i).Value.Clear();
         }
-
         Methods.Clear();
+        Methods = null;
     }
 
     public void RemoveMethodsByPluginName(string pluginName)
     {
-        if (Childrens.TryGetValue(pluginName, out var categoryGroup))
+        if (Childrens.ContainsKey(pluginName))
         {
-            categoryGroup.Clear();
+            Childrens[pluginName].Clear();
         }
-
         Childrens.Remove(pluginName);
         for (var i = 0; i < MixinInfos.Count; i++)
         {

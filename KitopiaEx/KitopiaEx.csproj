@@ -32,4 +32,11 @@
         <PackageReference Include="SharpHook" Version="5.3.7"/>
     </ItemGroup>
 
+
+    <ItemGroup>
+      <None Update="manifest.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

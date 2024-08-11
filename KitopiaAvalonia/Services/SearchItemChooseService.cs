@@ -1,7 +1,6 @@
 ﻿using System;
 using Core.SDKs.Services;
 using Core.ViewModel;
-using Kitopia.View;
 using KitopiaAvalonia.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using PluginCore;

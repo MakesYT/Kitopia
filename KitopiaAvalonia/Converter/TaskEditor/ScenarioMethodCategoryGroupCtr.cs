@@ -49,7 +49,7 @@ public class ScenarioMethodCategoryGroupCtr : IValueConverter
             var expander = new Expander();
             itemsControl.Items.Add(expander);
             itemsControl.DataTemplates.Add(DataTemplate);
-            expander.Header = key;
+            expander.Header = scenarioMethodCategoryGroup.Name;
             var control = new ItemsControl();
             expander.Content = control;
             Prase(scenarioMethodCategoryGroup, control);

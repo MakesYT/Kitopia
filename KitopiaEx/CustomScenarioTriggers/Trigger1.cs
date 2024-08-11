@@ -13,6 +13,6 @@ public class Trigger1 : CustomScenarioTrigger
 
     public static void Excite1()
     {
-        Excite(KitopiaEx.PluginInfo, nameof(Trigger1));
+        Excite(nameof(Trigger1));
     }
 }

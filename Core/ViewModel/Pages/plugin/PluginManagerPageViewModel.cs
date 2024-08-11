@@ -23,53 +23,13 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(PluginManagerPageViewModel));
     private readonly TaskScheduler _scheduler = TaskScheduler.FromCurrentSynchronizationContext();
-    [ObservableProperty] private ObservableCollection<PluginInfo> _items = new();
+    public ObservableCollection<PluginInfo> Items => PluginManager.AllPluginInfos;
 
     public PluginManagerPageViewModel()
     {
-        //Task.Factory.StartNew(LoadPluginsInfo, CancellationToken.None, TaskCreationOptions.None, _scheduler);
-        Task.Run(LoadPluginsInfo);
+        
     }
-
-    private void LoadPluginsInfo()
-    {
-        Items.Clear();
-        var pluginsDirectoryInfo = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "plugins");
-        if (!pluginsDirectoryInfo.Exists)
-        {
-            Log.Debug($"插件目录不存在创建{pluginsDirectoryInfo.FullName}");
-            pluginsDirectoryInfo.Create();
-        }
-
-        foreach (var directoryInfo in pluginsDirectoryInfo.EnumerateDirectories())
-        {
-            var last = directoryInfo.Name.Split("_").Last();
-            if (File.Exists($"{directoryInfo.FullName}{Path.DirectorySeparatorChar}{last}.dll"))
-            {
-                var pluginInfoEx = PluginInfoTool.GetPluginInfoEx($"{directoryInfo.FullName}{Path.DirectorySeparatorChar}{last}.dll",
-                    out var alcWeakRef);
-                if (pluginInfoEx.Version != "error")
-                {
-                    if (PluginManager.EnablePlugin.ContainsKey(pluginInfoEx.ToPlgString()))
-                    {
-                        pluginInfoEx.IsEnabled = true;
-                    }
-
-                    Task.Factory.StartNew(() =>
-                    {
-                        Items.Add(pluginInfoEx);
-                    }, CancellationToken.None, TaskCreationOptions.None, _scheduler);
-                }
-
-                while (alcWeakRef.IsAlive)
-                {
-                    GC.Collect();
-                    GC.WaitForPendingFinalizers();
-                }
-            }
-        }
-    }
-
+    
     [RelayCommand]
     private void RestartApp()
     {
@@ -81,7 +41,7 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
     {
         var dialog = new DialogContent()
         {
-            Title = $"删除{pluginInfoEx.PluginName}?",
+            Title = $"删除{pluginInfoEx.DisplayName}?",
             Content = "是否确定删除?\n他真的会丢失很久很久(不可恢复)",
             PrimaryButtonText = "确定",
             CloseButtonText = "取消",
@@ -92,7 +52,7 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
                 {
                     var pluginsDirectoryInfo = new DirectoryInfo($"{AppDomain.CurrentDomain.BaseDirectory}plugins{Path.DirectorySeparatorChar}{pluginInfoEx.ToPlgString()}");
                     pluginsDirectoryInfo.Delete(true);
-                    Task.Run(LoadPluginsInfo);
+                    Task.Run(PluginManager.Reload);
                 }
             }
         };
@@ -110,23 +70,25 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
 
             Plugin.UnloadByPluginInfo(pluginInfoEx.ToPlgString(), out var weakReference);
             PluginManager.EnablePlugin.Remove(pluginInfoEx.ToPlgString());
-            for (int i = 0; i < 10; i++)
-            {
-                GC.Collect(2, GCCollectionMode.Aggressive);
-                GC.WaitForPendingFinalizers();
-                Task.Delay(10).Wait();
-            }
-            
-
-            ConfigManger.Config.EnabledPluginInfos.RemoveAll(e =>
-                e.PluginId == pluginInfoEx.PluginId && e.Author == pluginInfoEx.Author &&
-                e.VersionInt == pluginInfoEx.VersionInt);
+            ConfigManger.Config.EnabledPluginInfos.RemoveAll(e => e.ToPlgString()==pluginInfoEx.ToPlgString());
             ConfigManger.Save();
             pluginInfoEx.IsEnabled = false;
-            if (weakReference.IsAlive)
+
+            Task.Run((() =>
             {
-                pluginInfoEx.UnloadFailed = true;
-            }
+                Task.Delay(1000).Wait();
+                for (int i = 0; i < 15; i++)
+                {
+                    GC.Collect(2, GCCollectionMode.Aggressive);
+                    GC.WaitForPendingFinalizers();
+                    Task.Delay(10).Wait();
+                }
+                if (weakReference.IsAlive)
+                {
+                    pluginInfoEx.UnloadFailed = true;
+                }
+            }));
+            
             // Items.ResetBindings();
             CustomScenarioManger.LoadAll();
         }
@@ -135,7 +97,7 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
             //加载插件
             //Plugin.NewPlugin(pluginInfoEx.Path, out var weakReference);
             PluginManager.EnablePlugin.Add(pluginInfoEx.ToPlgString(),
-                new Plugin(pluginInfoEx.Path));
+                new Plugin(pluginInfoEx));
             ConfigManger.Config.EnabledPluginInfos.Add(pluginInfoEx);
             ConfigManger.Save();
             pluginInfoEx.IsEnabled = true;

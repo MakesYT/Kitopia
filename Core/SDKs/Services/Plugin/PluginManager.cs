@@ -1,5 +1,7 @@
 ﻿#region
 
+using System.Collections.ObjectModel;
+using System.Text.Json;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.Services.Config;
 using log4net;
@@ -13,6 +15,7 @@ public class PluginManager
 {
     private static readonly ILog Log = LogManager.GetLogger(nameof(PluginManager));
 
+    public readonly static ObservableCollection<PluginInfo> AllPluginInfos = new();
     public readonly static Dictionary<string, Plugin> EnablePlugin = new();
 
     public static void Init()
@@ -21,6 +24,16 @@ public class PluginManager
             (ISearchItemTool)ServiceManager.Services.GetService(typeof(ISearchItemTool))!;
         PluginCore.Kitopia.IToastService = (IToastService)ServiceManager.Services.GetService(typeof(IToastService))!;
         PluginCore.Kitopia._i18n = CustomScenarioGloble._i18n;
+       Load();
+    }
+
+    public static void Reload()
+    {
+        AllPluginInfos.Clear();
+        Load();
+    }
+    public static void Load()
+    {
         var pluginsDirectoryInfo = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "plugins");
         if (!pluginsDirectoryInfo.Exists)
         {
@@ -30,34 +43,26 @@ public class PluginManager
 
         foreach (var directoryInfo in pluginsDirectoryInfo.EnumerateDirectories())
         {
-            var last = directoryInfo.Name.Split("_").Last();
-            if (File.Exists($"{directoryInfo.FullName}{Path.DirectorySeparatorChar}{last}.dll"))
+            if (File.Exists($"{directoryInfo.FullName}{Path.DirectorySeparatorChar}manifest.json"))
             {
-                Log.Debug($"加载插件:{last}.dll");
-
-                var pluginInfoEx = PluginInfoTool.GetPluginInfoEx($"{directoryInfo.FullName}{Path.DirectorySeparatorChar}{last}.dll",
-                    out var alcWeakRef);
-
-
-                while (alcWeakRef.IsAlive)
+                var readAllText = File.ReadAllText($"{directoryInfo.FullName}{Path.DirectorySeparatorChar}manifest.json");
+                var serialize = JsonSerializer.Deserialize<PluginInfo>(readAllText);
+                if (serialize != null)
                 {
-                    GC.Collect();
-                    GC.WaitForPendingFinalizers();
-                }
-
-                if (pluginInfoEx.Version != "error")
-                {
-                    if (ConfigManger.Config.EnabledPluginInfos.Any(e =>
-                            e.PluginId == pluginInfoEx.PluginId && e.Author == pluginInfoEx.Author &&
-                            e.VersionInt == pluginInfoEx.VersionInt))
+                    AllPluginInfos.Add(serialize);
+                    serialize.FullPath= $"{directoryInfo.FullName}{Path.DirectorySeparatorChar}{serialize.Main}";
+                    serialize.IsEnabled = false;
+                    if (ConfigManger.Config.EnabledPluginInfos.Any(e => e.ToPlgString()==serialize.ToPlgString()))
                     {
+                        serialize.IsEnabled = true;
                         Task.Run(() =>
                         {
-                            Plugin.Load(pluginInfoEx);
+                            Plugin.Load(serialize);
                         }).Wait();
                     }
                 }
             }
+            
         }
     }
 }

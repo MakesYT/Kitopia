@@ -84,24 +84,21 @@ public class Plugin
             });
     }
 
-    public Plugin(string path)
+    public Plugin(PluginInfo pluginInfo)
     {
-        _plugin = new AssemblyLoadContextH(path, path.Split(Path.DirectorySeparatorChar)
+        _plugin = new AssemblyLoadContextH(pluginInfo.FullPath, pluginInfo.FullPath.Split(Path.DirectorySeparatorChar)
             .Last() + "_plugin");
-        Log.Debug($"加载插件:{path}");
+        Log.Debug($"加载插件:{pluginInfo.FullPath}");
         var t = _dll.GetExportedTypes();
         //Dictionary<string, (MethodInfo, object)> methodInfos = new();
         ScenarioMethodCategoryGroup pluginMainScenarioMethodCategoryGroup = new();
 
         List<Func<string, SearchViewItem?>> searchViews = new();
+        PluginInfo = pluginInfo;
         foreach (var type in t)
         {
             if (type.GetInterface("IPlugin") != null)
             {
-                var PluginInfo = (PluginInfo)type.GetField("PluginInfo")
-                    .GetValue(null);
-                PluginInfo.Path = path;
-                this.PluginInfo = PluginInfo;
                 Log.Debug($"加载插件:{PluginInfo.ToPlgString()}");
                 //var instance = Activator.CreateInstance(type);
                 ServiceProvider = (IServiceProvider)type.GetMethod("GetServiceProvider")
@@ -111,16 +108,9 @@ public class Plugin
                 break;
             }
         }
-
-        if (PluginInfo is null)
-        {
-            Log.Error("未找到插件信息");
-            return;
-        }
-
         ScenarioMethodCategoryGroup.RootScenarioMethodCategoryGroup.Childrens.Add(this.PluginInfo.ToPlgString(),
             pluginMainScenarioMethodCategoryGroup);
-        pluginMainScenarioMethodCategoryGroup.Name = PluginInfo.PluginName;
+        pluginMainScenarioMethodCategoryGroup.Name = PluginInfo.DisplayName;
 
         foreach (var type in t)
         {
@@ -276,7 +266,7 @@ public class Plugin
     public static void Load(PluginInfo pluginInfoEx)
     {
         PluginManager.EnablePlugin.Add(pluginInfoEx.ToPlgString(),
-            new Plugin(pluginInfoEx.Path));
+            new Plugin(pluginInfoEx));
     }
 
     public void Unload(out WeakReference weakReference)
@@ -297,7 +287,7 @@ public class Plugin
 
         CustomScenarioManger.UnloadByPlugStr(PluginInfo.ToPlgString());
 
-        PluginInfo = new PluginInfo();
+        PluginInfo = null;
         ServiceProvider = null;
 
         _plugin.Unload();
