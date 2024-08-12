@@ -15,8 +15,8 @@
               xmlns:controls2="clr-namespace:NodifyM.Avalonia.Controls;assembly=NodifyM.Avalonia"
               xmlns:pages="clr-namespace:KitopiaAvalonia.Pages"
               xmlns:u="https://irihi.tech/ursa"
-              xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls"
               xmlns:system="clr-namespace:System;assembly=System.Runtime"
+              xmlns:settingsExpander="clr-namespace:KitopiaAvalonia.Controls.SettingsExpander"
               mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
               x:Class="KitopiaAvalonia.Windows.TaskEditor"
               Title="情景编排"
@@ -93,42 +93,42 @@
                     <Expander Header="情景信息" IsExpanded="True" HorizontalContentAlignment="Stretch">
                         <Expander.Content>
                             <StackPanel HorizontalAlignment="Stretch">
-                                <controls:SettingsExpander Header="情景名称">
-                                    <controls:SettingsExpander.Footer>
+                                <settingsExpander:SettingsExpander Header="情景名称">
+                                    <settingsExpander:SettingsExpander.Footer>
                                         <TextBox MinWidth="80" Text="{Binding Scenario.Name}" />
-                                    </controls:SettingsExpander.Footer>
-                                    <controls:SettingsExpander.IconSource>
+                                    </settingsExpander:SettingsExpander.Footer>
+                                    <settingsExpander:SettingsExpander.IconSource>
                                         <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
                                                             Glyph="&#xf669;" />
-                                    </controls:SettingsExpander.IconSource>
-                                </controls:SettingsExpander>
-                                <controls:SettingsExpander Margin="0" Header="情景描述">
-                                    <controls:SettingsExpander.Footer>
+                                    </settingsExpander:SettingsExpander.IconSource>
+                                </settingsExpander:SettingsExpander>
+                                <settingsExpander:SettingsExpander Margin="0" Header="情景描述">
+                                    <settingsExpander:SettingsExpander.Footer>
                                         <TextBox TextWrapping="Wrap" MinWidth="80"
                                                  Text="{Binding Scenario.Description}" />
-                                    </controls:SettingsExpander.Footer>
-                                    <controls:SettingsExpander.IconSource>
+                                    </settingsExpander:SettingsExpander.Footer>
+                                    <settingsExpander:SettingsExpander.IconSource>
                                         <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
                                                             Glyph="&#xf4a3;" />
-                                    </controls:SettingsExpander.IconSource>
-                                </controls:SettingsExpander>
+                                    </settingsExpander:SettingsExpander.IconSource>
+                                </settingsExpander:SettingsExpander>
                             </StackPanel>
                         </Expander.Content>
                     </Expander>
 
-                    <controls:SettingsExpander Margin="0" Header="含有入参"
+                    <settingsExpander:SettingsExpander Margin="0" Header="含有入参"
                                                BorderThickness="0">
 
-                        <controls:SettingsExpander.Footer>
+                        <settingsExpander:SettingsExpander.Footer>
                             <ToggleSwitch
                                 IsChecked="{Binding Scenario.IsHaveInputValue,Mode=TwoWay}" />
-                        </controls:SettingsExpander.Footer>
+                        </settingsExpander:SettingsExpander.Footer>
 
 
-                        <controls:SettingsExpander.IconSource>
+                        <settingsExpander:SettingsExpander.IconSource>
                             <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
                                                 Glyph="&#xf226;" />
-                        </controls:SettingsExpander.IconSource>
+                        </settingsExpander:SettingsExpander.IconSource>
                         <StackPanel>
                             <ListBox Margin="0,0,10,0" x:Name="inputvalues"
                                      ItemsSource="{Binding Scenario.InputValue }">
@@ -212,25 +212,25 @@
                         </StackPanel>
 
 
-                    </controls:SettingsExpander>
+                    </settingsExpander:SettingsExpander>
 
 
                     <Expander Header="Tick控制" IsExpanded="True">
                         <Expander.Content>
                             <StackPanel>
-                                <controls:SettingsExpander Margin="0" Header="执行间隔(秒)">
-                                    <controls:SettingsExpander.Footer>
+                                <settingsExpander:SettingsExpander Margin="0" Header="执行间隔(秒)">
+                                    <settingsExpander:SettingsExpander.Footer>
                                         <u:NumericFloatUpDown
                                             Minimum="0.1"
                                             Value="{Binding Scenario.TickIntervalSecond}" />
 
-                                    </controls:SettingsExpander.Footer>
+                                    </settingsExpander:SettingsExpander.Footer>
 
-                                    <controls:SettingsExpander.IconSource>
+                                    <settingsExpander:SettingsExpander.IconSource>
                                         <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
                                                             Glyph="&#xed88;" />
-                                    </controls:SettingsExpander.IconSource>
-                                </controls:SettingsExpander>
+                                    </settingsExpander:SettingsExpander.IconSource>
+                                </settingsExpander:SettingsExpander>
                             </StackPanel>
 
 
@@ -510,44 +510,44 @@
 
                             <StackPanel>
 
-                                <controls:SettingsExpander Margin="0" Header="手动触发"
+                                <settingsExpander:SettingsExpander Margin="0" Header="手动触发"
                                                            BorderThickness="0">
-                                    <controls:SettingsExpander.Footer>
+                                    <settingsExpander:SettingsExpander.Footer>
                                         <ToggleSwitch
                                             IsChecked="{Binding Scenario.ExecutionManual,Mode=TwoWay}" />
-                                    </controls:SettingsExpander.Footer>
+                                    </settingsExpander:SettingsExpander.Footer>
 
 
-                                    <controls:SettingsExpander.IconSource>
+                                    <settingsExpander:SettingsExpander.IconSource>
                                         <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
                                                             Glyph="&#xf226;" />
-                                    </controls:SettingsExpander.IconSource>
+                                    </settingsExpander:SettingsExpander.IconSource>
                                     <StackPanel>
-                                        <controls:SettingsExpander Margin="0" Header="关键词"
+                                        <settingsExpander:SettingsExpander Margin="0" Header="关键词"
                                                                    BorderThickness="0">
-                                            <controls:SettingsExpander.IconSource>
+                                            <settingsExpander:SettingsExpander.IconSource>
                                                 <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
                                                                     Glyph="&#xf4b6;" />
-                                            </controls:SettingsExpander.IconSource>
+                                            </settingsExpander:SettingsExpander.IconSource>
                                             <controls1:ListShow AddCommand="{Binding AddKeyCommand}"
                                                                 DelCommand="{Binding DelKeyCommand}"
                                                                 ItemsSource="{Binding Scenario.Keys}" WithAdd="True">
 
                                             </controls1:ListShow>
 
-                                        </controls:SettingsExpander>
+                                        </settingsExpander:SettingsExpander>
 
 
                                     </StackPanel>
 
-                                </controls:SettingsExpander>
-                                <controls:SettingsExpander Margin="0" Header="自动触发"
+                                </settingsExpander:SettingsExpander>
+                                <settingsExpander:SettingsExpander Margin="0" Header="自动触发"
                                                            BorderThickness="0">
 
-                                    <controls:SettingsExpander.IconSource>
+                                    <settingsExpander:SettingsExpander.IconSource>
                                         <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
                                                             Glyph="&#xf217;" />
-                                    </controls:SettingsExpander.IconSource>
+                                    </settingsExpander:SettingsExpander.IconSource>
 
                                     <ItemsControl Margin="15,0,0,0"
                                                   ItemsSource="{Binding Source={x:Static customScenario:CustomScenarioGloble.Triggers}}">
@@ -579,16 +579,16 @@
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
 
-                                </controls:SettingsExpander>
-                                <controls:SettingsExpander Margin="0" Header="快捷键触发"
+                                </settingsExpander:SettingsExpander>
+                                <settingsExpander:SettingsExpander Margin="0" Header="快捷键触发"
                                                            BorderThickness="0">
-                                    <controls:SettingsExpander.IconSource>
+                                    <settingsExpander:SettingsExpander.IconSource>
                                         <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
                                                             Glyph="&#xf4b8;" />
-                                    </controls:SettingsExpander.IconSource>
+                                    </settingsExpander:SettingsExpander.IconSource>
                                     <StackPanel Margin="0" Orientation="Vertical">
-                                        <controls:SettingsExpander Header="激活快捷键" Description="修改激活快捷键">
-                                            <controls:SettingsExpander.Footer>
+                                        <settingsExpander:SettingsExpander Header="激活快捷键" Description="修改激活快捷键">
+                                            <settingsExpander:SettingsExpander.Footer>
                                                 <Panel>
                                                     <u:DisableContainer DisabledTip="需要先保存一次情景才可设置"
                                                                         ToolTip.ShowDelay="100">
@@ -601,15 +601,15 @@
                                                 </Panel>
 
 
-                                            </controls:SettingsExpander.Footer>
+                                            </settingsExpander:SettingsExpander.Footer>
 
-                                            <controls:SettingsExpander.IconSource>
+                                            <settingsExpander:SettingsExpander.IconSource>
                                                 <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
                                                                     Glyph="&#xf4b8;" />
-                                            </controls:SettingsExpander.IconSource>
-                                        </controls:SettingsExpander>
-                                        <controls:SettingsExpander Header="停止快捷键" Description="修改停止快捷键">
-                                            <controls:SettingsExpander.Footer>
+                                            </settingsExpander:SettingsExpander.IconSource>
+                                        </settingsExpander:SettingsExpander>
+                                        <settingsExpander:SettingsExpander Header="停止快捷键" Description="修改停止快捷键">
+                                            <settingsExpander:SettingsExpander.Footer>
                                                 <Panel>
                                                     <u:DisableContainer DisabledTip="需要先保存一次情景才可设置"
                                                                         ToolTip.ShowDelay="100">
@@ -619,15 +619,15 @@
                                                         </controls1:HotKeyShow>
                                                     </u:DisableContainer>
                                                 </Panel>
-                                            </controls:SettingsExpander.Footer>
+                                            </settingsExpander:SettingsExpander.Footer>
 
-                                            <controls:SettingsExpander.IconSource>
+                                            <settingsExpander:SettingsExpander.IconSource>
                                                 <controls1:FontIcon FontFamily="{StaticResource FluentFont}"
                                                                     Glyph="&#xf4b8;" />
-                                            </controls:SettingsExpander.IconSource>
-                                        </controls:SettingsExpander>
+                                            </settingsExpander:SettingsExpander.IconSource>
+                                        </settingsExpander:SettingsExpander>
                                     </StackPanel>
-                                </controls:SettingsExpander>
+                                </settingsExpander:SettingsExpander>
                             </StackPanel>
                         </Expander.Content>
                     </Expander>

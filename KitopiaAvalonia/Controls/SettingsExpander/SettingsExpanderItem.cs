@@ -9,10 +9,9 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.VisualTree;
-using FluentAvalonia.Core;
 using ICommandSource = Avalonia.Input.ICommandSource;
 
-namespace FluentAvalonia.UI.Controls;
+namespace KitopiaAvalonia.Controls.SettingsExpander;
 
 /// <summary>
 /// An item displayed within a <see cref="SettingsExpander"/>
@@ -35,13 +34,13 @@ public partial class SettingsExpanderItem : ContentControl, ICommandSource
                 if (availableSize.Width > _adaptiveWidthTrigger)
                 {
                     _isFooterAtBottom = false;
-                    PseudoClasses.Set(s_pcFooterBottom, false);
+                    PseudoClasses.Set(SettingsExpanderItem.s_pcFooterBottom, false);
                 }
             }
             else if (availableSize.Width < _adaptiveWidthTrigger)
             {
                 _isFooterAtBottom = true;
-                PseudoClasses.Set(s_pcFooterBottom, true);
+                PseudoClasses.Set(SettingsExpanderItem.s_pcFooterBottom, true);
             }
         }
 
@@ -52,7 +51,7 @@ public partial class SettingsExpanderItem : ContentControl, ICommandSource
     {
         base.OnApplyTemplate(e);
 
-        _adaptiveWidthDisposable = this.GetResourceObservable(s_resAdaptiveWidthTrigger)
+        _adaptiveWidthDisposable = this.GetResourceObservable(SettingsExpanderItem.s_resAdaptiveWidthTrigger)
             .Subscribe(OnAdaptiveWidthValueChanged);
 
         // We only want to allow interaction on the SettingsExpanderItem IF we're a child item,
@@ -66,19 +65,19 @@ public partial class SettingsExpanderItem : ContentControl, ICommandSource
     {
         base.OnPropertyChanged(change);
 
-        if (change.Property == IconSourceProperty)
+        if (change.Property == SettingsExpanderItem.IconSourceProperty)
         {
             OnIconSourceChanged(change);
         }
-        else if (change.Property == ActionIconSourceProperty)
+        else if (change.Property == SettingsExpanderItem.ActionIconSourceProperty)
         {
             OnActionIconSourceChanged(change);
         }
-        else if (change.Property == IsClickEnabledProperty)
+        else if (change.Property == SettingsExpanderItem.IsClickEnabledProperty)
         {
             OnIsClickEnabledChanged(change);
         }
-        else if (change.Property == FooterProperty)
+        else if (change.Property == SettingsExpanderItem.FooterProperty)
         {
             OnFooterChanged(change);
         }
@@ -86,11 +85,11 @@ public partial class SettingsExpanderItem : ContentControl, ICommandSource
         {
             OnContentChanged(change);
         }
-        else if (change.Property == DescriptionProperty)
+        else if (change.Property == SettingsExpanderItem.DescriptionProperty)
         {
             OnDescriptionChanged(change);
         }
-        else if (change.Property == CommandProperty)
+        else if (change.Property == SettingsExpanderItem.CommandProperty)
         {
             if (((ILogical)this).IsAttachedToLogicalTree)
             {
@@ -108,7 +107,7 @@ public partial class SettingsExpanderItem : ContentControl, ICommandSource
 
             CanExecuteChanged(this, EventArgs.Empty);
         }
-        else if (change.Property == CommandParameterProperty)
+        else if (change.Property == SettingsExpanderItem.CommandParameterProperty)
         {
             CanExecuteChanged(this, EventArgs.Empty);
         }
@@ -213,7 +212,7 @@ public partial class SettingsExpanderItem : ContentControl, ICommandSource
     /// </summary>
     protected virtual void OnClick()
     {
-        var args = new RoutedEventArgs(ClickEvent);
+        var args = new RoutedEventArgs(SettingsExpanderItem.ClickEvent);
         RaiseEvent(args);
 
         var @param = CommandParameter;
@@ -244,7 +243,7 @@ public partial class SettingsExpanderItem : ContentControl, ICommandSource
         {
             // Only set the icon if IsClickEnabled
             var newIcon = args.GetNewValue<object>();
-            PseudoClasses.Set(s_pcActionIcon, newIcon != null);
+            PseudoClasses.Set(SettingsExpanderItem.s_pcActionIcon, newIcon != null);
 
             TemplateSettings.ActionIcon = newIcon;
         }
@@ -261,12 +260,12 @@ public partial class SettingsExpanderItem : ContentControl, ICommandSource
         {
             // If not enabled, clear the ActionIcon in template settings
             TemplateSettings.ActionIcon = null;
-            PseudoClasses.Set(s_pcActionIcon, false);
+            PseudoClasses.Set(SettingsExpanderItem.s_pcActionIcon, false);
         }
         else if (actionIcon != null)
         {
             TemplateSettings.ActionIcon = actionIcon;
-            PseudoClasses.Set(s_pcActionIcon, true);
+            PseudoClasses.Set(SettingsExpanderItem.s_pcActionIcon, true);
         }
     }
 
@@ -278,12 +277,12 @@ public partial class SettingsExpanderItem : ContentControl, ICommandSource
 
     private void OnContentChanged(AvaloniaPropertyChangedEventArgs args)
     {
-        PseudoClasses.Set(s_pcContent, args.NewValue != null);
+        PseudoClasses.Set(SettingsExpanderItem.s_pcContent, args.NewValue != null);
     }
 
     private void OnDescriptionChanged(AvaloniaPropertyChangedEventArgs args)
     {
-        PseudoClasses.Set(s_pcDescription, args.NewValue != null);
+        PseudoClasses.Set(SettingsExpanderItem.s_pcDescription, args.NewValue != null);
     }
 
     private void CanExecuteChanged(object sender, EventArgs e)

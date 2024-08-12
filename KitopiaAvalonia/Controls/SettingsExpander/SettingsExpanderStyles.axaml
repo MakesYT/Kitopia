@@ -1,15 +1,15 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:ui="using:FluentAvalonia.UI.Controls"
+                    xmlns:settingsExpander="clr-namespace:KitopiaAvalonia.Controls.SettingsExpander"
                     xmlns:controls="clr-namespace:KitopiaAvalonia.Controls">
     <Design.PreviewWith>
         <Border Padding="20" Width="700" Height="250">
-            <ui:SettingsExpander IconSource="Globe" Header="Test Header"
+            <settingsExpander:SettingsExpander IconSource="Globe" Header="Test Header"
                                  Description="This is a description for the SettingsExpander"
                                  ActionIconSource="Save" IsClickEnabled="True">
-                <ui:SettingsExpander.Footer>
+                <settingsExpander:SettingsExpander.Footer>
                     <Button Content="FooterButton" />
-                </ui:SettingsExpander.Footer>
+                </settingsExpander:SettingsExpander.Footer>
 
                 <!--<ui:SettingsExpanderItem Content="Content Here" ActionIconSource="Pin" IsClickEnabled="True"  />
                 <ui:SettingsExpanderItem Content="Content Here">
@@ -17,7 +17,7 @@
                         <Button Content="FooterButton" />
                     </ui:SettingsExpanderItem.Footer>
                 </ui:SettingsExpanderItem>-->
-            </ui:SettingsExpander>
+            </settingsExpander:SettingsExpander>
         </Border>
     </Design.PreviewWith>
 
@@ -137,7 +137,7 @@
         </Style>
     </ControlTheme>
 
-    <ControlTheme x:Key="{x:Type ui:SettingsExpander}" TargetType="ui:SettingsExpander">
+    <ControlTheme x:Key="{x:Type settingsExpander:SettingsExpander}" TargetType="settingsExpander:SettingsExpander">
         <Setter Property="Background" Value="{DynamicResource SemiBackground4Color}" />
         <Setter Property="BorderBrush" Value="{DynamicResource SemiBackground0Color}" />
         <Setter Property="BorderThickness" Value="1" />
@@ -154,7 +154,7 @@
                           Theme="{StaticResource SettingsExpanderExpanderStyle}"
                           IsExpanded="{TemplateBinding IsExpanded, Mode=TwoWay}">
                     <Expander.Header>
-                        <ui:SettingsExpanderItem Content="{TemplateBinding Header}"
+                        <settingsExpander:SettingsExpanderItem Content="{TemplateBinding Header}"
                                                  ContentTemplate="{TemplateBinding HeaderTemplate}"
                                                  Description="{TemplateBinding Description}"
                                                  IsClickEnabled="{TemplateBinding IsClickEnabled}"

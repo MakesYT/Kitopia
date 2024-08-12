@@ -8,6 +8,8 @@
   "Version": "1.0.0",
   "VersionId": 1,
   "Description": "官方拓展插件,提供更多功能",
-  "Main": "KitopiaEx.dll"
-  
+  "Main": "KitopiaEx.dll",
+  "Dependencies": {
+    
+  }
 }

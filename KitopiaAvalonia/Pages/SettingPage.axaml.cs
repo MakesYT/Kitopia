@@ -13,12 +13,13 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Core.SDKs.HotKey;
 using Core.SDKs.Services.Config;
-using FluentAvalonia.UI.Controls;
 using KitopiaAvalonia.Controls;
 using PluginCore;
 using PluginCore.Attribute;
 using PluginCore.Config;
 using Ursa.Controls;
+using FontIcon = KitopiaAvalonia.Controls.FontIcon;
+using SettingsExpander = KitopiaAvalonia.Controls.SettingsExpander.SettingsExpander;
 
 namespace KitopiaAvalonia.Pages;
 

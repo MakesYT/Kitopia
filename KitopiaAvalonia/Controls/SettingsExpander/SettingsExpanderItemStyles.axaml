@@ -1,6 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:ui="using:FluentAvalonia.UI.Controls">
+                    xmlns:ui="clr-namespace:KitopiaAvalonia.Controls.SettingsExpander">
     <Design.PreviewWith>
         <Border Padding="20" Width="700" Height="250">
             <ui:SettingsExpander IconSource="Globe" Header="Test Header" IsExpanded="True"

@@ -1,6 +1,6 @@
 ﻿using Avalonia;
 
-namespace FluentAvalonia.UI.Controls;
+namespace KitopiaAvalonia.Controls.SettingsExpander;
 
 /// <summary>
 /// Represents data for use in a SettingsExpander temlate

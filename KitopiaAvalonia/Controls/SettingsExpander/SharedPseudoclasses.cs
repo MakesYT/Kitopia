@@ -1,4 +1,4 @@
-﻿namespace FluentAvalonia.Core;
+﻿namespace KitopiaAvalonia.Controls.SettingsExpander;
 
 // These are pseudoclass names that are used in multiple controls. Share them so we don't have
 // a bunch of duplicate strings everywhere

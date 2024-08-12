@@ -10,10 +10,9 @@ using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using FluentAvalonia.Core;
 using ICommandSource = Avalonia.Input.ICommandSource;
 
-namespace FluentAvalonia.UI.Controls;
+namespace KitopiaAvalonia.Controls.SettingsExpander;
 
 /// <summary>
 /// Control used to display or group settings options within an app, like in
@@ -36,7 +35,7 @@ public partial class SettingsExpander : HeaderedItemsControl, ICommandSource
         _expander.Loaded += ExpanderLoaded;
         _expander.Expanding += ExpanderExpanding;
 
-        _contentHost = e.NameScope.Get<SettingsExpanderItem>(s_tpContentHost);
+        _contentHost = e.NameScope.Get<KitopiaAvalonia.Controls.SettingsExpander.SettingsExpanderItem>(s_tpContentHost);
         _hasAppliedTemplate = true;
 
         SetIcons();
@@ -136,8 +135,8 @@ public partial class SettingsExpander : HeaderedItemsControl, ICommandSource
 
     protected override bool NeedsContainerOverride(object item, int index, out object recycleKey)
     {
-        bool isItem = item is SettingsExpanderItem;
-        recycleKey = isItem ? null : nameof(SettingsExpanderItem);
+        bool isItem = item is KitopiaAvalonia.Controls.SettingsExpander.SettingsExpanderItem;
+        recycleKey = isItem ? null : nameof(KitopiaAvalonia.Controls.SettingsExpander.SettingsExpanderItem);
         return !isItem;
     }
 
@@ -145,19 +144,19 @@ public partial class SettingsExpander : HeaderedItemsControl, ICommandSource
     {
         var cont = this.FindDataTemplate(item, ItemTemplate)?.Build(item);
 
-        if (cont is SettingsExpanderItem sei)
+        if (cont is KitopiaAvalonia.Controls.SettingsExpander.SettingsExpanderItem sei)
         {
             sei.DataContext = item;
             sei.IsContainerFromTemplate = true;
             return sei;
         }
 
-        return new SettingsExpanderItem();
+        return new KitopiaAvalonia.Controls.SettingsExpander.SettingsExpanderItem();
     }
 
     protected override void PrepareContainerForItemOverride(Control container, object item, int index)
     {
-        var sei = container as SettingsExpanderItem;
+        var sei = container as KitopiaAvalonia.Controls.SettingsExpander.SettingsExpanderItem;
 
         // If the container was created from a DataTemplate, do NOT call PrepareContainer or it will
         // do another template lookup and then put a item within an item as it sets the normal
@@ -174,7 +173,7 @@ public partial class SettingsExpander : HeaderedItemsControl, ICommandSource
     {
         base.ClearContainerForItemOverride(container);
 
-        if (container is SettingsExpanderItem sei)
+        if (container is KitopiaAvalonia.Controls.SettingsExpander.SettingsExpanderItem sei)
         {
             if (sei.IconSource != null)
                 _iconCount--;
@@ -285,7 +284,7 @@ public partial class SettingsExpander : HeaderedItemsControl, ICommandSource
         }
     }
 
-    internal void InvalidateIcons(SettingsExpanderItem item)
+    internal void InvalidateIcons(KitopiaAvalonia.Controls.SettingsExpander.SettingsExpanderItem item)
     {
         if (item == _contentHost)
             return;
@@ -296,7 +295,7 @@ public partial class SettingsExpander : HeaderedItemsControl, ICommandSource
     private bool _commandCanExecute = true;
     private Expander _expander;
     private ToggleButton _expanderToggleButton;
-    private SettingsExpanderItem _contentHost;
+    private KitopiaAvalonia.Controls.SettingsExpander.SettingsExpanderItem _contentHost;
     private int _iconCount = 0;
     private bool _hasAppliedTemplate;
 }

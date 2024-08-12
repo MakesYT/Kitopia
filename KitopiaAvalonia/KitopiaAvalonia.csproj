@@ -102,10 +102,5 @@
           <DependentUpon>CaptureToolBase.axaml</DependentUpon>
         </Compile>
     </ItemGroup>
-    <ItemGroup>
-        <Reference Include="FluentAvalonia">
-            <HintPath>C:\Users\liaom\.nuget\packages\fluentavaloniaui\2.0.5\lib\net6.0\FluentAvalonia.dll</HintPath>
-        </Reference>
-    </ItemGroup>
 
 </Project>
