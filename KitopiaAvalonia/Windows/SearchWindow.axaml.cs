@@ -33,9 +33,9 @@ public partial class SearchWindow : Window
         {
             base.Show();
         }
-
         ServiceManager.Services.GetService<IWindowTool>()!.MoveWindowToMouseScreenCenter(this);
         base.Show();
+        ServiceManager.Services.GetService<IWindowTool>()!.MoveWindowToMouseScreenCenter(this);
         ServiceManager.Services.GetService<IWindowTool>()!.SetForegroundWindow(
             this.TryGetPlatformHandle()!.Handle);
         tx.Focus();
