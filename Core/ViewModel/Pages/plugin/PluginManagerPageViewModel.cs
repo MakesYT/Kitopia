@@ -74,20 +74,16 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
             ConfigManger.Save();
             pluginInfoEx.IsEnabled = false;
 
-            Task.Run((() =>
+            for (int i = 0; i < 15; i++)
             {
-                Task.Delay(1000).Wait();
-                for (int i = 0; i < 15; i++)
-                {
-                    GC.Collect(2, GCCollectionMode.Aggressive);
-                    GC.WaitForPendingFinalizers();
-                    Task.Delay(10).Wait();
-                }
-                if (weakReference.IsAlive)
-                {
-                    pluginInfoEx.UnloadFailed = true;
-                }
-            }));
+                GC.Collect(2, GCCollectionMode.Aggressive);
+                GC.WaitForPendingFinalizers();
+                Task.Delay(10).Wait();
+            }
+            if (weakReference.IsAlive)
+            {
+                pluginInfoEx.UnloadFailed = true;
+            }
             
             // Items.ResetBindings();
             CustomScenarioManger.LoadAll();

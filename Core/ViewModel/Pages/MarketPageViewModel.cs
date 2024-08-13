@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Drawing;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
@@ -8,6 +9,7 @@ using Core.SDKs.Services.Plugin;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PluginCore;
+using Bitmap = Avalonia.Media.Imaging.Bitmap;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Core.ViewModel.Pages;
@@ -16,7 +18,7 @@ public class ApiResponse
     public bool flag { get; set; }
     public List<OnlinePluginInfo> data { get; set; }
 }
-public partial class OnlinePluginInfo
+public partial class OnlinePluginInfo : ObservableObject
 {
     public int Id { set; get; }
 
@@ -40,6 +42,7 @@ public partial class OnlinePluginInfo
     }
 
     public int AuthorId { set; get; }
+    [ObservableProperty] public Bitmap? _icon;
 
     public string Name { set; get; }
     public string NameSign { set; get; }
@@ -69,12 +72,17 @@ public partial class MarketPageViewModel : ObservableObject
 
     public MarketPageViewModel()
     {
-        var handler = new HttpClientHandler();
-        handler.ServerCertificateCustomValidationCallback = delegate { return true; };
-        _httpClient = new HttpClient(handler);
+        _httpClient = new HttpClient();
         LoadPlugins();
     }
 
+     ~MarketPageViewModel()
+     {
+         for (var i = 0; i < _plugins.Count; i++)
+         {
+             _plugins[i].Icon?.Dispose();
+         }
+     }
     private async Task LoadPlugins()
     {
         var async =await  MarketPageViewModel._httpClient.GetAsync("https://www.ncserver.top:5111/api/plugin/all");
@@ -94,7 +102,7 @@ public partial class MarketPageViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void OpenPlugin(PluginInfo plugin)
+    private void OpenPlugin(OnlinePluginInfo plugin)
     {
        
     }
