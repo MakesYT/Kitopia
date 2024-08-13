@@ -22,8 +22,9 @@ public class ViewLocator : IValueConverter
         switch (args)
         {
             case "Home":
-            case "Market":
                 return ServiceManager.Services.GetKeyedService<UserControl>("HomePage");
+            case "Market":
+                return ServiceManager.Services.GetKeyedService<UserControl>("MarketPage");
             case "Plugin":
                 return ServiceManager.Services.GetKeyedService<UserControl>("PluginManagerPage");
             case "Scenario":

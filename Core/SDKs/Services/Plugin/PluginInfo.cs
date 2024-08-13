@@ -12,7 +12,7 @@ public partial class PluginInfo
 
     public int AuthorId { set; get; }
 
-    public string DisplayName { set; get; }
+    public string Name { set; get; }
     public string NameSign { set; get; }
     public bool IsPublic { set; get; }
 

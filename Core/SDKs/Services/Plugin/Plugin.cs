@@ -110,7 +110,7 @@ public class Plugin
         }
         ScenarioMethodCategoryGroup.RootScenarioMethodCategoryGroup.Childrens.Add(this.PluginInfo.ToPlgString(),
             pluginMainScenarioMethodCategoryGroup);
-        pluginMainScenarioMethodCategoryGroup.Name = PluginInfo.DisplayName;
+        pluginMainScenarioMethodCategoryGroup.Name = PluginInfo.Name;
 
         foreach (var type in t)
         {

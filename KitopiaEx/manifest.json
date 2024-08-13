@@ -1,14 +1,17 @@
 {
-  "Id": 0,
+  "Id": 7,
   "AuthorName": "Kitopia",
-  "AuthorId" : 0,
-  "DisplayName": "Kitopia拓展",
+  "AuthorId" : 7,
+  "Name": "Kitopia拓展",
   "NameSign" : "KitopiaEx",
   "IsPublic": true,
   "Version": "1.0.0",
   "VersionId": 1,
   "Description": "官方拓展插件,提供更多功能",
   "Main": "KitopiaEx.dll",
+  "SupportSystems": [
+    "Windows"
+  ],
   "Dependencies": {
     
   }

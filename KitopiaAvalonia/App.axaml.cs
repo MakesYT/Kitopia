@@ -119,6 +119,9 @@ public partial class App : Application
         services.AddSingleton<PluginSettingViewModel>(e => new PluginSettingViewModel() { IsActive = true });
         services.AddKeyedSingleton<UserControl, PluginSettingSelectPage>("PluginSettingSelectPage",
             (e, _) => new PluginSettingSelectPage() { DataContext = e.GetService<PluginSettingViewModel>() });
+        services.AddTransient<MarketPageViewModel>();
+        services.AddKeyedTransient<UserControl, MarketPage>("MarketPage",
+            (e, _) => new MarketPage() { DataContext = e.GetService<MarketPageViewModel>() });
         services.AddSingleton<SettingPage>(e => new SettingPage());
 
         return services.BuildServiceProvider();

@@ -41,7 +41,7 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
     {
         var dialog = new DialogContent()
         {
-            Title = $"删除{pluginInfoEx.DisplayName}?",
+            Title = $"删除{pluginInfoEx.Name}?",
             Content = "是否确定删除?\n他真的会丢失很久很久(不可恢复)",
             PrimaryButtonText = "确定",
             CloseButtonText = "取消",
