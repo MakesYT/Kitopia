@@ -60,7 +60,7 @@
                                 <StackPanel Grid.Column="0" Margin="5,0,5,0" Spacing="5" Grid.ColumnSpan="2"
                                             Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
                                     <Button IsEnabled="{Binding !InLocal}"
-                                                  Command="{Binding Path=$parent[ItemsControl].((pages:MarketPageViewModel)DataContext).OpenPluginCommand}"
+                                                  Command="{Binding Path=$parent[ItemsControl].((pages:MarketPageViewModel)DataContext).DownloadPluginCommand}"
                                                   CommandParameter="{Binding}">
                                         <Button.Styles>
                                             <Style Selector="Button[IsEnabled=True]">

@@ -47,7 +47,7 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
             CloseButtonText = "取消",
             PrimaryAction = () =>
             {
-                Switch(pluginInfoEx);
+                UnloadPlugin(pluginInfoEx);
                 if (!pluginInfoEx.UnloadFailed)
                 {
                     var pluginsDirectoryInfo = new DirectoryInfo($"{AppDomain.CurrentDomain.BaseDirectory}plugins{Path.DirectorySeparatorChar}{pluginInfoEx.ToPlgString()}");
@@ -68,39 +68,40 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
         {
             //卸载插件
 
-            Plugin.UnloadByPluginInfo(pluginInfoEx.ToPlgString(), out var weakReference);
-            PluginManager.EnablePlugin.Remove(pluginInfoEx.ToPlgString());
-            ConfigManger.Config.EnabledPluginInfos.RemoveAll(e => e.ToPlgString()==pluginInfoEx.ToPlgString());
-            ConfigManger.Save();
-            pluginInfoEx.IsEnabled = false;
-
-            for (int i = 0; i < 15; i++)
-            {
-                GC.Collect(2, GCCollectionMode.Aggressive);
-                GC.WaitForPendingFinalizers();
-                Task.Delay(10).Wait();
-            }
-            if (weakReference.IsAlive)
-            {
-                pluginInfoEx.UnloadFailed = true;
-            }
-            
-            // Items.ResetBindings();
-            CustomScenarioManger.LoadAll();
+            UnloadPlugin(pluginInfoEx);
         }
         else
         {
             //加载插件
             //Plugin.NewPlugin(pluginInfoEx.Path, out var weakReference);
-            PluginManager.EnablePlugin.Add(pluginInfoEx.ToPlgString(),
-                new Plugin(pluginInfoEx));
-            ConfigManger.Config.EnabledPluginInfos.Add(pluginInfoEx);
-            ConfigManger.Save();
-            pluginInfoEx.IsEnabled = true;
-            // Items.ResetBindings();
-            CustomScenarioManger.ReCheck(true);
+            PluginManager.EnablePluginByInfo(pluginInfoEx);
         }
     }
+
+    private static void UnloadPlugin(PluginInfo pluginInfoEx)
+    {
+        Plugin.UnloadByPluginInfo(pluginInfoEx.ToPlgString(), out var weakReference);
+        PluginManager.EnablePlugin.Remove(pluginInfoEx.ToPlgString());
+        ConfigManger.Config.EnabledPluginInfos.RemoveAll(e => e.ToPlgString()==pluginInfoEx.ToPlgString());
+        ConfigManger.Save();
+        pluginInfoEx.IsEnabled = false;
+
+        for (int i = 0; i < 15; i++)
+        {
+            GC.Collect(2, GCCollectionMode.Aggressive);
+            GC.WaitForPendingFinalizers();
+            Task.Delay(10).Wait();
+        }
+        if (weakReference.IsAlive)
+        {
+            pluginInfoEx.UnloadFailed = true;
+        }
+            
+        // Items.ResetBindings();
+        CustomScenarioManger.LoadAll();
+    }
+
+   
 
     [RelayCommand]
     public void ToPluginSettingPage(PluginInfo pluginInfoEx)

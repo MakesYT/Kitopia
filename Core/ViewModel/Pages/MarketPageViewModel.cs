@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Drawing;
+using System.IO.Compression;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
@@ -57,7 +58,11 @@ public partial class OnlinePluginInfo : ObservableObject
         get{
             return PluginManager.AllPluginInfos.Any(x=>x.NameSign==NameSign);
         }}
-    
+
+    public void Upadate()
+    {
+        OnPropertyChanged(nameof(InLocal));
+    }
     public string ToPlgString() => $"{Id}_{AuthorId}_{NameSign}";
 
     public override string ToString()
@@ -102,9 +107,28 @@ public partial class MarketPageViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void OpenPlugin(OnlinePluginInfo plugin)
+    private async Task DownloadPlugin(OnlinePluginInfo plugin)
     {
-       
+        var streamAsync =await _httpClient.GetStreamAsync($"https://www.ncserver.top:5111/api/plugin/download/1/{plugin.Id}/{plugin.LastVersionId}");
+        Directory.CreateDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "temp"));
+        var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "temp",$"{plugin}.zip");
+        using (var fs = new FileStream(path, FileMode.Create))
+        {
+            await streamAsync.CopyToAsync(fs);
+        }
+
+        var zipArchive = ZipFile.Open(path,ZipArchiveMode.Read);
+        zipArchive.ExtractToDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "plugins",plugin.ToPlgString()));
+        zipArchive.Dispose();
+        File.Delete(path);
+        PluginManager.Reload();
+        var pluginInfoEx = PluginManager.AllPluginInfos.FirstOrDefault(e=>e.ToPlgString()==plugin.ToPlgString());
+        if (pluginInfoEx is null)
+        {
+            return;
+        }
+        PluginManager.EnablePluginByInfo(pluginInfoEx);
+        plugin.Upadate();
     }
     
 }

@@ -27,6 +27,17 @@ public class PluginManager
        Load();
     }
 
+    public static void EnablePluginByInfo(PluginInfo pluginInfoEx)
+    {
+        PluginManager.EnablePlugin.Add(pluginInfoEx.ToPlgString(),
+            new Plugin(pluginInfoEx));
+        ConfigManger.Config.EnabledPluginInfos.Add(pluginInfoEx);
+        ConfigManger.Save();
+        pluginInfoEx.IsEnabled = true;
+        // Items.ResetBindings();
+        CustomScenarioManger.ReCheck(true);
+    }
+
     public static void Reload()
     {
         AllPluginInfos.Clear();
