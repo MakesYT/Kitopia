@@ -84,7 +84,7 @@
                                     <Button Classes="Danger" Content="删除"  
                                             Command="{Binding Path=$parent[ItemsControl].((plugin:PluginManagerPageViewModel)DataContext).DeleteCommand}"
                                             CommandParameter="{Binding }"></Button>
-                                    <Button Content="更新" IsEnabled="False"></Button>
+                                    <Button Content="更新" IsVisible="{Binding CanUpdata}"></Button>
                                 </StackPanel>
 
                             </Grid>

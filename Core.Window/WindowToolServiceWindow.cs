@@ -12,6 +12,7 @@ public class WindowToolServiceWindow : IWindowTool
     public void SetForegroundWindow(IntPtr hWnd)
     {
         User32.SetActiveWindow(hWnd);
+        User32.SetForegroundWindow(hWnd);
     }
 
     public void MoveWindowToMouseScreenCenter(Avalonia.Controls.Window window)

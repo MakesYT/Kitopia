@@ -29,7 +29,8 @@ public partial class PluginInfo
     
     [ObservableProperty] public bool isEnabled;
     [ObservableProperty] public bool unloadFailed;
-    
+
+    [ObservableProperty] private bool canUpdata;
     public string ToPlgString() => $"{Id}_{AuthorId}_{NameSign}";
 
     public override string ToString()

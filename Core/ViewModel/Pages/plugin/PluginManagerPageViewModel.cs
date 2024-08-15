@@ -27,7 +27,7 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
 
     public PluginManagerPageViewModel()
     {
-        
+        PluginManager.CheckUpdate();
     }
     
     [RelayCommand]

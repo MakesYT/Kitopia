@@ -1,11 +1,14 @@
 ﻿#region
 
 using System.Collections.ObjectModel;
-using System.Text.Json;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.Services.Config;
+using Core.ViewModel.Pages;
 using log4net;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using PluginCore;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 #endregion
 
@@ -102,6 +105,24 @@ public class PluginManager
                 }
             }
             
+        }
+    }
+
+    public static void CheckUpdate()
+    {
+        for (var i = 0; i < AllPluginInfos.Count; i++)
+        {
+            try
+            {
+                var httpResponseMessage = MarketPageViewModel._httpClient.GetAsync($"https://www.ncserver.top:5111/api/plugin/{AllPluginInfos[i].Id}").Result;
+                var httpContent = httpResponseMessage.Content.ReadAsStringAsync().Result;
+                var deserializeObject = (JObject)JsonConvert.DeserializeObject(httpContent);
+                AllPluginInfos[i].CanUpdata= deserializeObject["data"]["lastVersionId"].ToObject<int>() > AllPluginInfos[i].VersionId;
+            }
+            catch (Exception e)
+            {
+                AllPluginInfos[i].CanUpdata=false;
+            }
         }
     }
 }

@@ -3,6 +3,7 @@
 #endif
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -54,6 +55,7 @@ public partial class App : Application
         base.OnFrameworkInitializationCompleted();
     }
 
+    [MemberNotNull]
     private static IServiceProvider ConfigureServices()
     {
         var services = new ServiceCollection();
@@ -113,8 +115,8 @@ public partial class App : Application
         services.AddSingleton<HotKeyManagerPageViewModel>(e => new HotKeyManagerPageViewModel() { });
         services.AddKeyedSingleton<UserControl, HotKeyManagerPage>("HotKeyManagerPage",
             (e, _) => new HotKeyManagerPage() { DataContext = e.GetService<HotKeyManagerPageViewModel>() });
-        services.AddSingleton<PluginManagerPageViewModel>(e => new PluginManagerPageViewModel() { IsActive = true });
-        services.AddKeyedSingleton<UserControl, PluginManagerPage>("PluginManagerPage",
+        services.AddTransient<PluginManagerPageViewModel>(e => new PluginManagerPageViewModel() { IsActive = true });
+        services.AddKeyedTransient<UserControl, PluginManagerPage>("PluginManagerPage",
             (e, _) => new PluginManagerPage() { DataContext = e.GetService<PluginManagerPageViewModel>() });
         services.AddSingleton<PluginSettingViewModel>(e => new PluginSettingViewModel() { IsActive = true });
         services.AddKeyedSingleton<UserControl, PluginSettingSelectPage>("PluginSettingSelectPage",
