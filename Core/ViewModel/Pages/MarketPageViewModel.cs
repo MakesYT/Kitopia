@@ -10,7 +10,9 @@ using Core.SDKs.Services.Plugin;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PluginCore;
+using SixLabors.ImageSharp;
 using Bitmap = Avalonia.Media.Imaging.Bitmap;
+using Image = SixLabors.ImageSharp.Image;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Core.ViewModel.Pages;
@@ -121,6 +123,20 @@ public partial class MarketPageViewModel : ObservableObject
         zipArchive.ExtractToDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "plugins",plugin.ToPlgString()));
         zipArchive.Dispose();
         File.Delete(path);
+        
+        var request = new HttpRequestMessage()
+        {
+            RequestUri = new Uri("https://www.ncserver.top:5111/api/plugin/avatar"),
+            Method = HttpMethod.Get,
+        };
+        request.Headers.Add("id", plugin.Id.ToString());
+        var sendAsync =await MarketPageViewModel._httpClient.SendAsync(request);
+        var stringAsync =await  sendAsync.Content.ReadAsStringAsync();
+        var deserializeObject = (JObject)JsonConvert.DeserializeObject(stringAsync);
+        using var image = Image.Load(deserializeObject["data"].ToObject<byte[]>());
+        await image.SaveAsPngAsync(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "plugins",plugin.ToPlgString(),"avatar.png"));
+        
+
         PluginManager.Reload();
         var pluginInfoEx = PluginManager.AllPluginInfos.FirstOrDefault(e=>e.ToPlgString()==plugin.ToPlgString());
         if (pluginInfoEx is null)

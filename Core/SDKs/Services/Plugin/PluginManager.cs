@@ -38,6 +38,29 @@ public class PluginManager
         CustomScenarioManger.ReCheck(true);
     }
 
+    public static void UnloadPlugin(PluginInfo pluginInfoEx)
+    {
+        Plugin.UnloadByPluginInfo(pluginInfoEx.ToPlgString(), out var weakReference);
+        PluginManager.EnablePlugin.Remove(pluginInfoEx.ToPlgString());
+        ConfigManger.Config.EnabledPluginInfos.RemoveAll(e => e.ToPlgString()==pluginInfoEx.ToPlgString());
+        ConfigManger.Save();
+        pluginInfoEx.IsEnabled = false;
+
+        for (int i = 0; i < 15; i++)
+        {
+            GC.Collect(2, GCCollectionMode.Aggressive);
+            GC.WaitForPendingFinalizers();
+            Task.Delay(10).Wait();
+        }
+        if (weakReference.IsAlive)
+        {
+            pluginInfoEx.UnloadFailed = true;
+        }
+            
+        // Items.ResetBindings();
+        CustomScenarioManger.LoadAll();
+    }
+
     public static void Reload()
     {
         AllPluginInfos.Clear();
@@ -62,6 +85,7 @@ public class PluginManager
                 {
                     AllPluginInfos.Add(serialize);
                     serialize.FullPath= $"{directoryInfo.FullName}{Path.DirectorySeparatorChar}{serialize.Main}";
+                    serialize.Path= $"{directoryInfo.FullName}{Path.DirectorySeparatorChar}";
                     serialize.IsEnabled = false;
                     if (ConfigManger.Config.EnabledPluginInfos.Any(e => e.ToPlgString()==serialize.ToPlgString()))
                     {

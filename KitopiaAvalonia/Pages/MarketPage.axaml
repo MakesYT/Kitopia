@@ -33,7 +33,7 @@
                                                 Converter={StaticResource IconCtr},
                                                 ConverterParameter={Binding .}}"
                                        Height="64" />
-                                <StackPanel Grid.Column="1" Margin="0,15,5,5" VerticalAlignment="Top" Spacing="5"
+                                <StackPanel Grid.Column="1" Margin="0,15,0,5" VerticalAlignment="Top" Spacing="5"
                                             HorizontalAlignment="Stretch">
                                     <TextBlock VerticalAlignment="Center" Focusable="False"
                                                Text="{Binding Path=Name}"
