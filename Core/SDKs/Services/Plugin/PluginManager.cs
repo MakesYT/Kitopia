@@ -63,6 +63,10 @@ public class PluginManager
 
     public static void Reload()
     {
+        for (var i = 0; i < AllPluginInfos.Count; i++)
+        {
+            AllPluginInfos[i].Icon?.Dispose();
+        }
         AllPluginInfos.Clear();
         Load();
     }

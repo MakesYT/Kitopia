@@ -25,7 +25,7 @@ public partial class PluginInfo
     public string Main { set; get; }
     public string FullPath { set; get; }
     public string Path { set; get; }
-    [ObservableProperty] private Bitmap _icon;
+    [ObservableProperty] private Bitmap? _icon;
     
     [ObservableProperty] public bool isEnabled;
     [ObservableProperty] public bool unloadFailed;

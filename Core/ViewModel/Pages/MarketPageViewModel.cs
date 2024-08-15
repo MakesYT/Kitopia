@@ -55,7 +55,7 @@ public partial class OnlinePluginInfo : ObservableObject
     public int LastVersionId { set; get; }
 
     public string Description { set; get; }
-    
+    public List<string> SupportSystems { set; get; }
     public bool InLocal {
         get{
             return PluginManager.AllPluginInfos.Any(x=>x.NameSign==NameSign);

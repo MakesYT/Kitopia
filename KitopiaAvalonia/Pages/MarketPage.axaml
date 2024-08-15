@@ -39,6 +39,14 @@
                                                Text="{Binding Path=Name}"
                                                Background="{x:Null}"
                                                FontWeight="Normal" FontSize="18" />
+                                    <ItemsControl ItemsSource="{Binding SupportSystems}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="x:String">
+                                                <Label Theme="{StaticResource TagLabel}" Content="{Binding .}" Classes="Ghost Cyan"></Label>
+                                            </DataTemplate>
+                                            
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
                                     <StackPanel Orientation="Horizontal" Spacing="5">
                                         <TextBlock VerticalAlignment="Top"
                                                    Text="{Binding LastVersion}" />
