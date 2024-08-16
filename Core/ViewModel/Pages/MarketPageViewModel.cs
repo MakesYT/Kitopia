@@ -36,7 +36,7 @@ public partial class OnlinePluginInfo : ObservableObject
                 Method = HttpMethod.Get,
             };
             request.Headers.Add("id",AuthorId.ToString());
-            var async = MarketPageViewModel._httpClient.SendAsync(request).GetAwaiter().GetResult();
+            var async = PluginManager._httpClient.SendAsync(request).GetAwaiter().GetResult();
             var stringAsync =  async.Content.ReadAsStringAsync().Result;
             var deserializeObject = (JObject)JsonConvert.DeserializeObject(stringAsync);
             
@@ -74,12 +74,11 @@ public partial class OnlinePluginInfo : ObservableObject
 }
 public partial class MarketPageViewModel : ObservableObject
 {
-    public static HttpClient _httpClient;
+    
     [ObservableProperty] private ObservableCollection<OnlinePluginInfo> _plugins = new();
 
     public MarketPageViewModel()
     {
-        _httpClient = new HttpClient();
         LoadPlugins();
     }
 
@@ -92,7 +91,7 @@ public partial class MarketPageViewModel : ObservableObject
      }
     private async Task LoadPlugins()
     {
-        var async =await  MarketPageViewModel._httpClient.GetAsync("https://www.ncserver.top:5111/api/plugin/all");
+        var async =await  PluginManager._httpClient.GetAsync("https://www.ncserver.top:5111/api/plugin/all");
         var stringAsync = await async.Content.ReadAsStringAsync();
         var options = new JsonSerializerOptions
         {
@@ -111,40 +110,8 @@ public partial class MarketPageViewModel : ObservableObject
     [RelayCommand]
     private async Task DownloadPlugin(OnlinePluginInfo plugin)
     {
-        var streamAsync =await _httpClient.GetStreamAsync($"https://www.ncserver.top:5111/api/plugin/download/1/{plugin.Id}/{plugin.LastVersionId}");
-        Directory.CreateDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "temp"));
-        var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "temp",$"{plugin}.zip");
-        using (var fs = new FileStream(path, FileMode.Create))
-        {
-            await streamAsync.CopyToAsync(fs);
-        }
-
-        var zipArchive = ZipFile.Open(path,ZipArchiveMode.Read);
-        zipArchive.ExtractToDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "plugins",plugin.ToPlgString()));
-        zipArchive.Dispose();
-        File.Delete(path);
-        
-        var request = new HttpRequestMessage()
-        {
-            RequestUri = new Uri("https://www.ncserver.top:5111/api/plugin/avatar"),
-            Method = HttpMethod.Get,
-        };
-        request.Headers.Add("id", plugin.Id.ToString());
-        var sendAsync =await MarketPageViewModel._httpClient.SendAsync(request);
-        var stringAsync =await  sendAsync.Content.ReadAsStringAsync();
-        var deserializeObject = (JObject)JsonConvert.DeserializeObject(stringAsync);
-        using var image = Image.Load(deserializeObject["data"].ToObject<byte[]>());
-        await image.SaveAsPngAsync(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "plugins",plugin.ToPlgString(),"avatar.png"));
-        
-
-        PluginManager.Reload();
-        var pluginInfoEx = PluginManager.AllPluginInfos.FirstOrDefault(e=>e.ToPlgString()==plugin.ToPlgString());
-        if (pluginInfoEx is null)
-        {
-            return;
-        }
-        PluginManager.EnablePluginByInfo(pluginInfoEx);
-        plugin.Upadate();
+        await PluginManager.DownloadPluginOnline(plugin);
     }
+
     
 }

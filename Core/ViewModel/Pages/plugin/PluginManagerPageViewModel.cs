@@ -13,6 +13,8 @@ using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using PluginCore;
 
 #endregion
@@ -78,7 +80,28 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
         }
     }
 
-   
+    [RelayCommand]
+    public async Task Update(PluginInfo pluginInfoEx)
+    {
+        var httpResponseMessage = PluginManager._httpClient.GetAsync($"https://www.ncserver.top:5111/api/plugin/{pluginInfoEx.Id}").Result;
+        var httpContent = httpResponseMessage.Content.ReadAsStringAsync().Result;
+        var deserializeObject = (JObject)JsonConvert.DeserializeObject(httpContent);
+        pluginInfoEx.UpdateTargetVersion = deserializeObject["data"]["lastVersionId"].ToObject<int>();
+        
+        PluginManager.UnloadPlugin(pluginInfoEx);
+
+        if (!pluginInfoEx.UnloadFailed)
+        {
+            await PluginManager.DownloadPluginOnline(pluginInfoEx);
+            var pluginInfoEx2 = PluginManager.AllPluginInfos.FirstOrDefault(e=>e.ToPlgString()==pluginInfoEx.ToPlgString());
+            if (pluginInfoEx2 is null)
+            {
+                return;
+            }
+            PluginManager.EnablePluginByInfo(pluginInfoEx);
+        }
+        
+    }
 
    
 

@@ -84,7 +84,8 @@
                                     <Button Classes="Danger" Content="删除"  
                                             Command="{Binding Path=$parent[ItemsControl].((plugin:PluginManagerPageViewModel)DataContext).DeleteCommand}"
                                             CommandParameter="{Binding }"></Button>
-                                    <Button Content="更新" IsVisible="{Binding CanUpdata}"></Button>
+                                    <Button Content="更新" IsVisible="{Binding CanUpdata}"  Command="{Binding Path=$parent[ItemsControl].((plugin:PluginManagerPageViewModel)DataContext).UpdateCommand}"
+                                            CommandParameter="{Binding }"></Button>
                                 </StackPanel>
 
                             </Grid>
@@ -92,7 +93,7 @@
                                 <StackPanel.Background>
                                     <SolidColorBrush Color="{DynamicResource SemiBackground0Color}" Opacity="0.4"></SolidColorBrush>
                                 </StackPanel.Background>
-                                <TextBlock Text="插件动态卸载失败,重启后完成卸载"></TextBlock>
+                                <TextBlock Text="插件动态卸载失败,重启后完成卸载/更新"></TextBlock>
                                 <Button Content="重启" Command="{Binding Path=$parent[ItemsControl].((plugin:PluginManagerPageViewModel)DataContext).RestartAppCommand}"></Button>
                             </StackPanel>
                         </Panel>

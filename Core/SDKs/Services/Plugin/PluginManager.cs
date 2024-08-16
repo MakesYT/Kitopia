@@ -1,6 +1,8 @@
 ﻿#region
 
 using System.Collections.ObjectModel;
+using System.IO.Compression;
+using System.Text;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.Services.Config;
 using Core.ViewModel.Pages;
@@ -8,6 +10,7 @@ using log4net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PluginCore;
+using SixLabors.ImageSharp;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 #endregion
@@ -21,6 +24,7 @@ public class PluginManager
     public readonly static ObservableCollection<PluginInfo> AllPluginInfos = new();
     public readonly static Dictionary<string, Plugin> EnablePlugin = new();
 
+    public static HttpClient _httpClient= new HttpClient();
     public static void Init()
     {
         PluginCore.Kitopia.ISearchItemTool =
@@ -94,6 +98,14 @@ public class PluginManager
                     serialize.FullPath= $"{directoryInfo.FullName}{Path.DirectorySeparatorChar}{serialize.Main}";
                     serialize.Path= $"{directoryInfo.FullName}{Path.DirectorySeparatorChar}";
                     serialize.IsEnabled = false;
+                    if (serialize.UpdateTargetVersion==0)
+                    {
+                        serialize.UpdateTargetVersion = serialize.VersionId;
+                    }
+                    if (serialize.UpdateTargetVersion!=serialize.VersionId)
+                    {
+                        DownloadPluginOnline(serialize).Wait();
+                    }
                     if (ConfigManger.Config.EnabledPluginInfos.Any(e => e.ToPlgString()==serialize.ToPlgString()))
                     {
                         serialize.IsEnabled = true;
@@ -114,7 +126,7 @@ public class PluginManager
         {
             try
             {
-                var httpResponseMessage = MarketPageViewModel._httpClient.GetAsync($"https://www.ncserver.top:5111/api/plugin/{AllPluginInfos[i].Id}").Result;
+                var httpResponseMessage = PluginManager._httpClient.GetAsync($"https://www.ncserver.top:5111/api/plugin/{AllPluginInfos[i].Id}").Result;
                 var httpContent = httpResponseMessage.Content.ReadAsStringAsync().Result;
                 var deserializeObject = (JObject)JsonConvert.DeserializeObject(httpContent);
                 AllPluginInfos[i].CanUpdata= deserializeObject["data"]["lastVersionId"].ToObject<int>() > AllPluginInfos[i].VersionId;
@@ -124,5 +136,62 @@ public class PluginManager
                 AllPluginInfos[i].CanUpdata=false;
             }
         }
+    }
+
+    public static async Task DownloadPluginOnline(OnlinePluginInfo plugin)
+    {
+        await DownloadPlugin(plugin.Id,plugin.LastVersionId,plugin.ToPlgString());
+        var pluginInfoEx = AllPluginInfos.FirstOrDefault(e=>e.ToPlgString()==plugin.ToPlgString());
+        if (pluginInfoEx is null)
+        {
+            return;
+        }
+        PluginManager.EnablePluginByInfo(pluginInfoEx);
+        plugin.Upadate();
+    }
+
+    private static async Task DownloadPlugin(int id,int versionId,string plugin)
+    {
+        try
+        {
+            var streamAsync =await _httpClient.GetStreamAsync($"https://www.ncserver.top:5111/api/plugin/download/1/{id}/{versionId}");
+            Directory.CreateDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "temp"));
+            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "temp",$"{plugin}.zip");
+            using (var fs = new FileStream(path, FileMode.Create))
+            {
+                await streamAsync.CopyToAsync(fs);
+            }
+
+            var zipArchive = ZipFile.Open(path,ZipArchiveMode.Read);
+            zipArchive.ExtractToDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "plugins",plugin),true);
+            zipArchive.Dispose();
+            File.Delete(path);
+        
+            var request = new HttpRequestMessage()
+            {
+                RequestUri = new Uri("https://www.ncserver.top:5111/api/plugin/avatar"),
+                Method = HttpMethod.Get,
+            };
+            request.Headers.Add("id", id.ToString());
+            var sendAsync =await _httpClient.SendAsync(request);
+            var stringAsync =await  sendAsync.Content.ReadAsStringAsync();
+            var deserializeObject = (JObject)JsonConvert.DeserializeObject(stringAsync);
+            using var image = Image.Load(deserializeObject["data"].ToObject<byte[]>());
+            await image.SaveAsPngAsync(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "plugins",plugin,"avatar.png"));
+        
+
+            Reload();
+        }
+        catch (Exception e)
+        {
+            Log.Error("错误",e);
+            return;
+        }
+    }
+
+    public static async Task DownloadPluginOnline(PluginInfo plugin)
+    {
+        await DownloadPlugin(plugin.Id,plugin.UpdateTargetVersion,plugin.ToPlgString());
+       
     }
 }

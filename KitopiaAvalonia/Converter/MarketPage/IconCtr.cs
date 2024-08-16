@@ -8,6 +8,7 @@ using Avalonia.Controls;
 using Avalonia.Data.Converters;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media.Imaging;
+using Core.SDKs.Services.Plugin;
 using Core.ViewModel.Pages;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -40,7 +41,7 @@ public class IconCtr : IValueConverter
                     Method = HttpMethod.Get,
                 };
                 request.Headers.Add("id", onlinePluginInfo.Id.ToString());
-                var sendAsync =await MarketPageViewModel._httpClient.SendAsync(request);
+                var sendAsync =await PluginManager._httpClient.SendAsync(request);
                 var stringAsync =await  sendAsync.Content.ReadAsStringAsync();
                 var deserializeObject = (JObject)JsonConvert.DeserializeObject(stringAsync);
                 onlinePluginInfo.Icon = new Bitmap(new MemoryStream(deserializeObject["data"].ToObject<byte[]>()));

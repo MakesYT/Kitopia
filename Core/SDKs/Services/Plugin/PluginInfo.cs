@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Bitmap = Avalonia.Media.Imaging.Bitmap;
 
@@ -25,12 +26,15 @@ public partial class PluginInfo
     public string Main { set; get; }
     public string FullPath { set; get; }
     public string Path { set; get; }
+    [JsonIgnore]
+    [property:JsonIgnore]
     [ObservableProperty] private Bitmap? _icon;
     
     [ObservableProperty] public bool isEnabled;
     [ObservableProperty] public bool unloadFailed;
 
     [ObservableProperty] private bool canUpdata;
+    public int UpdateTargetVersion { set; get; }
     public string ToPlgString() => $"{Id}_{AuthorId}_{NameSign}";
 
     public override string ToString()
