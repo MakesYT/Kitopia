@@ -66,6 +66,7 @@ public static class CustomScenarioManger
 
     public static void LoadAll()
     {
+        CustomScenarios.Clear();
         var info = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "customScenarios");
         foreach (var fileInfo in info.GetFiles())
         {
@@ -94,22 +95,8 @@ public static class CustomScenarioManger
                 {
                     continue;
                 }
-
-                // if (!PluginOverall.CustomScenarioNodeMethods.TryGetValue(nodePlugin, out var method))
-                // {
-                //     throw new CustomScenarioLoadFromJsonException(nodePlugin, node.MerthodName);
-                // }
-                //
-                // if (method.ContainsKey(node.MerthodName))
-                // {
-                //     continue;
-                // }
-                //
-                // throw new CustomScenarioLoadFromJsonException(nodePlugin, node.MerthodName);
+                
             }
-
-            //
-
             deserializeObject.HasInit = true;
             deserializeObject.IsRunning = false;
 
@@ -347,6 +334,14 @@ public static class CustomScenarioManger
             if (configF.Exists)
             {
                 Load(configF);
+            }
+        }
+        DirectoryInfo info = new DirectoryInfo($"{AppDomain.CurrentDomain.BaseDirectory}customScenarios");
+        foreach (var fileInfo in info.GetFiles())
+        {
+            if (CustomScenarios.All(e => e.UUID != fileInfo.Name))
+            {
+                Load(fileInfo);
             }
         }
     }
