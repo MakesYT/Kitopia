@@ -43,6 +43,20 @@
                                     <StackPanel Orientation="Horizontal" Spacing="5">
                                         <TextBlock VerticalAlignment="Top"
                                                    Text="{Binding Version}" />
+                                        <StackPanel Orientation="Horizontal" Spacing="5" >
+                                            <TextBlock VerticalAlignment="Top" Text=">" IsVisible="{Binding CanUpdata}">
+                                                <TextBlock.Foreground>
+                                                    <SolidColorBrush Color="{DynamicResource SemiOrange4Color}" />
+                                                </TextBlock.Foreground>
+                                            </TextBlock>
+                                            <TextBlock VerticalAlignment="Top" 
+                                                       Text="{Binding CanUpdateVersion}">
+                                                <TextBlock.Foreground>
+                                                    <SolidColorBrush Color="{DynamicResource SemiOrange4Color}" />
+                                                </TextBlock.Foreground>
+                                            </TextBlock>
+                                        </StackPanel>
+                                        
                                         <TextBlock VerticalAlignment="Top"
                                                    Text="{Binding AuthorName}" />
                                     </StackPanel>

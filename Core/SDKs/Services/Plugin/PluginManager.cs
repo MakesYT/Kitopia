@@ -131,8 +131,9 @@ public class PluginManager
                     .GetAsync($"https://www.ncserver.top:5111/api/plugin/{AllPluginInfos[i].Id}").Result;
                 var httpContent = httpResponseMessage.Content.ReadAsStringAsync().Result;
                 var deserializeObject = (JObject)JsonConvert.DeserializeObject(httpContent);
-                AllPluginInfos[i].CanUpdata = deserializeObject["data"]["lastVersionId"].ToObject<int>() >
-                                              AllPluginInfos[i].VersionId;
+                var o = deserializeObject["data"];
+                AllPluginInfos[i].CanUpdata = o["lastVersionId"].ToObject<int>() > AllPluginInfos[i].VersionId;
+                AllPluginInfos[i].CanUpdateVersion= o["lastVersion"].ToString();
             }
             catch (Exception e)
             {

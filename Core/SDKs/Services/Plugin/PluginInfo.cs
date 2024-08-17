@@ -34,6 +34,7 @@ public partial class PluginInfo
     [ObservableProperty] public bool unloadFailed;
 
     [ObservableProperty] private bool canUpdata;
+    [ObservableProperty] private string canUpdateVersion;
     public int UpdateTargetVersion { set; get; }
     public string ToPlgString() => $"{Id}_{AuthorId}_{NameSign}";
 
