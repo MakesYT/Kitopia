@@ -78,7 +78,7 @@
         </EmbeddedResource>
     </ItemGroup>
     <ItemGroup>
-        <Compile Update="Windows\Dialog.axaml.cs">
+        <Compile Update="Windows\DialogWindow.axaml.cs">
             <DependentUpon>Dialog.axaml</DependentUpon>
             <SubType>Code</SubType>
         </Compile>
@@ -101,6 +101,13 @@
         <Compile Update="Controls\Capture\CaptureToolBase.cs">
           <DependentUpon>CaptureToolBase.axaml</DependentUpon>
         </Compile>
+        <Compile Update="Controls\DialogOvercover.axaml.cs">
+          <DependentUpon>DialogWindow.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Tools\" />
     </ItemGroup>
 
 </Project>

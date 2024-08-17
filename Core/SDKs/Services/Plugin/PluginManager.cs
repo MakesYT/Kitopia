@@ -134,6 +134,7 @@ public class PluginManager
                 var o = deserializeObject["data"];
                 AllPluginInfos[i].CanUpdata = o["lastVersionId"].ToObject<int>() > AllPluginInfos[i].VersionId;
                 AllPluginInfos[i].CanUpdateVersion= o["lastVersion"].ToString();
+                AllPluginInfos[i].CanUpdateVersionId = o["lastVersionId"].ToObject<int>();
             }
             catch (Exception e)
             {

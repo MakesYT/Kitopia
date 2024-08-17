@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using log4net;
 using log4net.Config;
 using Microsoft.Toolkit.Uwp.Notifications;
@@ -69,6 +70,7 @@ class Program
         {
             TextRenderingMode = TextRenderingMode.Antialias,
             EdgeMode = EdgeMode.Antialias,
+            BitmapInterpolationMode = BitmapInterpolationMode.HighQuality,
         });
         buildAvaloniaApp.LogToTrace();
 

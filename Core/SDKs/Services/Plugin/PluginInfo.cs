@@ -26,6 +26,7 @@ public partial class PluginInfo
     public string Main { set; get; }
     public string FullPath { set; get; }
     public string Path { set; get; }
+    
     [JsonIgnore]
     [property:JsonIgnore]
     [ObservableProperty] private Bitmap? _icon;
@@ -35,6 +36,7 @@ public partial class PluginInfo
 
     [ObservableProperty] private bool canUpdata;
     [ObservableProperty] private string canUpdateVersion;
+    [ObservableProperty] private int canUpdateVersionId;
     public int UpdateTargetVersion { set; get; }
     public string ToPlgString() => $"{Id}_{AuthorId}_{NameSign}";
 

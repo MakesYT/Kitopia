@@ -54,6 +54,7 @@ public partial class OnlinePluginInfo : ObservableObject
     public string LastVersion { set; get; }
     public int LastVersionId { set; get; }
 
+    public string DescriptionShort { set; get; }
     public string Description { set; get; }
     public List<string> SupportSystems { set; get; }
     public bool InLocal {

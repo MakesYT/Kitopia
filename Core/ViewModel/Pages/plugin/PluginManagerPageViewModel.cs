@@ -3,6 +3,14 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
+using Avalonia.Controls.Shapes;
+using Avalonia.LogicalTree;
+using Avalonia.Markup.Xaml.MarkupExtensions;
+using Avalonia.Media;
+using Avalonia.Styling;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -11,11 +19,13 @@ using Core.SDKs.CustomScenario;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
+using KitopiaAvalonia.Tools;
 using log4net;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PluginCore;
+using Path = System.IO.Path;
 
 #endregion
 
@@ -115,6 +125,58 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
 
         ((INavigationPageService)ServiceManager.Services!.GetService(typeof(INavigationPageService))).Navigate(
             $"PluginSettingSelectPage_{pluginInfoEx.ToPlgString()}");
+        
+    }
+
+    [RelayCommand]
+    private async Task ShowPluginVersionInfo(Control control)
+    {
+        if (control.DataContext is PluginInfo pluginInfo)
+        {
+            var request = new HttpRequestMessage()
+            {
+                RequestUri = new Uri($"https://www.ncserver.top:5111/api/plugin/detail/{pluginInfo.Id}/{pluginInfo.CanUpdateVersionId}"),
+                Method = HttpMethod.Get,
+            };
+            request.Headers.Add("AllBeforeThisVersion",true.ToString());
+            var sendAsync =await PluginManager._httpClient.SendAsync(request);
+            var stringAsync =await  sendAsync.Content.ReadAsStringAsync();
+            var deserializeObject = (JObject)JsonConvert.DeserializeObject(stringAsync);
+            var list = deserializeObject["data"].ToObject<List<JObject>>();
+            StackPanel stackPanel = new StackPanel();
+            stackPanel.Spacing = 4;
+            Application.Current.Styles.TryGetResource("TitleLabel",null,out var h1);
+            Application.Current.Styles.TryGetResource("SemiColorBorder",null,out var semiColorBorder);
+            var semiColorBorder2 = semiColorBorder as SolidColorBrush;
+            var controlTheme = h1 as ControlTheme;
+            var childOfType = control.GetParentOfType<Window>().GetChildOfType<ContentPresenter>("DialogOvercover");
+            for (var i = 0; i < list.Count; i++)
+            {
+                stackPanel.Children.Add( new Label()
+                {
+                    Classes = { "H3" },
+                    Theme =controlTheme,
+                    Content = list[i]["version"]
+                });
+                stackPanel.Children.Add(new Line()
+                {
+                    Stroke = semiColorBorder2,
+                    EndPoint = new Point( childOfType.Bounds.Width,0)
+                });
+                stackPanel.Children.Add( new Label()
+                {
+                    Content = list[i]["detail"]
+                });
+            }
+            var dialog = new DialogContent()
+            {
+                Content =stackPanel,
+                Title = "版本详细信息",
+            };
+            
+            ServiceManager.Services!.GetService<IContentDialog>()!.ShowDialogAsync(childOfType,
+                dialog,true);
+        }
         
     }
 }

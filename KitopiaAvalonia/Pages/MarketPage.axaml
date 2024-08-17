@@ -60,7 +60,7 @@
                                         <TextBlock VerticalAlignment="Center"
                                                    MaxWidth="{Binding $parent.Bounds.Width}"
                                                    TextWrapping="Wrap"
-                                                   Text="{Binding Description}" />
+                                                   Text="{Binding DescriptionShort}" />
                                     </ScrollViewer>
 
 

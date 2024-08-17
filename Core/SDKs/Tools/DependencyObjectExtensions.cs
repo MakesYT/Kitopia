@@ -5,7 +5,7 @@ using Avalonia.VisualTree;
 
 namespace KitopiaAvalonia.Tools
 {
-    internal static class DependencyObjectExtensions
+    public static class DependencyObjectExtensions
     {
         public static T? GetParentOfType<T>(this Control child, string? name = null)
             where T : Control

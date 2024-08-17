@@ -1,36 +1,47 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.VisualTree;
 using Core.SDKs;
 
 namespace KitopiaAvalonia.Controls;
 
-public partial class Dialog : Window
+public partial class DialogOvercover : UserControl
 {
+    public static readonly StyledProperty<bool> CanDismissProperty =
+        AvaloniaProperty.Register<DialogOvercover, bool>(nameof(CanDismiss), false);
+    
+    public bool CanDismiss
+    {
+        get => GetValue(CanDismissProperty);
+        set => SetValue(CanDismissProperty, value);
+    }
     private const string s_pcPrimary = ":primary";
     private const string s_pcSecondary = ":secondary";
     private const string s_pcClose = ":close";
     private bool _mouseDownForWindowMoving = false;
     private PointerPoint _originalPoint;
 
-    public Dialog()
+    public DialogOvercover()
     {
         InitializeComponent();
     }
 
-    public Dialog(DialogContent content)
+    public DialogOvercover(DialogContent content,bool canDismiss = false)
     {
+        CanDismiss = canDismiss;
         InitializeComponent();
         Title.Text = content.Title;
         Content.Content = content.Content;
 
+       
 
         if (content.PrimaryButtonText != null)
         {
             PrimaryButton.Content = content.PrimaryButtonText;
 
             PrimaryButton.Click += (sender, args) => {
-                this.Close();
+                IsVisible = false;
                 content.PrimaryAction?.Invoke();
             };
             PrimaryButton.IsVisible = true;
@@ -40,7 +51,7 @@ public partial class Dialog : Window
         {
             CloseButton.Content = content.CloseButtonText;
             CloseButton.Click += (sender, args) => {
-                this.Close();
+                IsVisible = false;
                 content.CloseAction?.Invoke();
             };
             CloseButton.IsVisible = true;
@@ -49,8 +60,9 @@ public partial class Dialog : Window
         if (content.SecondaryButtonText != null)
         {
             SecondaryButton.Content = content.SecondaryButtonText;
-            SecondaryButton.Click += (sender, args) => {
-                this.Close();
+            SecondaryButton.Click += (sender, args) =>
+            {
+                IsVisible = false;
                 content.SecondaryAction?.Invoke();
             };
             SecondaryButton.IsVisible = true;
@@ -123,20 +135,33 @@ public partial class Dialog : Window
         if (!_mouseDownForWindowMoving) return;
 
         PointerPoint currentPoint = e.GetCurrentPoint(this);
-        Position = new PixelPoint(Position.X + (int)(currentPoint.Position.X - _originalPoint.Position.X),
-            Position.Y + (int)(currentPoint.Position.Y - _originalPoint.Position.Y));
+        // Position = new PixelPoint(Position.X + (int)(currentPoint.Position.X - _originalPoint.Position.X),
+        //     Position.Y + (int)(currentPoint.Position.Y - _originalPoint.Position.Y));
     }
 
     private void InputElement_OnPointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        if (WindowState == WindowState.Maximized || WindowState == WindowState.FullScreen) return;
-
+        if (CanDismiss&&sender is DialogOvercover)
+        {
+            this.IsVisible = false;
+            e.Handled = true;
+            return;
+        }
         _mouseDownForWindowMoving = true;
         _originalPoint = e.GetCurrentPoint(this);
+        e.Handled = true;
     }
 
     private void InputElement_OnPointerReleased(object? sender, PointerReleasedEventArgs e)
     {
         _mouseDownForWindowMoving = false;
+    }
+
+
+    private void Visual_OnAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
+    {
+        var visualParent = this.GetVisualParent();
+        BackgroundElement.Width = visualParent.Bounds.Width / 3;
+        BackgroundElement.Height = visualParent.Bounds.Height / 3;
     }
 }
