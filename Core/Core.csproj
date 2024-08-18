@@ -37,6 +37,7 @@
         <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)"/>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2"/>
         <PackageReference Include="log4net" Version="2.0.17"/>
+        <PackageReference Include="Markdown.Avalonia" Version="11.0.2" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0"/>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1"/>
         <PackageReference Include="Microsoft.Extensions.Resilience" Version="8.7.0"/>
@@ -66,6 +67,11 @@
         <Reference Include="screen_capture_lite_csharp">
             <HintPath>DLLs\screen_capture_lite_csharp.dll</HintPath>
         </Reference>
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <AdditionalFiles Include="PluginManagerPage\PluginDetail.axaml" />
     </ItemGroup>
 
 </Project>

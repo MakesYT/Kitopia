@@ -7,6 +7,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Shapes;
+using Avalonia.Layout;
 using Avalonia.LogicalTree;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
@@ -19,8 +20,10 @@ using Core.SDKs.CustomScenario;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
+using KitopiaAvalonia.Controls.PluginManagerPage;
 using KitopiaAvalonia.Tools;
 using log4net;
+using Markdown.Avalonia.Full;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -163,9 +166,9 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
                     Stroke = semiColorBorder2,
                     EndPoint = new Point( childOfType.Bounds.Width,0)
                 });
-                stackPanel.Children.Add( new Label()
+                stackPanel.Children.Add( new MarkdownScrollViewer()
                 {
-                    Content = list[i]["detail"]
+                    Markdown = list[i]["detail"].ToString()
                 });
             }
             var dialog = new DialogContent()
@@ -173,6 +176,64 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
                 Content =stackPanel,
                 Title = "版本详细信息",
             };
+            
+            ServiceManager.Services!.GetService<IContentDialog>()!.ShowDialogAsync(childOfType,
+                dialog,true);
+        }
+        
+    }
+    
+    [RelayCommand]
+    private async Task ShowPluginDetail(Control control)
+    {
+        if (control.DataContext is PluginInfo pluginInfo)
+        {
+            StackPanel stackPanel = new StackPanel();
+            stackPanel.Spacing = 4;
+            
+            var request = new HttpRequestMessage()
+            {
+                RequestUri = new Uri($"https://www.ncserver.top:5111/api/plugin/detail/{pluginInfo.Id}/{pluginInfo.CanUpdateVersionId}"),
+                Method = HttpMethod.Get,
+            };
+            request.Headers.Add("AllBeforeThisVersion",true.ToString());
+            var sendAsync =await PluginManager._httpClient.SendAsync(request);
+            var stringAsync =await  sendAsync.Content.ReadAsStringAsync();
+            var deserializeObject = (JObject)JsonConvert.DeserializeObject(stringAsync);
+            var list = deserializeObject["data"].ToObject<List<JObject>>();
+            
+            Application.Current.Styles.TryGetResource("TitleLabel",null,out var h1);
+            Application.Current.Styles.TryGetResource("SemiColorBorder",null,out var semiColorBorder);
+            var semiColorBorder2 = semiColorBorder as SolidColorBrush;
+            var controlTheme = h1 as ControlTheme;
+            var childOfType = control.GetParentOfType<Window>().GetChildOfType<ContentPresenter>("DialogOvercover");
+            for (var i = 0; i < list.Count; i++)
+            {
+                stackPanel.Children.Add( new Label()
+                {
+                    Classes = { "H3" },
+                    Theme =controlTheme,
+                    Content = list[i]["version"]
+                });
+                stackPanel.Children.Add(new Line()
+                {
+                    Stroke = semiColorBorder2,
+                    EndPoint = new Point( childOfType.Bounds.Width,0)
+                });
+                stackPanel.Children.Add( new MarkdownScrollViewer()
+                {
+                    Markdown = list[i]["detail"].ToString()
+                });
+            }
+            var pluginDetail = new PluginDetail();
+            pluginDetail.DataContext= pluginInfo;
+            pluginDetail.Content = stackPanel;
+            var dialog = new DialogContent()
+            {
+                Content =pluginDetail,
+                Title = "插件详细信息",
+            };
+
             
             ServiceManager.Services!.GetService<IContentDialog>()!.ShowDialogAsync(childOfType,
                 dialog,true);

@@ -5,13 +5,14 @@
              xmlns:plugin="clr-namespace:Core.ViewModel.Pages.plugin;assembly=Core"
              xmlns:marketPage="clr-namespace:KitopiaAvalonia.Converter.MarketPage"
              xmlns:pluginManagerPage="clr-namespace:KitopiaAvalonia.Converter.PluginManagerPage"
+             xmlns:pluginManagerPage1="clr-namespace:KitopiaAvalonia.Converter.PluginManagerPage;assembly=Core"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="plugin:PluginManagerPageViewModel"
              x:Class="KitopiaAvalonia.Pages.PluginManagerPage">
 
     <UserControl.Resources>
 
-        <pluginManagerPage:IconCtr x:Key="IconCtr" />
+        <pluginManagerPage1:IconCtr x:Key="IconCtr" />
     </UserControl.Resources>
     <Panel>
         <ContentPresenter ZIndex="1" x:Name="DialogOvercover"></ContentPresenter>
@@ -41,10 +42,16 @@
                                            Height="64" />
                                     <StackPanel Grid.Column="1" Margin="0,15,0,5" VerticalAlignment="Top" Spacing="5"
                                                 HorizontalAlignment="Stretch">
-                                        <TextBlock VerticalAlignment="Center" Focusable="False"
-                                                   Text="{Binding Path=Name}"
-                                                   Background="{x:Null}"
-                                                   FontWeight="Normal" FontSize="18" />
+                                        <Button VerticalAlignment="Center"
+                                                HorizontalAlignment="Left"
+                                                Theme="{DynamicResource BorderlessButton}" Padding="0"
+                                                MinHeight="0"
+                                                Content="{Binding Name}" 
+                                                FontWeight="Normal" FontSize="18"
+                                                Foreground="{DynamicResource DefaultForeground}"
+                                                Command="{Binding Path=$parent[ItemsControl].((plugin:PluginManagerPageViewModel)DataContext).ShowPluginDetailCommand}"
+                                                CommandParameter="{Binding $self}">
+                                        </Button>
                                         <StackPanel Orientation="Horizontal" Spacing="5">
                                             <TextBlock VerticalAlignment="Top"
                                                        Text="{Binding Version}" />
