@@ -15,12 +15,12 @@ using Avalonia.Styling;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Core.AvaloniaControl.PluginManagerPage;
 using Core.SDKs;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
-using KitopiaAvalonia.Controls.PluginManagerPage;
 using KitopiaAvalonia.Tools;
 using log4net;
 using Markdown.Avalonia.Full;
@@ -207,6 +207,17 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
             var semiColorBorder2 = semiColorBorder as SolidColorBrush;
             var controlTheme = h1 as ControlTheme;
             var childOfType = control.GetParentOfType<Window>().GetChildOfType<ContentPresenter>("DialogOvercover");
+            stackPanel.Children.Add( new Label()
+            {
+                Classes = { "H2" },
+                Theme =controlTheme,
+                Content = "版本说明"
+            });
+            stackPanel.Children.Add(new Line()
+            {
+                Stroke = semiColorBorder2,
+                EndPoint = new Point( childOfType.Bounds.Width,0)
+            });
             for (var i = 0; i < list.Count; i++)
             {
                 stackPanel.Children.Add( new Label()

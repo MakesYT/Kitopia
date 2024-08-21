@@ -10,6 +10,8 @@
     <UserControl.Resources>
         <marketPage:IconCtr x:Key="IconCtr" />
     </UserControl.Resources>
+    <Panel>
+         <ContentPresenter ZIndex="1" x:Name="DialogOvercover"></ContentPresenter>
     <Grid RowDefinitions="Auto,*" Margin="42">
         <TextBlock Margin="0" FontSize="18" FontWeight="Bold" Text="插件列表">
 
@@ -35,10 +37,16 @@
                                        Height="64" />
                                 <StackPanel Grid.Column="1" Margin="0,15,0,5" VerticalAlignment="Top" Spacing="5"
                                             HorizontalAlignment="Stretch">
-                                    <TextBlock VerticalAlignment="Center" Focusable="False"
-                                               Text="{Binding Path=Name}"
-                                               Background="{x:Null}"
-                                               FontWeight="Normal" FontSize="18" />
+                                    <Button VerticalAlignment="Center"
+                                            HorizontalAlignment="Left"
+                                            Theme="{DynamicResource BorderlessButton}" Padding="0"
+                                            MinHeight="0"
+                                            Content="{Binding Name}" 
+                                            FontWeight="Normal" FontSize="18"
+                                            Foreground="{DynamicResource DefaultForeground}"
+                                            Command="{Binding Path=$parent[ItemsControl].((pages:MarketPageViewModel)DataContext).ShowPluginDetailCommand}"
+                                            CommandParameter="{Binding $self}">
+                                    </Button>
                                     <ItemsControl ItemsSource="{Binding SupportSystems}">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate x:DataType="x:String">
@@ -91,4 +99,6 @@
         </ItemsControl>
 
     </Grid>
+    </Panel>
+   
 </UserControl>

@@ -161,7 +161,7 @@ public partial class DialogOvercover : UserControl
     private void Visual_OnAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
     {
         var visualParent = this.GetVisualParent();
-        BackgroundElement.Width = visualParent.Bounds.Width / 3;
-        BackgroundElement.Height = visualParent.Bounds.Height / 3;
+        BackgroundElement.Width = visualParent.Bounds.Width / 2.5;
+        BackgroundElement.Height = visualParent.Bounds.Height /2;
     }
 }

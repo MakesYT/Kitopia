@@ -36,6 +36,7 @@ public class ContentDialogService : IContentDialog
                 if (contentPresenter is ContentPresenter control)
                 {
                     control.Content = new DialogOvercover(dialogContent,canDismiss);
+                    
                 }
             });
         });

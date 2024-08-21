@@ -71,7 +71,10 @@
 
 
     <ItemGroup>
-      <AdditionalFiles Include="PluginManagerPage\PluginDetail.axaml" />
+      <Compile Update="AvaloniaControl\MarketPage\PluginDetail.axaml.cs">
+        <DependentUpon>PluginDetail.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
     </ItemGroup>
 
 </Project>

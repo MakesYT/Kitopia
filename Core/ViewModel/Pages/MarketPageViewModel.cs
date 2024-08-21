@@ -4,9 +4,21 @@ using System.IO.Compression;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
+using Avalonia.Controls.Shapes;
+using Avalonia.Media;
+using Avalonia.Styling;
+using AvaloniaEdit.Utils;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Core.AvaloniaControl.PluginManagerPage;
+using Core.SDKs;
+using Core.SDKs.Services;
 using Core.SDKs.Services.Plugin;
+using KitopiaAvalonia.Tools;
+using Markdown.Avalonia.Full;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PluginCore;
@@ -14,6 +26,7 @@ using SixLabors.ImageSharp;
 using Bitmap = Avalonia.Media.Imaging.Bitmap;
 using Image = SixLabors.ImageSharp.Image;
 using JsonSerializer = System.Text.Json.JsonSerializer;
+using Point = Avalonia.Point;
 
 namespace Core.ViewModel.Pages;
 public class ApiResponse
@@ -114,5 +127,72 @@ public partial class MarketPageViewModel : ObservableObject
         await PluginManager.DownloadPluginOnline(plugin);
     }
 
-    
+    [RelayCommand]
+    private async Task ShowPluginDetail(Control control)
+    {
+        if (control.DataContext is OnlinePluginInfo pluginInfo)
+        {
+            StackPanel stackPanel = new StackPanel();
+            stackPanel.Spacing = 4;
+            
+            var request = new HttpRequestMessage()
+            {
+                RequestUri = new Uri($"https://www.ncserver.top:5111/api/plugin/detail/{pluginInfo.Id}/{pluginInfo.LastVersionId}"),
+                Method = HttpMethod.Get,
+            };
+            request.Headers.Add("AllBeforeThisVersion",true.ToString());
+            var sendAsync =await PluginManager._httpClient.SendAsync(request);
+            var stringAsync =await  sendAsync.Content.ReadAsStringAsync();
+            var deserializeObject = (JObject)JsonConvert.DeserializeObject(stringAsync);
+            var list = deserializeObject["data"].ToObject<List<JObject>>();
+            
+            Application.Current.Styles.TryGetResource("TitleLabel",null,out var h1);
+            Application.Current.Styles.TryGetResource("SemiColorBorder",null,out var semiColorBorder);
+            var semiColorBorder2 = semiColorBorder as SolidColorBrush;
+            var controlTheme = h1 as ControlTheme;
+            var childOfType = control.GetParentOfType<Window>().GetChildOfType<ContentPresenter>("DialogOvercover");
+            stackPanel.Children.Add( new Label()
+            {
+                Classes = { "H2" },
+                Theme =controlTheme,
+                Content = "版本说明"
+            });
+            stackPanel.Children.Add(new Line()
+            {
+                Stroke = semiColorBorder2,
+                EndPoint = new Point( childOfType.Bounds.Width,0)
+            });
+            for (var i = 0; i < list.Count; i++)
+            {
+                stackPanel.Children.Add( new Label()
+                {
+                    Classes = { "H3" },
+                    Theme =controlTheme,
+                    Content = list[i]["version"]
+                });
+                stackPanel.Children.Add(new Line()
+                {
+                    Stroke = semiColorBorder2,
+                    EndPoint = new Point( childOfType.Bounds.Width,0)
+                });
+                stackPanel.Children.Add( new MarkdownScrollViewer()
+                {
+                    Markdown = list[i]["detail"].ToString()
+                });
+            }
+            var pluginDetail = new AvaloniaControl.MarketPage.PluginDetail();
+            pluginDetail.DataContext= pluginInfo;
+            pluginDetail.Content = stackPanel;
+            var dialog = new DialogContent()
+            {
+                Content =pluginDetail,
+                Title = "插件详细信息",
+            };
+
+            
+            ServiceManager.Services!.GetService<IContentDialog>()!.ShowDialogAsync(childOfType,
+                dialog,true);
+        }
+        
+    }
 }

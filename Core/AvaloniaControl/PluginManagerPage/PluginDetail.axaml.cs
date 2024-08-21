@@ -1,13 +1,12 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using Core.SDKs.Services.Plugin;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PluginCore;
 
-namespace KitopiaAvalonia.Controls.PluginManagerPage;
+namespace Core.AvaloniaControl.PluginManagerPage;
 
 public partial class PluginDetail : UserControl
 {
@@ -27,7 +26,6 @@ public partial class PluginDetail : UserControl
     public PluginDetail()
     {
         InitializeComponent();
-        
     }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
