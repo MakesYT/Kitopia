@@ -1,6 +1,9 @@
 ﻿using System.Collections.ObjectModel;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Unicode;
 using CommunityToolkit.Mvvm.Messaging;
 using Core.SDKs.HotKey;
 using Core.SDKs.Services;
@@ -95,8 +98,9 @@ public static class CustomScenarioManger
                 {
                     continue;
                 }
-                
+
             }
+
             deserializeObject.HasInit = true;
             deserializeObject.IsRunning = false;
 
@@ -143,46 +147,90 @@ public static class CustomScenarioManger
 
             CustomScenarios.Add(deserializeObject);
         }
-        catch (Exception e1)
+        catch (CustomScenarioLoadFromJsonException e1)
         {
             // Log.Error(e1);
-            Log.Error($"情景文件\"{fileInfo.FullName}\"加载失败");
-            try
+            var Name = string.Empty;
+            Log.Error($"情景文件\"{fileInfo.FullName}\"加载失败,内部异常");
+            var utf8JsonReader = new Utf8JsonReader(File.ReadAllBytes(fileInfo.FullName));
+            utf8JsonReader.Read();
+            while (utf8JsonReader.Read())
             {
-                var pluginName = ((CustomScenarioLoadFromJsonException)e1).PluginName.Split("_");
-
-
-                var deserializeObject = JsonSerializer.Deserialize<CustomScenario>(json, ConfigManger.DefaultOptions)!;
-                deserializeObject.HasInit = false;
-                deserializeObject.IsRunning = false;
-
-                var content = $"对应文件\n{fileInfo.FullName}\n情景所需的插件不存在\n需要来自作者{pluginName[0]}的插件{pluginName[1]}";
-                deserializeObject.InitError = content;
-                CustomScenarios.Add(deserializeObject);
-                var dialog = new DialogContent()
+                if (utf8JsonReader.TokenType==JsonTokenType.StartObject)
                 {
-                    Title = $"自定义情景\"{deserializeObject.Name}\"加载失败",
-                    Content = content,
-                    PrimaryButtonText = "尝试在市场中自动安装",
-                    CloseButtonText = "我知道了",
-                    PrimaryAction = () => { }
-                };
-                ((IContentDialog)ServiceManager.Services!.GetService(typeof(IContentDialog))!).ShowDialogAsync(null,
-                    dialog);
+                    utf8JsonReader.Skip();
+                }
+
+                if (utf8JsonReader.TokenType==JsonTokenType.PropertyName)
+                {
+                    var name = utf8JsonReader.GetString();
+                    Log.Debug(name);
+                    if (name==nameof(CustomScenario.Name))
+                    {
+                        utf8JsonReader.Read();
+                        Name = utf8JsonReader.GetString();
+                        break;
+                    }
+                }
             }
-            catch (Exception e)
+            switch (e1.FailedType)
             {
-                var content = $"情景文件\n{fileInfo.FullName}\n加载失败疑似文件已损坏";
-                var dialog = new DialogContent()
+                case CustomScenarioLoadFromJsonFailedType.插件未找到:
                 {
-                    Title = $"自定义情景\"{fileInfo.Name}\"加载失败",
-                    Content = content,
-                    CloseButtonText = "我知道了",
-                    PrimaryAction = () => { }
-                };
-                ((IContentDialog)ServiceManager.Services!.GetService(typeof(IContentDialog))!).ShowDialogAsync(null,
-                    dialog);
+                
+                    var content = $"对应文件\n{fileInfo.FullName}\n情景所需的插件不存在\n需要插件{e1.PluginName}";
+                    var dialog = new DialogContent()
+                    {
+                        Title = $"自定义情景\"{Name}\"加载失败",
+                        Content = content,
+                        PrimaryButtonText = "尝试在市场中自动安装",
+                        CloseButtonText = "我知道了",
+                        PrimaryAction = () => { }
+                    };
+                    ((IContentDialog)ServiceManager.Services!.GetService(typeof(IContentDialog))!).ShowDialogAsync(null,
+                        dialog);
+                    break;
+                }
+                case CustomScenarioLoadFromJsonFailedType.插件未启用:
+                {
+                    var content = $"对应文件\n{fileInfo.FullName}\n情景所需的插件未启用\n需要插件{e1.PluginName}";
+                   
+                    var dialog = new DialogContent()
+                    {
+                        Title = $"自定义情景\"{Name}\"加载失败",
+                        Content = content,
+                        PrimaryButtonText = "启用该插件",
+                        CloseButtonText = "我知道了",
+                        PrimaryAction = () => { }
+                    };
+                    ((IContentDialog)ServiceManager.Services!.GetService(typeof(IContentDialog))!).ShowDialogAsync(null,
+                        dialog);
+                    break;
+                }
+                case CustomScenarioLoadFromJsonFailedType.方法未找到:
+                {
+                    break;
+                }
+                case CustomScenarioLoadFromJsonFailedType.类未找到:
+                {
+                    break;
+                }
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
+        }
+        catch (Exception e)
+        {
+            var content = $"情景文件\n{fileInfo.FullName}\n加载失败疑似文件已损坏";
+            var dialog = new DialogContent()
+            {
+                Title = $"自定义情景\"{fileInfo.Name}\"加载失败",
+                Content = content,
+                CloseButtonText = "我知道了",
+                PrimaryAction = () => { }
+            };
+            ((IContentDialog)ServiceManager.Services!.GetService(typeof(IContentDialog))!).ShowDialogAsync(null,
+                dialog);
         }
     }
 

@@ -31,7 +31,6 @@ public static class ConfigManger
         WriteIndented = true,
         ReferenceHandler = ReferenceHandler.Preserve,
         Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-
         // DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 

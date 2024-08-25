@@ -31,15 +31,15 @@ public class TypeJsonConverter : JsonConverter<Type>
                 }
             }
 
-            throw new CustomScenarioLoadFromJsonException(strings[0], strings[1]);
+            throw new CustomScenarioLoadFromJsonException(CustomScenarioLoadFromJsonFailedType.类未找到,strings[0], strings[1]);
         }
 
         if (PluginManager.EnablePlugin.TryGetValue(strings[0], out var value))
         {
-            return value.GetType(strings[1]);
+            return value.GetType(strings[1])?? throw new CustomScenarioLoadFromJsonException(CustomScenarioLoadFromJsonFailedType.类未找到,strings[0], strings[1]);;
         }
 
-        throw new CustomScenarioLoadFromJsonException(strings[0], strings[1]);
+        throw new CustomScenarioLoadFromJsonException(CustomScenarioLoadFromJsonFailedType.插件未找到,strings[0], strings[1]);
     }
 
     public override void Write(Utf8JsonWriter writer, Type type, JsonSerializerOptions options)

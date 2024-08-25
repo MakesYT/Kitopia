@@ -182,7 +182,7 @@ public class Plugin
     public PluginInfo PluginInfo { set; get; }
 
 
-    public Type GetType(string typeName)
+    public Type? GetType(string typeName)
     {
         foreach (var pluginAssembly in _plugin.Assemblies)
         {
