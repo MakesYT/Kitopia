@@ -55,9 +55,8 @@
                                         <StackPanel Orientation="Horizontal" Spacing="5">
                                             <TextBlock VerticalAlignment="Top"
                                                        Text="{Binding Version}" />
-                                            <StackPanel Orientation="Horizontal" Spacing="5">
-                                                <TextBlock VerticalAlignment="Top" Text=">"
-                                                           IsVisible="{Binding CanUpdata}">
+                                            <StackPanel Orientation="Horizontal" Spacing="5" IsVisible="{Binding CanUpdata}">
+                                                <TextBlock VerticalAlignment="Top" Text=">">
                                                     <TextBlock.Foreground>
                                                         <SolidColorBrush Color="{DynamicResource SemiOrange4Color}" />
                                                     </TextBlock.Foreground>

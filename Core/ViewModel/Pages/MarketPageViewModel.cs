@@ -122,9 +122,9 @@ public partial class MarketPageViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task DownloadPlugin(OnlinePluginInfo plugin)
+    private async Task<bool> DownloadPlugin(OnlinePluginInfo plugin)
     {
-        await PluginManager.DownloadPluginOnline(plugin);
+       return await PluginManager.DownloadPluginOnline(plugin);
     }
 
     [RelayCommand]

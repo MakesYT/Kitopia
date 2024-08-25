@@ -163,9 +163,7 @@ public static class CustomScenarioManger
 
                 if (utf8JsonReader.TokenType==JsonTokenType.PropertyName)
                 {
-                    var name = utf8JsonReader.GetString();
-                    Log.Debug(name);
-                    if (name==nameof(CustomScenario.Name))
+                    if (utf8JsonReader.GetString()==nameof(CustomScenario.Name))
                     {
                         utf8JsonReader.Read();
                         Name = utf8JsonReader.GetString();
@@ -178,14 +176,33 @@ public static class CustomScenarioManger
                 case CustomScenarioLoadFromJsonFailedType.插件未找到:
                 {
                 
-                    var content = $"对应文件\n{fileInfo.FullName}\n情景所需的插件不存在\n需要插件{e1.PluginName}";
+                    var content = $"对应文件\n{fileInfo.FullName}\n情景所需的插件不存在\n需要插件\"{e1.PluginName}\"";
                     var dialog = new DialogContent()
                     {
                         Title = $"自定义情景\"{Name}\"加载失败",
                         Content = content,
                         PrimaryButtonText = "尝试在市场中自动安装",
                         CloseButtonText = "我知道了",
-                        PrimaryAction = () => { }
+                        PrimaryAction =async () =>
+                        {
+                            var onlinePluginInfo = await PluginManager.GetOnlinePluginInfo(int.Parse(e1.PluginName.Split("_")[0]));
+                            if (onlinePluginInfo is null)
+                            {
+                                ServiceManager.Services.GetService<IToastService>().Show("自动下载插件失败",$"未找到ID:{e1.PluginName.Split("_")[0]}的插件");
+                                return;
+                            }
+
+                            var downloadPluginOnline = await PluginManager.DownloadPluginOnline(onlinePluginInfo);
+                                
+                            if (downloadPluginOnline)
+                            {
+                                ServiceManager.Services.GetService<IToastService>().Show("自动下载插件成功",$"已自动下载并启用{onlinePluginInfo.Name}");
+                            }
+                            else
+                            {
+                                ServiceManager.Services.GetService<IToastService>().Show("自动下载插件失败",$"下载ID:{e1.PluginName.Split("_")[0]}的插件时遇到错误");
+                            }
+                        }
                     };
                     ((IContentDialog)ServiceManager.Services!.GetService(typeof(IContentDialog))!).ShowDialogAsync(null,
                         dialog);
@@ -193,7 +210,9 @@ public static class CustomScenarioManger
                 }
                 case CustomScenarioLoadFromJsonFailedType.插件未启用:
                 {
-                    var content = $"对应文件\n{fileInfo.FullName}\n情景所需的插件未启用\n需要插件{e1.PluginName}";
+                    var pluginByPlgStr = PluginManager.GetPluginByPlgStr(e1.PluginName);
+                    
+                    var content = $"对应文件\n{fileInfo.FullName}\n情景所需的插件未启用\n需要插件{pluginByPlgStr.Name}(ID:{pluginByPlgStr.Id})";
                    
                     var dialog = new DialogContent()
                     {
@@ -201,7 +220,10 @@ public static class CustomScenarioManger
                         Content = content,
                         PrimaryButtonText = "启用该插件",
                         CloseButtonText = "我知道了",
-                        PrimaryAction = () => { }
+                        PrimaryAction = () =>
+                        {
+                            PluginManager.EnablePluginByInfo(pluginByPlgStr);
+                        }
                     };
                     ((IContentDialog)ServiceManager.Services!.GetService(typeof(IContentDialog))!).ShowDialogAsync(null,
                         dialog);

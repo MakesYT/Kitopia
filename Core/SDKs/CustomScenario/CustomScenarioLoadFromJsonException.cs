@@ -14,23 +14,13 @@ public class CustomScenarioLoadFromJsonException : Exception
     private string? _pluginName;
     public CustomScenarioLoadFromJsonFailedType FailedType { get; set; }
 
-    public string? PluginName
-
+    public string PluginName
     {
-        get
-        {
-            if (_pluginName is null)
-                return PluginInfo.Name;
-            return _pluginName;
-        }
-        set => _pluginName = value;
+        get;
+        set;
     }
 
-    public PluginInfo PluginInfo
-   {
-       get;
-       set;
-   }
+   
     public string? MethodName
     {
         get;
@@ -40,12 +30,6 @@ public class CustomScenarioLoadFromJsonException : Exception
     public CustomScenarioLoadFromJsonException(CustomScenarioLoadFromJsonFailedType customScenarioLoadFromJsonFailedType,string pluginName, string? methodName)
     {
         this.PluginName = pluginName;
-        this.MethodName = methodName;
-        this.FailedType = customScenarioLoadFromJsonFailedType;
-    }
-    public CustomScenarioLoadFromJsonException(CustomScenarioLoadFromJsonFailedType customScenarioLoadFromJsonFailedType,PluginInfo pluginInfo, string? methodName)
-    {
-        this.PluginInfo = pluginInfo;
         this.MethodName = methodName;
         this.FailedType = customScenarioLoadFromJsonFailedType;
     }

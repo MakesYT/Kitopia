@@ -17,10 +17,10 @@ public class ScenarioMethodJsonCtr : JsonConverter<ScenarioMethod>
                 if (PluginManager.AllPluginInfos.Any(e=>e.ToPlgString()==scenario.PluginInfo!.ToPlgString()))
                 {
                     throw new CustomScenarioLoadFromJsonException(CustomScenarioLoadFromJsonFailedType.插件未启用,
-                        scenario.PluginInfo, null);
+                        scenario.PluginInfo.ToPlgString(), null);
                 }
                 throw new CustomScenarioLoadFromJsonException(CustomScenarioLoadFromJsonFailedType.插件未找到,
-                    scenario.PluginInfo, null);
+                    scenario.PluginInfo.ToPlgString(), null);
             }
             scenario.ServiceProvider = PluginManager.EnablePlugin[scenario.PluginInfo!.ToPlgString()].ServiceProvider!;
             scenario.Method = PluginManager.EnablePlugin[scenario.PluginInfo.ToPlgString()]

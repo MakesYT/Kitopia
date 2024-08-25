@@ -31,7 +31,17 @@ public class PluginManager
             (ISearchItemTool)ServiceManager.Services.GetService(typeof(ISearchItemTool))!;
         PluginCore.Kitopia.IToastService = (IToastService)ServiceManager.Services.GetService(typeof(IToastService))!;
         PluginCore.Kitopia._i18n = CustomScenarioGloble._i18n;
-       Load();
+       Load(true);
+    }
+
+    /// <summary>
+    /// 所有插件中搜索无论是否启用
+    /// </summary>
+    /// <param name="plgStr"></param>
+    /// <returns></returns>
+    public static PluginInfo? GetPluginByPlgStr(string plgStr)
+    {
+        return AllPluginInfos.FirstOrDefault(e => e.ToPlgString() == plgStr);
     }
 
     public static void EnablePluginByInfo(PluginInfo pluginInfoEx)
@@ -49,6 +59,7 @@ public class PluginManager
     {
         Plugin.UnloadByPluginInfo(pluginInfoEx.ToPlgString(), out var weakReference);
         PluginManager.EnablePlugin.Remove(pluginInfoEx.ToPlgString());
+        
         ConfigManger.Config.EnabledPluginInfos.RemoveAll(e => e.ToPlgString()==pluginInfoEx.ToPlgString());
         ConfigManger.Save();
         pluginInfoEx.IsEnabled = false;
@@ -62,6 +73,8 @@ public class PluginManager
         if (weakReference.IsAlive)
         {
             pluginInfoEx.UnloadFailed = true;
+            File.Create(
+                $"{AppDomain.CurrentDomain.BaseDirectory}plugins{Path.DirectorySeparatorChar}{pluginInfoEx.ToPlgString()}{Path.DirectorySeparatorChar}.unload");
         }
             
         // Items.ResetBindings();
@@ -77,7 +90,7 @@ public class PluginManager
         AllPluginInfos.Clear();
         Load();
     }
-    public static void Load()
+    public static void Load(bool init=false)
     {
         var pluginsDirectoryInfo = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "plugins");
         if (!pluginsDirectoryInfo.Exists)
@@ -88,6 +101,31 @@ public class PluginManager
 
         foreach (var directoryInfo in pluginsDirectoryInfo.EnumerateDirectories())
         {
+            if (File.Exists($"{directoryInfo.FullName}{Path.DirectorySeparatorChar}.remove"))
+            {
+                try
+                {
+                    directoryInfo.Delete(true);
+                }
+                catch (Exception e)
+                {
+                    Log.Error("错误",e);
+                }
+                continue;
+            }
+
+            if (File.Exists($"{directoryInfo.FullName}{Path.DirectorySeparatorChar}.unload"))
+            {
+                if (init)
+                {
+                    File.Delete($"{directoryInfo.FullName}{Path.DirectorySeparatorChar}.unload");
+                }
+                else
+                {
+                    continue;
+                }
+                
+            }
             if (File.Exists($"{directoryInfo.FullName}{Path.DirectorySeparatorChar}manifest.json"))
             {
                 var readAllText = File.ReadAllText($"{directoryInfo.FullName}{Path.DirectorySeparatorChar}manifest.json");
@@ -121,7 +159,29 @@ public class PluginManager
         
     }
 
-    public static async Task CheckUpdate()
+    public static async Task<OnlinePluginInfo> GetOnlinePluginInfo(int id)
+    {
+        try
+        {
+            var request = new HttpRequestMessage()
+            {
+                RequestUri = new Uri($"https://www.ncserver.top:5111/api/plugin/{id}"),
+                Method = HttpMethod.Get,
+            };
+            request.Headers.Add("AllBeforeThisVersion",true.ToString());
+            var sendAsync =await _httpClient.SendAsync(request);
+            var stringAsync =await  sendAsync.Content.ReadAsStringAsync();
+            var deserializeObject = (JObject)JsonConvert.DeserializeObject(stringAsync);
+            return deserializeObject["data"].ToObject<OnlinePluginInfo>();
+        }
+        catch (Exception e)
+        {
+            Log.Error("错误",e);
+            return null;
+        }
+    }
+
+    public static async Task CheckAllUpdate()
     {
        await Parallel.ForAsync(0, AllPluginInfos.Count, (i, token) =>
         {
@@ -146,19 +206,24 @@ public class PluginManager
       
     }
 
-    public static async Task DownloadPluginOnline(OnlinePluginInfo plugin)
+    public static async Task<bool> DownloadPluginOnline(OnlinePluginInfo plugin)
     {
-        await DownloadPlugin(plugin.Id,plugin.LastVersionId,plugin.ToPlgString());
+        var downloadPlugin = await DownloadPlugin(plugin.Id,plugin.LastVersionId,plugin.ToPlgString());
+        if (!downloadPlugin)
+        {
+            return false;
+        }
         var pluginInfoEx = AllPluginInfos.FirstOrDefault(e=>e.ToPlgString()==plugin.ToPlgString());
         if (pluginInfoEx is null)
         {
-            return;
+            return false;
         }
         PluginManager.EnablePluginByInfo(pluginInfoEx);
         plugin.Upadate();
+        return true;
     }
 
-    private static async Task DownloadPlugin(int id,int versionId,string plugin)
+    private static async Task<bool> DownloadPlugin(int id,int versionId,string plugin)
     {
         try
         {
@@ -193,13 +258,15 @@ public class PluginManager
         catch (Exception e)
         {
             Log.Error("错误",e);
-            return;
+            return false;
         }
+
+        return true;
     }
 
-    public static async Task DownloadPluginOnline(PluginInfo plugin)
+    public static async Task<bool> DownloadPluginOnline(PluginInfo plugin)
     {
-        await DownloadPlugin(plugin.Id,plugin.UpdateTargetVersion,plugin.ToPlgString());
+       return await DownloadPlugin(plugin.Id,plugin.UpdateTargetVersion,plugin.ToPlgString());
        
     }
 }

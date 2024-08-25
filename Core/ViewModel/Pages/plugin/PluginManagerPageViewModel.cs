@@ -42,7 +42,7 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
 
     public PluginManagerPageViewModel()
     {
-        PluginManager.CheckUpdate();
+        PluginManager.CheckAllUpdate();
     }
     
     [RelayCommand]
@@ -67,6 +67,12 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
                 {
                     var pluginsDirectoryInfo = new DirectoryInfo($"{AppDomain.CurrentDomain.BaseDirectory}plugins{Path.DirectorySeparatorChar}{pluginInfoEx.ToPlgString()}");
                     pluginsDirectoryInfo.Delete(true);
+                    Task.Run(PluginManager.Reload);
+                }
+                else
+                {
+                    File.Create(
+                        $"{AppDomain.CurrentDomain.BaseDirectory}plugins{Path.DirectorySeparatorChar}{pluginInfoEx.ToPlgString()}{Path.DirectorySeparatorChar}.remove");
                     Task.Run(PluginManager.Reload);
                 }
             }
