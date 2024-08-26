@@ -1,8 +1,10 @@
 ﻿#region
 
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.IO.Compression;
 using System.Text;
+using AvaloniaEdit.Utils;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.Services.Config;
 using Core.ViewModel.Pages;
@@ -31,9 +33,45 @@ public class PluginManager
             (ISearchItemTool)ServiceManager.Services.GetService(typeof(ISearchItemTool))!;
         PluginCore.Kitopia.IToastService = (IToastService)ServiceManager.Services.GetService(typeof(IToastService))!;
         PluginCore.Kitopia._i18n = CustomScenarioGloble._i18n;
-       Load(true);
+        Load(true);
     }
 
+    private static bool VersionInRange(string version, string range)
+    {
+        var v = new Version(version);
+        if (range.StartsWith("^"))
+        {
+            var r = new Version(range.Substring(1));
+            return v>=r;
+        }
+
+        if (range.Contains("-"))
+        {
+            var strings = range.Split('-');
+            var r = new Version(strings[0]);
+            return v>=r&&v<=new Version(strings[1]);
+        }
+
+        return version == range;
+    }
+    private static bool VersionInRange(Version v, string range)
+    {
+       
+        if (range.StartsWith("^"))
+        {
+            var r = new Version(range.Substring(1));
+            return v>=r;
+        }
+
+        if (range.Contains("-"))
+        {
+            var strings = range.Split('-');
+            var r = new Version(strings[0]);
+            return v>=r&&v<=new Version(strings[1]);
+        }
+
+        return v == new Version(range);
+    }
     /// <summary>
     /// 所有插件中搜索无论是否启用
     /// </summary>
@@ -90,6 +128,106 @@ public class PluginManager
         AllPluginInfos.Clear();
         Load();
     }
+    public enum VersionCheckResult
+    {
+        依赖正常,
+        依赖不存在,
+        依赖远端不存在,
+        依赖下载失败,
+        依赖未启用,
+        依赖版本不匹配,
+        Kitopia版本不匹配
+    }
+
+    public static (bool,ConcurrentDictionary<string,VersionCheckResult>) CheckDependencies(List<PluginInfo> previewList,Dictionary<string, string> dependencies,bool autoDownload =true,bool autoEnable = false)
+    {
+        ConcurrentDictionary<string,VersionCheckResult> results = new();
+        bool canLoad = true;
+        
+        Parallel.ForEachAsync(dependencies, async (e1, e) =>
+        {
+            var (pluginSignName, verStr) = e1;
+            if (pluginSignName=="Kitopia")
+            {
+                if (!VersionInRange(ConfigManger.Version,verStr))
+                {
+                    canLoad = false;
+                    results.TryAdd(pluginSignName,VersionCheckResult.Kitopia版本不匹配);
+                    return;
+                }
+                return;
+            }
+            if (autoDownload)
+            {//下载缺失依赖
+                if (previewList.All(e => e.NameSign != pluginSignName))
+                {
+                    var onlinePluginInfo = await GetOnlinePluginInfo(pluginSignName);
+                    if (onlinePluginInfo is null)
+                    {
+                        ServiceManager.Services.GetService<IToastService>().Show("自动下载插件失败",$"未找到ID:{pluginSignName}的插件");
+                        canLoad = false;
+                        results.TryAdd(pluginSignName,VersionCheckResult.依赖远端不存在);
+                        return;
+                    }
+
+                    var downloadPluginOnline = await DownloadPluginOnline(onlinePluginInfo,targetVersion:verStr.Replace("^","").Split("-")[0]);
+                                
+                    if (downloadPluginOnline)
+                    {
+                        ServiceManager.Services.GetService<IToastService>().Show("自动下载插件成功",$"已自动下载并启用{onlinePluginInfo.Name}");
+                    }
+                    else
+                    {
+                        ServiceManager.Services.GetService<IToastService>().Show("自动下载插件失败",$"下载ID:{pluginSignName}的插件时遇到错误");
+                        results.TryAdd(pluginSignName,VersionCheckResult.依赖下载失败);
+                            
+                    }
+                }
+                var firstOrDefault2 = AllPluginInfos.FirstOrDefault(e => e.NameSign != pluginSignName);
+                if (firstOrDefault2 is null)
+                {
+                    canLoad = false;
+                    results.TryAdd(pluginSignName, VersionCheckResult.依赖不存在);
+                    return;
+                }
+
+                var versionInRange = VersionInRange(firstOrDefault2.Version,verStr);
+                if (!versionInRange)
+                {
+                    canLoad = false;
+                    results.TryAdd(pluginSignName, VersionCheckResult.依赖版本不匹配);
+                    return;
+                }
+            }
+            var firstOrDefault = AllPluginInfos.FirstOrDefault(e => e.ToPlgString() != pluginSignName);
+            if (firstOrDefault is null)
+            {
+                canLoad = false;
+                results.TryAdd(pluginSignName, VersionCheckResult.依赖不存在);
+                return;
+            }
+                
+            var contains = EnablePlugin.ContainsKey(pluginSignName);
+            if (!contains)
+            {
+                if (autoEnable)
+                {
+                    PluginManager.Load(contains);
+                }
+                else
+                {
+                    canLoad = false;
+                    results.TryAdd(pluginSignName, VersionCheckResult.依赖未启用);
+                    return;
+                }
+               
+            }
+        });
+            
+        
+
+        return (canLoad, results);
+    }
     public static void Load(bool init=false)
     {
         var pluginsDirectoryInfo = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "plugins");
@@ -98,7 +236,19 @@ public class PluginManager
             Log.Debug($"插件目录不存在创建{pluginsDirectoryInfo.FullName}");
             pluginsDirectoryInfo.Create();
         }
-
+        List<PluginInfo> previewList = new();
+        foreach (var enumerateDirectory in pluginsDirectoryInfo.EnumerateDirectories())
+        {
+            if (File.Exists($"{enumerateDirectory.FullName}{Path.DirectorySeparatorChar}manifest.json"))
+            {
+                var readAllText = File.ReadAllText($"{enumerateDirectory.FullName}{Path.DirectorySeparatorChar}manifest.json");
+                var serialize = JsonSerializer.Deserialize<PluginInfo>(readAllText);
+                if (serialize != null)
+                {
+                    previewList.Add(serialize);
+                }
+            }
+        }
         foreach (var directoryInfo in pluginsDirectoryInfo.EnumerateDirectories())
         {
             if (File.Exists($"{directoryInfo.FullName}{Path.DirectorySeparatorChar}.remove"))
@@ -136,6 +286,27 @@ public class PluginManager
                     serialize.FullPath= $"{directoryInfo.FullName}{Path.DirectorySeparatorChar}{serialize.Main}";
                     serialize.Path= $"{directoryInfo.FullName}{Path.DirectorySeparatorChar}";
                     serialize.IsEnabled = false;
+                    var (item1, versionCheckResults) = 
+                        CheckDependencies(previewList,serialize.Dependencies,ConfigManger.Config.EnabledPluginInfos.Any(e => e.ToPlgString()==serialize.ToPlgString()));
+                    if (!item1)
+                    {
+                        StringBuilder stringBuilder = new StringBuilder();
+                        foreach (var (key, value) in versionCheckResults)
+                        {
+                            stringBuilder.AppendLine($"{key} {value.ToString()}");
+                        }
+                        
+                        Log.Error($"加载插件{serialize.Name}时插件错误,缺失依赖\n {stringBuilder}");
+                        var dialog = new DialogContent()
+                        {
+                            Title = $"加载插件{serialize.Name}时插件错误",
+                            Content = stringBuilder,
+                            CloseButtonText = "我知道了",
+                        };
+                        ((IContentDialog)ServiceManager.Services!.GetService(typeof(IContentDialog))!).ShowDialogAsync(null,
+                            dialog);
+                        continue;
+                    }
                     if (serialize.UpdateTargetVersion==0)
                     {
                         serialize.UpdateTargetVersion = serialize.VersionId;
@@ -180,10 +351,31 @@ public class PluginManager
             return null;
         }
     }
+    public static async Task<OnlinePluginInfo> GetOnlinePluginInfo(string pluginSignName)
+    {
+        try
+        {
+            var request = new HttpRequestMessage()
+            {
+                RequestUri = new Uri($"https://www.ncserver.top:5111/api/plugin/{pluginSignName}"),
+                Method = HttpMethod.Get,
+            };
+            request.Headers.Add("AllBeforeThisVersion",true.ToString());
+            var sendAsync =await _httpClient.SendAsync(request);
+            var stringAsync =await  sendAsync.Content.ReadAsStringAsync();
+            var deserializeObject = (JObject)JsonConvert.DeserializeObject(stringAsync);
+            return deserializeObject["data"].ToObject<OnlinePluginInfo>();
+        }
+        catch (Exception e)
+        {
+            Log.Error("错误",e);
+            return null;
+        }
+    }
 
     public static async Task CheckAllUpdate()
     {
-       await Parallel.ForAsync(0, AllPluginInfos.Count, (i, token) =>
+        await Parallel.ForAsync(0, AllPluginInfos.Count, (i, token) =>
         {
             try
             {
@@ -206,9 +398,14 @@ public class PluginManager
       
     }
 
-    public static async Task<bool> DownloadPluginOnline(OnlinePluginInfo plugin)
+    public static async Task<bool> DownloadPluginOnline(OnlinePluginInfo plugin,int? targetVersionId=null,string? targetVersion=null)
     {
-        var downloadPlugin = await DownloadPlugin(plugin.Id,plugin.LastVersionId,plugin.ToPlgString());
+        object? key = (targetVersionId.HasValue ? targetVersionId.Value : targetVersion);
+        if (key is null)
+        {
+            key = plugin.LastVersionId;
+        }
+        var downloadPlugin = await DownloadPlugin(plugin.Id,key,plugin.ToPlgString());
         if (!downloadPlugin)
         {
             return false;
@@ -223,7 +420,7 @@ public class PluginManager
         return true;
     }
 
-    private static async Task<bool> DownloadPlugin(int id,int versionId,string plugin)
+    private static async Task<bool> DownloadPlugin(int id,object versionId,string plugin)
     {
         try
         {
@@ -266,7 +463,7 @@ public class PluginManager
 
     public static async Task<bool> DownloadPluginOnline(PluginInfo plugin)
     {
-       return await DownloadPlugin(plugin.Id,plugin.UpdateTargetVersion,plugin.ToPlgString());
+        return await DownloadPlugin(plugin.Id,plugin.UpdateTargetVersion,plugin.ToPlgString());
        
     }
 }

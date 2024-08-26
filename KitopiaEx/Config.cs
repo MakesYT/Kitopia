@@ -27,7 +27,6 @@ public class Config : ConfigBase
                 }
             }
         };
-        Console.WriteLine(1);
         
     }
 }

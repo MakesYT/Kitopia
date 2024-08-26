@@ -52,7 +52,6 @@ public class MyDataTemplateSelector : IDataTemplate
                 var control = Templates["EnumTemplate"].Build(item);
                 var childOfType = control.GetChildOfType<ComboBox>("ComboBox");
                 childOfType.ItemsSource = pointItem.RealType.GetEnumValues();
-                Console.WriteLine(1);
                 return control;
             }
 

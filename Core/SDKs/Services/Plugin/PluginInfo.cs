@@ -1,10 +1,20 @@
 ﻿using System.Drawing;
 using System.Text.Json.Serialization;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Core.JsonConverter;
 using Bitmap = Avalonia.Media.Imaging.Bitmap;
 
 namespace PluginCore;
-
+public class PluginDependency
+{
+    public string Item1 { get; set; }
+    public string Item2 { get; set; }
+    public void Deconstruct(out string plgStr, out string verStr)
+    {
+        plgStr = Item1;
+        verStr = Item2;
+    }
+}
 [ObservableObject]
 public partial class PluginInfo
 {
@@ -26,6 +36,8 @@ public partial class PluginInfo
     public string Main { set; get; }
     public string FullPath { set; get; }
     public string Path { set; get; }
+    
+    public Dictionary<string, string> Dependencies { set; get; }
     
     [JsonIgnore]
     [property:JsonIgnore]

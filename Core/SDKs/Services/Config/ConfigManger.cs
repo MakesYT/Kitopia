@@ -20,6 +20,7 @@ namespace Core.SDKs.Services.Config;
 
 public static class ConfigManger
 {
+    public static Version Version = new Version("1.0.0");
     public static Dictionary<string, ConfigBase> Configs = new();
     public static KitopiaConfig? Config => Configs["KitopiaConfig"] as KitopiaConfig ?? null;
     private static readonly ILog log = LogManager.GetLogger(nameof(ConfigManger));
