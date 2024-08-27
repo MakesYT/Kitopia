@@ -63,11 +63,11 @@ public static class CustomScenarioManger
         {
             Load(fileInfo);
         }
-
+        Log.Debug($"加载情景信息完成共{CustomScenarios.Count}情景被识别");
         WeakReferenceMessenger.Default.Send("Kitopia_SoftwareStarted", "CustomScenarioTrigger");
     }
 
-    public static void LoadAll()
+    public static void Reload()
     {
         CustomScenarios.Clear();
         var info = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "customScenarios");
@@ -75,6 +75,7 @@ public static class CustomScenarioManger
         {
             Load(fileInfo);
         }
+        Log.Debug($"重载情景信息完成共{CustomScenarios.Count}情景被识别");
     }
 
     public static void Load(FileInfo fileInfo)

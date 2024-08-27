@@ -93,7 +93,7 @@ public class PluginManager
         CustomScenarioManger.ReCheck(true);
     }
 
-    public static void UnloadPlugin(PluginInfo pluginInfoEx)
+    public static void UnloadPlugin(PluginInfo pluginInfoEx,bool reloadPluginAndCustomScenarion=true)
     {
         Plugin.UnloadByPluginInfo(pluginInfoEx.ToPlgString(), out var weakReference);
         PluginManager.EnablePlugin.Remove(pluginInfoEx.ToPlgString());
@@ -111,12 +111,15 @@ public class PluginManager
         if (weakReference.IsAlive)
         {
             pluginInfoEx.UnloadFailed = true;
-            File.Create(
-                $"{AppDomain.CurrentDomain.BaseDirectory}plugins{Path.DirectorySeparatorChar}{pluginInfoEx.ToPlgString()}{Path.DirectorySeparatorChar}.unload");
         }
             
         // Items.ResetBindings();
-        CustomScenarioManger.LoadAll();
+        if (reloadPluginAndCustomScenarion)
+        {
+            Reload();
+            CustomScenarioManger.Reload();
+        }
+       
     }
 
     public static void Reload()
@@ -127,6 +130,7 @@ public class PluginManager
         }
         AllPluginInfos.Clear();
         Load();
+        
     }
     public enum VersionCheckResult
     {
@@ -264,18 +268,7 @@ public class PluginManager
                 continue;
             }
 
-            if (File.Exists($"{directoryInfo.FullName}{Path.DirectorySeparatorChar}.unload"))
-            {
-                if (init)
-                {
-                    File.Delete($"{directoryInfo.FullName}{Path.DirectorySeparatorChar}.unload");
-                }
-                else
-                {
-                    continue;
-                }
-                
-            }
+           
             if (File.Exists($"{directoryInfo.FullName}{Path.DirectorySeparatorChar}manifest.json"))
             {
                 var readAllText = File.ReadAllText($"{directoryInfo.FullName}{Path.DirectorySeparatorChar}manifest.json");
@@ -315,6 +308,7 @@ public class PluginManager
                     {
                         DownloadPluginOnline(serialize).Wait();
                     }
+                    Log.Debug($"加载插件{serialize.Name}信息成功");
                     if (ConfigManger.Config.EnabledPluginInfos.Any(e => e.ToPlgString()==serialize.ToPlgString()))
                     {
                         serialize.IsEnabled = true;
@@ -327,7 +321,48 @@ public class PluginManager
             }
             
         }
-        
+        Log.Debug($"加载插件信息完成共{AllPluginInfos.Count}插件被识别");
+    }
+
+    public static void DeletePlugin(string pluginSignName)
+    {
+        DeletePlugin(AllPluginInfos.FirstOrDefault(e=>e.NameSign==pluginSignName));
+    }
+    public static void DeletePlugin(PluginInfo pluginInfoEx)
+    {
+        var dialog = new DialogContent()
+        {
+            Title = $"删除{pluginInfoEx.Name}?",
+            Content = "是否确定删除?\n他真的会丢失很久很久(不可恢复)",
+            PrimaryButtonText = "确定",
+            CloseButtonText = "取消",
+            PrimaryAction = () =>
+            {
+                DeletePluginWithoutCheck(pluginInfoEx);
+            }
+        };
+        ((IContentDialog)ServiceManager.Services!.GetService(typeof(IContentDialog))!).ShowDialogAsync(null,
+            dialog);
+    }
+
+    public static void DeletePluginWithoutCheck(PluginInfo pluginInfoEx)
+    {
+        Log.Debug($"删除插件{pluginInfoEx.Name}");
+        PluginManager.UnloadPlugin(pluginInfoEx,false);
+        if (!pluginInfoEx.UnloadFailed)
+        {
+            var pluginsDirectoryInfo = new DirectoryInfo($"{AppDomain.CurrentDomain.BaseDirectory}plugins{Path.DirectorySeparatorChar}{pluginInfoEx.ToPlgString()}");
+            pluginsDirectoryInfo.Delete(true);
+            Task.Run(PluginManager.Reload);
+        }
+        else
+        {
+            File.Create(
+                $"{AppDomain.CurrentDomain.BaseDirectory}plugins{Path.DirectorySeparatorChar}{pluginInfoEx.ToPlgString()}{Path.DirectorySeparatorChar}.remove");
+            Task.Run(PluginManager.Reload);
+        }
+        Reload();
+        CustomScenarioManger.Reload();
     }
 
     public static async Task<OnlinePluginInfo> GetOnlinePluginInfo(int id)
@@ -424,6 +459,7 @@ public class PluginManager
     {
         try
         {
+            Log.Debug( $"从服务器下载插件{plugin}(ID:{id})版本{versionId}");
             var streamAsync =await _httpClient.GetStreamAsync($"https://www.ncserver.top:5111/api/plugin/download/1/{id}/{versionId}");
             Directory.CreateDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "temp"));
             var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "temp",$"{plugin}.zip");

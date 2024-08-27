@@ -6,6 +6,7 @@ public enum CustomScenarioLoadFromJsonFailedType
 {
     插件未找到,
     插件未启用,
+    插件正在被卸载需要重启,
     方法未找到,
     类未找到
 }

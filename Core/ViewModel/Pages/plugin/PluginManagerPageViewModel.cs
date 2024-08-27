@@ -54,31 +54,7 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
     [RelayCommand]
     private void Delete(PluginInfo pluginInfoEx)
     {
-        var dialog = new DialogContent()
-        {
-            Title = $"删除{pluginInfoEx.Name}?",
-            Content = "是否确定删除?\n他真的会丢失很久很久(不可恢复)",
-            PrimaryButtonText = "确定",
-            CloseButtonText = "取消",
-            PrimaryAction = () =>
-            {
-                PluginManager.UnloadPlugin(pluginInfoEx);
-                if (!pluginInfoEx.UnloadFailed)
-                {
-                    var pluginsDirectoryInfo = new DirectoryInfo($"{AppDomain.CurrentDomain.BaseDirectory}plugins{Path.DirectorySeparatorChar}{pluginInfoEx.ToPlgString()}");
-                    pluginsDirectoryInfo.Delete(true);
-                    Task.Run(PluginManager.Reload);
-                }
-                else
-                {
-                    File.Create(
-                        $"{AppDomain.CurrentDomain.BaseDirectory}plugins{Path.DirectorySeparatorChar}{pluginInfoEx.ToPlgString()}{Path.DirectorySeparatorChar}.remove");
-                    Task.Run(PluginManager.Reload);
-                }
-            }
-        };
-        ((IContentDialog)ServiceManager.Services!.GetService(typeof(IContentDialog))!).ShowDialogAsync(null,
-            dialog);
+        PluginManager.DeletePlugin(pluginInfoEx);
         
         
     }
