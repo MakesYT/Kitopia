@@ -365,26 +365,9 @@ public class PluginManager
         CustomScenarioManger.Reload();
     }
 
-    public static async Task<OnlinePluginInfo> GetOnlinePluginInfo(int id)
+    public static Task<OnlinePluginInfo> GetOnlinePluginInfo(int id)
     {
-        try
-        {
-            var request = new HttpRequestMessage()
-            {
-                RequestUri = new Uri($"https://www.ncserver.top:5111/api/plugin/{id}"),
-                Method = HttpMethod.Get,
-            };
-            request.Headers.Add("AllBeforeThisVersion",true.ToString());
-            var sendAsync =await _httpClient.SendAsync(request);
-            var stringAsync =await  sendAsync.Content.ReadAsStringAsync();
-            var deserializeObject = (JObject)JsonConvert.DeserializeObject(stringAsync);
-            return deserializeObject["data"].ToObject<OnlinePluginInfo>();
-        }
-        catch (Exception e)
-        {
-            Log.Error("错误",e);
-            return null;
-        }
+        return GetOnlinePluginInfo(id.ToString());
     }
     public static async Task<OnlinePluginInfo> GetOnlinePluginInfo(string pluginSignName)
     {

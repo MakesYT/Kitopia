@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using AvaloniaEdit.Utils;
+using Core.SDKs.Services.Plugin;
 using log4net;
 using MQTTnet;
 using MQTTnet.Client;
@@ -51,7 +52,19 @@ public class MqttManager
                     {
                         Log.Debug("MQTT连接成功");
                         var jObject = new JObject();
-                        jObject.Add("type",(int)MqttMsgType.重复启动);
+                        if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime
+                            appLifetime)
+                        {
+                            if (appLifetime.Args is null)
+                            {
+                                jObject.Add("type",(int)MqttMsgType.重复启动);
+                            }
+                            else
+                            {
+                                
+                            }
+                        }
+                       
                         mqttClient.PublishAsync( new MqttApplicationMessage { Topic = "test", Payload = Encoding.UTF8.GetBytes(jObject.ToString()),QualityOfServiceLevel = MqttQualityOfServiceLevel.ExactlyOnce });
                     }
             
@@ -120,7 +133,20 @@ public class MqttManager
                     break;
                 }
                 case MqttMsgType.下载指定插件:
+                {
+                    //0 : pluginId
+                    //1 : pluginVersionInt
+                    // if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime appLifetime)
+                    // {
+                    //     var onlinePluginInfo =await PluginManager.GetOnlinePluginInfo(appLifetime.Args[0]);
+                    //     if (onlinePluginInfo == null)
+                    //     {
+                    //         break;
+                    //     }
+                    //     PluginManager.DownloadPluginOnline(onlinePluginInfo,int.Parse(appLifetime.Args[1]));
+                    // }
                     break;
+                }
                 default:
                     throw new ArgumentOutOfRangeException();
             }
