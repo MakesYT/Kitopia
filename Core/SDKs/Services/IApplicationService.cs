@@ -3,4 +3,5 @@
 public interface IApplicationService
 {
     public void Restart();
+    public void Stop();
 }

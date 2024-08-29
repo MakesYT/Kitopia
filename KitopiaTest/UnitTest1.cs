@@ -1,3 +1,4 @@
+using MQTTnet;
 using SharpHook;
 using SharpHook.Native;
 
@@ -13,16 +14,14 @@ public class Tests
     [Test]
     public void Test1()
     {
-        var eventSimulator = new EventSimulator();
-        eventSimulator.SimulateKeyPress(KeyCode.VcLeftControl);
-
-        eventSimulator.SimulateKeyPress(KeyCode.VcLeftAlt);
-        eventSimulator.SimulateKeyPress(KeyCode.VcA);
-        Task.Delay(100).GetAwaiter().GetResult();
-
-        eventSimulator.SimulateKeyRelease(KeyCode.VcA);
-        eventSimulator.SimulateKeyRelease(KeyCode.VcLeftAlt);
-        eventSimulator.SimulateKeyRelease(KeyCode.VcLeftControl);
+        var mqttFactory = new MqttFactory();
+        var mqttServerOptions = mqttFactory.CreateServerOptionsBuilder()
+            .WithDefaultEndpoint().WithDefaultEndpointPort(6600).Build();
+        var Server = mqttFactory.CreateMqttServer(mqttServerOptions);
+       
+        
+            Server.StartAsync();
+            Console.Read();
 
 
         Assert.Pass();

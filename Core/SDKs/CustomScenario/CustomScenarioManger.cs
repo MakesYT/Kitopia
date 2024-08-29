@@ -53,12 +53,12 @@ public static class CustomScenarioManger
         });
 
 
-        if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "customScenarios"))
+        if (!Directory.Exists($"{AppDomain.CurrentDomain.BaseDirectory}customScenarios"))
         {
-            Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + "customScenarios");
+            Directory.CreateDirectory($"{AppDomain.CurrentDomain.BaseDirectory}customScenarios");
         }
 
-        var info = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "customScenarios");
+        var info = new DirectoryInfo($"{AppDomain.CurrentDomain.BaseDirectory}customScenarios");
         foreach (var fileInfo in info.GetFiles())
         {
             Load(fileInfo);

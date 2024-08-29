@@ -10,6 +10,7 @@ using Avalonia.Threading;
 using Core.SDKs.CustomScenario;
 using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
+using Core.SDKs.Services.MQTT;
 using Core.SDKs.Services.Plugin;
 using Core.ViewModel;
 using log4net;
@@ -58,12 +59,14 @@ public partial class MainWindow : UrsaWindow
 
         CheckAndDeleteLogFiles();
         log.Info("启动");
-
+        MqttManager.Init();
+        log.Info("MQTT初始化完成");
 
         HotKeyManager.Init();
         log.Debug("注册热键管理器完成");
         ConfigManger.Init();
         log.Info("配置文件初始化完成");
+        
         switch (ConfigManger.Config.themeChoice)
         {
             case ThemeEnum.跟随系统:

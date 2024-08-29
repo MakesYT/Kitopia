@@ -2,9 +2,11 @@
 
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using AvaloniaEdit.Utils;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using Core.SDKs.Services;
 using Core.SDKs.Services.Config;
 
 #endregion
@@ -73,8 +75,7 @@ public partial class MainWindowViewModel : ObservableRecipient
     [RelayCommand]
     public void Exit()
     {
-        ConfigManger.Save();
-        Environment.Exit(0);
+        ServiceManager.Services.GetService<IApplicationService>().Stop();
     }
 }
 
