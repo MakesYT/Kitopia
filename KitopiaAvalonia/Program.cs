@@ -30,8 +30,6 @@ using KitopiaAvalonia.Services;
 using KitopiaAvalonia.Windows;
 using log4net;
 using log4net.Config;
-
-using Microsoft.Toolkit.Uwp.Notifications;
 using PluginCore;
 using HotKeyManager = Core.SDKs.HotKey.HotKeyManager;
 using ScreenCaptureWindow = KitopiaAvalonia.Services.ScreenCaptureWindow;
@@ -55,13 +53,13 @@ class Program
         try
         {
             // RxApp.DefaultExceptionHandler = new MyCoolObservableExceptionHandler();
-            TaskScheduler.UnobservedTaskException += (sender, eventArgs) => { log.Error(eventArgs.Exception); };
+            TaskScheduler.UnobservedTaskException += (sender, eventArgs) => { log.Error("错误",eventArgs.Exception); };
 
-            AppDomain.CurrentDomain.UnhandledException += (sender, e) => { log.Fatal(e.ExceptionObject); };
+            AppDomain.CurrentDomain.UnhandledException += (sender, e) => { log.Fatal("错误",(Exception)e.ExceptionObject); };
             AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
             {
                 log.Info("程序退出");
-                ToastNotificationManagerCompat.Uninstall();
+                ServiceManager.Services.GetService<IToastService>().Unregister();
             };
             Task.Run(async () =>
             {
@@ -193,7 +191,7 @@ class Program
         
         MqttManager.Init().Wait();
         log.Info("MQTT初始化完成");
-
+        ServiceManager.Services.GetService<IToastService>().Init();
         HotKeyManager.Init();
         log.Debug("注册热键管理器完成");
         ConfigManger.Init();

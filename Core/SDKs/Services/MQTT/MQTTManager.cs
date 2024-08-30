@@ -11,6 +11,7 @@ using MQTTnet.Client;
 using MQTTnet.Protocol;
 using MQTTnet.Server;
 using Newtonsoft.Json.Linq;
+using PluginCore;
 
 namespace Core.SDKs.Services.MQTT;
 
@@ -95,6 +96,7 @@ public class MqttManager
         Server.ClientConnectedAsync+= Server_ClientConnectedAsync;
         Server.ClientDisconnectedAsync+= Server_ClientDisconnectedAsync;
         Server.InterceptingPublishAsync += Server_InterceptingPublishAsync;
+        
 
 
         try
@@ -148,15 +150,15 @@ public class MqttManager
                 {
                     //0 : pluginId
                     //1 : pluginVersionInt
-                    if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime appLifetime)
+                   
+                    var onlinePluginInfo =await PluginManager.GetOnlinePluginInfo(int.Parse(jObject["pluginId"].ToString()));
+                    if (onlinePluginInfo == null)
                     {
-                        var onlinePluginInfo =await PluginManager.GetOnlinePluginInfo(int.Parse(jObject["pluginId"].ToString()));
-                        if (onlinePluginInfo == null)
-                        {
-                            break;
-                        }
-                        PluginManager.DownloadPluginOnline(onlinePluginInfo,int.Parse(jObject["pluginVersionInt"].ToString()));
+                        ServiceManager.Services.GetService<IToastService>().Show("来自URL的操作失败",$"下载安装插件ID:{jObject["pluginVersionInt"]}不存在");
+                        break;
                     }
+                    PluginManager.DownloadPluginOnline(onlinePluginInfo,int.Parse(jObject["pluginVersionInt"].ToString()));
+                    ServiceManager.Services.GetService<IToastService>().Show("来自URL的操作",$"下载安装插件{onlinePluginInfo.Name}ID:{jObject["pluginVersionInt"]}成功");
                     break;
                 }
                 default:
@@ -165,7 +167,7 @@ public class MqttManager
         }
         catch (Exception e)
         {
-            Log.Error("错误",e);
+            Log.Error("来自URL的操作出现错误",e);
         }
         
     }

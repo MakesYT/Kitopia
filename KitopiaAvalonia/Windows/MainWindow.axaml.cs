@@ -14,7 +14,7 @@ using Core.SDKs.Services.MQTT;
 using Core.SDKs.Services.Plugin;
 using Core.ViewModel;
 using log4net;
-using Microsoft.Extensions.DependencyInjection;
+
 using Ursa.Controls;
 using HotKeyManager = Core.SDKs.HotKey.HotKeyManager;
 

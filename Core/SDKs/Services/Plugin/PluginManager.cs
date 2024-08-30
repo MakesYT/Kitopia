@@ -365,11 +365,11 @@ public class PluginManager
         CustomScenarioManger.Reload();
     }
 
-    public static Task<OnlinePluginInfo> GetOnlinePluginInfo(int id)
+    public static Task<OnlinePluginInfo?> GetOnlinePluginInfo(int id)
     {
         return GetOnlinePluginInfo(id.ToString());
     }
-    public static async Task<OnlinePluginInfo> GetOnlinePluginInfo(string pluginSignName)
+    public static async Task<OnlinePluginInfo?> GetOnlinePluginInfo(string pluginSignName)
     {
         try
         {
@@ -382,7 +382,12 @@ public class PluginManager
             var sendAsync =await _httpClient.SendAsync(request);
             var stringAsync =await  sendAsync.Content.ReadAsStringAsync();
             var deserializeObject = (JObject)JsonConvert.DeserializeObject(stringAsync);
-            return deserializeObject["data"].ToObject<OnlinePluginInfo>();
+            var jToken = deserializeObject["data"];
+            if (jToken.Type==JTokenType.Integer)
+            {
+                return null;
+            }
+            return jToken.ToObject<OnlinePluginInfo>();
         }
         catch (Exception e)
         {

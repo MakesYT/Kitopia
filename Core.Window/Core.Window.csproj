@@ -2,6 +2,7 @@
     
     <PropertyGroup>
         <TargetFrameworks>net8.0-windows10.0.17763.0</TargetFrameworks>
+        <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
     </PropertyGroup>
     <PropertyGroup>
         <UseWPF>true</UseWPF>
@@ -9,6 +10,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <WindowsPackageType>None</WindowsPackageType>
+        <EnableMsixTooling>true</EnableMsixTooling>
     </PropertyGroup>
 
     <ItemGroup>
@@ -28,6 +31,7 @@
         </Content>
     </ItemGroup>
     <ItemGroup>
+        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240802000" />
         <PackageReference Include="Vanara.Core" Version="4.0.1"/>
         <PackageReference Include="Vanara.PInvoke.FirewallApi" Version="4.0.1"/>
         <PackageReference Include="Vanara.PInvoke.NetApi32" Version="4.0.1"/>
