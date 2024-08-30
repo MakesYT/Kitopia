@@ -112,7 +112,6 @@ class Program
         services.AddSingleton<ISearchItemTool, SearchItemTool>();
         services.AddTransient<IClipboardService, ClipboardWindow>();
         services.AddTransient<IWindowTool, WindowToolServiceWindow>();
-        services.AddTransient<IAutoStartService, AutoStartService>();
         services.AddTransient<IApplicationService, ApplicationService>();
         #endif
 
@@ -184,47 +183,7 @@ class Program
             }
         }
     }
-
-    private static void SetAutoStartup()
-    {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            SetAutoStartupWindow();
-        }
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-        {
-            SetAutoStartupLinux();
-        }
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    private static void SetAutoStartupWindow()
-    {
-        ServiceManager.Services.GetService<IAutoStartService>()
-            .ChangeAutoStart(true);
-    }
-
-    private static void SetAutoStartupLinux()
-    {
-        var strName = AppDomain.CurrentDomain.BaseDirectory + "KitopiaAvalonia";
-        if (!File.Exists(strName)) //判断要自动运行的应用程序文件是否存在
-        {
-            return;
-        }
-
-        var iniF = $"{Environment.GetEnvironmentVariable("HOME")}/.config/autostart/kitopia.desktop";
-        if (File.Exists(iniF)) //判断要自动运行的应用程序文件是否存在
-        {
-            return;
-        }
-
-        // \nIcon=/home/makesyt/.local/share/JetBrains/Toolbox/toolbox.svg
-        File.WriteAllText(iniF,
-            $"[Desktop Entry]\nExec={strName}\nVersion=1.0\nType=Application\nCategories=Development\nName=Kitopia\nStartupWMClass=kitopia\nTerminal=false\nX-GNOME-Autostart-enabled=true\nStartupNotify=false\nX-GNOME-Autostart-Delay=10\nX-MATE-Autostart-Delay=10\nX-KDE-autostart-after=panel\nX-Deepin-CreatedBy=com.deepin.SessionManager\nX-Deepin-AppID=kitopia\nHidden=false");
-    }
+    
     public static void OnStartup(string[] arg)
     {
         log.Info("启动");
@@ -279,9 +238,10 @@ class Program
         if (ConfigManger.Config.autoStart)
         {
             log.Info("设置开机自启");
-            SetAutoStartup();
+            ServiceManager.Services.GetService<IApplicationService>()
+                .ChangeAutoStart(true);
         }
-
+        ServiceManager.Services.GetService<IApplicationService>().Init();
         Dispatcher.UIThread.InvokeAsync(() => { ServiceManager.Services.GetService<SearchWindowViewModel>(); });
     }
     // Avalonia configuration, don't remove; also used by visual designer.

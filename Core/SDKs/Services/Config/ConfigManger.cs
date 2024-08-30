@@ -97,7 +97,7 @@ public static class ConfigManger
             {
                 case "autoStart":
                 {
-                    ServiceManager.Services.GetService<IAutoStartService>()
+                    ServiceManager.Services.GetService<IApplicationService>()
                         .ChangeAutoStart(args.Value as bool? ?? false);
 
                     break;

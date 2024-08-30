@@ -61,7 +61,19 @@ public class MqttManager
                             }
                             else
                             {
-                                
+                                var replace = appLifetime.Args[0].Replace("kitopiaurl://","").TrimEnd('/');
+                                jObject.Add("data",replace);
+                                var strings = replace.Split(";");
+                                for (int i1 = 0; i1 < strings.Length; i1++)
+                                {
+                                    var s = strings[i1].Split("=");
+                                    if (s.Length == 2)
+                                    {
+                                       
+                                        jObject.Add(s[0],s[1]);
+                                    }
+                                }
+                               
                             }
                         }
                        
@@ -136,15 +148,15 @@ public class MqttManager
                 {
                     //0 : pluginId
                     //1 : pluginVersionInt
-                    // if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime appLifetime)
-                    // {
-                    //     var onlinePluginInfo =await PluginManager.GetOnlinePluginInfo(appLifetime.Args[0]);
-                    //     if (onlinePluginInfo == null)
-                    //     {
-                    //         break;
-                    //     }
-                    //     PluginManager.DownloadPluginOnline(onlinePluginInfo,int.Parse(appLifetime.Args[1]));
-                    // }
+                    if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime appLifetime)
+                    {
+                        var onlinePluginInfo =await PluginManager.GetOnlinePluginInfo(int.Parse(jObject["pluginId"].ToString()));
+                        if (onlinePluginInfo == null)
+                        {
+                            break;
+                        }
+                        PluginManager.DownloadPluginOnline(onlinePluginInfo,int.Parse(jObject["pluginVersionInt"].ToString()));
+                    }
                     break;
                 }
                 default:
