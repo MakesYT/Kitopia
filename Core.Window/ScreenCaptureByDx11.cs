@@ -54,10 +54,10 @@ public class ScreenCaptureByDx11 : IScreenCapture
         public void Dispose() => busySetter.Invoke();
     }
 
-    public (Queue<Bitmap>, Queue<Bitmap>) CaptureAllScreen()
+    public Stack<ScreenCaptureResult> CaptureAllScreen()
     {
-        Queue<Bitmap> bitmaps = new();
-        Queue<Bitmap> mosaics = new();
+        var screenCaptureResults = new Stack<ScreenCaptureResult>();
+        
         unsafe
         {
             DXGI dxgi = new DXGI(new DefaultNativeContext("dxgi"));
@@ -192,9 +192,7 @@ public class ScreenCaptureByDx11 : IScreenCapture
                         }
 
                         span = null;
-
-                        bitmaps.Enqueue(writeableBitmap);
-
+                        
                         var process = GaussianBlur1.GaussianBlur(array, desc.DesktopCoordinates.Size.X,
                             desc.DesktopCoordinates.Size.Y, 4);
                         var writeableBitmap2 = new WriteableBitmap(
@@ -209,8 +207,19 @@ public class ScreenCaptureByDx11 : IScreenCapture
                                     desc.DesktopCoordinates.Size.X * 4);
                             }
                         }
-
-                        mosaics.Enqueue(writeableBitmap2);
+                        
+                        screenCaptureResults.Push(new ScreenCaptureResult()
+                        {
+                            Source = writeableBitmap,
+                            Mosaic = writeableBitmap2,
+                            Info = new ScreenCaptureInfo()
+                            {
+                                Height = desc.DesktopCoordinates.Size.Y,
+                                Width = desc.DesktopCoordinates.Size.X,
+                                X= desc.DesktopCoordinates.Min.X,
+                                Y = desc.DesktopCoordinates.Min.Y
+                            }
+                        });
                         array = null;
                         process = null;
 
@@ -259,7 +268,7 @@ public class ScreenCaptureByDx11 : IScreenCapture
         }
 
 
-        return (bitmaps, mosaics);
+        return screenCaptureResults;
     }
 
     public (Bitmap?, Bitmap?)? CaptureScreen(ScreenCaptureInfo screenCaptureInfo, bool withMosaic = false)

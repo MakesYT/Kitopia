@@ -16,37 +16,25 @@ public class ScreenCaptureWindow : IScreenCaptureWindow
     public void CaptureScreen()
     {
         var captureAllScreen = ServiceManager.Services.GetService<IScreenCapture>()!.CaptureAllScreen();
-        if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        while (captureAllScreen.TryPop(out var result))
         {
-            var screens = desktop.MainWindow.Screens;
-            for (var index = 0; index < screens.All.Count; index++)
+            var window = new Windows.ScreenCaptureWindow(0)
             {
-                var screen = screens.All[index];
-                var rect = screen.Bounds;
-                new Windows.ScreenCaptureWindow(index)
-                {
-                    Position = new PixelPoint(rect.X, rect.Y),
-                    WindowState = WindowState.FullScreen,
-                    SystemDecorations = SystemDecorations.None,
-                    Background = new SolidColorBrush(Colors.Black),
-                    ShowInTaskbar = false,
-                    Topmost = true,
-                    CanResize = false,
-                    IsVisible = true,
-                    MosaicImage =
-                    {
-                        Source = captureAllScreen.Item2.Count > 0 ? captureAllScreen.Item2.Dequeue() : null
-                    },
-                    Image =
-                    {
-                        Source = captureAllScreen.Item1.Count > 0 ? captureAllScreen.Item1.Dequeue() : null
-                    }
-                }.Show();
-            }
-        }
+                Position = new PixelPoint(result.Info.X, result.Info.Y),
+                WindowState = WindowState.FullScreen,
+                SystemDecorations = SystemDecorations.None,
+                Background = new SolidColorBrush(Colors.Black),
+                ShowInTaskbar = false,
+                Topmost = false,
+                CanResize = false,
+                IsVisible = true,
+            };
 
-        captureAllScreen.Item2.Clear();
-        captureAllScreen.Item1.Clear();
+            window.MosaicImage.Source = result.Mosaic;
+            window.Image.Source = result.Source;
+            window.Show();
+        }
+        
         GC.Collect(2, GCCollectionMode.Aggressive);
     }
 
@@ -64,35 +52,26 @@ public class ScreenCaptureWindow : IScreenCaptureWindow
         };
         await semaphore.WaitAsync();
         var captureAllScreen = ServiceManager.Services.GetService<IScreenCapture>()!.CaptureAllScreen();
-        if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        while (captureAllScreen.TryPop(out var result))
         {
-            var screens = desktop.MainWindow.Screens;
-            for (var index = 0; index < screens.All.Count; index++)
+            var window = new Windows.ScreenCaptureWindow(0)
             {
-                var screen = screens.All[index];
-                var rect = screen.Bounds;
-                var window = new Windows.ScreenCaptureWindow(index)
-                {
-                    Position = new PixelPoint(rect.X, rect.Y),
-                    WindowState = WindowState.FullScreen,
-                    SystemDecorations = SystemDecorations.None,
-                    Background = new SolidColorBrush(Colors.Black),
-                    ShowInTaskbar = false,
-                    Topmost = false,
-                    CanResize = false,
-                    IsVisible = true,
-                };
+                Position = new PixelPoint(result.Info.X, result.Info.Y),
+                WindowState = WindowState.FullScreen,
+                SystemDecorations = SystemDecorations.None,
+                Background = new SolidColorBrush(Colors.Black),
+                ShowInTaskbar = false,
+                Topmost = false,
+                CanResize = false,
+                IsVisible = true,
+            };
 
-                window.MosaicImage.Source = captureAllScreen.Item2.Count > 0 ? captureAllScreen.Item2.Dequeue() : null;
-                window.Image.Source = captureAllScreen.Item1.Count > 0 ? captureAllScreen.Item1.Dequeue() : null;
-                window.SetToSelectMode(action);
-                window.Show();
-            }
+            window.MosaicImage.Source = result.Mosaic;
+            window.Image.Source = result.Source;
+            window.SetToSelectMode(action);
+            window.Show();
         }
-
         await semaphore.WaitAsync();
-        captureAllScreen.Item2.Clear();
-        captureAllScreen.Item1.Clear();
         semaphore.Dispose();
         GC.Collect(2, GCCollectionMode.Aggressive);
 
