@@ -32,7 +32,7 @@
         <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
         <DebugType Condition="'$(Configuration)' == 'Release'">none</DebugType>
         <Version>0.0.2.074</Version>
-        <AvaloniaVersion>11.2.999-cibuild0050397-alpha</AvaloniaVersion>
+        <AvaloniaVersion>11.2.0-rc1</AvaloniaVersion>
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU;x64</Platforms>
     </PropertyGroup>
@@ -49,8 +49,6 @@
         <ProjectReference Condition=" '$(OS)' == 'Windows_NT' " Include="..\Core.Window\Core.Window.csproj"/>
         <ProjectReference Include="..\NodifyM.Avalonia\NodifyM.Avalonia\NodifyM.Avalonia.csproj"/>
         <ProjectReference Include="..\Core\Core.csproj"/>
-        <ProjectReference Include="..\Semi.Avalonia\src\Semi.Avalonia.ColorPicker\Semi.Avalonia.ColorPicker.csproj"/>
-        <ProjectReference Include="..\Semi.Avalonia\src\Semi.Avalonia\Semi.Avalonia.csproj"/>
     </ItemGroup>
     <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
         <DefineConstants>$(DefineConstants);ENABLE_XAML_HOT_RELOAD</DefineConstants>
@@ -67,14 +65,16 @@
         <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)"/>
         <PackageReference Include="Avalonia.Controls.ColorPicker" Version="$(AvaloniaVersion)"/>
         <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)"/>
-        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.1.0-rc2"/>
-        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2"/>
-        <PackageReference Include="Irihi.Ursa" Version="1.0.0-rc1"/>
-        <PackageReference Include="Irihi.Ursa.Themes.Semi" Version="1.0.0-rc1"/>
+        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.1.0.4" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
+        <PackageReference Include="Irihi.Ursa" Version="1.4.0" />
+        <PackageReference Include="Irihi.Ursa.Themes.Semi" Version="1.4.0" />
         <PackageReference Include="log4net" Version="2.0.17"/>
-        <PackageReference Include="Markdown.Avalonia" Version="11.0.2" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0"/>
-        <PackageReference Include="System.Drawing.Common" Version="8.0.6"/>
+        <PackageReference Include="Markdown.Avalonia" Version="11.0.3-a1" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0-rc.2.24473.5" />
+        <PackageReference Include="Semi.Avalonia" Version="11.2.0-beta1" />
+        <PackageReference Include="Semi.Avalonia.ColorPicker" Version="11.1.0.5-beta1" />
+        <PackageReference Include="System.Drawing.Common" Version="9.0.0-rc.2.24474.1" />
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Include="log4net.config">
