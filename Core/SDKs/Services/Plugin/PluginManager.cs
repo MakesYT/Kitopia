@@ -375,7 +375,7 @@ public class PluginManager
         {
             var request = new HttpRequestMessage()
             {
-                RequestUri = new Uri($"https://www.ncserver.top:5111/api/plugin/{pluginSignName}"),
+                RequestUri = new Uri($"{ConfigManger.ApiUrl}/api/plugin/{pluginSignName}"),
                 Method = HttpMethod.Get,
             };
             request.Headers.Add("AllBeforeThisVersion",true.ToString());
@@ -403,7 +403,7 @@ public class PluginManager
             try
             {
                 var httpResponseMessage = PluginManager._httpClient
-                    .GetAsync($"https://www.ncserver.top:5111/api/plugin/{AllPluginInfos[i].Id}").Result;
+                    .GetAsync($"{ConfigManger.ApiUrl}/api/plugin/{AllPluginInfos[i].Id}").Result;
                 var httpContent = httpResponseMessage.Content.ReadAsStringAsync().Result;
                 var deserializeObject = (JObject)JsonConvert.DeserializeObject(httpContent);
                 var o = deserializeObject["data"];
@@ -448,7 +448,7 @@ public class PluginManager
         try
         {
             Log.Debug( $"从服务器下载插件{plugin}(ID:{id})版本{versionId}");
-            var streamAsync =await _httpClient.GetStreamAsync($"https://www.ncserver.top:5111/api/plugin/download/1/{id}/{versionId}");
+            var streamAsync =await _httpClient.GetStreamAsync($"{ConfigManger.ApiUrl}/api/plugin/download/1/{id}/{versionId}");
             Directory.CreateDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "temp"));
             var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "temp",$"{plugin}.zip");
             using (var fs = new FileStream(path, FileMode.Create))
@@ -463,7 +463,7 @@ public class PluginManager
         
             var request = new HttpRequestMessage()
             {
-                RequestUri = new Uri("https://www.ncserver.top:5111/api/plugin/avatar"),
+                RequestUri = new Uri($"{ConfigManger.ApiUrl}/api/plugin/avatar"),
                 Method = HttpMethod.Get,
             };
             request.Headers.Add("id", id.ToString());

@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
+using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
 using Core.ViewModel.Pages;
 using Newtonsoft.Json;
@@ -41,7 +42,7 @@ public partial class PluginDetail : UserControl
         {
             var request = new HttpRequestMessage()
             {
-                RequestUri = new Uri($"https://www.ncserver.top:5111/api/plugin/{pluginInfo.Id}"),
+                RequestUri = new Uri($"{ConfigManger.ApiUrl}/api/plugin/{pluginInfo.Id}"),
                 Method = HttpMethod.Get,
             };
             request.Headers.Add("AllBeforeThisVersion", true.ToString());

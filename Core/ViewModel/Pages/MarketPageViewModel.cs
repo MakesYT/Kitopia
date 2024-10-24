@@ -16,6 +16,7 @@ using CommunityToolkit.Mvvm.Input;
 using Core.AvaloniaControl.PluginManagerPage;
 using Core.SDKs;
 using Core.SDKs.Services;
+using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
 using KitopiaAvalonia.Tools;
 using Markdown.Avalonia.Full;
@@ -45,7 +46,7 @@ public partial class OnlinePluginInfo : ObservableObject
         {
            
             var request = new HttpRequestMessage() {
-                RequestUri = new Uri("https://www.ncserver.top:5111/api/user/baseInfo"),
+                RequestUri = new Uri($"{ConfigManger.ApiUrl}/api/user/baseInfo"),
                 Method = HttpMethod.Get,
             };
             request.Headers.Add("id",AuthorId.ToString());
@@ -105,7 +106,7 @@ public partial class MarketPageViewModel : ObservableObject
      }
     private async Task LoadPlugins()
     {
-        var async =await  PluginManager._httpClient.GetAsync("https://www.ncserver.top:5111/api/plugin/all");
+        var async =await  PluginManager._httpClient.GetAsync($"{ConfigManger.ApiUrl}/api/plugin/all");
         var stringAsync = await async.Content.ReadAsStringAsync();
         var options = new JsonSerializerOptions
         {
@@ -137,7 +138,7 @@ public partial class MarketPageViewModel : ObservableObject
             
             var request = new HttpRequestMessage()
             {
-                RequestUri = new Uri($"https://www.ncserver.top:5111/api/plugin/detail/{pluginInfo.Id}/{pluginInfo.LastVersionId}"),
+                RequestUri = new Uri($"{ConfigManger.ApiUrl}/api/plugin/detail/{pluginInfo.Id}/{pluginInfo.LastVersionId}"),
                 Method = HttpMethod.Get,
             };
             request.Headers.Add("AllBeforeThisVersion",true.ToString());

@@ -6,7 +6,7 @@
              xmlns:mdxaml="https://github.com/whistyun/Markdown.Avalonia.Tight"
              xmlns:pluginManagerPage1="clr-namespace:Core.AvaloniaControl.MarketPage"
              xmlns:pages="clr-namespace:Core.ViewModel.Pages"
-             xmlns:pluginManagerPage111="clr-namespace:KitopiaAvalonia.Converter.PluginManagerPage"
+             xmlns:pluginManagerPage111="clr-namespace:Core.AvaloniaControl.MarketPage"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="pages:OnlinePluginInfo"
              HorizontalAlignment="Stretch"

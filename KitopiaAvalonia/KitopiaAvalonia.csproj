@@ -111,6 +111,7 @@
         </Compile>
     </ItemGroup>
     <ItemGroup>
+      <Folder Include="Converter\MarketPage\" />
       <Folder Include="Converter\PluginManagerPage\" />
       <Folder Include="Tools\" />
     </ItemGroup>

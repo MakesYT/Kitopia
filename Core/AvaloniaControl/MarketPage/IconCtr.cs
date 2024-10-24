@@ -1,21 +1,15 @@
-﻿using System;
-using System.Globalization;
-using System.IO;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Globalization;
 using Avalonia.Controls;
 using Avalonia.Data.Converters;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media.Imaging;
+using Core.SDKs.Services.Config;
 using Core.SDKs.Services.Plugin;
 using Core.ViewModel.Pages;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using PluginCore;
-using SixLabors.ImageSharp;
 
-namespace KitopiaAvalonia.Converter.MarketPage;
+namespace Core.AvaloniaControl.MarketPage;
 
 public class IconCtr : IValueConverter
 {
@@ -37,14 +31,19 @@ public class IconCtr : IValueConverter
             {
                 var request = new HttpRequestMessage()
                 {
-                    RequestUri = new Uri("https://www.ncserver.top:5111/api/plugin/avatar"),
+                    RequestUri = new Uri($"{ConfigManger.ApiUrl}/api/plugin/avatar"),
                     Method = HttpMethod.Get,
                 };
                 request.Headers.Add("id", onlinePluginInfo.Id.ToString());
                 var sendAsync =await PluginManager._httpClient.SendAsync(request);
                 var stringAsync =await  sendAsync.Content.ReadAsStringAsync();
                 var deserializeObject = (JObject)JsonConvert.DeserializeObject(stringAsync);
-                onlinePluginInfo.Icon = new Bitmap(new MemoryStream(deserializeObject["data"].ToObject<byte[]>()));
+                if (deserializeObject["flag"].ToObject<bool>())
+                {
+                    onlinePluginInfo.Icon = new Bitmap(new MemoryStream(deserializeObject["data"].ToObject<byte[]>()));
+
+                }
+                
             });
 
 

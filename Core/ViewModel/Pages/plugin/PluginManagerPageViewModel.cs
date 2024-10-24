@@ -78,7 +78,7 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
     [RelayCommand]
     public async Task Update(PluginInfo pluginInfoEx)
     {
-        var httpResponseMessage = PluginManager._httpClient.GetAsync($"https://www.ncserver.top:5111/api/plugin/{pluginInfoEx.Id}").Result;
+        var httpResponseMessage = PluginManager._httpClient.GetAsync($"{ConfigManger.ApiUrl}/api/plugin/{pluginInfoEx.Id}").Result;
         var httpContent = httpResponseMessage.Content.ReadAsStringAsync().Result;
         var deserializeObject = (JObject)JsonConvert.DeserializeObject(httpContent);
         pluginInfoEx.UpdateTargetVersion = deserializeObject["data"]["lastVersionId"].ToObject<int>();
@@ -120,7 +120,7 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
         {
             var request = new HttpRequestMessage()
             {
-                RequestUri = new Uri($"https://www.ncserver.top:5111/api/plugin/detail/{pluginInfo.Id}/{pluginInfo.CanUpdateVersionId}"),
+                RequestUri = new Uri($"{ConfigManger.ApiUrl}/api/plugin/detail/{pluginInfo.Id}/{pluginInfo.CanUpdateVersionId}"),
                 Method = HttpMethod.Get,
             };
             request.Headers.Add("AllBeforeThisVersion",true.ToString());
@@ -175,7 +175,7 @@ public partial class PluginManagerPageViewModel : ObservableRecipient
             
             var request = new HttpRequestMessage()
             {
-                RequestUri = new Uri($"https://www.ncserver.top:5111/api/plugin/detail/{pluginInfo.Id}/{pluginInfo.CanUpdateVersionId}"),
+                RequestUri = new Uri($"{ConfigManger.ApiUrl}/api/plugin/detail/{pluginInfo.Id}/{pluginInfo.CanUpdateVersionId}"),
                 Method = HttpMethod.Get,
             };
             request.Headers.Add("AllBeforeThisVersion",true.ToString());
