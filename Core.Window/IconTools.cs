@@ -103,7 +103,7 @@ internal class IconTools
             var successCount = PrivateExtractIcons((string)path, 0, 48, 48, hIcons, ids, iconTotalCount, 0);
 
             //遍历并保存图标
-
+            Icon? icon =null;
             for (var i = 0; i < successCount; i++)
             {
                 //指针为空，跳过
@@ -112,8 +112,18 @@ internal class IconTools
                     continue;
                 }
 
-                var icon = Icon.FromHandle(hIcons[i]);
+                if (icon is null)
+                {
+                    icon = Icon.FromHandle(hIcons[i]);
+                }
+                else DestroyIcon(hIcons[i]);
 
+
+
+            }
+
+            if (icon is not null)
+            {
                 return icon;
             }
         }
@@ -147,7 +157,6 @@ internal class IconTools
     internal static void GetIconByItem(SearchViewItem t)
     {
         //Log.Debug($"为{t.OnlyKey}生成Icon");
-
         {
             switch (t.FileType)
             {
