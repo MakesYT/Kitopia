@@ -159,10 +159,10 @@ public partial class AppTools
         bool logging = false, bool useEverything = false)
     {
         log.Debug("索引全部软件及收藏项目");
-
-
+        
+       
         UwpTools.GetAll(collection);
-
+        log.Debug("索引全部软件及收藏项目UWP");
 
         // 创建一个空的文件路径集合
 

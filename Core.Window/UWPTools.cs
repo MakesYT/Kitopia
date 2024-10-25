@@ -37,22 +37,20 @@ internal static class UwpTools
         return null;
     }
 
-    internal static async Task GetAll(ConcurrentDictionary<string, SearchViewItem> items)
+    internal static void GetAll(ConcurrentDictionary<string, SearchViewItem> items)
     {
-        ConcurrentBag<Task> list = new();
         FirewallApi.NetworkIsolationEnumAppContainers(FirewallApi.NETISO_FLAG.NETISO_FLAG_FORCE_COMPUTE_BINARIES,
             out var pdwNuminternalAppCs, out var ppinternalAppCs);
         var options = new ParallelOptions
         {
-            MaxDegreeOfParallelism = 256
+            MaxDegreeOfParallelism = 5
         };
         Parallel.ForEach(ppinternalAppCs.ToIEnum<FirewallApi.INET_FIREWALL_APP_CONTAINER>(
-            (int)pdwNuminternalAppCs), options, file => { list.Add(AppContainerAnalyse(file, items)); });
-
-        await Task.WhenAll(list.ToArray());
+            (int)pdwNuminternalAppCs), options, file => { AppContainerAnalyse(file, items); });
+        
     }
 
-    private static async Task AppContainerAnalyse(FirewallApi.INET_FIREWALL_APP_CONTAINER appContainer,
+    private static void AppContainerAnalyse(FirewallApi.INET_FIREWALL_APP_CONTAINER appContainer,
         ConcurrentDictionary<string, SearchViewItem> items)
     {
         if (ConfigManger.Config.ignoreItems.Contains(appContainer.appContainerName))
