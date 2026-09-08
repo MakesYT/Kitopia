@@ -1,4 +1,5 @@
 using System.IO.Compression;
+using System.Net.Http.Headers;
 using Kitopia.Desktop.Features.Services.Config;
 using Kitopia.Desktop.Features.Utils;
 using Newtonsoft.Json;
@@ -10,6 +11,17 @@ public class PluginNetworkService
 {
     private const string PluginApiPath = "api/v1/plugin";
     private static readonly ILogger Logger = LogManager.Logger.ForContext<PluginNetworkService>();
+
+    internal static HttpRequestMessage CreateAuthorizedGetRequest(string path)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Get, GetPluginApiUrl(path));
+        var token = ConfigManger.Config?.userToken;
+        if (!string.IsNullOrWhiteSpace(token))
+        {
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        }
+        return request;
+    }
 
     public static readonly HttpClient HttpClient = new(new HttpClientHandler
     {
@@ -73,14 +85,9 @@ public class PluginNetworkService
         try
         {
             Logger.Debug("从服务器下载插件 {PluginSignName} 版本 {Version}", pluginSignName, version);
-            var downloadPath = GetPluginApiUrl(
-                $"download/{GetCurrentPlatformType()}/{Uri.EscapeDataString(pluginSignName)}/{Uri.EscapeDataString(version)}");
-            using var request = new HttpRequestMessage(HttpMethod.Get, downloadPath);
-            var token = ConfigManger.Config?.userToken;
-            if (!string.IsNullOrWhiteSpace(token))
-            {
-                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            }
+            var downloadPath =
+                $"download/{GetCurrentPlatformType()}/{Uri.EscapeDataString(pluginSignName)}/{Uri.EscapeDataString(version)}";
+            using var request = CreateAuthorizedGetRequest(downloadPath);
             using var response = await HttpClient.SendAsync(
                 request,
                 HttpCompletionOption.ResponseHeadersRead,
@@ -255,7 +262,8 @@ public class PluginNetworkService
     {
         try
         {
-            using var response = await HttpClient.GetAsync(GetPluginApiUrl(path), cancellationToken);
+            using var request = CreateAuthorizedGetRequest(path);
+            using var response = await HttpClient.SendAsync(request, cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
                 Logger.Warning("插件接口请求失败: {StatusCode} {Path}", response.StatusCode, path);

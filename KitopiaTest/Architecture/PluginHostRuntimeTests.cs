@@ -1,5 +1,6 @@
 using Kitopia.Desktop.Features.Services.Plugin;
 using PluginCore;
+using PluginCore.Config;
 
 namespace KitopiaTest.Architecture;
 
@@ -130,5 +131,35 @@ public sealed class PluginHostRuntimeTests
         vm.SearchAuthorCommand.Execute(pluginItem);
         Assert.AreEqual("@Maklith", vm.Keyword);
         Assert.AreEqual(1, vm.CurrentPage);
+    }
+
+    [TestMethod]
+    public void PluginNetworkService_CreateAuthorizedGetRequest_AttachesBearerTokenWhenPresent()
+    {
+        var originalConfigs = Kitopia.Desktop.Features.Services.Config.ConfigManger.Configs;
+        try
+        {
+            var config = new Kitopia.Desktop.Features.Services.Config.KitopiaConfig();
+            Kitopia.Desktop.Features.Services.Config.ConfigManger.Configs = new Dictionary<string, ConfigBase>
+            {
+                ["KitopiaConfig"] = config
+            };
+
+            // Case 1: No token
+            config.userToken = string.Empty;
+            using var anonymousReq = Kitopia.Desktop.Features.Services.Plugin.PluginNetworkService.CreateAuthorizedGetRequest("all");
+            Assert.IsNull(anonymousReq.Headers.Authorization);
+
+            // Case 2: Token present
+            config.userToken = "test_desktop_token_12345";
+            using var authReq = Kitopia.Desktop.Features.Services.Plugin.PluginNetworkService.CreateAuthorizedGetRequest("all");
+            Assert.IsNotNull(authReq.Headers.Authorization);
+            Assert.AreEqual("Bearer", authReq.Headers.Authorization.Scheme);
+            Assert.AreEqual("test_desktop_token_12345", authReq.Headers.Authorization.Parameter);
+        }
+        finally
+        {
+            Kitopia.Desktop.Features.Services.Config.ConfigManger.Configs = originalConfigs;
+        }
     }
 }

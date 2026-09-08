@@ -1,8 +1,11 @@
 using System.Collections.ObjectModel;
 using Avalonia.Controls.Notifications;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Kitopia.Desktop.Features.Services;
+using Kitopia.Desktop.Features.Services.Account;
+using Kitopia.Desktop.Features.Services.Interfaces;
 using Kitopia.Desktop.Features.Services.Plugin;
 using Kitopia.Desktop.Features.UI.UiControls.Plugin;
 using Kitopia.Desktop.Features.ViewModel.Pages.plugin;
@@ -31,6 +34,7 @@ public partial class MarketPageViewModel : ObservableObject
 
     private int _loadGeneration;
     private CancellationTokenSource? _searchCts;
+    private readonly IAccountService? _accountService;
 
     public IReadOnlyList<PlatformOption> PlatformOptions { get; } =
     [
@@ -46,14 +50,45 @@ public partial class MarketPageViewModel : ObservableObject
     public string PageDisplayText => $"{CurrentPage} / {TotalPages}";
     public bool HasNoPlugins => !IsLoading && Plugins.Count == 0;
 
-    public MarketPageViewModel()
+    public MarketPageViewModel() : this(null)
     {
+    }
+
+    public MarketPageViewModel(IAccountService? accountService)
+    {
+        _accountService = accountService;
+        if (_accountService != null)
+        {
+            _accountService.UserStateChanged += OnUserStateChanged;
+        }
+
         _selectedPlatform = PlatformOptions[0];
         _ = LoadPluginsAsync();
     }
 
+    private void OnUserStateChanged(UserInfo? user)
+    {
+        if (Avalonia.Application.Current == null || Dispatcher.UIThread.CheckAccess())
+        {
+            CurrentPage = 1;
+            _ = LoadPluginsAsync();
+            return;
+        }
+
+        Dispatcher.UIThread.Post(() =>
+        {
+            CurrentPage = 1;
+            _ = LoadPluginsAsync();
+        });
+    }
+
     ~MarketPageViewModel()
     {
+        if (_accountService != null)
+        {
+            _accountService.UserStateChanged -= OnUserStateChanged;
+        }
+
         for (var i = 0; i < _plugins.Count; i++) _plugins[i].Icon?.Dispose();
     }
 
