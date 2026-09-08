@@ -40,6 +40,7 @@ public class KitopiaConfig : ConfigBase
     ];
 
     public List<string> alwayShows = new();
+    public string userToken = string.Empty;
 
     public Dictionary<string, string> OnnxTargetDevices = new();
     public Dictionary<string, string> deviceCustomNames = new();
@@ -225,6 +226,12 @@ public class KitopiaConfig : ConfigBase
     {
         await ServiceManager.Services.GetService<IApplicationService>()!.CheckUpdate(true);
     }
+
+#if DEBUG
+    [ConfigFieldCategory("开发者调试")]
+    [ConfigField("使用本地调试服务器", "开启后将所有远程 kitopia.top 改为 localhost 用于调试 (API: https://localhost:5111, Web: http://localhost:3000)", 0xf226, ConfigFieldType.布尔)]
+    public bool useLocalhostDebug = false;
+#endif
     
     public override void BeforeLoad()
     {

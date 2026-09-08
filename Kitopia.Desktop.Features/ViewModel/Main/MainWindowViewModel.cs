@@ -11,6 +11,9 @@ using PluginCore;
 
 #endregion
 
+using Avalonia.Media.Imaging;
+using Kitopia.Desktop.Features.Services.Account;
+
 namespace Kitopia.Desktop.Features.ViewModel.Main;
 
 /// <summary>
@@ -19,15 +22,73 @@ namespace Kitopia.Desktop.Features.ViewModel.Main;
 public partial class MainWindowViewModel : ObservableRecipient
 {
     private readonly INavigationService _navigationService;
-    [ObservableProperty] private object? _content;
+    private readonly IAccountService? _accountService;
 
+    [ObservableProperty] private object? _content;
     [ObservableProperty] private bool _settingPage;
 
-    public MainWindowViewModel(INavigationService navigationService)
+    [ObservableProperty] private bool _isUserLoggedIn;
+    [ObservableProperty] private string _userAvatarTooltip = "登录账户";
+    [ObservableProperty] private string _userAvatarInitial = "U";
+    [ObservableProperty] private Bitmap? _userAvatarBitmap;
+
+    public MainWindowViewModel(INavigationService navigationService, IAccountService? accountService = null)
     {
         _navigationService = navigationService;
+        _accountService = accountService;
+        if (_accountService != null)
+        {
+            _accountService.UserStateChanged += OnUserStateChanged;
+            UpdateAccountState(_accountService.CurrentUser);
+        }
+
         _navigationService.PageNavigated += OnPageNavigated;
         OnPageNavigated(_navigationService.CurrentPageRoute ?? "home");
+    }
+
+    private void OnUserStateChanged(UserInfo? user)
+    {
+        Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+        {
+            UpdateAccountState(user);
+        });
+    }
+
+    private void UpdateAccountState(UserInfo? user)
+    {
+        IsUserLoggedIn = user != null;
+        UserAvatarTooltip = user != null ? $"已登录: {user.DisplayName}" : "登录账户";
+        var name = user?.DisplayName ?? user?.UserName ?? "U";
+        UserAvatarInitial = !string.IsNullOrWhiteSpace(name) ? name.Substring(0, 1).ToUpperInvariant() : "U";
+
+        Bitmap? newBitmap = null;
+        if (user?.AvatarBytes is { Length: > 0 })
+        {
+            try
+            {
+                newBitmap = new Bitmap(new System.IO.MemoryStream(user.AvatarBytes));
+            }
+            catch
+            {
+                newBitmap = null;
+            }
+        }
+        else if (!string.IsNullOrWhiteSpace(user?.AvatarLocalPath) && System.IO.File.Exists(user.AvatarLocalPath))
+        {
+            try
+            {
+                var bytes = System.IO.File.ReadAllBytes(user.AvatarLocalPath);
+                newBitmap = new Bitmap(new System.IO.MemoryStream(bytes));
+            }
+            catch
+            {
+                newBitmap = null;
+            }
+        }
+
+        var oldBitmap = UserAvatarBitmap;
+        UserAvatarBitmap = newBitmap;
+        oldBitmap?.Dispose();
     }
 
     public ObservableCollection<MenuItemViewModel> MenuItems { get; } = new()
@@ -125,6 +186,12 @@ public partial class MainWindowViewModel : ObservableRecipient
 
     [RelayCommand]
     public void ActivateSettingPage()
+    {
+        _navigationService.Navigate("settings");
+    }
+
+    [RelayCommand]
+    public void ActivateAccountPage()
     {
         _navigationService.Navigate("settings");
     }

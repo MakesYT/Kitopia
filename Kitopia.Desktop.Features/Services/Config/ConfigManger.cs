@@ -24,9 +24,39 @@ public class ConfigManger : IConfigService
 {
     private static ILogger Logger = LogManager.Logger.ForContext<ConfigManger>();
     public static Version Version = new("1.0.0");
-    public static string ApiUrl = "https://api.kitopia.top:5111";
+    public static string ApiUrl
+    {
+        get
+        {
+#if DEBUG
+            if (Configs.TryGetValue("KitopiaConfig", out var configBase) &&
+                configBase is KitopiaConfig config &&
+                config.useLocalhostDebug)
+            {
+                return "https://localhost:5111";
+            }
+#endif
+            return "https://api.kitopia.top:5111";
+        }
+    }
+
+    public static string WebUrl
+    {
+        get
+        {
+#if DEBUG
+            if (Configs.TryGetValue("KitopiaConfig", out var configBase) &&
+                configBase is KitopiaConfig config &&
+                config.useLocalhostDebug)
+            {
+                return "http://localhost:3000";
+            }
+#endif
+            return "https://kitopia.top";
+        }
+    }
     public static Dictionary<string, ConfigBase> Configs = new();
-    public static KitopiaConfig Config => (KitopiaConfig)Configs["KitopiaConfig"];
+    public static KitopiaConfig Config => Configs.TryGetValue("KitopiaConfig", out var config) ? (KitopiaConfig)config : null!;
 
     private static readonly Dictionary<HotKeyModel, (object, FieldInfo)> hotkeysMappings = new();
 
@@ -217,6 +247,7 @@ public class ConfigManger : IConfigService
 
     Version IConfigService.Version => Version;
     string IConfigService.ApiUrl => ApiUrl;
+    string IConfigService.WebUrl => WebUrl;
     Dictionary<string, ConfigBase> IConfigService.Configs => Configs;
     KitopiaConfig IConfigService.Config => Config;
     JsonSerializerOptions IConfigService.DefaultOptions => DefaultOptions;

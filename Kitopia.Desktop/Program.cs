@@ -10,6 +10,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using ReactiveUI;
 using Kitopia.Desktop.Features.CustomScenario;
+using Kitopia.Desktop.Features.Services.Account;
 using Kitopia.Desktop.Features.Services;
 using Kitopia.Desktop.Features.Services.Config;
 using Kitopia.Feature.DeviceCommunication.Discovery;
@@ -18,6 +19,7 @@ using Kitopia.Desktop.Features.Services.MQTT;
 using Kitopia.Desktop.Features.Services.Onnx;
 using Kitopia.Desktop.Features.Services.Plugin;
 using Kitopia.Desktop.Features.Utils;
+using Kitopia.Desktop.Features.ViewModel.Account;
 using Kitopia.Desktop.Features.ViewModel.Main;
 using Kitopia.Desktop.Features.ViewModel.Pages;
 using Kitopia.Desktop.Features.ViewModel.Pages.plugin;
@@ -144,6 +146,8 @@ internal class Program {
         services.AddTransient<IScreenCaptureWindow, ScreenCaptureWindow>();
 
         services.AddSingleton<IConfigService, ConfigManger>();
+        services.AddSingleton<IAccountService, AccountService>();
+        services.AddSingleton<AccountCardViewModel>();
         services.AddSingleton<IDeviceIdentityStore, DesktopDeviceIdentityStore>();
         services.AddSingleton<Kitopia.Feature.DeviceCommunication.Codecs.IDeviceIdentityProvider,
             Kitopia.Feature.DeviceCommunication.Identity.DeviceIdentityProvider>();
@@ -325,6 +329,22 @@ internal class Program {
         Logger.Debug("注册热键管理器完成");
         ConfigManger.Init();
         Logger.Information("配置文件初始化完成");
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                var accountService = ServiceManager.Services.GetService<IAccountService>();
+                if (accountService != null)
+                {
+                    await accountService.InitializeAsync();
+                    Logger.Information("账户服务后台初始化完成");
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "账户服务异步初始化失败");
+            }
+        });
         PluginOverall.InitializeContextMenu();
         ServiceManager.Services.GetService<IHotKetImpl>()!.StartHook();
 

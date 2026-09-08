@@ -9,6 +9,7 @@ public interface IConfigService
 {
     Version Version => throw new NotSupportedException();
     string ApiUrl => throw new NotSupportedException();
+    string WebUrl => throw new NotSupportedException();
     Dictionary<string, ConfigBase> Configs => throw new NotSupportedException();
     KitopiaConfig Config => throw new NotSupportedException();
     JsonSerializerOptions DefaultOptions => throw new NotSupportedException();

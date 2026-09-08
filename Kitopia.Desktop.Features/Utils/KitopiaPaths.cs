@@ -28,6 +28,8 @@ public static class KitopiaPaths
     public static string GetPluginAvatarPath(string pluginSign) =>
         Path.Combine(GetPluginDirectory(pluginSign), "avatar.png");
 
+    public static string UserAvatarPath => Path.Combine(AppRoot, "user_avatar.png");
+
     public static string GetTempFilePath(string fileName) => Path.Combine(TempDirectory, fileName);
 
     private static string BuildAppRoot()

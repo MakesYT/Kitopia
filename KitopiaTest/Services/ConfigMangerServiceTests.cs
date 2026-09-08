@@ -5,6 +5,7 @@ using PluginCore.Config;
 namespace KitopiaTest.Services;
 
 [TestClass]
+[DoNotParallelize]
 public sealed class ConfigMangerServiceTests
 {
     [TestMethod]
@@ -33,5 +34,32 @@ public sealed class ConfigMangerServiceTests
         {
             ConfigManger.Configs = originalConfigs;
         }
+    }
+
+    [TestMethod]
+    public void ConfigManger_WhenUseLocalhostDebugEnabled_ReturnsLocalhostUrls()
+    {
+#if DEBUG
+        var originalConfigs = ConfigManger.Configs;
+        try
+        {
+            var config = new KitopiaConfig { Name = "KitopiaConfig", useLocalhostDebug = true };
+            ConfigManger.Configs = new Dictionary<string, ConfigBase>
+            {
+                ["KitopiaConfig"] = config
+            };
+
+            Assert.AreEqual("https://localhost:5111", ConfigManger.ApiUrl);
+            Assert.AreEqual("http://localhost:3000", ConfigManger.WebUrl);
+
+            config.useLocalhostDebug = false;
+            Assert.AreEqual("https://api.kitopia.top:5111", ConfigManger.ApiUrl);
+            Assert.AreEqual("https://kitopia.top", ConfigManger.WebUrl);
+        }
+        finally
+        {
+            ConfigManger.Configs = originalConfigs;
+        }
+#endif
     }
 }

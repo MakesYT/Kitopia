@@ -11,7 +11,19 @@ public class PluginNetworkService
     private const string PluginApiPath = "api/v1/plugin";
     private static readonly ILogger Logger = LogManager.Logger.ForContext<PluginNetworkService>();
 
-    public static readonly HttpClient HttpClient = new()
+    public static readonly HttpClient HttpClient = new(new HttpClientHandler
+    {
+#if DEBUG
+        ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>
+        {
+            if (message.RequestUri?.IsLoopback == true)
+            {
+                return true;
+            }
+            return errors == System.Net.Security.SslPolicyErrors.None;
+        }
+#endif
+    })
     {
         DefaultRequestHeaders =
         {
@@ -63,8 +75,14 @@ public class PluginNetworkService
             Logger.Debug("从服务器下载插件 {PluginSignName} 版本 {Version}", pluginSignName, version);
             var downloadPath = GetPluginApiUrl(
                 $"download/{GetCurrentPlatformType()}/{Uri.EscapeDataString(pluginSignName)}/{Uri.EscapeDataString(version)}");
-            using var response = await HttpClient.GetAsync(
-                downloadPath,
+            using var request = new HttpRequestMessage(HttpMethod.Get, downloadPath);
+            var token = ConfigManger.Config?.userToken;
+            if (!string.IsNullOrWhiteSpace(token))
+            {
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            }
+            using var response = await HttpClient.SendAsync(
+                request,
                 HttpCompletionOption.ResponseHeadersRead,
                 cancellationToken);
             response.EnsureSuccessStatusCode();

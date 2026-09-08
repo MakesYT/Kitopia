@@ -197,47 +197,99 @@
                     </u:NavMenu.IconTemplate>
                     <u:NavMenu.Footer>
                         <Border Margin="4,4,4,6">
-                            <Button HorizontalAlignment="Stretch" Height="40" ToolTip.Tip="设置"
-                                    Classes.selected="{Binding SettingPage}"
-                                    CornerRadius="6"
-                                    Padding="0"
-                                    HorizontalContentAlignment="Center"
-                                    VerticalContentAlignment="Center"
-                                    Command="{Binding ActivateSettingPageCommand}">
-                                <Button.Styles>
-                                    <Style Selector="Button">
-                                        <Setter Property="Background" Value="Transparent" />
-                                        <Setter Property="BorderThickness" Value="0" />
-                                        <Setter Property="Padding" Value="0" />
-                                    </Style>
-                                    <Style Selector="Button:pointerover /template/ ContentPresenter">
-                                        <Setter Property="Background" Value="{DynamicResource ListBoxItemPointeroverBackground}" />
-                                    </Style>
-                                    <Style Selector="Button.selected /template/ ContentPresenter">
-                                        <Setter Property="Background" Value="{DynamicResource ListBoxItemSelectedBackground}" />
-                                    </Style>
-                                    <Style Selector="Button.selected:pointerover /template/ ContentPresenter">
-                                        <Setter Property="Background" Value="{DynamicResource ListBoxItemSelectedPointeroverBackground}" />
-                                    </Style>
-                                </Button.Styles>
-                                <Panel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                    <controls:FontIcon
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Center"
-                                        IsVisible="{Binding !SettingPage}"
-                                        Foreground="{DynamicResource SemiColorText1}"
-                                        Width="20" Height="20" FontSize="20"
-                                        Glyph="&#xf6aa;" />
-                                    <controls:FontIcon
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Center"
-                                        IsVisible="{Binding SettingPage}"
-                                        Foreground="{DynamicResource SemiColorPrimary}"
-                                        Width="20" Height="20" FontSize="20"
-                                        IsFilled="True"
-                                        GlyphFilled="&#xf6b3;" />
-                                </Panel>
-                            </Button>
+                            <StackPanel Spacing="2">
+                                <!-- User Profile Quick Entry Button -->
+                                <Button HorizontalAlignment="Stretch" Height="40"
+                                        ToolTip.Tip="{Binding UserAvatarTooltip}"
+                                        CornerRadius="6"
+                                        Padding="0"
+                                        HorizontalContentAlignment="Center"
+                                        VerticalContentAlignment="Center"
+                                        Command="{Binding ActivateAccountPageCommand}">
+                                    <Button.Styles>
+                                        <Style Selector="Button">
+                                            <Setter Property="Background" Value="Transparent" />
+                                            <Setter Property="BorderThickness" Value="0" />
+                                            <Setter Property="Padding" Value="0" />
+                                        </Style>
+                                        <Style Selector="Button:pointerover /template/ ContentPresenter">
+                                            <Setter Property="Background" Value="{DynamicResource ListBoxItemPointeroverBackground}" />
+                                        </Style>
+                                    </Button.Styles>
+                                    <Panel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <!-- Logged Out Icon -->
+                                        <controls:FontIcon
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            IsVisible="{Binding !IsUserLoggedIn}"
+                                            Foreground="{DynamicResource SemiColorText1}"
+                                            Width="20" Height="20" FontSize="20"
+                                            Glyph="&#xf5bd;" />
+
+                                        <!-- Logged In Avatar -->
+                                        <Border Width="24" Height="24"
+                                                CornerRadius="12"
+                                                ClipToBounds="True"
+                                                IsVisible="{Binding IsUserLoggedIn}"
+                                                Background="{DynamicResource KitopiaAvatarBackground}">
+                                            <Panel>
+                                                <TextBlock Text="{Binding UserAvatarInitial}"
+                                                           FontSize="11" FontWeight="Bold"
+                                                           Foreground="{DynamicResource KitopiaAvatarForeground}"
+                                                           HorizontalAlignment="Center"
+                                                           VerticalAlignment="Center" />
+                                                <Image Source="{Binding UserAvatarBitmap}"
+                                                       Width="24" Height="24"
+                                                       Stretch="UniformToFill"
+                                                       IsVisible="{Binding UserAvatarBitmap, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                                            </Panel>
+                                        </Border>
+                                    </Panel>
+                                </Button>
+
+                                <!-- Settings Button -->
+                                <Button HorizontalAlignment="Stretch" Height="40" ToolTip.Tip="设置"
+                                        Classes.selected="{Binding SettingPage}"
+                                        CornerRadius="6"
+                                        Padding="0"
+                                        HorizontalContentAlignment="Center"
+                                        VerticalContentAlignment="Center"
+                                        Command="{Binding ActivateSettingPageCommand}">
+                                    <Button.Styles>
+                                        <Style Selector="Button">
+                                            <Setter Property="Background" Value="Transparent" />
+                                            <Setter Property="BorderThickness" Value="0" />
+                                            <Setter Property="Padding" Value="0" />
+                                        </Style>
+                                        <Style Selector="Button:pointerover /template/ ContentPresenter">
+                                            <Setter Property="Background" Value="{DynamicResource ListBoxItemPointeroverBackground}" />
+                                        </Style>
+                                        <Style Selector="Button.selected /template/ ContentPresenter">
+                                            <Setter Property="Background" Value="{DynamicResource ListBoxItemSelectedBackground}" />
+                                        </Style>
+                                        <Style Selector="Button.selected:pointerover /template/ ContentPresenter">
+                                            <Setter Property="Background" Value="{DynamicResource ListBoxItemSelectedPointeroverBackground}" />
+                                        </Style>
+                                    </Button.Styles>
+                                    <Panel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <controls:FontIcon
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            IsVisible="{Binding !SettingPage}"
+                                            Foreground="{DynamicResource SemiColorText1}"
+                                            Width="20" Height="20" FontSize="20"
+                                            Glyph="&#xf6aa;" />
+                                        <controls:FontIcon
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            IsVisible="{Binding SettingPage}"
+                                            Foreground="{DynamicResource SemiColorPrimary}"
+                                            Width="20" Height="20" FontSize="20"
+                                            IsFilled="True"
+                                            GlyphFilled="&#xf6b3;" />
+                                    </Panel>
+                                </Button>
+                            </StackPanel>
                         </Border>
                     </u:NavMenu.Footer>
 

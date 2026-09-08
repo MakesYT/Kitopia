@@ -3,13 +3,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:pages="clr-namespace:Kitopia.Desktop.Features.ViewModel.Pages;assembly=Kitopia.Desktop.Features"
+             xmlns:controls="clr-namespace:Kitopia.Desktop.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="pages:SettingPageViewModel"
              x:Class="Kitopia.Desktop.Pages.SettingPage">
     <UserControl.Resources>
     </UserControl.Resources>
 
-    <Grid RowDefinitions="Auto,*" Margin="{DynamicResource SemiThicknessExtraLoose}" RowSpacing="16">
+    <Grid RowDefinitions="Auto,Auto,*" Margin="{DynamicResource SemiThicknessExtraLoose}" RowSpacing="16">
         <!-- 1. Header: Preferences & Configuration + Title + Subtitle -->
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto" VerticalAlignment="Bottom">
             <StackPanel Grid.Column="0">
@@ -20,7 +21,10 @@
             </StackPanel>
         </Grid>
 
-        <ScrollViewer Grid.Row="1" Name="SettingsScrollViewer">
+        <!-- 2. Account Profile & Login Card -->
+        <controls:AccountCardControl Grid.Row="1" />
+
+        <ScrollViewer Grid.Row="2" Name="SettingsScrollViewer">
             <StackPanel VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                         Name="StackPanel" />
         </ScrollViewer>

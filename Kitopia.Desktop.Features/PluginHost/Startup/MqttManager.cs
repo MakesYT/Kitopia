@@ -1,4 +1,5 @@
 using System.Buffers;
+using System.Net;
 using System.Text;
 using Avalonia;
 using Avalonia.Controls;
@@ -85,7 +86,9 @@ public class MqttManager
         restart:
         MqttServerFactory mqttServerFactory = new MqttServerFactory();
         var mqttServerOptions = mqttServerFactory.CreateServerOptionsBuilder()
-            .WithDefaultEndpoint().WithDefaultEndpointPort(nowPort).Build();
+            .WithDefaultEndpoint()
+            .WithDefaultEndpointBoundIPAddress(IPAddress.Loopback)
+            .WithDefaultEndpointPort(nowPort).Build();
         Server = mqttServerFactory.CreateMqttServer(mqttServerOptions);
         Server.ClientConnectedAsync += Server_ClientConnectedAsync;
         Server.ClientDisconnectedAsync += Server_ClientDisconnectedAsync;
@@ -284,7 +287,30 @@ public class MqttManager
             case StartupAction.PluginRemove:
                 if (!string.IsNullOrEmpty(value))
                 {
-                    PluginManager.DeletePlugin(value);
+                    var pluginInfo = PluginManager.GetPluginLocalInfoByPlgStr(value);
+                    var pluginDisplayName = pluginInfo != null ? pluginInfo.PluginBaseInfo.Name : value;
+                    var request = new ToastRequest
+                    {
+                        Header = "卸载插件确认",
+                        Text = $"收到来自外部的卸载请求，是否确认删除插件【{pluginDisplayName}】（{value}）？",
+                        NotificationType = Avalonia.Controls.Notifications.NotificationType.Warning,
+                        AutoCloseDelay = null,
+                        Actions =
+                        [
+                            new ToastAction
+                            {
+                                Text = "确认卸载",
+                                IsPrimary = true,
+                                Callback = () =>
+                                {
+                                    PluginManager.DeletePlugin(value);
+                                    toast?.Show("插件操作", $"插件【{pluginDisplayName}】已成功卸载");
+                                }
+                            },
+                            new ToastAction { Text = "取消" }
+                        ]
+                    };
+                    await ShowPluginInstallDialogAsync(request, toast);
                 }
                 break;
             case StartupAction.LanFileShare:
@@ -334,6 +360,45 @@ public class MqttManager
 
                     await Dispatcher.UIThread.InvokeAsync(() => windowService.ShowForScope(rootDir, targetFiles));
                 }
+                break;
+            }
+            case StartupAction.Login:
+            {
+                var code = jObject["code"]?.ToString();
+                var state = jObject["state"]?.ToString();
+                if (string.IsNullOrWhiteSpace(code))
+                {
+                    code = value;
+                }
+
+                var accountService = ServiceManager.Services.GetService<IAccountService>();
+                if (accountService != null)
+                {
+                    if (!string.IsNullOrWhiteSpace(code))
+                    {
+                        await accountService.ExchangeCodeAndLoginAsync(code, state);
+                    }
+                    else
+                    {
+                        Logger.Warning("收到 Login 动作但未提供合法的 authorization_code，已拒绝");
+                    }
+                }
+
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop &&
+                        desktop.MainWindow != null)
+                    {
+                        desktop.MainWindow.Show();
+                        desktop.MainWindow.WindowState = WindowState.Normal;
+                        desktop.MainWindow.Activate();
+                        var platformHandle = desktop.MainWindow.TryGetPlatformHandle();
+                        if (platformHandle is not null)
+                        {
+                            ServiceManager.Services.GetService<IWindowTool>()?.SetForegroundWindow(platformHandle.Handle);
+                        }
+                    }
+                });
                 break;
             }
         }
