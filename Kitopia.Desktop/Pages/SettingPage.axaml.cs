@@ -129,6 +129,11 @@ public partial class SettingPage : UserControl
                                   
         Application.Current.TryGetResource("FluentFont", null, out var font);
         if (configBase is null) return;
+        if (string.IsNullOrWhiteSpace(configBase.Name))
+        {
+            configBase.Name = ConfigManger.Configs.FirstOrDefault(x => x.Value == configBase).Key
+                              ?? (configBase is KitopiaConfig ? "KitopiaConfig" : string.Empty);
+        }
         foreach (var fieldInfo in configBase.GetType()
                      .GetFields(BindingFlags.Instance | BindingFlags.Public))
         {
@@ -186,12 +191,21 @@ public partial class SettingPage : UserControl
                             CornerRadius = new CornerRadius(6),
                             VerticalContentAlignment = VerticalAlignment.Center
                         };
+                        var isInitial = true;
                         disposables.Add(textBox.GetObservable(TextBox.TextProperty)
                             .Subscribe((d) =>
                             {
+                                if (isInitial)
+                                {
+                                    isInitial = false;
+                                    return;
+                                }
                                 configBase.OnConfigChanged(this, fieldInfo.Name, d);
                                 fieldInfo.SetValue(configBase, d);
-                                ConfigManger.Save(configBase.Name);
+                                if (!string.IsNullOrWhiteSpace(configBase.Name))
+                                {
+                                    ConfigManger.Save(configBase.Name);
+                                }
                             }));
                         SettingsExpander.Footer = textBox;
                         break;

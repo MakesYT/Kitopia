@@ -65,6 +65,7 @@ public class Plugin
             var deserializeObject =
                 JsonSerializer.Deserialize(json, configBase.GetType(), ConfigManger.DefaultOptions)! as ConfigBase ??
                 configBase;
+            deserializeObject.Name = key;
             if (!ConfigManger.Configs.TryAdd(key, deserializeObject)) ConfigManger.Configs[key] = deserializeObject;
 
             deserializeObject.GetType()

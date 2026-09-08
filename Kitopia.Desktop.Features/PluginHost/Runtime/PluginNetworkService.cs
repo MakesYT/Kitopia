@@ -1,8 +1,12 @@
 using System.IO.Compression;
+using System.Net;
 using System.Net.Http.Headers;
 using Kitopia.Desktop.Features.Services.Config;
+using Kitopia.Desktop.Features.Services.Interfaces;
 using Kitopia.Desktop.Features.Utils;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using PluginCore;
 using Serilog;
 
 namespace Kitopia.Desktop.Features.Services.Plugin;
@@ -92,6 +96,7 @@ public class PluginNetworkService
                 request,
                 HttpCompletionOption.ResponseHeadersRead,
                 cancellationToken);
+            HandlePossibleUnauthorized(response.StatusCode);
             response.EnsureSuccessStatusCode();
 
             var tempPath = Path.Combine(KitopiaPaths.TempDirectory, $"{Guid.NewGuid():N}.zip");
@@ -266,6 +271,7 @@ public class PluginNetworkService
             using var response = await HttpClient.SendAsync(request, cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
+                HandlePossibleUnauthorized(response.StatusCode);
                 Logger.Warning("插件接口请求失败: {StatusCode} {Path}", response.StatusCode, path);
                 return default;
             }
@@ -278,6 +284,19 @@ public class PluginNetworkService
         {
             Logger.Error(exception, "请求插件接口错误: {Path}", path);
             return default;
+        }
+    }
+
+    private static void HandlePossibleUnauthorized(HttpStatusCode statusCode)
+    {
+        if (statusCode == HttpStatusCode.Unauthorized && !string.IsNullOrWhiteSpace(ConfigManger.Config?.userToken))
+        {
+            Logger.Warning("插件请求返回 401 Unauthorized，用户凭据已失效，触发账户自动刷新注销");
+            var accountService = ServiceManager.Services.GetService<IAccountService>();
+            if (accountService != null)
+            {
+                _ = Task.Run(async () => await accountService.RefreshUserInfoAsync());
+            }
         }
     }
 

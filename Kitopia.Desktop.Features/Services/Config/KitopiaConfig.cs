@@ -27,6 +27,11 @@ public enum ThemeEnum
 [ConfigName("Kitopia主配置文件")]
 public class KitopiaConfig : ConfigBase
 {
+    public KitopiaConfig()
+    {
+        Name = "KitopiaConfig";
+    }
+
     private static ILogger Logger = LogManager.Logger.ForContext<KitopiaConfig>();
     internal static readonly IReadOnlyList<string> DefaultTransientDirectoryNames =
     [

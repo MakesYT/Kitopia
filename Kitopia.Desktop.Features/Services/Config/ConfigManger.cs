@@ -99,9 +99,11 @@ public class ConfigManger : IConfigService
                             .OfType<string>());
                     }
                 }
-                Configs["KitopiaConfig"] =
+                var deserialized =
                     JsonSerializer.Deserialize(json, Config.GetType(), DefaultOptions)! as ConfigBase ??
                     Config;
+                deserialized.Name = "KitopiaConfig";
+                Configs["KitopiaConfig"] = deserialized;
                 foreach (var path in legacyCollections)
                 {
                     var target = Directory.Exists(path)
@@ -233,10 +235,19 @@ public class ConfigManger : IConfigService
         WeakReferenceMessenger.Default.Send<string, string>("ConfigSave", "ConfigSave");
     }
 
-    public static void Save(string key)
+    public static void Save(string? key)
     {
-        var configBase = Configs[key];
-        if (configBase is null) return;
+        if (string.IsNullOrWhiteSpace(key))
+        {
+            Logger.Warning("尝试保存配置但 key 为 null 或空，跳过保存");
+            return;
+        }
+
+        if (!Configs.TryGetValue(key, out var configBase) || configBase is null)
+        {
+            Logger.Warning("未找到 key 为 {Key} 的配置，跳过保存", key);
+            return;
+        }
 
         var configF = new FileInfo(KitopiaPaths.GetConfigFilePath(key));
 
