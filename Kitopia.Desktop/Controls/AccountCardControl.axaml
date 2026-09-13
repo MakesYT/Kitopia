@@ -1,0 +1,176 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:Kitopia.Desktop.Controls"
+             xmlns:vm="clr-namespace:Kitopia.Desktop.Features.ViewModel.Account;assembly=Kitopia.Desktop.Features"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="120"
+             x:DataType="vm:AccountCardViewModel"
+             x:Class="Kitopia.Desktop.Controls.AccountCardControl">
+
+    <Border Background="{DynamicResource KSemiColorBackground4}"
+            BorderBrush="{DynamicResource SemiColorBorder}"
+            BorderThickness="1"
+            CornerRadius="12"
+            Padding="18,14">
+        <Grid RowDefinitions="Auto,*" RowSpacing="10">
+            <!-- 1. Kicker Title -->
+            <TextBlock Grid.Row="0"
+                       Text="KITOPIA 账户"
+                       FontSize="11"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource SemiColorText2}"
+                       LetterSpacing="0.5" />
+
+            <!-- 2. Main Profile Content Row -->
+            <Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="16" VerticalAlignment="Center">
+                <!-- Left: Avatar -->
+                <Border Grid.Column="0"
+                        Width="46" Height="46"
+                        CornerRadius="23"
+                        ClipToBounds="True"
+                        BorderBrush="{DynamicResource SemiColorBorder}"
+                        BorderThickness="1"
+                        Background="{DynamicResource KitopiaAvatarBackground}">
+                    <Panel>
+                        <!-- Not Logged In Default Icon -->
+                        <controls:FontIcon Glyph="&#xf5be;"
+                                           FontSize="24"
+                                           Foreground="{DynamicResource SemiColorText2}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           IsVisible="{Binding !IsLoggedIn}" />
+
+                        <!-- Logged In Initial Placeholder -->
+                        <TextBlock Text="{Binding AvatarInitial}"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="{DynamicResource KitopiaAvatarForeground}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   IsVisible="{Binding IsLoggedIn}" />
+
+                        <!-- Logged In Image Avatar -->
+                        <Image Source="{Binding AvatarBitmap}"
+                               Width="46" Height="46"
+                               Stretch="UniformToFill"
+                               IsVisible="{Binding AvatarBitmap, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                    </Panel>
+                </Border>
+
+                <!-- Center: Info Column -->
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="3">
+                    <!-- Not Logged In State -->
+                    <StackPanel Spacing="2" IsVisible="{Binding !IsLoggedIn}">
+                        <TextBlock Text="未登录 Kitopia 账户"
+                                   FontSize="15"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource SemiColorText0}" />
+                        <TextBlock Text="通过浏览器安全授权登录，同步个人资料并管理扩展插件。"
+                                   FontSize="12"
+                                   Foreground="{DynamicResource SemiColorText2}" />
+                    </StackPanel>
+
+                    <!-- Logged In State -->
+                    <StackPanel Spacing="2" IsVisible="{Binding IsLoggedIn}">
+                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding DisplayName}"
+                                       FontSize="15"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource SemiColorText0}"
+                                       VerticalAlignment="Center" />
+
+                            <!-- Role Badge (Fluent style: light green bg + dark green text) -->
+                            <Border Background="#E6F7EC"
+                                    CornerRadius="4"
+                                    Padding="6,1.5"
+                                    VerticalAlignment="Center">
+                                <TextBlock Text="{Binding PrimaryRole}"
+                                           Foreground="#107C41"
+                                           FontSize="11"
+                                           FontWeight="Medium" />
+                            </Border>
+                        </StackPanel>
+
+                        <TextBlock FontSize="12"
+                                   Foreground="{DynamicResource SemiColorText2}">
+                            <Run Text="@" /><Run Text="{Binding UserName}" /><Run Text="  ·  " /><Run Text="{Binding Email}" />
+                        </TextBlock>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Right: Action Buttons -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <!-- Not Logged In Actions -->
+                    <Panel IsVisible="{Binding !IsLoggedIn}">
+                        <!-- Normal Login Trigger -->
+                        <Button Classes="Primary"
+                                IsVisible="{Binding !IsLoggingIn}"
+                                Command="{Binding LoginCommand}"
+                                Height="34"
+                                CornerRadius="6"
+                                Padding="16,0"
+                                VerticalContentAlignment="Center"
+                                Cursor="Hand">
+                            <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                <controls:FontIcon Glyph="&#xf45a;" FontSize="15" />
+                                <TextBlock Text="浏览器登录" FontSize="13" FontWeight="SemiBold" />
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Waiting in Browser State -->
+                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" IsVisible="{Binding IsLoggingIn}">
+                            <TextBlock Text="等待浏览器授权..."
+                                       FontSize="12"
+                                       Foreground="{DynamicResource SemiColorText2}"
+                                       VerticalAlignment="Center" />
+                            <Button Content="重新打开"
+                                    Command="{Binding LoginCommand}"
+                                    Height="30"
+                                    CornerRadius="6"
+                                    Padding="10,0"
+                                    FontSize="12"
+                                    Cursor="Hand" />
+                            <Button Content="取消"
+                                    Command="{Binding CancelLoginCommand}"
+                                    Height="30"
+                                    CornerRadius="6"
+                                    Padding="10,0"
+                                    FontSize="12"
+                                    Cursor="Hand" />
+                        </StackPanel>
+                    </Panel>
+
+                    <!-- Logged In Actions -->
+                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" IsVisible="{Binding IsLoggedIn}">
+                        <Button Content="管理网页账户"
+                                Command="{Binding OpenWebAccountCommand}"
+                                Height="32"
+                                CornerRadius="6"
+                                Padding="12,0"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Cursor="Hand" />
+                        <Button Content="刷新"
+                                Command="{Binding RefreshCommand}"
+                                Height="32"
+                                CornerRadius="6"
+                                Padding="12,0"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Cursor="Hand" />
+                        <Button Content="退出登录"
+                                Command="{Binding LogoutCommand}"
+                                Height="32"
+                                CornerRadius="6"
+                                Padding="12,0"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Theme="{DynamicResource KitopiaDangerSubtleButton}"
+                                Cursor="Hand" />
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>
